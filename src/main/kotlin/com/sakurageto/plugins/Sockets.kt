@@ -7,14 +7,18 @@ import io.ktor.websocket.*
 import java.time.Duration
 import io.ktor.server.application.*
 import com.sakurageto.RoomInformation
+import com.sakurageto.gamelogic.SakuraGame
+import com.sakurageto.protocol.CommandEnum
+import com.sakurageto.protocol.SakuraSendData
 import io.ktor.server.response.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
+import kotlinx.coroutines.delay
 
 fun Application.configureSockets() {
     install(WebSockets) {
-        pingPeriod = Duration.ofSeconds(15)
-        timeout = Duration.ofSeconds(15)
+        pingPeriod = Duration.ofSeconds(180)
+        timeout = Duration.ofSeconds(180)
         maxFrameSize = Long.MAX_VALUE
         masking = false
     }
@@ -57,9 +61,10 @@ fun Application.configureSockets() {
                 if (RoomInformation.room_connection_hashmap[roomnumber]?.isEmpty() ?: true){
                     val thisconnection = Connection(this)
                     RoomInformation.room_connection_hashmap[roomnumber] = mutableListOf(thisconnection)
-                    while (true){
-                        Thread.sleep(5000)
+                    while(true){
+                        delay(200)
                     }
+
                 }
                 else{
                     if(RoomInformation.room_connection_hashmap[roomnumber]!!.size == 1){
@@ -67,9 +72,8 @@ fun Application.configureSockets() {
                         RoomInformation.room_connection_hashmap[roomnumber]!!.add(thisconnection)
                         val now1 = RoomInformation.room_connection_hashmap[roomnumber]!!.get(0)
                         val now2 = RoomInformation.room_connection_hashmap[roomnumber]!!.get(1)
-                        //make play section
-
-                        //make play section
+                        val game = SakuraGame(now1, now2)
+                        game.startGame()
                     }
                     else{
                         close(CloseReason(CloseReason.Codes.PROTOCOL_ERROR, "invalid room number"))

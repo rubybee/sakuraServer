@@ -1,12 +1,20 @@
 package com.sakurageto.gamelogic
 
+import com.sakurageto.card.CardName
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.SakuraSendData
 
 class PlayerStatus {
+    var aura = 3
+    var life = 10
+    var flare = 0
+
     lateinit var megami_1: MegamiEnum
     lateinit var megami_2: MegamiEnum
     lateinit var megami_ban: MegamiEnum
+
+    var unselected_card: MutableList<CardName> = mutableListOf()
+    var unselected_specialcard: MutableList<CardName> = mutableListOf()
 
     fun setMegamiSSangjang(data: SakuraSendData){
         megami_1 = MegamiEnum.fromInt(data.data?.get(0)!!)

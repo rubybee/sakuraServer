@@ -1,7 +1,10 @@
 package com.sakurageto.gamelogic
 
 import com.sakurageto.Connection
+import com.sakurageto.card.Card
+import com.sakurageto.card.CardName
 import com.sakurageto.protocol.CommandEnum
+import com.sakurageto.protocol.SakuraCardSetSend
 import com.sakurageto.protocol.SakuraSendData
 import com.typesafe.config.ConfigException.Null
 import io.ktor.server.websocket.*
@@ -11,6 +14,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.util.logging.LogManager
+import javax.swing.text.StyledEditorKit.BoldAction
 
 class SakuraGame(private val player1: Connection, private val player2: Connection) {
     private var game_mode: Int //0 = no ban 1 = pick ban
@@ -49,6 +53,34 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
         }
 
         return SakuraSendData(CommandEnum.SELECT_MODE, null)
+    }
+
+    suspend fun waitCardSetUntil(player_id: Int, wait_command: CommandEnum): SakuraCardSetSend? {
+        if (player_id == 1){
+            for (frame in player1.session.incoming) {
+                if (frame is Frame.Text) {
+                    val text = frame.readText()
+                    val data = Json.decodeFromString<SakuraCardSetSend>(text)
+                    if (data.command == wait_command){
+                        return data
+                    }
+                }
+            }
+        }
+
+        else {
+            for (frame in player2.session.incoming) {
+                if (frame is Frame.Text) {
+                    val text = frame.readText()
+                    val data = Json.decodeFromString<SakuraCardSetSend>(text)
+                    if (data.command == wait_command){
+                        return data
+                    }
+                }
+            }
+        }
+
+        return null
     }
 
     suspend fun selectMode(){
@@ -127,6 +159,76 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
         player2.session.send(Json.encodeToString(player2_player1_data))
     }
 
+    fun checkCardSet(bigger: MutableList<CardName>, smaller: MutableList<CardName>, size: Int): Boolean{
+        if (smaller.size == size && smaller.distinct().size == size){
+            for (item in smaller){
+                if (bigger.contains(item)){
+                    continue
+                }
+                return false
+            }
+            return true
+        }
+        else{
+            return false
+        }
+    }
+
+    suspend fun selectCard(){
+        player1_status.unselected_card.addAll(CardName.Companion.returnNormalCardNameByMegami(player1_status.megami_1))
+        player1_status.unselected_card.addAll(CardName.Companion.returnNormalCardNameByMegami(player1_status.megami_2))
+        player2_status.unselected_card.addAll(CardName.Companion.returnNormalCardNameByMegami(player2_status.megami_1))
+        player2_status.unselected_card.addAll(CardName.Companion.returnNormalCardNameByMegami(player2_status.megami_2))
+        player1_status.unselected_specialcard.addAll(CardName.Companion.returnSpecialCardNameByMegami(player1_status.megami_1))
+        player1_status.unselected_specialcard.addAll(CardName.Companion.returnSpecialCardNameByMegami(player1_status.megami_2))
+        player2_status.unselected_specialcard.addAll(CardName.Companion.returnSpecialCardNameByMegami(player2_status.megami_1))
+        player2_status.unselected_specialcard.addAll(CardName.Companion.returnSpecialCardNameByMegami(player2_status.megami_2))
+
+        val send_request_player1 = SakuraCardSetSend(CommandEnum.SELECT_CARD, player1_status.unselected_card, player1_status.unselected_specialcard)
+        val send_request_player2 = SakuraCardSetSend(CommandEnum.SELECT_CARD, player2_status.unselected_card, player2_status.unselected_specialcard)
+
+        player1.session.send(Json.encodeToString(send_request_player1))
+        player2.session.send(Json.encodeToString(send_request_player2))
+
+        val player1_data = waitCardSetUntil(1, CommandEnum.SELECT_CARD)
+        val player2_data = waitCardSetUntil(2, CommandEnum.SELECT_CARD)
+
+        var card_data_player1: MutableList<CardName>
+        var specialcard_data_player1: MutableList<CardName>
+        var card_data_player2 : MutableList<CardName>
+        var specialcard_data_player2 : MutableList<CardName>
+
+        if(checkCardSet(player1_status.unselected_card, player1_data!!.normal_card, 7))
+            card_data_player1 = player1_data!!.normal_card
+        else
+            card_data_player1 = player1_status.unselected_card.subList(0, 7)
+
+        if(checkCardSet(player2_status.unselected_card, player2_data!!.normal_card, 7))
+            card_data_player2 = player2_data!!.normal_card
+        else
+            card_data_player2 = player2_status.unselected_card.subList(0, 7)
+
+        if(checkCardSet(player1_status.unselected_specialcard, player1_data!!.special_card, 3))
+            specialcard_data_player1 = player1_data!!.special_card
+        else
+            specialcard_data_player1 = player1_status.unselected_specialcard.subList(0, 3)
+
+        if(checkCardSet(player2_status.unselected_specialcard, player2_data!!.special_card, 3))
+            specialcard_data_player2 = player2_data!!.special_card
+        else
+            specialcard_data_player2 = player2_status.unselected_specialcard.subList(0, 3)
+
+        val end_player1_select = SakuraCardSetSend(CommandEnum.END_SELECT_CARD, card_data_player1, specialcard_data_player1)
+        val end_player2_select = SakuraCardSetSend(CommandEnum.END_SELECT_CARD, card_data_player2, specialcard_data_player2)
+
+        player1.session.send(Json.encodeToString(end_player1_select))
+        player2.session.send(Json.encodeToString(end_player2_select))
+
+        //card make section
+
+        //card make section
+    }
+
     suspend fun startGame(){
         selectMode()
         selectEnd()
@@ -136,6 +238,6 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
             selectBan()
         }
         checkFinalMegami()
-
+        selectCard()
     }
 }

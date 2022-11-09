@@ -47,7 +47,7 @@ fun Application.configureSockets() {
                         close(CloseReason(CloseReason.Codes.NORMAL, "player match successly"))
                         break
                     }
-                    Thread.sleep(5000)
+                    delay(1000)
                 }
             }
         }

@@ -167,6 +167,9 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
                 }
                 return false
             }
+            for (item in smaller){
+                bigger.remove(item)
+            }
             return true
         }
         else{

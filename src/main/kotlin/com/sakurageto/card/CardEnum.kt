@@ -44,6 +44,24 @@ enum class TextEffectTimingTag(){
 
 enum class TextEffectTag() {
     NOW_ATTACK_ENCHANTMENT_PLUS,
+    NEXT_ATTACK_ENCHANTMENT,
+    CHANGE_CONCENTRATION,
+}
+
+enum class AttackBufTag(){
+    INSERT,
+    CHANGE_EACH,
+    MULTIPLE,
+    DIVIDE,
+    PLUS_MINUS,
+}
+
+enum class RangeBufTag(){
+    CHANGE,
+    ADD,
+    DELETE,
+    PLUS,
+    MINUS
 }
 
 enum class CardName() {

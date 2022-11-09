@@ -11,7 +11,6 @@ class Card(val card_data: CardData, val player: PlayerEnum) {
         vertical = true
         flipped = true
     }
-
     companion object{
         fun cardMakerByName(card_name: CardName, player: PlayerEnum): Card{
             return Card(returnCardDataByName(card_name), player)

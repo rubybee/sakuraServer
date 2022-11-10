@@ -39,21 +39,30 @@ enum class DistanceType {
 }
 
 enum class TextEffectTimingTag(){
-    CONSTANT_EFFECT
+    CONSTANT_EFFECT,
+    AFTER_DESTRUCTION,
+    IN_DEPLOYMENT,
 }
 
 enum class TextEffectTag() {
-    NOW_ATTACK_ENCHANTMENT_PLUS,
     NEXT_ATTACK_ENCHANTMENT,
     CHANGE_CONCENTRATION,
-}
+    CHASM,
+    MAKE_ATTACK,
+    MOVE_SAKURA_TOKEN,
 
+}
 enum class AttackBufTag(){
     INSERT,
     CHANGE_EACH,
     MULTIPLE,
     DIVIDE,
     PLUS_MINUS,
+    INSERT_IMMEDIATE,
+    CHANGE_EACH_IMMEDIATE,
+    MULTIPLE_IMMEDIATE,
+    DIVIDE_IMMEDIATE,
+    PLUS_MINUS_IMMEDIATE,
 }
 
 enum class RangeBufTag(){
@@ -61,7 +70,12 @@ enum class RangeBufTag(){
     ADD,
     DELETE,
     PLUS,
-    MINUS
+    MINUS,
+    CHANGE_IMMEDIATE,
+    ADD_IMMEDIATE,
+    DELETE_IMMEDIATE,
+    PLUS_IMMEDIATE,
+    MINUS_IMMEDIATE
 }
 
 enum class CardName() {

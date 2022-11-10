@@ -1,28 +1,42 @@
 package com.sakurageto.card
 
+import com.sakurageto.gamelogic.MegamiEnum
+
 class MadeAttack(
     var distance_type: DistanceType,
     var life_damage: Int,
     var aura_damage: Int,
     var distance_cont: Pair<Int, Int>?,
     var distance_uncont: Array<Boolean>?,
+    var megami: MegamiEnum
 ) {
 
     var cannot_react_normal = false
     var cannot_react_special = false
     var cannot_react = false
 
+    var chogek = false
+
+    fun Chogek(){
+        chogek = true
+    }
+
     fun auraPlusMinus(number: Int){
-        aura_damage += number
-        if(aura_damage < 0){
-            aura_damage = 0
+        if(aura_damage != 999){
+            aura_damage += number
+            if(aura_damage!! < 0){
+                aura_damage = 0
+            }
         }
+
     }
 
     fun lifePlusMinus(number: Int){
-        life_damage += number
-        if(life_damage < 0){
-            life_damage = 0
+        if(life_damage != 999){
+            life_damage += number
+            if(life_damage < 0){
+                life_damage = 0
+            }
         }
     }
     fun canNotReactNormal(){

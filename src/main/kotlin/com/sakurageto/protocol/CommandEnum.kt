@@ -12,4 +12,5 @@ enum class CommandEnum() {
     CHECK_ANOTHER,
     SELECT_CARD,
     END_SELECT_CARD,
+    RETURN_SPECIAL_CARD,
 }

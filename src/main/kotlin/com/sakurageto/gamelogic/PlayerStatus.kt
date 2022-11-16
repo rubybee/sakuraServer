@@ -11,6 +11,22 @@ class PlayerStatus {
     var max_aura = 5
     var aura = 3
 
+    var special_card_deck: ArrayDeque<Card> = ArrayDeque<Card>()
+    var normal_card_deck: ArrayDeque<Card> = ArrayDeque<Card>()
+    var used_special_card: ArrayDeque<Card> = ArrayDeque<Card>()
+
+    fun usedToSpecial(card_name: CardName): Boolean{
+        for(i in 0..used_special_card.size){
+            val now = used_special_card.first()
+            if(now.card_data.card_name == card_name){
+                special_card_deck.addLast(now)
+                return true
+            }
+            used_special_card.addLast(now)
+        }
+        return false
+    }
+
     //return using dust
     fun plusAura(number: Int): Int{
         if(max_aura > aura + number){

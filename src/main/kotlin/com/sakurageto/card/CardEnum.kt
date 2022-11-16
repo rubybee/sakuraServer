@@ -2,10 +2,20 @@ package com.sakurageto.card
 
 import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.MegamiEnum
+import com.sakurageto.gamelogic.PlayerStatus
 
 enum class PlayerEnum {
     PLAYER1,
-    PLAYER2
+    PLAYER2;
+
+    fun Opposite(): PlayerEnum{
+        if(this == PLAYER1){
+            return PlayerEnum.PLAYER2
+        }
+        else{
+            return PlayerEnum.PLAYER1
+        }
+    }
 }
 
 enum class SpecialCardEnum {
@@ -42,6 +52,7 @@ enum class TextEffectTimingTag(){
     CONSTANT_EFFECT,
     AFTER_DESTRUCTION,
     IN_DEPLOYMENT,
+    USED,
 }
 
 enum class TextEffectTag() {
@@ -50,8 +61,11 @@ enum class TextEffectTag() {
     CHASM,
     MAKE_ATTACK,
     MOVE_SAKURA_TOKEN,
-
+    IMMEDIATE_RETURN,
+    END_TURN,
+    USING_CONDITION,
 }
+
 enum class AttackBufTag(){
     INSERT,
     CHANGE_EACH,

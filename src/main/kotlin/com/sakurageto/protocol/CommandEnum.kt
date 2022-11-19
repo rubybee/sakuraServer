@@ -13,4 +13,9 @@ enum class CommandEnum() {
     SELECT_CARD,
     END_SELECT_CARD,
     RETURN_SPECIAL_CARD,
+    FIRST_TURN,
+    SECOND_TURN,
+    DRAW,
+    MULIGUN,
+    MULIGUN_END,
 }

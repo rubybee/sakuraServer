@@ -16,6 +16,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.util.logging.LogManager
 import javax.swing.text.StyledEditorKit.BoldAction
+import kotlin.random.Random
 
 class SakuraGame(private val player1: Connection, private val player2: Connection) {
     private var game_mode: Int //0 = no ban 1 = pick ban
@@ -31,15 +32,10 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
             for (frame in player1.session.incoming) {
                 if (frame is Frame.Text) {
                     val text = frame.readText()
-                    try{
-                        val data = Json.decodeFromString<SakuraSendData>(text)
-                        if (data.command == wait_command){
-                            return data
-                        }
-                    }finally {
-                        continue
+                    val data = Json.decodeFromString<SakuraSendData>(text)
+                    if (data.command == wait_command){
+                        return data
                     }
-
                 }
             }
         }
@@ -48,13 +44,9 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
             for (frame in player2.session.incoming) {
                 if (frame is Frame.Text) {
                     val text = frame.readText()
-                    try{
-                        val data = Json.decodeFromString<SakuraSendData>(text)
-                        if (data.command == wait_command){
-                            return data
-                        }
-                    }finally {
-                        continue
+                    val data = Json.decodeFromString<SakuraSendData>(text)
+                    if (data.command == wait_command){
+                        return data
                     }
                 }
             }
@@ -68,13 +60,9 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
             for (frame in player1.session.incoming) {
                 if (frame is Frame.Text) {
                     val text = frame.readText()
-                    try{
-                        val data = Json.decodeFromString<SakuraCardSetSend>(text)
-                        if (data.command == wait_command){
-                            return data
-                        }
-                    }finally {
-                        continue
+                    val data = Json.decodeFromString<SakuraCardSetSend>(text)
+                    if (data.command == wait_command){
+                        return data
                     }
                 }
             }
@@ -84,13 +72,9 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
             for (frame in player2.session.incoming) {
                 if (frame is Frame.Text) {
                     val text = frame.readText()
-                    try{
-                        val data = Json.decodeFromString<SakuraCardSetSend>(text)
-                        if (data.command == wait_command){
-                            return data
-                        }
-                    }finally {
-                        continue
+                    val data = Json.decodeFromString<SakuraCardSetSend>(text)
+                    if (data.command == wait_command){
+                        return data
                     }
                 }
             }
@@ -113,7 +97,6 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
     }
 
     suspend fun selectMegami(){
-        TODO("CHANGE GAME_STATUS_PLAYER1, 2")
         val data = SakuraSendData(CommandEnum.SELECT_MEGAMI, null)
         val send_data = Json.encodeToString(data)
         player1.session.send(send_data)
@@ -139,7 +122,6 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
     }
 
     suspend fun checkMegami(){
-        TODO("CHANGE GAME_STATUS_PLAYER1, 2")
         val check_data_player1 = SakuraSendData(CommandEnum.CHECK_MEGAMI, game_status.player1.returnListMegami3())
         val check_data_player2 = SakuraSendData(CommandEnum.CHECK_MEGAMI, game_status.player2.returnListMegami3())
         player1.session.send(Json.encodeToString(check_data_player2))
@@ -155,7 +137,6 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
         val player1_data = waitUntil(PlayerEnum.PLAYER1, CommandEnum.SELECT_BAN)
         val player2_data = waitUntil(PlayerEnum.PLAYER2, CommandEnum.SELECT_BAN)
 
-        TODO("CHANGE GAME_STATUS_PLAYER1, 2")
         game_status.player1.banMegami(player2_data)
         game_status.player2.banMegami(player1_data)
 
@@ -166,7 +147,6 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
     }
 
     suspend fun checkFinalMegami(){
-        TODO("CHANGE GAME_STATUS_PLAYER1, 2")
         val player1_player1_data = game_status.player1.makeMegamiData(CommandEnum.CHECK_YOUR)
         val player2_player2_data = game_status.player2.makeMegamiData(CommandEnum.CHECK_YOUR)
         val player1_player2_data = game_status.player2.makeMegamiData(CommandEnum.CHECK_ANOTHER)
@@ -198,7 +178,6 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
     }
 
     suspend fun selectCard(){
-        TODO("CHANGE GAME_STATUS_PLAYER1, 2")
         game_status.player1.unselected_card.addAll(CardName.Companion.returnNormalCardNameByMegami(game_status.player1.megami_1))
         game_status.player1.unselected_card.addAll(CardName.Companion.returnNormalCardNameByMegami(game_status.player1.megami_2))
         game_status.player2.unselected_card.addAll(CardName.Companion.returnNormalCardNameByMegami(game_status.player2.megami_1))
@@ -222,23 +201,23 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
         var card_data_player2 : MutableList<CardName>
         var specialcard_data_player2 : MutableList<CardName>
 
-        if(checkCardSet(game_status.player1.unselected_card, player1_data!!.normal_card, 7))
-            card_data_player1 = player1_data!!.normal_card
+        if(checkCardSet(game_status.player1.unselected_card, player1_data!!.normal_card!!, 7))
+            card_data_player1 = player1_data!!.normal_card!!
         else
             card_data_player1 = game_status.player1.unselected_card.subList(0, 7)
 
-        if(checkCardSet(game_status.player2.unselected_card, player2_data!!.normal_card, 7))
-            card_data_player2 = player2_data!!.normal_card
+        if(checkCardSet(game_status.player2.unselected_card, player2_data!!.normal_card!!, 7))
+            card_data_player2 = player2_data!!.normal_card!!
         else
             card_data_player2 = game_status.player2.unselected_card.subList(0, 7)
 
-        if(checkCardSet(game_status.player1.unselected_specialcard, player1_data!!.special_card, 3))
-            specialcard_data_player1 = player1_data!!.special_card
+        if(checkCardSet(game_status.player1.unselected_specialcard, player1_data!!.special_card!!, 3))
+            specialcard_data_player1 = player1_data!!.special_card!!
         else
             specialcard_data_player1 = game_status.player1.unselected_specialcard.subList(0, 3)
 
-        if(checkCardSet(game_status.player2.unselected_specialcard, player2_data!!.special_card, 3))
-            specialcard_data_player2 = player2_data!!.special_card
+        if(checkCardSet(game_status.player2.unselected_specialcard, player2_data!!.special_card!!, 3))
+            specialcard_data_player2 = player2_data!!.special_card!!
         else
             specialcard_data_player2 = game_status.player2.unselected_specialcard.subList(0, 3)
 
@@ -248,9 +227,72 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
         player1.session.send(Json.encodeToString(end_player1_select))
         player2.session.send(Json.encodeToString(end_player2_select))
 
-        //card make section
+        Card.Companion.cardInitInsert(game_status.player1.normal_card_deck, card_data_player1, PlayerEnum.PLAYER1)
+        Card.Companion.cardInitInsert(game_status.player1.special_card_deck, specialcard_data_player1, PlayerEnum.PLAYER1)
+        Card.Companion.cardInitInsert(game_status.player2.normal_card_deck, card_data_player2, PlayerEnum.PLAYER2)
+        Card.Companion.cardInitInsert(game_status.player2.special_card_deck, specialcard_data_player2, PlayerEnum.PLAYER2)
+    }
 
-        //card make section
+    suspend fun selectFirst(){
+        val random = Random.nextInt(2)
+        var player1_data: SakuraSendData
+        var player2_data: SakuraSendData
+        if(random == 0){
+            player1_data = SakuraSendData(CommandEnum.FIRST_TURN, null)
+            player2_data = SakuraSendData(CommandEnum.SECOND_TURN, null)
+            game_status.setFirstTurn(PlayerEnum.PLAYER1)
+        }
+        else{
+            player1_data = SakuraSendData(CommandEnum.SECOND_TURN, null)
+            player2_data = SakuraSendData(CommandEnum.FIRST_TURN, null)
+            game_status.setFirstTurn(PlayerEnum.PLAYER2)
+        }
+
+        player1.session.send(Json.encodeToString(player1_data))
+        player2.session.send(Json.encodeToString(player2_data))
+    }
+
+    suspend fun drawCard(player: PlayerEnum, number: Int){
+        val data = SakuraCardSetSend(CommandEnum.DRAW, game_status.drawCard(player, number), null)
+        when(player){
+            PlayerEnum.PLAYER1 -> {
+                player1.session.send(Json.encodeToString(data))
+            }
+            PlayerEnum.PLAYER2 -> {
+                player2.session.send(Json.encodeToString(data))
+            }
+        }
+
+    }
+
+    suspend fun muligun(){
+        val data = SakuraSendData(CommandEnum.MULIGUN, null)
+        player1.session.send(Json.encodeToString(data))
+        player2.session.send(Json.encodeToString(data))
+        val player1_data = waitCardSetUntil(PlayerEnum.PLAYER1, CommandEnum.MULIGUN)
+        val player2_data = waitCardSetUntil(PlayerEnum.PLAYER2, CommandEnum.MULIGUN)
+        var count = 0
+        player1_data!!.normal_card?.also {
+            for(card_name in it){
+                if(game_status.insertHandToDeck(PlayerEnum.PLAYER1, card_name)){
+                    count += 1
+                }
+            }
+        }
+        val muligun_end_data_player1 = SakuraCardSetSend(CommandEnum.MULIGUN_END, game_status.drawCard(PlayerEnum.PLAYER1, count), null)
+
+        count = 0
+        player2_data!!.normal_card?.also {
+            for(card_name in it){
+                if(game_status.insertHandToDeck(PlayerEnum.PLAYER2, card_name)){
+                    count += 1
+                }
+            }
+        }
+        val muligun_end_data_player2 = SakuraCardSetSend(CommandEnum.MULIGUN_END, game_status.drawCard(PlayerEnum.PLAYER2, count), null)
+
+        player1.session.send(Json.encodeToString(muligun_end_data_player1))
+        player2.session.send(Json.encodeToString(muligun_end_data_player2))
     }
 
     suspend fun startGame(){
@@ -263,5 +305,9 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
         }
         checkFinalMegami()
         selectCard()
+        selectFirst()
+        drawCard(PlayerEnum.PLAYER1, 3)
+        drawCard(PlayerEnum.PLAYER2, 3)
+        muligun()
     }
 }

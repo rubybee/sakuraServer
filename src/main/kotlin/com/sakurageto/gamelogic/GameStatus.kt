@@ -1,10 +1,7 @@
 package com.sakurageto.gamelogic
 
-import com.sakurageto.card.AttackBuff
-import com.sakurageto.card.MadeAttack
-import com.sakurageto.card.PlayerEnum
-import com.sakurageto.card.RangeBuff
 import com.sakurageto.Connection
+import com.sakurageto.card.*
 import com.sakurageto.protocol.UsedCardReturn
 
 class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val player1_socket: Connection, val player2_socket: Connection) {
@@ -14,6 +11,17 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
 
     var player1_life_listner: ArrayDeque<ImmediateBackListner> = ArrayDeque<ImmediateBackListner>()
     var player2_life_listner: ArrayDeque<ImmediateBackListner> = ArrayDeque<ImmediateBackListner>()
+
+    fun setFirstTurn(player: PlayerEnum){
+        when(player){
+            PlayerEnum.PLAYER1 -> {
+                player2.concentration = 1
+            }
+            PlayerEnum.PLAYER2 -> {
+                player1.concentration = 1
+            }
+        }
+    }
 
 
     fun addImmediateLifeListner(player: PlayerEnum, listner: ImmediateBackListner){
@@ -122,6 +130,52 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
             PlayerEnum.PLAYER1 -> player1.addConcentration(number)
             PlayerEnum.PLAYER2 -> player2.addConcentration(number)
         }
+    }
+
+    fun drawCard(player: PlayerEnum, number: Int): MutableList<CardName>{
+        var return_list = mutableListOf<CardName>()
+        when (player){
+            PlayerEnum.PLAYER1 -> {
+                for(i in 1..number){
+                    return_list.add(player1.normal_card_deck.first().card_data.card_name)
+                    player1.hand.add(player1.normal_card_deck.first())
+                    player1.normal_card_deck.removeFirst()
+                }
+            }
+            PlayerEnum.PLAYER2 -> {
+                for(i in 1..number){
+                    return_list.add(player2.normal_card_deck.first().card_data.card_name)
+                    player2.hand.add(player2.normal_card_deck.first())
+                    player2.normal_card_deck.removeFirst()
+                }
+            }
+        }
+        return return_list
+    }
+
+    fun insertHandToDeck(player: PlayerEnum, card_name: CardName): Boolean{
+        when(player){
+            PlayerEnum.PLAYER1 -> {
+                for(i in player1.hand.indices){
+                    if(player1.hand[i].card_data.card_name == card_name){
+                        player1.normal_card_deck.addLast(player1.hand[i])
+                        player1.hand.removeAt(i)
+                        return true
+                    }
+                }
+            }
+
+            PlayerEnum.PLAYER2 -> {
+                for(i in player2.hand.indices){
+                    if(player2.hand[i].card_data.card_name == card_name){
+                        player2.normal_card_deck.addLast(player2.hand[i])
+                        player2.hand.removeAt(i)
+                        return true
+                    }
+                }
+            }
+        }
+        return false
     }
 
 }

@@ -12,8 +12,8 @@ data class SakuraCardCommand(
 @Serializable
 data class SakuraCardSetSend(
     val command: CommandEnum,
-    val normal_card: MutableList<CardName>,
-    var special_card: MutableList<CardName>,
+    val normal_card: MutableList<CardName>?,
+    var special_card: MutableList<CardName>?,
 )
 
 @Serializable

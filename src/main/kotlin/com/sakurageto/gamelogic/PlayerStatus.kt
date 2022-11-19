@@ -11,6 +11,8 @@ class PlayerStatus {
     var max_aura = 5
     var aura = 3
 
+    var hand: MutableList<Card> = mutableListOf()
+
     var special_card_deck: ArrayDeque<Card> = ArrayDeque<Card>()
     var normal_card_deck: ArrayDeque<Card> = ArrayDeque<Card>()
     var used_special_card: ArrayDeque<Card> = ArrayDeque<Card>()

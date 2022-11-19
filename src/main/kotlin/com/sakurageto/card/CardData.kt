@@ -56,4 +56,8 @@ class CardData(
         this.effect!!.add(text)
     }
 
+    fun isItSpecial(): Boolean{
+        return this.card_class == CardClass.SPECIAL
+    }
+
 }

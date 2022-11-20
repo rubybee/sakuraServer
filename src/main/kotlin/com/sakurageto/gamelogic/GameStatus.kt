@@ -2,7 +2,10 @@ package com.sakurageto.gamelogic
 
 import com.sakurageto.Connection
 import com.sakurageto.card.*
-import com.sakurageto.protocol.UsedCardReturn
+import com.sakurageto.protocol.*
+import io.ktor.websocket.*
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val player1_socket: Connection, val player2_socket: Connection) {
 
@@ -125,10 +128,84 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
         }
     }
 
-    fun addConcentration(player: PlayerEnum, number: Int){
+    suspend fun addConcentration(player: PlayerEnum){
+        var data_player1: SakuraCardCommand? = null
+        var data_player2: SakuraCardCommand? = null
         when (player){
-            PlayerEnum.PLAYER1 -> player1.addConcentration(number)
-            PlayerEnum.PLAYER2 -> player2.addConcentration(number)
+            PlayerEnum.PLAYER1 -> {
+                when(player1.addConcentration()){
+                    0 -> {
+                        data_player1 = SakuraCardCommand(CommandEnum.ADD_CONCENTRATION_YOUR, null)
+                        data_player2 = SakuraCardCommand(CommandEnum.ADD_CONCENTRATION_OTHER, null)
+                    }
+                    1 -> {
+                        data_player1 = SakuraCardCommand(CommandEnum.REMOVE_SHRINK_YOUR, null)
+                        data_player2 = SakuraCardCommand(CommandEnum.REMOVE_SHRINK_OTHER, null)
+                    }
+                }
+            }
+            PlayerEnum.PLAYER2 -> {
+                when(player2.addConcentration()){
+                    0 -> {
+                        data_player1 = SakuraCardCommand(CommandEnum.ADD_CONCENTRATION_OTHER, null)
+                        data_player2 = SakuraCardCommand(CommandEnum.ADD_CONCENTRATION_YOUR, null)
+                    }
+                    1 -> {
+                        data_player1 = SakuraCardCommand(CommandEnum.REMOVE_SHRINK_YOUR, null)
+                        data_player2 = SakuraCardCommand(CommandEnum.REMOVE_SHRINK_OTHER, null)
+                    }
+                }
+            }
+        }
+        data_player1?.let {
+            player1_socket.session.send(Json.encodeToString(data_player1))
+        }
+        data_player2?.let {
+            player2_socket.session.send(Json.encodeToString(data_player2))
+        }
+    }
+
+    suspend fun enchantmentReduceAll(player: PlayerEnum){
+        sendReduceNapStart(player1_socket)
+        sendReduceNapStart(player2_socket)
+
+        var player1_card: MutableList<CardName> = mutableListOf()
+        var player2_card: MutableList<CardName> = mutableListOf()
+
+        for(i in player1.enchantment_card){
+            if(i.value.reduceNapNormaly()){
+                sendReduceNapSelf(player1_socket, i.key)
+                sendReduceNapOther(player2_socket, i.key)
+            }
+            if(i.value.isItDestruction()){
+                player1_card.add(i.key)
+            }
+        }
+        for(i in player2.enchantment_card){
+            if(i.value.reduceNapNormaly()){
+                sendReduceNapOther(player1_socket, i.key)
+                sendReduceNapSelf(player2_socket, i.key)
+            }
+            if(i.value.isItDestruction()){
+                player2_card.add(i.key)
+            }
+        }
+
+        sendReduceNapEnd(player1_socket)
+        sendReduceNapEnd(player2_socket)
+
+        var selected_player1_card: ArrayDeque<CardName> = ArrayDeque()
+        var selected_player2_card: ArrayDeque<CardName> = ArrayDeque()
+
+        when(player){
+            PlayerEnum.PLAYER1 -> {
+                sendStartSelectEnchantment(player1_socket)
+                requestEnchantmentCard(player1_socket, player1_card, player2_card)
+            }
+            PlayerEnum.PLAYER2 -> {
+                sendStartSelectEnchantment(player2_socket)
+                requestEnchantmentCard(player2_socket, player2_card, player1_card)
+            }
         }
     }
 

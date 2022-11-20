@@ -64,6 +64,7 @@ enum class TextEffectTag() {
     IMMEDIATE_RETURN,
     END_TURN,
     USING_CONDITION,
+    DO_NOT_NAP,
 }
 
 enum class AttackBufTag(){

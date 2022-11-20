@@ -7,6 +7,7 @@ import com.sakurageto.card.PlayerEnum
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.SakuraCardSetSend
 import com.sakurageto.protocol.SakuraSendData
+import com.sakurageto.protocol.sendStartTurn
 import com.typesafe.config.ConfigException.Null
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
@@ -21,6 +22,8 @@ import kotlin.random.Random
 class SakuraGame(private val player1: Connection, private val player2: Connection) {
     private var game_mode: Int //0 = no ban 1 = pick ban
     private var game_status: GameStatus
+    private var first_turn = PlayerEnum.PLAYER1
+    private var now_turn = PlayerEnum.PLAYER1
 
     init {
         game_mode = 0
@@ -240,11 +243,13 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
         if(random == 0){
             player1_data = SakuraSendData(CommandEnum.FIRST_TURN, null)
             player2_data = SakuraSendData(CommandEnum.SECOND_TURN, null)
+            first_turn = PlayerEnum.PLAYER1
             game_status.setFirstTurn(PlayerEnum.PLAYER1)
         }
         else{
             player1_data = SakuraSendData(CommandEnum.SECOND_TURN, null)
             player2_data = SakuraSendData(CommandEnum.FIRST_TURN, null)
+            first_turn = PlayerEnum.PLAYER2
             game_status.setFirstTurn(PlayerEnum.PLAYER2)
         }
 
@@ -295,6 +300,27 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
         player2.session.send(Json.encodeToString(muligun_end_data_player2))
     }
 
+    suspend fun startTurn(){
+        when(now_turn){
+            PlayerEnum.PLAYER1 -> {
+                sendStartTurn(player1)
+                game_status.addConcentration(PlayerEnum.PLAYER1)
+            }
+            PlayerEnum.PLAYER2 -> {
+                sendStartTurn(player2)
+                game_status.addConcentration(PlayerEnum.PLAYER1)
+            }
+        }
+    }
+
+
+    suspend fun simulateStart(){
+        now_turn = first_turn
+        while(true){
+
+        }
+    }
+
     suspend fun startGame(){
         selectMode()
         selectEnd()
@@ -309,5 +335,6 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
         drawCard(PlayerEnum.PLAYER1, 3)
         drawCard(PlayerEnum.PLAYER2, 3)
         muligun()
+        simulateStart()
     }
 }

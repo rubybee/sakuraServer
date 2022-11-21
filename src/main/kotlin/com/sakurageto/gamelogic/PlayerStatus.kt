@@ -18,6 +18,10 @@ class PlayerStatus {
     var normal_card_deck: ArrayDeque<Card> = ArrayDeque<Card>()
     var used_special_card: ArrayDeque<Card> = ArrayDeque<Card>()
 
+    var discard: ArrayDeque<Card> = ArrayDeque<Card>()
+
+
+
 
     fun usedToSpecial(card_name: CardName): Boolean{
         for(i in 0..used_special_card.size){

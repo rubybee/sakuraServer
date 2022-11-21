@@ -47,7 +47,7 @@ object CardSet {
             null
         })
         giback.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.CHANGE_CONCENTRATION) { player, game_status ->
-            game_status.addConcentration(player, 1)
+            game_status.addConcentration(player)
             null
         })
         giback.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { player, game_status->

@@ -2,6 +2,7 @@ package com.sakurageto.card
 
 import com.sakurageto.card.CardSet.returnCardDataByName
 import kotlin.collections.ArrayDeque
+import kotlin.reflect.jvm.internal.impl.metadata.ProtoBuf.Effect
 
 class Card(val card_data: CardData, val player: PlayerEnum, var special_card_state: SpecialCardEnum?) {
     var vertical: Boolean
@@ -66,6 +67,20 @@ class Card(val card_data: CardData, val player: PlayerEnum, var special_card_sta
         return false
     }
 
+    fun destructionEnchantmentNormaly(): ArrayDeque<Text>{
+        val return_data: ArrayDeque<Text> = ArrayDeque()
+        card_data.effect?.let {
+            for(i in it){
+                when(i.timing_tag){
+                    TextEffectTimingTag.AFTER_DESTRUCTION -> {
+                        return_data.add(i)
+                    }
+                    else -> {}
+                }
+            }
+        }
+        return return_data
+    }
 
 
 

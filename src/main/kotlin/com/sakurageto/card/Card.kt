@@ -1,8 +1,8 @@
 package com.sakurageto.card
 
 import com.sakurageto.card.CardSet.returnCardDataByName
+import com.sakurageto.gamelogic.GameStatus
 import kotlin.collections.ArrayDeque
-import kotlin.reflect.jvm.internal.impl.metadata.ProtoBuf.Effect
 
 class Card(val card_data: CardData, val player: PlayerEnum, var special_card_state: SpecialCardEnum?) {
     var vertical: Boolean
@@ -81,7 +81,61 @@ class Card(val card_data: CardData, val player: PlayerEnum, var special_card_sta
         }
         return return_data
     }
+    fun addAttackBuff(player: PlayerEnum, gameStatus: GameStatus){
+        card_data.effect?.let {
+            for(i in it){
+                when(i.timing_tag){
+                    TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTimingTag.USED -> {
+                        when(i.tag){
+                            TextEffectTag.NEXT_ATTACK_ENCHANTMENT -> {
+                               i.effect!!(player, gameStatus, null)
+                            }
+                            else -> continue
+                        }
+                    }
+                    else -> continue
+                }
+            }
+        }
+    }
 
+    fun canUseAtReact(player: PlayerEnum, gameStatus: GameStatus): Boolean{
+        if(card_data.sub_type == SubType.REACTION){
+            return true
+        }
+        card_data.effect?.let {
+            for(text in it){
+                when(text.timing_tag){
+                    TextEffectTimingTag.CONSTANT_EFFECT -> {
+                        when(text.tag){
+                            TextEffectTag.CAN_REACTABLE -> {
+                                return text.effect!!(player, gameStatus, null)!!
+                            }
+                            else -> continue
+                        }
+                    }
+                    else -> continue
 
+                }
+            }
+        }
+        return false
+    }
 
+    fun canReactable(attack: MadeAttack): Boolean{
+        if(attack.cannot_react_special){
+            if(card_data.card_class == CardClass.SPECIAL){
+                return false
+            }
+        }
+        else if(attack.cannot_react){
+            return false
+        }
+        else if(attack.cannot_react_normal){
+            if(card_data.card_class == CardClass.NORMAL){
+                return false
+            }
+        }
+        return true
+    }
 }

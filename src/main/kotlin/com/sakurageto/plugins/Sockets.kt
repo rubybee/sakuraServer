@@ -8,11 +8,6 @@ import java.time.Duration
 import io.ktor.server.application.*
 import com.sakurageto.RoomInformation
 import com.sakurageto.gamelogic.SakuraGame
-import com.sakurageto.protocol.CommandEnum
-import com.sakurageto.protocol.SakuraSendData
-import io.ktor.server.response.*
-import io.ktor.server.request.*
-import io.ktor.server.routing.*
 import kotlinx.coroutines.delay
 
 fun Application.configureSockets() {

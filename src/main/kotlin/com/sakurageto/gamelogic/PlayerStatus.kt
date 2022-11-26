@@ -3,25 +3,40 @@ package com.sakurageto.gamelogic
 import com.sakurageto.card.*
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.SakuraSendData
-import java.util.LinkedList
-import java.util.Queue
-import kotlin.reflect.jvm.internal.impl.metadata.ProtoBuf.Effect
-
 class PlayerStatus {
     var max_aura = 5
     var aura = 3
 
     var hand: MutableList<Card> = mutableListOf()
+
+    fun getCardFromHand(card_name: CardName): Card?{
+        for(card in hand){
+            if(card.card_data.card_name == card_name){
+                return card
+            }
+        }
+        return null
+    }
+
     var enchantment_card: HashMap<CardName, Card> = HashMap()
 
     var special_card_deck: ArrayDeque<Card> = ArrayDeque<Card>()
+
+    fun getCardFromSpecial(card_name: CardName): Card?{
+        for(card in special_card_deck){
+            if(card.card_data.card_name == card_name){
+                return card
+            }
+        }
+        return null
+    }
+
     var normal_card_deck: ArrayDeque<Card> = ArrayDeque<Card>()
     var used_special_card: ArrayDeque<Card> = ArrayDeque<Card>()
 
     var discard: ArrayDeque<Card> = ArrayDeque<Card>()
 
-
-
+    var end_turn: Boolean = false
 
     fun usedToSpecial(card_name: CardName): Boolean{
         for(i in 0..used_special_card.size){
@@ -116,27 +131,27 @@ class PlayerStatus {
             AttackBufTag.MULTIPLE -> attack_buf[5].add(buf)
             AttackBufTag.DIVIDE -> attack_buf[7].add(buf)
             AttackBufTag.PLUS_MINUS -> attack_buf[9].add(buf)
-            AttackBufTag.INSERT_IMMEDIATE -> attack_buf[2].add(buf)
-            AttackBufTag.CHANGE_EACH_IMMEDIATE -> attack_buf[4].add(buf)
-            AttackBufTag.MULTIPLE_IMMEDIATE -> attack_buf[6].add(buf)
-            AttackBufTag.DIVIDE_IMMEDIATE -> attack_buf[8].add(buf)
-            AttackBufTag.PLUS_MINUS_IMMEDIATE -> attack_buf[10].add(buf)
-            else -> attack_buf[0].add(buf)
+            AttackBufTag.INSERT_IMMEDIATE -> attack_buf[0].add(buf)
+            AttackBufTag.CHANGE_EACH_IMMEDIATE -> attack_buf[2].add(buf)
+            AttackBufTag.MULTIPLE_IMMEDIATE -> attack_buf[4].add(buf)
+            AttackBufTag.DIVIDE_IMMEDIATE -> attack_buf[6].add(buf)
+            AttackBufTag.PLUS_MINUS_IMMEDIATE -> attack_buf[8].add(buf)
+            else -> attack_buf[11].add(buf)
         }
     }
 
     fun addRangeBuff(buf: RangeBuff){
         when(buf.tag){
-            RangeBufTag.CHANGE -> range_buf[0].add(buf)
-            RangeBufTag.ADD -> range_buf[2].add(buf)
-            RangeBufTag.DELETE -> range_buf[4].add(buf)
-            RangeBufTag.PLUS -> range_buf[6].add(buf)
-            RangeBufTag.MINUS -> range_buf[8].add(buf)
-            RangeBufTag.CHANGE_IMMEDIATE -> range_buf[1].add(buf)
-            RangeBufTag.ADD_IMMEDIATE -> range_buf[3].add(buf)
-            RangeBufTag.DELETE_IMMEDIATE -> range_buf[5].add(buf)
-            RangeBufTag.PLUS_IMMEDIATE -> range_buf[7].add(buf)
-            RangeBufTag.MINUS_IMMEDIATE -> range_buf[9].add(buf)
+            RangeBufTag.CHANGE -> range_buf[1].add(buf)
+            RangeBufTag.ADD -> range_buf[3].add(buf)
+            RangeBufTag.DELETE -> range_buf[5].add(buf)
+            RangeBufTag.PLUS -> range_buf[7].add(buf)
+            RangeBufTag.MINUS -> range_buf[9].add(buf)
+            RangeBufTag.CHANGE_IMMEDIATE -> range_buf[0].add(buf)
+            RangeBufTag.ADD_IMMEDIATE -> range_buf[2].add(buf)
+            RangeBufTag.DELETE_IMMEDIATE -> range_buf[4].add(buf)
+            RangeBufTag.PLUS_IMMEDIATE -> range_buf[6].add(buf)
+            RangeBufTag.MINUS_IMMEDIATE -> range_buf[8].add(buf)
         }
     }
 

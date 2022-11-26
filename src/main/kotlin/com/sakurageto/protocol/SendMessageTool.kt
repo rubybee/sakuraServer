@@ -1,9 +1,7 @@
 package com.sakurageto.protocol
 
 import com.sakurageto.Connection
-import com.sakurageto.card.Card
 import com.sakurageto.card.CardName
-import com.sakurageto.card.PlayerEnum
 import io.ktor.websocket.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -74,6 +72,31 @@ suspend fun sendUsed(mine: Connection, other: Connection, card_name: CardName){
     other.session.send(Json.encodeToString(data_other))
 }
 
+suspend fun makeAttackComplete(mine: Connection, other: Connection, card_name: CardName){
+    val data_your = SakuraCardCommand(CommandEnum.MAKE_ATTACK_COMPLETE_YOUR, card_name)
+    val data_other = SakuraCardCommand(CommandEnum.MAKE_ATTACK_COMPLETE_OTHER, card_name)
+    mine.session.send(Json.encodeToString(data_your))
+    other.session.send(Json.encodeToString(data_other))
+}
+
+suspend fun sendAttackInformation(mine: Connection, other: Connection, data: MutableList<Int>) {
+    val data_your = SakuraSendData(CommandEnum.ATTACK_INFORMATION_YOUR, data)
+    val data_other = SakuraSendData(CommandEnum.ATTACK_INFORMATION_OTHER, data)
+    mine.session.send(Json.encodeToString(data_your))
+    other.session.send(Json.encodeToString(data_other))
+
+}
+
+suspend fun sendChooseDamage(mine: Connection){
+    val data = SakuraCardCommand(CommandEnum.CHOOSE_DAMAGE, null)
+    mine.session.send(Json.encodeToString(data))
+}
+
+suspend fun sendRequestReact(mine: Connection){
+    val data = SakuraCardCommand(CommandEnum.REACT_REQUEST, null)
+    mine.session.send(Json.encodeToString(data))
+}
+
 
 //receive function
 suspend fun receiveEnchantment(player: Connection): Pair<CommandEnum, CardName?> {
@@ -90,4 +113,20 @@ suspend fun receiveEnchantment(player: Connection): Pair<CommandEnum, CardName?>
         }
     }
     return Pair(CommandEnum.SELECT_ENCHANTMENT_END, null)
+}
+
+suspend fun receiveReact(player: Connection): Pair<CommandEnum, CardName?> {
+    for (frame in player.session.incoming) {
+        if (frame is Frame.Text) {
+            val text = frame.readText()
+            val data = Json.decodeFromString<SakuraCardCommand>(text)
+            if (data.command == CommandEnum.USE_CARD_IN_HAND || data.command == CommandEnum.USE_CARD_IN_SPEICAL){
+                return Pair(data.command, data.card)
+            }
+            else if(data.command == CommandEnum.DO_NOT_REACT){
+                return Pair(data.command, null)
+            }
+        }
+    }
+    return Pair(CommandEnum.DO_NOT_REACT, null)
 }

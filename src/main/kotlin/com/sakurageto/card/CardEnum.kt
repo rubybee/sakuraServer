@@ -1,8 +1,6 @@
 package com.sakurageto.card
 
-import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.MegamiEnum
-import com.sakurageto.gamelogic.PlayerStatus
 
 enum class PlayerEnum {
     PLAYER1,
@@ -65,6 +63,10 @@ enum class TextEffectTag() {
     END_TURN,
     USING_CONDITION,
     DO_NOT_NAP,
+    CAN_REACTABLE,
+    REACT_ATTACK_REDUCE,
+    REACT_ATTACK_NO_DAMAGE,
+    REACT_ATTACK_INVALID
 }
 
 enum class AttackBufTag(){

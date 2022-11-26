@@ -55,7 +55,7 @@ class MadeAttack(
                             break
                         }
                     }
-                    for (i in min - number..min - 1){
+                    for (i in min - number until min){
                         distance_uncont!![i] = true
                     }
                 }
@@ -93,6 +93,42 @@ class MadeAttack(
                 }
             }
         }
+    }
+
+    fun rangeCheck(now_range: Int): Boolean{
+        when(distance_type){
+            DistanceType.DISCONTINUOUS -> return distance_uncont!![now_range]
+            DistanceType.CONTINUOUS -> return distance_cont!!.first <= now_range && now_range <= distance_cont!!.second
+        }
+    }
+
+    //{-1, 1, 2, 3, 4, 5, -1, 3, 5, 20, 0, 0, 0}
+    //{uncont, distance..., uncont, auro, life, megami, reactable}
+    fun Information(): MutableList<Int>{
+        var return_data = mutableListOf<Int>()
+        when(distance_type){
+            DistanceType.DISCONTINUOUS -> {
+                return_data.add(-1)
+                for(i in distance_uncont!!.indices){
+                    if(distance_uncont!![i]) return_data.add(i)
+                }
+                return_data.add(-1)
+            }
+            DistanceType.CONTINUOUS -> {
+                return_data.add(-2)
+                return_data.add(distance_cont!!.first)
+                return_data.add(distance_cont!!.second)
+                return_data.add(-2)
+            }
+        }
+        return_data.add(aura_damage)
+        return_data.add(life_damage)
+        return_data.add(megami.real_number)
+        if(cannot_react) return_data.add(1) else return_data.add(0)
+        if(cannot_react_normal) return_data.add(1) else return_data.add(0)
+        if(cannot_react_special) return_data.add(1) else return_data.add(0)
+
+        return return_data
     }
 
 }

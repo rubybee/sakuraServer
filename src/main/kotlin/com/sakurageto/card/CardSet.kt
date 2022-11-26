@@ -1,6 +1,5 @@
 package com.sakurageto.card
 
-import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.ImmediateBackListner
 import com.sakurageto.gamelogic.MegamiEnum
 
@@ -20,38 +19,38 @@ object CardSet {
     fun YurinaCardInitialization(){
         cham.setAttack(DistanceType.CONTINUOUS, Pair(3, 4), null, 3, 1)
         ilsom.setAttack(DistanceType.CONTINUOUS, Pair(3, 3), null, 2, 2)
-        ilsom.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { player, game_status->
+        ilsom.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { player, game_status, _->
             if (game_status.getPlayerLife(player) <= 3) {
-                game_status.addThisTurnAttackBuff(player, AttackBuff(AttackBufTag.PLUS_MINUS_IMMEDIATE, {_, _ -> true}, {madeAttack ->
+                game_status.addThisTurnAttackBuff(player, AttackBuff(CardName.YURINA_ILSUM, 1, AttackBufTag.PLUS_MINUS_IMMEDIATE, {_, _ -> true}, {madeAttack ->
                     madeAttack.auraPlusMinus(1)
                 }))
             }
             null
         })
         jaru_chigi.setAttack(DistanceType.CONTINUOUS, Pair(1, 2), null, 2, 1)
-        jaru_chigi.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { player, game_status ->
+        jaru_chigi.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { player, game_status, _ ->
             if (game_status.getPlayerLife(player) <= 3) {
-                game_status.addThisTurnAttackBuff(player, AttackBuff(AttackBufTag.PLUS_MINUS, {_, _ -> true}, {madeAttack ->
+                game_status.addThisTurnAttackBuff(player, AttackBuff(CardName.YURINA_JARUCHIGI, 1, AttackBufTag.PLUS_MINUS, {_, _ -> true}, {madeAttack ->
                     madeAttack.auraPlusMinus(1)
                 }))
             }
             null
         })
         guhab.setAttack(DistanceType.CONTINUOUS, Pair(2, 4), null, 4, 3)
-        guhab.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { player, game_status ->
-            game_status.addThisTurnAttackBuff(player, AttackBuff(AttackBufTag.PLUS_MINUS_IMMEDIATE, {_, _ -> true}, {madeAttack ->
+        guhab.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { player, game_status, _ ->
+            game_status.addThisTurnAttackBuff(player, AttackBuff(CardName.YURINA_GUHAB, 1, AttackBufTag.PLUS_MINUS_IMMEDIATE, {_, _ -> true}, {madeAttack ->
                 if(game_status.distance <= 2){
                     madeAttack.lifePlusMinus(-1); madeAttack.auraPlusMinus(-1)
                 }
             }))
             null
         })
-        giback.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.CHANGE_CONCENTRATION) { player, game_status ->
+        giback.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.CHANGE_CONCENTRATION) { player, game_status, _ ->
             game_status.addConcentration(player)
             null
         })
-        giback.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { player, game_status->
-            game_status.addThisTurnRangeBuff(player, RangeBuff(RangeBufTag.ADD, {_, _ -> true}, {madeattack ->
+        giback.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { player, game_status, _->
+            game_status.addThisTurnRangeBuff(player, RangeBuff(CardName.YURINA_GIBACK,1, RangeBufTag.ADD, {_, _ -> true}, {madeattack ->
                 madeattack?.run{
                     addRange(1, true); madeattack.canNotReactNormal()
                 }
@@ -60,13 +59,13 @@ object CardSet {
         })
         apdo.setEnchantment(2)
         apdo.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.CHASM, null))
-        apdo.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MAKE_ATTACK) {player, game_status ->
+        apdo.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MAKE_ATTACK) {player, game_status, _ ->
             game_status.addPreAttackZone(player, MadeAttack(DistanceType.CONTINUOUS, 999,  3, Pair(1, 4), null, MegamiEnum.YURINA))
             null
         })
         giyenbanzo.setEnchantment(4)
-        giyenbanzo.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT){ player, game_status ->
-            game_status.addThisTurnAttackBuff(player, AttackBuff(AttackBufTag.PLUS_MINUS_IMMEDIATE, {_, _ -> true}, {madeAttack ->
+        giyenbanzo.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT){ player, game_status, _ ->
+            game_status.addThisTurnAttackBuff(player, AttackBuff(CardName.YURINA_GIYENBANJO, 1, AttackBufTag.PLUS_MINUS_IMMEDIATE, { _, _ -> true}, { madeAttack ->
                 if(madeAttack.megami != MegamiEnum.YURINA) madeAttack.run {
                     Chogek(); auraPlusMinus(1); lifePlusMinus(1)
                 }
@@ -77,18 +76,18 @@ object CardSet {
         wolyungnack.setSpecial(7)
         pobaram.setAttack(DistanceType.CONTINUOUS, Pair(0, 10), null, 999, 2)
         pobaram.setSpecial(3)
-        pobaram.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT){ player, game_status ->
-            game_status.addThisTurnAttackBuff(player.Opposite(), AttackBuff(AttackBufTag.PLUS_MINUS_IMMEDIATE, {_, _ -> true}, {madeAttack ->
+        pobaram.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.REACT_ATTACK_REDUCE){ player, game_status, _ ->
+            game_status.addThisTurnAttackBuff(player.Opposite(), AttackBuff(CardName.YURINA_POBARAM, 1, AttackBufTag.PLUS_MINUS_IMMEDIATE, {_, _ -> true}, {madeAttack ->
                 madeAttack.auraPlusMinus(-2)
             }))
             null
         })
         pobaram.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.END_TURN, null))
-        jjockbae.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.MOVE_SAKURA_TOKEN){ player, game_status ->
+        jjockbae.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.MOVE_SAKURA_TOKEN){ player, game_status, _ ->
             game_status.dustToAura(player, 5)
             null
         })
-        jjockbae.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){player, game_status ->
+        jjockbae.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){player, game_status, _ ->
             game_status.addImmediateLifeListner(player, ImmediateBackListner(CardName.YURINA_JJOCKBAE) { before, after, _ ->
                 if(before > 3 && after <= 3){
                     true
@@ -100,7 +99,7 @@ object CardSet {
         jjockbae.setSpecial(2)
         juruck.setAttack(DistanceType.CONTINUOUS, Pair(1, 4), null, 5, 5)
         juruck.setSpecial(5)
-        juruck.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.USING_CONDITION){player, game_status ->
+        juruck.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.USING_CONDITION){player, game_status, _ ->
             game_status.getPlayerLife(player) <= 3
         })
     }

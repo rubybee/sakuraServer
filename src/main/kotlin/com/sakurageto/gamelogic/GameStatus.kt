@@ -3,17 +3,23 @@ package com.sakurageto.gamelogic
 import com.sakurageto.Connection
 import com.sakurageto.card.*
 import com.sakurageto.protocol.*
-import io.ktor.websocket.*
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val player1_socket: Connection, val player2_socket: Connection) {
 
+    var real_distance = 10
     var distance = 10
     var dust = 0
 
     var player1_life_listner: ArrayDeque<ImmediateBackListner> = ArrayDeque<ImmediateBackListner>()
     var player2_life_listner: ArrayDeque<ImmediateBackListner> = ArrayDeque<ImmediateBackListner>()
+
+    inline fun getPlayer(player: PlayerEnum): PlayerStatus{
+        return if(player ==  PlayerEnum.PLAYER1) player1 else player2
+    }
+
+    inline fun getSocket(player: PlayerEnum): Connection{
+        return if(player ==  PlayerEnum.PLAYER1) player1_socket else player2_socket
+    }
 
     fun setFirstTurn(player: PlayerEnum){
         when(player){
@@ -101,10 +107,85 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
         }
     }
 
-    fun addPreAttackZone(player: PlayerEnum, attack: MadeAttack){
+    fun addAllCardText(){
+        for(card in player1.enchantment_card){
+            card.value.addAttackBuff(PlayerEnum.PLAYER1, this)
+        }
+        for(card in player1.used_special_card){
+            card.addAttackBuff(PlayerEnum.PLAYER1, this)
+        }
+        for(card in player2.enchantment_card){
+            card.value.addAttackBuff(PlayerEnum.PLAYER2, this)
+        }
+        for(card in player2.used_special_card){
+            card.addAttackBuff(PlayerEnum.PLAYER2, this)
+        }
+    }
+
+    fun applyAllAttackBuff(player: PlayerEnum){
+        var now_player = if(player == PlayerEnum.PLAYER1) player1 else player2
+
+        for(queue in now_player.attack_buf){
+            var tempq: ArrayDeque<AttackBuff> = ArrayDeque()
+            for(i in queue.indices){
+                val now = queue.first()
+                queue.removeFirst()
+                if(now.condition(player, this)){
+                    now.counter -= 1
+                    tempq.add(now)
+                }
+                if(now.counter != 0){
+                    queue.addLast(now)
+                }
+            }
+            for(buff in tempq){
+                buff.effect(now_player.pre_attack_card)
+            }
+        }
+    }
+
+    fun attackCheck(player: PlayerEnum): Boolean{
+        addAllCardText()
+
+        var now_player = if(player == PlayerEnum.PLAYER1) player1 else player2
+
+        for(queue in now_player.range_buf){
+            var tempq: ArrayDeque<RangeBuff> = ArrayDeque()
+            for(buff in queue){
+                if(buff.condition(player, this)){
+                    buff.counter *= -1
+                    tempq.add(buff)
+                }
+            }
+            for(buff in tempq){
+                buff.effect(now_player.pre_attack_card)
+            }
+        }
+
+        return now_player.pre_attack_card.rangeCheck(real_distance)
+    }
+
+    fun cleanAllBuff(){
+        cleanRangeTempBuff(player1.range_buf)
+        cleanRangeTempBuff(player2.range_buf)
+        cleanAttackTempBuff(player1.attack_buf)
+        cleanAttackTempBuff(player2.attack_buf)
+    }
+
+    fun addPreAttackZone(player: PlayerEnum, attack: MadeAttack): Boolean{
         when (player){
             PlayerEnum.PLAYER1 -> player1.addPreAttackZone(attack)
             PlayerEnum.PLAYER2 -> player2.addPreAttackZone(attack)
+        }
+
+        if(attackCheck(player)){
+            cleanRangeBuff(if(player == PlayerEnum.PLAYER1) player1.range_buf else player2.range_buf)
+            applyAllAttackBuff(player)
+            return true
+        }
+        else{
+            cleanAllBuff()
+            return false
         }
     }
     fun getPlayerLife(player: PlayerEnum): Int{
@@ -161,17 +242,66 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
         return Pair(data_player1, data_player2)
     }
 
-    suspend fun processTextDestruction(text: Text){
+    fun reactCheck(player: PlayerEnum, card: Card): Boolean{
+        val other_player = getPlayer(player.Opposite())
+
+        if(card.canUseAtReact(player, this)){
+            if(card.canReactable(other_player.pre_attack_card)){
+                return true
+            }
+        }
+
+        return false
+    }
+
+    suspend fun useCard(player: PlayerEnum, card_name: CardName, commandEnum: CommandEnum){
+
+    }
+
+    suspend fun afterMakeAttack(card_name: CardName, player: PlayerEnum){
+        val now_socket = getSocket(player)
+        val other_socket = getSocket(player.Opposite())
+        makeAttackComplete(now_socket, other_socket, card_name)
+
+        val now_player = getPlayer(player)
+        val other_player = getPlayer(player.Opposite())
+        sendAttackInformation(now_socket, other_socket, now_player.pre_attack_card.Information())
+        if(!other_player.end_turn){
+            while(true){
+                sendRequestReact(other_socket)
+                val react = receiveReact(other_socket)
+                if(react.first == CommandEnum.USE_CARD_IN_HAND){
+                    other_player.getCardFromHand(react.second!!)?.let {
+                        if(reactCheck(player.Opposite(), it)){
+
+                        }
+                    }
+                    continue
+                }
+                else if(react.first == CommandEnum.USE_CARD_IN_SPEICAL){
+                    other_player.getCardFromSpecial(react.second!!)?.let {
+                        if(reactCheck(player.Opposite(), it)){
+
+                        }
+                    }
+                    continue
+                }
+                else{
+                    break
+                }
+            }
+        }
+
+        sendChooseDamage(other_socket)
+    }
+
+    suspend fun processTextDestruction(card_name: CardName, player: PlayerEnum, text: Text){
         when(text.tag){
-            TextEffectTag.NEXT_ATTACK_ENCHANTMENT -> TODO()
-            TextEffectTag.CHANGE_CONCENTRATION -> TODO()
-            TextEffectTag.CHASM -> TODO()
-            TextEffectTag.MAKE_ATTACK -> TODO()
-            TextEffectTag.MOVE_SAKURA_TOKEN -> TODO()
-            TextEffectTag.IMMEDIATE_RETURN -> TODO()
-            TextEffectTag.END_TURN -> TODO()
-            TextEffectTag.USING_CONDITION -> TODO()
-            TextEffectTag.DO_NOT_NAP -> TODO()
+            TextEffectTag.MAKE_ATTACK -> {
+                text.effect!!(player, this, null)
+                afterMakeAttack(card_name, player)
+            }
+            else -> {}
         }
     }
 
@@ -207,7 +337,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
     suspend fun enchantmentDestruction(player: PlayerEnum, card: Card){
         val effects = card.destructionEnchantmentNormaly()
         for(i in effects){
-            processTextDestruction(i)
+            processTextDestruction(card.card_data.card_name, player, i)
         }
 
         when(player){
@@ -250,8 +380,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
 
         sendReduceNapEnd(player1_socket)
         sendReduceNapEnd(player2_socket)
-
-
 
         when(player){
             PlayerEnum.PLAYER1 -> {
@@ -310,8 +438,17 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
             }
         }
 
+        for(card_name in player1_card.keys){
+            val card = player1.enchantment_card[card_name]
+            sendDestructionEnchant(player1_socket, player2_socket, card_name)
+            enchantmentDestruction(PlayerEnum.PLAYER1, card!!)
+        }
 
-
+        for(card_name in player2_card.keys){
+            val card = player2.enchantment_card[card_name]
+            sendDestructionEnchant(player1_socket, player2_socket, card_name)
+            enchantmentDestruction(PlayerEnum.PLAYER1, card!!)
+        }
     }
 
     fun drawCard(player: PlayerEnum, number: Int): MutableList<CardName>{

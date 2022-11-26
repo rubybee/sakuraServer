@@ -8,15 +8,10 @@ import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.SakuraCardSetSend
 import com.sakurageto.protocol.SakuraSendData
 import com.sakurageto.protocol.sendStartTurn
-import com.typesafe.config.ConfigException.Null
-import io.ktor.server.websocket.*
 import io.ktor.websocket.*
-import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.util.logging.LogManager
-import javax.swing.text.StyledEditorKit.BoldAction
 import kotlin.random.Random
 
 class SakuraGame(private val player1: Connection, private val player2: Connection) {
@@ -31,26 +26,14 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
     }
 
     suspend fun waitUntil(player_id: PlayerEnum, wait_command: CommandEnum): SakuraSendData {
-        if (player_id == PlayerEnum.PLAYER1){
-            for (frame in player1.session.incoming) {
-                if (frame is Frame.Text) {
-                    val text = frame.readText()
-                    val data = Json.decodeFromString<SakuraSendData>(text)
-                    if (data.command == wait_command){
-                        return data
-                    }
-                }
-            }
-        }
+        var now_socket = if(player_id == PlayerEnum.PLAYER1) player1 else player2
 
-        else {
-            for (frame in player2.session.incoming) {
-                if (frame is Frame.Text) {
-                    val text = frame.readText()
-                    val data = Json.decodeFromString<SakuraSendData>(text)
-                    if (data.command == wait_command){
-                        return data
-                    }
+        for (frame in now_socket.session.incoming) {
+            if (frame is Frame.Text) {
+                val text = frame.readText()
+                val data = Json.decodeFromString<SakuraSendData>(text)
+                if (data.command == wait_command){
+                    return data
                 }
             }
         }
@@ -59,26 +42,14 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
     }
 
     suspend fun waitCardSetUntil(player_id: PlayerEnum, wait_command: CommandEnum): SakuraCardSetSend? {
-        if (player_id == PlayerEnum.PLAYER1){
-            for (frame in player1.session.incoming) {
-                if (frame is Frame.Text) {
-                    val text = frame.readText()
-                    val data = Json.decodeFromString<SakuraCardSetSend>(text)
-                    if (data.command == wait_command){
-                        return data
-                    }
-                }
-            }
-        }
+        var now_socket = if(player_id == PlayerEnum.PLAYER1) player1 else player2
 
-        else {
-            for (frame in player2.session.incoming) {
-                if (frame is Frame.Text) {
-                    val text = frame.readText()
-                    val data = Json.decodeFromString<SakuraCardSetSend>(text)
-                    if (data.command == wait_command){
-                        return data
-                    }
+        for (frame in now_socket.session.incoming) {
+            if (frame is Frame.Text) {
+                val text = frame.readText()
+                val data = Json.decodeFromString<SakuraCardSetSend>(text)
+                if (data.command == wait_command){
+                    return data
                 }
             }
         }

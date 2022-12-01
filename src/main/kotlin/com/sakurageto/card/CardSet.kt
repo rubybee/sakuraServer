@@ -21,7 +21,7 @@ object CardSet {
         ilsom.setAttack(DistanceType.CONTINUOUS, Pair(3, 3), null, 2, 2)
         ilsom.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { player, game_status, _->
             if (game_status.getPlayerLife(player) <= 3) {
-                game_status.addThisTurnAttackBuff(player, AttackBuff(CardName.YURINA_ILSUM, 1, AttackBufTag.PLUS_MINUS_IMMEDIATE, {_, _ -> true}, {madeAttack ->
+                game_status.addThisTurnAttackBuff(player, Buff(CardName.YURINA_ILSUM, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _ -> true}, {madeAttack ->
                     madeAttack.auraPlusMinus(1)
                 }))
             }
@@ -30,7 +30,7 @@ object CardSet {
         jaru_chigi.setAttack(DistanceType.CONTINUOUS, Pair(1, 2), null, 2, 1)
         jaru_chigi.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { player, game_status, _ ->
             if (game_status.getPlayerLife(player) <= 3) {
-                game_status.addThisTurnAttackBuff(player, AttackBuff(CardName.YURINA_JARUCHIGI, 1, AttackBufTag.PLUS_MINUS, {_, _ -> true}, {madeAttack ->
+                game_status.addThisTurnAttackBuff(player, Buff(CardName.YURINA_JARUCHIGI, 1, BufTag.PLUS_MINUS, {_, _ -> true}, {madeAttack ->
                     madeAttack.auraPlusMinus(1)
                 }))
             }
@@ -38,7 +38,7 @@ object CardSet {
         })
         guhab.setAttack(DistanceType.CONTINUOUS, Pair(2, 4), null, 4, 3)
         guhab.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { player, game_status, _ ->
-            game_status.addThisTurnAttackBuff(player, AttackBuff(CardName.YURINA_GUHAB, 1, AttackBufTag.PLUS_MINUS_IMMEDIATE, {_, _ -> true}, {madeAttack ->
+            game_status.addThisTurnAttackBuff(player, Buff(CardName.YURINA_GUHAB, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _ -> true}, {madeAttack ->
                 if(game_status.distance <= 2){
                     madeAttack.lifePlusMinus(-1); madeAttack.auraPlusMinus(-1)
                 }
@@ -65,7 +65,7 @@ object CardSet {
         })
         giyenbanzo.setEnchantment(4)
         giyenbanzo.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT){ player, game_status, _ ->
-            game_status.addThisTurnAttackBuff(player, AttackBuff(CardName.YURINA_GIYENBANJO, 1, AttackBufTag.PLUS_MINUS_IMMEDIATE, { _, _ -> true}, { madeAttack ->
+            game_status.addThisTurnAttackBuff(player, Buff(CardName.YURINA_GIYENBANJO, 1, BufTag.PLUS_MINUS_IMMEDIATE, { _, _ -> true}, { madeAttack ->
                 if(madeAttack.megami != MegamiEnum.YURINA) madeAttack.run {
                     Chogek(); auraPlusMinus(1); lifePlusMinus(1)
                 }
@@ -77,9 +77,7 @@ object CardSet {
         pobaram.setAttack(DistanceType.CONTINUOUS, Pair(0, 10), null, 999, 2)
         pobaram.setSpecial(3)
         pobaram.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.REACT_ATTACK_REDUCE){ player, game_status, _ ->
-            game_status.addThisTurnAttackBuff(player.Opposite(), AttackBuff(CardName.YURINA_POBARAM, 1, AttackBufTag.PLUS_MINUS_IMMEDIATE, {_, _ -> true}, {madeAttack ->
-                madeAttack.auraPlusMinus(-2)
-            }))
+
             null
         })
         pobaram.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.END_TURN, null))
@@ -100,7 +98,10 @@ object CardSet {
         juruck.setAttack(DistanceType.CONTINUOUS, Pair(1, 4), null, 5, 5)
         juruck.setSpecial(5)
         juruck.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.USING_CONDITION){player, game_status, _ ->
-            game_status.getPlayerLife(player) <= 3
+            if(game_status.getPlayerLife(player) <= 3){
+                1
+            }
+            0
         })
     }
 

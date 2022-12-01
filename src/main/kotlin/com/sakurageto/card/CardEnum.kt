@@ -66,33 +66,10 @@ enum class TextEffectTag() {
     CAN_REACTABLE,
     REACT_ATTACK_REDUCE,
     REACT_ATTACK_NO_DAMAGE,
-    REACT_ATTACK_INVALID
-}
-
-enum class AttackBufTag(){
-    INSERT,
-    CHANGE_EACH,
-    MULTIPLE,
-    DIVIDE,
-    PLUS_MINUS,
-    INSERT_IMMEDIATE,
-    CHANGE_EACH_IMMEDIATE,
-    MULTIPLE_IMMEDIATE,
-    DIVIDE_IMMEDIATE,
-    PLUS_MINUS_IMMEDIATE,
-}
-
-enum class RangeBufTag(){
-    CHANGE,
-    ADD,
-    DELETE,
-    PLUS,
-    MINUS,
-    CHANGE_IMMEDIATE,
-    ADD_IMMEDIATE,
-    DELETE_IMMEDIATE,
-    PLUS_IMMEDIATE,
-    MINUS_IMMEDIATE
+    REACT_ATTACK_INVALID,
+    IF_REACT_BUFF,
+    COST_BUFF,
+    COST_X,
 }
 
 enum class CardName() {

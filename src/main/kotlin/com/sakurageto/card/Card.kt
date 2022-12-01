@@ -2,6 +2,7 @@ package com.sakurageto.card
 
 import com.sakurageto.card.CardSet.returnCardDataByName
 import com.sakurageto.gamelogic.GameStatus
+import com.sakurageto.gamelogic.PlayerStatus
 import kotlin.collections.ArrayDeque
 
 class Card(val card_data: CardData, val player: PlayerEnum, var special_card_state: SpecialCardEnum?) {
@@ -36,21 +37,14 @@ class Card(val card_data: CardData, val player: PlayerEnum, var special_card_sta
     fun reduceNapNormaly(): Boolean{
        card_data.effect?.let {
            for(i in it){
-               when(i.timing_tag){
-                   TextEffectTimingTag.CONSTANT_EFFECT -> {
-                   }
-                   TextEffectTimingTag.IN_DEPLOYMENT -> {
-                   }
-                   else -> {
-                       continue
-                   }
-               }
-               when(i.tag){
-                   TextEffectTag.DO_NOT_NAP -> {
-                       return false
-                   }
-                   else -> {
-                       continue
+               if(i.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT || i.timing_tag == TextEffectTimingTag.IN_DEPLOYMENT){
+                   when(i.tag){
+                       TextEffectTag.DO_NOT_NAP -> {
+                           return false
+                       }
+                       else -> {
+                           continue
+                       }
                    }
                }
            }
@@ -81,16 +75,26 @@ class Card(val card_data: CardData, val player: PlayerEnum, var special_card_sta
         }
         return return_data
     }
-    fun addAttackBuff(player: PlayerEnum, gameStatus: GameStatus){
+    suspend fun addAttackBuff(player: PlayerEnum, gameStatus: GameStatus){
         card_data.effect?.let {
             for(i in it){
                 when(i.timing_tag){
-                    TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTimingTag.USED -> {
+                    TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTimingTag.USED -> {
                         when(i.tag){
                             TextEffectTag.NEXT_ATTACK_ENCHANTMENT -> {
                                i.effect!!(player, gameStatus, null)
                             }
                             else -> continue
+                        }
+                    }
+                    TextEffectTimingTag.IN_DEPLOYMENT -> {
+                        if((nap ?:0) >= 1 && card_data.card_type == CardType.ENCHANTMENT){
+                            when(i.tag){
+                                TextEffectTag.NEXT_ATTACK_ENCHANTMENT -> {
+                                    i.effect!!(player, gameStatus, null)
+                                }
+                                else -> continue
+                            }
                         }
                     }
                     else -> continue
@@ -99,7 +103,35 @@ class Card(val card_data: CardData, val player: PlayerEnum, var special_card_sta
         }
     }
 
-    fun canUseAtReact(player: PlayerEnum, gameStatus: GameStatus): Boolean{
+    suspend fun addCostBuff(player: PlayerEnum, gameStatus: GameStatus){
+        card_data.effect?.let {
+            for(i in it){
+                when(i.timing_tag){
+                    TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTimingTag.USED -> {
+                        when(i.tag){
+                            TextEffectTag.COST_BUFF -> {
+                                i.effect!!(player, gameStatus, null)
+                            }
+                            else -> continue
+                        }
+                    }
+                    TextEffectTimingTag.IN_DEPLOYMENT -> {
+                        if((nap ?:0) >= 1 && card_data.card_type == CardType.ENCHANTMENT){
+                            when(i.tag){
+                                TextEffectTag.COST_BUFF -> {
+                                    i.effect!!(player, gameStatus, null)
+                                }
+                                else -> continue
+                            }
+                        }
+                    }
+                    else -> continue
+                }
+            }
+        }
+    }
+
+    suspend fun canUseAtReact(player: PlayerEnum, gameStatus: GameStatus): Boolean{
         if(card_data.sub_type == SubType.REACTION){
             return true
         }
@@ -109,7 +141,10 @@ class Card(val card_data: CardData, val player: PlayerEnum, var special_card_sta
                     TextEffectTimingTag.CONSTANT_EFFECT -> {
                         when(text.tag){
                             TextEffectTag.CAN_REACTABLE -> {
-                                return text.effect!!(player, gameStatus, null)!!
+                                if(text.effect!!(player, gameStatus, null)!! == 1){
+                                    return true
+                                }
+                                return false
                             }
                             else -> continue
                         }
@@ -135,6 +170,31 @@ class Card(val card_data: CardData, val player: PlayerEnum, var special_card_sta
             if(card_data.card_class == CardClass.NORMAL){
                 return false
             }
+        }
+        return true
+    }
+
+    suspend fun getBaseCost(player: PlayerEnum, gameStatus: GameStatus): Int{
+        if(card_data.cost != null){
+            return card_data.cost!!
+        }
+        else{
+            card_data.effect?.let {
+                for(text in it){
+                    if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
+                        if(text.tag == TextEffectTag.COST_X){
+                            return text.effect!!(player, gameStatus, null)!!
+                        }
+                    }
+                }
+            }
+        }
+        return 1000
+    }
+    suspend fun canUse(player: PlayerEnum, gameStatus: GameStatus): Boolean{
+        if(card_data.card_class == CardClass.SPECIAL){
+            gameStatus.addAllCardCostBuff()
+
         }
         return true
     }

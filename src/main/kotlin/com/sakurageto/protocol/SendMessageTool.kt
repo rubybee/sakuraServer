@@ -84,19 +84,42 @@ suspend fun sendAttackInformation(mine: Connection, other: Connection, data: Mut
     val data_other = SakuraSendData(CommandEnum.ATTACK_INFORMATION_OTHER, data)
     mine.session.send(Json.encodeToString(data_your))
     other.session.send(Json.encodeToString(data_other))
-
 }
 
-suspend fun sendChooseDamage(mine: Connection){
-    val data = SakuraCardCommand(CommandEnum.CHOOSE_DAMAGE, null)
+suspend fun sendChooseDamage(mine: Connection, command: CommandEnum, aura: Int, life: Int){
+    val pre_data = SakuraCardCommand(CommandEnum.CHOOSE_DAMAGE, null)
+    val data = SakuraSendData(command, mutableListOf(aura, life))
+    mine.session.send(Json.encodeToString(pre_data))
     mine.session.send(Json.encodeToString(data))
 }
-
 suspend fun sendRequestReact(mine: Connection){
     val data = SakuraCardCommand(CommandEnum.REACT_REQUEST, null)
     mine.session.send(Json.encodeToString(data))
 }
 
+suspend fun sendMoveToken(mine: Connection, other: Connection, from: LocationEnum, to: LocationEnum, number: Int){
+    val pre_data = SakuraCardCommand(CommandEnum.MOVE_TOKEN, null)
+    mine.session.send(Json.encodeToString(pre_data))
+    other.session.send(Json.encodeToString(pre_data))
+    val data_your = SakuraSendData(CommandEnum.MOVE_TOKEN, mutableListOf(from.real_number, to.real_number, number))
+    val data_other = SakuraSendData(CommandEnum.MOVE_TOKEN, mutableListOf(from.Opposite().real_number, to.Opposite().real_number, number))
+    mine.session.send(Json.encodeToString(data_your))
+    other.session.send(Json.encodeToString(data_other))
+}
+
+suspend fun sendAddConcentration(mine: Connection, other: Connection){
+    val data_your = SakuraCardCommand(CommandEnum.ADD_CONCENTRATION_YOUR, null)
+    val data_other = SakuraSendData(CommandEnum.ADD_CONCENTRATION_OTHER, null)
+    mine.session.send(Json.encodeToString(data_your))
+    other.session.send(Json.encodeToString(data_other))
+}
+
+suspend fun sendRemoveShrink(mine: Connection, other: Connection){
+    val data_your = SakuraCardCommand(CommandEnum.REMOVE_SHRINK_YOUR, null)
+    val data_other = SakuraSendData(CommandEnum.REMOVE_SHRINK_OTHER, null)
+    mine.session.send(Json.encodeToString(data_your))
+    other.session.send(Json.encodeToString(data_other))
+}
 
 //receive function
 suspend fun receiveEnchantment(player: Connection): Pair<CommandEnum, CardName?> {
@@ -129,4 +152,20 @@ suspend fun receiveReact(player: Connection): Pair<CommandEnum, CardName?> {
         }
     }
     return Pair(CommandEnum.DO_NOT_REACT, null)
+}
+
+suspend fun receiveChooseDamage(player: Connection): CommandEnum {
+    for (frame in player.session.incoming) {
+        if (frame is Frame.Text) {
+            val text = frame.readText()
+            val data = Json.decodeFromString<SakuraCardCommand>(text)
+            if (data.command == CommandEnum.CHOOSE_AURA || data.command == CommandEnum.CHOOSE_LIFE){
+                return data.command
+            }
+            else {
+                continue
+            }
+        }
+    }
+    return CommandEnum.CHOOSE_AURA
 }

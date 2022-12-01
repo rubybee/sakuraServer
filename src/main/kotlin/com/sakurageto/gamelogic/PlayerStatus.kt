@@ -7,6 +7,8 @@ class PlayerStatus {
     var max_aura = 5
     var aura = 3
 
+    var using_card: Card? = null
+
     var hand: MutableList<Card> = mutableListOf()
 
     fun getCardFromHand(card_name: CardName): Card?{
@@ -16,6 +18,16 @@ class PlayerStatus {
             }
         }
         return null
+    }
+
+    fun useCardFromHand(card_name: CardName) {
+        for(i in hand.indices){
+            if(hand[i].card_data.card_name == card_name){
+                using_card = hand[i]
+                hand.removeAt(i)
+                return
+            }
+        }
     }
 
     var enchantment_card: HashMap<CardName, Card> = HashMap()
@@ -31,6 +43,18 @@ class PlayerStatus {
         return null
     }
 
+    fun useCardFromSpecial(card_name: CardName) {
+        for(i in special_card_deck.indices){
+            val card = special_card_deck.first()
+            special_card_deck.removeFirst()
+            if(card.card_data.card_name == card_name){
+                using_card = card
+                return
+            }
+            special_card_deck.addLast(card)
+        }
+    }
+
     var normal_card_deck: ArrayDeque<Card> = ArrayDeque<Card>()
     var used_special_card: ArrayDeque<Card> = ArrayDeque<Card>()
 
@@ -41,6 +65,7 @@ class PlayerStatus {
     fun usedToSpecial(card_name: CardName): Boolean{
         for(i in 0..used_special_card.size){
             val now = used_special_card.first()
+            used_special_card.removeFirst()
             if(now.card_data.card_name == card_name){
                 special_card_deck.addLast(now)
                 return true
@@ -92,25 +117,26 @@ class PlayerStatus {
     var unselected_card: MutableList<CardName> = mutableListOf()
     var unselected_specialcard: MutableList<CardName> = mutableListOf()
 
-    lateinit var pre_attack_card: MadeAttack
+    var pre_attack_card: MadeAttack? = null
 
     fun addPreAttackZone(madeAttack: MadeAttack){
         pre_attack_card = madeAttack
     }
 
-    var attack_buf: Array<ArrayDeque<AttackBuff>> = arrayOf(
-        ArrayDeque<AttackBuff>(),
-        ArrayDeque<AttackBuff>(),
-        ArrayDeque<AttackBuff>(),
-        ArrayDeque<AttackBuff>(),
-        ArrayDeque<AttackBuff>(),
-        ArrayDeque<AttackBuff>(),
-        ArrayDeque<AttackBuff>(),
-        ArrayDeque<AttackBuff>(),
-        ArrayDeque<AttackBuff>(),
-        ArrayDeque<AttackBuff>(),
-        ArrayDeque<AttackBuff>(),
+    var attack_buf: Array<ArrayDeque<Buff>> = arrayOf(
+        ArrayDeque<Buff>(),
+        ArrayDeque<Buff>(),
+        ArrayDeque<Buff>(),
+        ArrayDeque<Buff>(),
+        ArrayDeque<Buff>(),
+        ArrayDeque<Buff>(),
+        ArrayDeque<Buff>(),
+        ArrayDeque<Buff>(),
+        ArrayDeque<Buff>(),
+        ArrayDeque<Buff>(),
+        ArrayDeque<Buff>(),
     )
+
     var range_buf: Array<ArrayDeque<RangeBuff>> = arrayOf(
         ArrayDeque<RangeBuff>(),
         ArrayDeque<RangeBuff>(),
@@ -124,18 +150,32 @@ class PlayerStatus {
         ArrayDeque<RangeBuff>(),
     )
 
-    fun addAttackBuff(buf: AttackBuff){
+    var cost_buf: Array<ArrayDeque<CostBuff>> = arrayOf(
+        ArrayDeque<CostBuff>(),
+        ArrayDeque<CostBuff>(),
+        ArrayDeque<CostBuff>(),
+        ArrayDeque<CostBuff>(),
+        ArrayDeque<CostBuff>(),
+        ArrayDeque<CostBuff>(),
+        ArrayDeque<CostBuff>(),
+        ArrayDeque<CostBuff>(),
+        ArrayDeque<CostBuff>(),
+        ArrayDeque<CostBuff>(),
+        ArrayDeque<CostBuff>(),
+    )
+
+    fun addAttackBuff(buf: Buff){
         when(buf.tag){
-            AttackBufTag.INSERT -> attack_buf[1].add(buf)
-            AttackBufTag.CHANGE_EACH -> attack_buf[3].add(buf)
-            AttackBufTag.MULTIPLE -> attack_buf[5].add(buf)
-            AttackBufTag.DIVIDE -> attack_buf[7].add(buf)
-            AttackBufTag.PLUS_MINUS -> attack_buf[9].add(buf)
-            AttackBufTag.INSERT_IMMEDIATE -> attack_buf[0].add(buf)
-            AttackBufTag.CHANGE_EACH_IMMEDIATE -> attack_buf[2].add(buf)
-            AttackBufTag.MULTIPLE_IMMEDIATE -> attack_buf[4].add(buf)
-            AttackBufTag.DIVIDE_IMMEDIATE -> attack_buf[6].add(buf)
-            AttackBufTag.PLUS_MINUS_IMMEDIATE -> attack_buf[8].add(buf)
+            BufTag.INSERT -> attack_buf[1].add(buf)
+            BufTag.CHANGE_EACH -> attack_buf[3].add(buf)
+            BufTag.MULTIPLE -> attack_buf[5].add(buf)
+            BufTag.DIVIDE -> attack_buf[7].add(buf)
+            BufTag.PLUS_MINUS -> attack_buf[9].add(buf)
+            BufTag.INSERT_IMMEDIATE -> attack_buf[0].add(buf)
+            BufTag.CHANGE_EACH_IMMEDIATE -> attack_buf[2].add(buf)
+            BufTag.MULTIPLE_IMMEDIATE -> attack_buf[4].add(buf)
+            BufTag.DIVIDE_IMMEDIATE -> attack_buf[6].add(buf)
+            BufTag.PLUS_MINUS_IMMEDIATE -> attack_buf[8].add(buf)
             else -> attack_buf[11].add(buf)
         }
     }
@@ -152,6 +192,22 @@ class PlayerStatus {
             RangeBufTag.DELETE_IMMEDIATE -> range_buf[4].add(buf)
             RangeBufTag.PLUS_IMMEDIATE -> range_buf[6].add(buf)
             RangeBufTag.MINUS_IMMEDIATE -> range_buf[8].add(buf)
+        }
+    }
+
+    fun addCostBuff(buf: CostBuff){
+        when(buf.tag){
+            BufTag.INSERT -> cost_buf[1].add(buf)
+            BufTag.CHANGE_EACH -> cost_buf[3].add(buf)
+            BufTag.MULTIPLE -> cost_buf[5].add(buf)
+            BufTag.DIVIDE -> cost_buf[7].add(buf)
+            BufTag.PLUS_MINUS -> cost_buf[9].add(buf)
+            BufTag.INSERT_IMMEDIATE -> cost_buf[0].add(buf)
+            BufTag.CHANGE_EACH_IMMEDIATE -> cost_buf[2].add(buf)
+            BufTag.MULTIPLE_IMMEDIATE -> cost_buf[4].add(buf)
+            BufTag.DIVIDE_IMMEDIATE -> cost_buf[6].add(buf)
+            BufTag.PLUS_MINUS_IMMEDIATE -> cost_buf[8].add(buf)
+            else -> cost_buf[11].add(buf)
         }
     }
 

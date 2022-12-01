@@ -39,14 +39,27 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
             PlayerEnum.PLAYER2 -> player2_life_listner.addLast(listner)
         }
     }
+
+    suspend fun auraToDust(player: PlayerEnum, number: Int){
+        var now_player = getPlayer(player)
+        var value: Int
+
+        if(now_player.aura >= number){
+            value = number
+            now_player.aura -= number
+        }
+        else{
+            value = now_player.aura
+            now_player.aura = 0
+        }
+
+        sendMoveToken(getSocket(player), getSocket(player.Opposite()), LocationEnum.YOUR_AURA, LocationEnum.DUST, value)
+    }
+
+
     //return endgame
     suspend fun lifeToSelfFlare(player: PlayerEnum, number: Int, reconstruct: Boolean): Boolean{
-        var now_player: PlayerStatus
-
-        when(player){
-            PlayerEnum.PLAYER1 -> now_player = player1
-            PlayerEnum.PLAYER2 -> now_player = player2
-        }
+        var now_player = getPlayer(player)
 
         val before = now_player.life
 
@@ -57,6 +70,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
         else{
             return true
         }
+
+        sendMoveToken(getSocket(player), getSocket(player.Opposite()), LocationEnum.YOUR_LIFE, LocationEnum.YOUR_FLARE, number)
 
         when(player){
             PlayerEnum.PLAYER1 -> {
@@ -92,22 +107,21 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
         return false
     }
 
-    fun dustToAura(player: PlayerEnum, number: Int){
+    suspend fun dustToAura(player: PlayerEnum, number: Int){
+        val now_player = getPlayer(player)
+        var value: Int
         if(number > dust){
-            dust -= when (player){
-                PlayerEnum.PLAYER1 -> player1.plusAura(dust)
-                PlayerEnum.PLAYER2 -> player2.plusAura(dust)
-            }
+            value = now_player.plusAura(dust)
+            dust -= value
         }
         else{
-            dust -= when (player){
-                PlayerEnum.PLAYER1 -> player1.plusAura(number)
-                PlayerEnum.PLAYER2 -> player2.plusAura(number)
-            }
+            value = now_player.plusAura(number)
+            dust -= value
         }
+        sendMoveToken(getSocket(player), getSocket(player.Opposite()), LocationEnum.DUST, LocationEnum.YOUR_AURA, value)
     }
 
-    fun addAllCardText(){
+    suspend fun addAllCardTextBuff(){
         for(card in player1.enchantment_card){
             card.value.addAttackBuff(PlayerEnum.PLAYER1, this)
         }
@@ -122,11 +136,26 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
         }
     }
 
+    suspend fun addAllCardCostBuff(){
+        for(card in player1.enchantment_card){
+            card.value.addCostBuff(PlayerEnum.PLAYER1, this)
+        }
+        for(card in player1.used_special_card){
+            card.addCostBuff(PlayerEnum.PLAYER1, this)
+        }
+        for(card in player2.enchantment_card){
+            card.value.addCostBuff(PlayerEnum.PLAYER2, this)
+        }
+        for(card in player2.used_special_card){
+            card.addCostBuff(PlayerEnum.PLAYER2, this)
+        }
+    }
+
     fun applyAllAttackBuff(player: PlayerEnum){
         var now_player = if(player == PlayerEnum.PLAYER1) player1 else player2
 
         for(queue in now_player.attack_buf){
-            var tempq: ArrayDeque<AttackBuff> = ArrayDeque()
+            var tempq: ArrayDeque<Buff> = ArrayDeque()
             for(i in queue.indices){
                 val now = queue.first()
                 queue.removeFirst()
@@ -139,15 +168,15 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
                 }
             }
             for(buff in tempq){
-                buff.effect(now_player.pre_attack_card)
+                buff.effect(now_player.pre_attack_card!!)
             }
         }
     }
 
-    fun attackCheck(player: PlayerEnum): Boolean{
-        addAllCardText()
+    suspend fun attackCheck(player: PlayerEnum): Boolean{
+        addAllCardTextBuff()
 
-        var now_player = if(player == PlayerEnum.PLAYER1) player1 else player2
+        var now_player = getPlayer(player)
 
         for(queue in now_player.range_buf){
             var tempq: ArrayDeque<RangeBuff> = ArrayDeque()
@@ -158,11 +187,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
                 }
             }
             for(buff in tempq){
-                buff.effect(now_player.pre_attack_card)
+                buff.effect(now_player.pre_attack_card!!)
             }
         }
 
-        return now_player.pre_attack_card.rangeCheck(real_distance)
+        return now_player.pre_attack_card!!.rangeCheck(real_distance)
     }
 
     fun cleanAllBuff(){
@@ -172,14 +201,15 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
         cleanAttackTempBuff(player2.attack_buf)
     }
 
-    fun addPreAttackZone(player: PlayerEnum, attack: MadeAttack): Boolean{
-        when (player){
-            PlayerEnum.PLAYER1 -> player1.addPreAttackZone(attack)
-            PlayerEnum.PLAYER2 -> player2.addPreAttackZone(attack)
-        }
+    suspend fun addPreAttackZone(player: PlayerEnum, attack: MadeAttack): Boolean{
+        var now_player = getPlayer(player)
+        var other_player = getPlayer(player.Opposite())
+
+        now_player.addPreAttackZone(attack)
 
         if(attackCheck(player)){
-            cleanRangeBuff(if(player == PlayerEnum.PLAYER1) player1.range_buf else player2.range_buf)
+            cleanRangeTempBuff(other_player.range_buf)
+            cleanRangeBuff(now_player.range_buf)
             applyAllAttackBuff(player)
             return true
         }
@@ -195,7 +225,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
         }
     }
 
-    fun addThisTurnAttackBuff(player: PlayerEnum, effect: AttackBuff){
+    fun addThisTurnAttackBuff(player: PlayerEnum, effect: Buff){
         when (player){
             PlayerEnum.PLAYER1 -> player1.addAttackBuff(effect)
             PlayerEnum.PLAYER2 -> player2.addAttackBuff(effect)
@@ -209,53 +239,32 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
         }
     }
 
-    fun addConcentration(player: PlayerEnum): Pair<SakuraCardCommand?, SakuraCardCommand?>{
-        var data_player1: SakuraCardCommand? = null
-        var data_player2: SakuraCardCommand? = null
-        when (player){
-            PlayerEnum.PLAYER1 -> {
-                when(player1.addConcentration()){
-                    0 -> {
-                        data_player1 = SakuraCardCommand(CommandEnum.ADD_CONCENTRATION_YOUR, null)
-                        data_player2 = SakuraCardCommand(CommandEnum.ADD_CONCENTRATION_OTHER, null)
-                    }
-                    1 -> {
-                        data_player1 = SakuraCardCommand(CommandEnum.REMOVE_SHRINK_YOUR, null)
-                        data_player2 = SakuraCardCommand(CommandEnum.REMOVE_SHRINK_OTHER, null)
-                    }
-                }
+    suspend fun addConcentration(player: PlayerEnum){
+        var now_player = getPlayer(player)
+
+        var now_socket = getSocket(player)
+        var other_socket = getSocket(player)
+
+        when(now_player.addConcentration()){
+            0 -> {
+                sendAddConcentration(now_socket, other_socket)
             }
-            PlayerEnum.PLAYER2 -> {
-                when(player2.addConcentration()){
-                    0 -> {
-                        data_player1 = SakuraCardCommand(CommandEnum.ADD_CONCENTRATION_OTHER, null)
-                        data_player2 = SakuraCardCommand(CommandEnum.ADD_CONCENTRATION_YOUR, null)
-                    }
-                    1 -> {
-                        data_player1 = SakuraCardCommand(CommandEnum.REMOVE_SHRINK_YOUR, null)
-                        data_player2 = SakuraCardCommand(CommandEnum.REMOVE_SHRINK_OTHER, null)
-                    }
-                }
+            1 -> {
+                sendRemoveShrink(now_socket, other_socket)
             }
         }
-
-        return Pair(data_player1, data_player2)
     }
 
-    fun reactCheck(player: PlayerEnum, card: Card): Boolean{
+    suspend fun reactCheck(player: PlayerEnum, card: Card): Boolean{
         val other_player = getPlayer(player.Opposite())
 
         if(card.canUseAtReact(player, this)){
-            if(card.canReactable(other_player.pre_attack_card)){
+            if(card.canReactable(other_player.pre_attack_card!!)){
                 return true
             }
         }
 
         return false
-    }
-
-    suspend fun useCard(player: PlayerEnum, card_name: CardName, commandEnum: CommandEnum){
-
     }
 
     suspend fun afterMakeAttack(card_name: CardName, player: PlayerEnum){
@@ -265,15 +274,15 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
 
         val now_player = getPlayer(player)
         val other_player = getPlayer(player.Opposite())
-        sendAttackInformation(now_socket, other_socket, now_player.pre_attack_card.Information())
-        if(!other_player.end_turn){
+        sendAttackInformation(now_socket, other_socket, now_player.pre_attack_card!!.Information())
+        if(!other_player.end_turn && other_player.pre_attack_card == null){
             while(true){
                 sendRequestReact(other_socket)
                 val react = receiveReact(other_socket)
                 if(react.first == CommandEnum.USE_CARD_IN_HAND){
                     other_player.getCardFromHand(react.second!!)?.let {
                         if(reactCheck(player.Opposite(), it)){
-
+                            TODO()
                         }
                     }
                     continue
@@ -281,7 +290,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
                 else if(react.first == CommandEnum.USE_CARD_IN_SPEICAL){
                     other_player.getCardFromSpecial(react.second!!)?.let {
                         if(reactCheck(player.Opposite(), it)){
-
+                            TODO()
                         }
                     }
                     continue
@@ -291,8 +300,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
                 }
             }
         }
-
-        sendChooseDamage(other_socket)
     }
 
     suspend fun processTextDestruction(card_name: CardName, player: PlayerEnum, text: Text){
@@ -310,6 +317,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
             PlayerEnum.PLAYER1 -> {
                 when(card.card_data.card_class){
                     CardClass.SPECIAL -> {
+                        card.special_card_state = SpecialCardEnum.PLAYED
                         player1.used_special_card.addLast(card)
                         sendUsed(player1_socket, player2_socket, card.card_data.card_name)
                     }
@@ -322,6 +330,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
             PlayerEnum.PLAYER2 -> {
                 when(card.card_data.card_class){
                     CardClass.SPECIAL -> {
+                        card.special_card_state = SpecialCardEnum.PLAYED
                         player2.used_special_card.addLast(card)
                         sendUsed(player1_socket, player2_socket, card.card_data.card_name)
                     }
@@ -361,6 +370,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
 
         for(i in player1.enchantment_card){
             if(i.value.reduceNapNormaly()){
+                dust += 1
                 sendReduceNapSelf(player1_socket, i.key)
                 sendReduceNapOther(player2_socket, i.key)
             }
@@ -370,6 +380,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
         }
         for(i in player2.enchantment_card){
             if(i.value.reduceNapNormaly()){
+                dust += 1
                 sendReduceNapOther(player1_socket, i.key)
                 sendReduceNapSelf(player2_socket, i.key)
             }
@@ -451,11 +462,48 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
         }
     }
 
-    fun drawCard(player: PlayerEnum, number: Int): MutableList<CardName>{
+    suspend fun gameEnd(){
+
+    }
+
+    suspend fun processDamage(player: PlayerEnum, command: CommandEnum, damage: Pair<Int, Int>, reconstruct: Boolean){
+        val now_player = getPlayer(player)
+        if(command == CommandEnum.CHOOSE_AURA){
+            if(damage.first == 999){
+                processDamage(player, CommandEnum.CHOOSE_LIFE, damage, reconstruct)
+            }
+            else{
+                if(now_player.aura < damage.first){
+                    processDamage(player, CommandEnum.CHOOSE_LIFE, damage, reconstruct)
+                }
+                else{
+                    auraToDust(player, damage.first)
+                }
+            }
+        }
+        else{
+            if(damage.second == 999){
+                processDamage(player, CommandEnum.CHOOSE_AURA, damage, reconstruct)
+            }
+            else{
+                if(lifeToSelfFlare(player, damage.second, reconstruct)) {
+                    gameEnd()
+                }
+            }
+        }
+    }
+
+    suspend fun drawCard(player: PlayerEnum, number: Int): MutableList<CardName>{
         var return_list = mutableListOf<CardName>()
         when (player){
             PlayerEnum.PLAYER1 -> {
                 for(i in 1..number){
+                    if(player1.normal_card_deck.size == 0){
+                        sendChooseDamage(player1_socket, CommandEnum.CHOOSE_CHOJO, 1, 1)
+                        val chosen = receiveChooseDamage(player1_socket)
+                        processDamage(PlayerEnum.PLAYER1, chosen, Pair(1, 1), false)
+                        continue
+                    }
                     return_list.add(player1.normal_card_deck.first().card_data.card_name)
                     player1.hand.add(player1.normal_card_deck.first())
                     player1.normal_card_deck.removeFirst()
@@ -463,6 +511,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
             }
             PlayerEnum.PLAYER2 -> {
                 for(i in 1..number){
+                    if(player2.normal_card_deck.size == 0){
+                        sendChooseDamage(player2_socket, CommandEnum.CHOOSE_CHOJO, 1, 1)
+                        val chosen = receiveChooseDamage(player2_socket)
+                        processDamage(PlayerEnum.PLAYER2, chosen, Pair(1, 1), false)
+                        continue
+                    }
                     return_list.add(player2.normal_card_deck.first().card_data.card_name)
                     player2.hand.add(player2.normal_card_deck.first())
                     player2.normal_card_deck.removeFirst()

@@ -46,6 +46,14 @@ fun cleanRangeBuff(array: Array<ArrayDeque<RangeBuff>>){
     }
 }
 
+fun cleanCostTempBuff(array: Array<ArrayDeque<CostBuff>>){
+    for(index in array.indices){
+        if(index % 2 == 0){
+            array[index].clear()
+        }
+    }
+}
+
 fun cleanAttackTempBuff(array: Array<ArrayDeque<Buff>>){
     for(index in array.indices){
         if(index % 2 == 0){

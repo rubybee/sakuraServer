@@ -4,6 +4,8 @@ import com.sakurageto.card.*
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.SakuraSendData
 class PlayerStatus {
+    var full_action = false
+
     var max_aura = 5
     var aura = 3
 

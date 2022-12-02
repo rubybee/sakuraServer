@@ -191,11 +191,35 @@ class Card(val card_data: CardData, val player: PlayerEnum, var special_card_sta
         }
         return 1000
     }
+
+    suspend fun textUseCheck(player: PlayerEnum, gameStatus: GameStatus): Boolean{
+        card_data.effect?.let {
+            for(text in it){
+                if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT && text.tag == TextEffectTag.USING_CONDITION){
+                    if(text.effect!!(player, gameStatus, null)!! == 1){
+                        return true
+                    }
+                    return false
+                }
+            }
+        }
+        return true
+    }
     suspend fun canUse(player: PlayerEnum, gameStatus: GameStatus): Boolean{
+        if(card_data.sub_type == SubType.FULLPOWER){
+            if(!gameStatus.getPlayerFullAction(player)){
+                return false
+            }
+        }
+
+        if(!textUseCheck(player, gameStatus)){
+            return false
+        }
+
         if(card_data.card_class == CardClass.SPECIAL){
             gameStatus.addAllCardCostBuff()
-
         }
+
         return true
     }
 }

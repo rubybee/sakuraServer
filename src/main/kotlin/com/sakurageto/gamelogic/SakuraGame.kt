@@ -18,7 +18,6 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
     private var game_mode: Int //0 = no ban 1 = pick ban
     private var game_status: GameStatus
     private var first_turn = PlayerEnum.PLAYER1
-    private var now_turn = PlayerEnum.PLAYER1
 
     init {
         game_mode = 0
@@ -272,7 +271,7 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
     }
 
     suspend fun startTurn(){
-        when(now_turn){
+        when(game_status.getTurnPlayer()){
             PlayerEnum.PLAYER1 -> {
                 sendStartTurn(player1)
                 game_status.addConcentration(PlayerEnum.PLAYER1)
@@ -286,7 +285,7 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
 
 
     suspend fun simulateStart(){
-        now_turn = first_turn
+        game_status.setTurn(first_turn)
         while(true){
 
         }

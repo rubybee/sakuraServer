@@ -5,6 +5,15 @@ import com.sakurageto.card.*
 import com.sakurageto.protocol.*
 
 class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val player1_socket: Connection, val player2_socket: Connection) {
+    var now_turn: PlayerEnum = PlayerEnum.PLAYER1
+
+    fun setTurn(player: PlayerEnum){
+        now_turn = player
+    }
+
+    fun getTurnPlayer(): PlayerEnum{
+        return now_turn
+    }
 
     var real_distance = 10
     var distance = 10
@@ -151,6 +160,31 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
         }
     }
 
+    fun applyAllCostBuff(player: PlayerEnum, cost: Int): Int{
+        var now_player = if(player == PlayerEnum.PLAYER1) player1 else player2
+        var now_cost = cost
+
+        for(queue in now_player.cost_buf){
+            var tempq: ArrayDeque<CostBuff> = ArrayDeque()
+            for(i in queue.indices){
+                val now = queue.first()
+                queue.removeFirst()
+                if(now.condition(player, this)){
+                    now.counter -= 1
+                    tempq.add(now)
+                }
+                if(now.counter != 0){
+                    queue.addLast(now)
+                }
+            }
+            for(buff in tempq){
+                now_cost = buff.effect(now_cost)
+            }
+        }
+
+        return now_cost
+    }
+
     fun applyAllAttackBuff(player: PlayerEnum){
         var now_player = if(player == PlayerEnum.PLAYER1) player1 else player2
 
@@ -222,6 +256,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
         when (player){
             PlayerEnum.PLAYER1 -> return player1.life
             PlayerEnum.PLAYER2 -> return player2.life
+        }
+    }
+
+    fun getPlayerFullAction(player: PlayerEnum): Boolean{
+        when (player){
+            com.sakurageto.card.PlayerEnum.PLAYER1 -> return player1.full_action
+            com.sakurageto.card.PlayerEnum.PLAYER2 -> return player2.full_action
         }
     }
 

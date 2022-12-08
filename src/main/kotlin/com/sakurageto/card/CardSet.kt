@@ -45,11 +45,11 @@ object CardSet {
             }))
             null
         })
-        giback.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.CHANGE_CONCENTRATION) { player, game_status, _ ->
+        giback.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CHANGE_CONCENTRATION) { player, game_status, _ ->
             game_status.addConcentration(player)
             null
         })
-        giback.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { player, game_status, _->
+        giback.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { player, game_status, _->
             game_status.addThisTurnRangeBuff(player, RangeBuff(CardName.YURINA_GIBACK,1, RangeBufTag.ADD, {_, _ -> true}, {madeattack ->
                 madeattack?.run{
                     addRange(1, true); madeattack.canNotReactNormal()
@@ -77,7 +77,7 @@ object CardSet {
         pobaram.setAttack(DistanceType.CONTINUOUS, Pair(0, 10), null, 999, 2)
         pobaram.setSpecial(3)
         pobaram.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.REACT_ATTACK_REDUCE){ player, game_status, _ ->
-
+            TODO()
             null
         })
         pobaram.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.END_TURN, null))

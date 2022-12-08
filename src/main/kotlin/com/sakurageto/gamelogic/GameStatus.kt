@@ -62,7 +62,27 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
             now_player.aura = 0
         }
 
+        dust += value
+
         sendMoveToken(getSocket(player), getSocket(player.Opposite()), LocationEnum.YOUR_AURA, LocationEnum.DUST, value)
+    }
+
+    suspend fun flareToDust(player: PlayerEnum, number: Int){
+        var now_player = getPlayer(player)
+        var value: Int
+
+        if(now_player.flare >= number){
+            value = number
+            now_player.flare -= number
+        }
+        else{
+            value = now_player.flare
+            now_player.flare = 0
+        }
+
+        dust += value
+
+        sendMoveToken(getSocket(player), getSocket(player.Opposite()), LocationEnum.YOUR_FLARE, LocationEnum.DUST, value)
     }
 
 
@@ -160,25 +180,22 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
         }
     }
 
-    fun applyAllCostBuff(player: PlayerEnum, cost: Int): Int{
-        var now_player = if(player == PlayerEnum.PLAYER1) player1 else player2
+    suspend fun applyAllCostBuff(player: PlayerEnum, cost: Int, card: Card): Int{
+        var now_player = getPlayer(player)
         var now_cost = cost
+
+        addAllCardTextBuff()
 
         for(queue in now_player.cost_buf){
             var tempq: ArrayDeque<CostBuff> = ArrayDeque()
-            for(i in queue.indices){
-                val now = queue.first()
-                queue.removeFirst()
-                if(now.condition(player, this)){
-                    now.counter -= 1
-                    tempq.add(now)
-                }
-                if(now.counter != 0){
-                    queue.addLast(now)
+            for(buff in queue){
+                if(buff.condition(player, this, card)){
+                    buff.counter *= -1
+                    tempq.add(buff)
                 }
             }
             for(buff in tempq){
-                now_cost = buff.effect(now_cost)
+                buff.effect(now_cost)
             }
         }
 
@@ -228,6 +245,16 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
         return now_player.pre_attack_card!!.rangeCheck(real_distance)
     }
 
+    fun cleanAfterUseCost(){
+        cleanCostBuff(player1.cost_buf)
+        cleanCostBuff(player2.cost_buf)
+    }
+
+    fun cleanCostBuff(){
+        cleanCostTempBuff(player1.cost_buf)
+        cleanCostTempBuff(player2.cost_buf)
+    }
+
     fun cleanAllBuff(){
         cleanRangeTempBuff(player1.range_buf)
         cleanRangeTempBuff(player2.range_buf)
@@ -261,8 +288,15 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
 
     fun getPlayerFullAction(player: PlayerEnum): Boolean{
         when (player){
-            com.sakurageto.card.PlayerEnum.PLAYER1 -> return player1.full_action
-            com.sakurageto.card.PlayerEnum.PLAYER2 -> return player2.full_action
+            PlayerEnum.PLAYER1 -> return player1.full_action
+            PlayerEnum.PLAYER2 -> return player2.full_action
+        }
+    }
+
+    fun getPlayerFlare(player: PlayerEnum): Int{
+        when(player){
+            PlayerEnum.PLAYER1 -> return player1.flare
+            PlayerEnum.PLAYER2 -> return player2.flare
         }
     }
 
@@ -308,46 +342,89 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
         return false
     }
 
-    suspend fun afterMakeAttack(card_name: CardName, player: PlayerEnum){
+    suspend fun useCard(player: PlayerEnum, card: Card, madeAttack: MadeAttack?){
+        when(card.card_data.card_type){
+            CardType.ATTACK -> {
+                TODO()
+            }
+            CardType.BEHAVIOR -> {
+                TODO()
+            }
+            CardType.ENCHANTMENT -> {
+                TODO()
+
+            }
+            CardType.UNDEFINED -> TODO()
+        }
+    }
+
+    suspend fun afterMakeAttack(card_name: CardName, player: PlayerEnum, react_attack: MadeAttack?){
         val now_socket = getSocket(player)
         val other_socket = getSocket(player.Opposite())
-        makeAttackComplete(now_socket, other_socket, card_name)
-
         val now_player = getPlayer(player)
         val other_player = getPlayer(player.Opposite())
-        sendAttackInformation(now_socket, other_socket, now_player.pre_attack_card!!.Information())
-        if(!other_player.end_turn && other_player.pre_attack_card == null){
+
+        if(now_player.pre_attack_card == null){
+            return
+        }
+
+        var now_attack = now_player.pre_attack_card!!
+
+        makeAttackComplete(now_socket, other_socket, card_name)
+        sendAttackInformation(now_socket, other_socket, now_attack.Information())
+        if(!other_player.end_turn && react_attack == null){
             while(true){
                 sendRequestReact(other_socket)
                 val react = receiveReact(other_socket)
                 if(react.first == CommandEnum.USE_CARD_IN_HAND){
+                    var check_bit = true
                     other_player.getCardFromHand(react.second!!)?.let {
                         if(reactCheck(player.Opposite(), it)){
-                            TODO()
+                            val cost = it.canUse(player.Opposite(), this)
+                            if(cost == -1){
+                                check_bit = false
+                                useCardMeesage(other_socket, now_socket, true, it.card_data.card_name)
+                                other_player.useCardFromHand(it.card_data.card_name)
+                                useCard(player.Opposite(), it, now_attack)
+                            }
                         }
                     }
-                    continue
+                    if(check_bit){
+                        continue
+                    }
                 }
                 else if(react.first == CommandEnum.USE_CARD_IN_SPEICAL){
+                    var check_bit = true
                     other_player.getCardFromSpecial(react.second!!)?.let {
                         if(reactCheck(player.Opposite(), it)){
-                            TODO()
+                            val cost = it.canUse(player.Opposite(), this)
+                            if(cost >= 0){
+                                check_bit = false
+                                useCardMeesage(other_socket, now_socket, true, it.card_data.card_name)
+                                flareToDust(player.Opposite(), cost)
+                                other_player.useCardFromSpecial(it.card_data.card_name)
+                                useCard(player.Opposite(), it, now_attack)
+                            }
                         }
                     }
-                    continue
+                    if(check_bit){
+                        continue
+                    }
                 }
                 else{
                     break
                 }
             }
         }
+
+        TODO("after process using now_attack")
     }
 
     suspend fun processTextDestruction(card_name: CardName, player: PlayerEnum, text: Text){
         when(text.tag){
             TextEffectTag.MAKE_ATTACK -> {
                 text.effect!!(player, this, null)
-                afterMakeAttack(card_name, player)
+                afterMakeAttack(card_name, player, null)
             }
             else -> {}
         }

@@ -51,6 +51,7 @@ enum class TextEffectTimingTag(){
     AFTER_DESTRUCTION,
     IN_DEPLOYMENT,
     USED,
+    USING,
 }
 
 enum class TextEffectTag() {

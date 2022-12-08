@@ -205,21 +205,48 @@ class Card(val card_data: CardData, val player: PlayerEnum, var special_card_sta
         }
         return true
     }
-    suspend fun canUse(player: PlayerEnum, gameStatus: GameStatus): Boolean{
+
+    suspend fun makeAttack(player: PlayerEnum, gameStatus: GameStatus): MadeAttack{
+        this.addAttackBuff(player, gameStatus)
+        return MadeAttack(
+            distance_type = this.card_data.distance_type!!,
+            life_damage = this.card_data.life_damage!!,
+            aura_damage = this.card_data.aura_damage!!,
+            distance_cont = this.card_data.distance_cont,
+            distance_uncont = this.card_data.distance_uncont,
+            megami = this.card_data.megami
+        )
+    }
+    //-2: can't use -1: can use >= 0 cost
+    suspend fun canUse(player: PlayerEnum, gameStatus: GameStatus): Int{
         if(card_data.sub_type == SubType.FULLPOWER){
             if(!gameStatus.getPlayerFullAction(player)){
-                return false
+                return -2
             }
         }
 
         if(!textUseCheck(player, gameStatus)){
-            return false
+            return -2
         }
+
+        var cost = -2
 
         if(card_data.card_class == CardClass.SPECIAL){
             gameStatus.addAllCardCostBuff()
+            cost = gameStatus.applyAllCostBuff(player, this.getBaseCost(player, gameStatus), this)
+            if(cost > gameStatus.getPlayerFlare(player)){
+                gameStatus.cleanCostBuff()
+                return 0
+            }
         }
 
-        return true
+        if(card_data.card_type == CardType.ATTACK){
+            if(gameStatus.addPreAttackZone(player, this.makeAttack(player, gameStatus).addAttackAndReturn(this.card_data))){
+                return cost
+            }
+            return -2
+        }
+
+        return cost
     }
 }

@@ -114,6 +114,13 @@ suspend fun sendAddConcentration(mine: Connection, other: Connection){
     other.session.send(Json.encodeToString(data_other))
 }
 
+suspend fun useCardMeesage(mine: Connection, other: Connection, reaction: Boolean, card_name: CardName){
+    val data_your = if(reaction) SakuraCardCommand(CommandEnum.USE_CARD_YOUR_REACTION, card_name) else SakuraCardCommand(CommandEnum.USE_CARD_YOUR, card_name)
+    val data_other = if(reaction) SakuraCardCommand(CommandEnum.USE_CARD_OTHER_REACTION, card_name) else SakuraCardCommand(CommandEnum.USE_CARD_OTHER, card_name)
+    mine.session.send(Json.encodeToString(data_your))
+    other.session.send(Json.encodeToString(data_other))
+}
+
 suspend fun sendRemoveShrink(mine: Connection, other: Connection){
     val data_your = SakuraCardCommand(CommandEnum.REMOVE_SHRINK_YOUR, null)
     val data_other = SakuraSendData(CommandEnum.REMOVE_SHRINK_OTHER, null)

@@ -9,7 +9,7 @@ class PlayerStatus {
     var max_aura = 5
     var aura = 3
 
-    var using_card: Card? = null
+    var using_card: ArrayDeque<Card> = ArrayDeque()
 
     var hand: MutableList<Card> = mutableListOf()
 
@@ -25,7 +25,7 @@ class PlayerStatus {
     fun useCardFromHand(card_name: CardName) {
         for(i in hand.indices){
             if(hand[i].card_data.card_name == card_name){
-                using_card = hand[i]
+                using_card.addLast(hand[i])
                 hand.removeAt(i)
                 return
             }
@@ -50,7 +50,7 @@ class PlayerStatus {
             val card = special_card_deck.first()
             special_card_deck.removeFirst()
             if(card.card_data.card_name == card_name){
-                using_card = card
+                using_card.addLast(card)
                 return
             }
             special_card_deck.addLast(card)
@@ -126,44 +126,44 @@ class PlayerStatus {
     }
 
     var attack_buf: Array<ArrayDeque<Buff>> = arrayOf(
-        ArrayDeque<Buff>(),
-        ArrayDeque<Buff>(),
-        ArrayDeque<Buff>(),
-        ArrayDeque<Buff>(),
-        ArrayDeque<Buff>(),
-        ArrayDeque<Buff>(),
-        ArrayDeque<Buff>(),
-        ArrayDeque<Buff>(),
-        ArrayDeque<Buff>(),
-        ArrayDeque<Buff>(),
-        ArrayDeque<Buff>(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque()
     )
 
     var range_buf: Array<ArrayDeque<RangeBuff>> = arrayOf(
-        ArrayDeque<RangeBuff>(),
-        ArrayDeque<RangeBuff>(),
-        ArrayDeque<RangeBuff>(),
-        ArrayDeque<RangeBuff>(),
-        ArrayDeque<RangeBuff>(),
-        ArrayDeque<RangeBuff>(),
-        ArrayDeque<RangeBuff>(),
-        ArrayDeque<RangeBuff>(),
-        ArrayDeque<RangeBuff>(),
-        ArrayDeque<RangeBuff>(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
     )
 
     var cost_buf: Array<ArrayDeque<CostBuff>> = arrayOf(
-        ArrayDeque<CostBuff>(),
-        ArrayDeque<CostBuff>(),
-        ArrayDeque<CostBuff>(),
-        ArrayDeque<CostBuff>(),
-        ArrayDeque<CostBuff>(),
-        ArrayDeque<CostBuff>(),
-        ArrayDeque<CostBuff>(),
-        ArrayDeque<CostBuff>(),
-        ArrayDeque<CostBuff>(),
-        ArrayDeque<CostBuff>(),
-        ArrayDeque<CostBuff>(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque()
     )
 
     fun addAttackBuff(buf: Buff){

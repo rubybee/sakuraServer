@@ -10,10 +10,23 @@ class MadeAttack(
     var distance_uncont: Array<Boolean>?,
     var megami: MegamiEnum
 ) {
+    var is_it_valid = true
 
     var cannot_react_normal = false
     var cannot_react_special = false
     var cannot_react = false
+
+    var effect: MutableList<Text>? = null
+
+    fun addAttackAndReturn(card_data: CardData): MadeAttack{
+        card_data.effect?.let {
+            this.effect = mutableListOf()
+            for(text in it){
+                this.effect!!.add(text)
+            }
+        }
+        return this
+    }
 
     var chogek = false
 

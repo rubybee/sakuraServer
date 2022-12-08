@@ -2,7 +2,7 @@ package com.sakurageto.card
 
 import com.sakurageto.gamelogic.GameStatus
 
-class CostBuff(val cardName: CardName, var counter: Int, val tag: BufTag, val condition: (PlayerEnum, GameStatus) -> Boolean, val effect: (Int) -> Int
+class CostBuff(val cardName: CardName, var counter: Int, val tag: BufTag, val condition: (PlayerEnum, GameStatus, Card) -> Boolean, val effect: (Int) -> Int
 ) {
 
 }
@@ -46,10 +46,24 @@ fun cleanRangeBuff(array: Array<ArrayDeque<RangeBuff>>){
     }
 }
 
-fun cleanCostTempBuff(array: Array<ArrayDeque<CostBuff>>){
+fun cleanCostBuff(array: Array<ArrayDeque<CostBuff>>){
     for(index in array.indices){
         if(index % 2 == 0){
             array[index].clear()
+        }
+        else{
+            for(i in array[index].indices){
+                var now = array[index].first()
+                array[index].removeFirst()
+                if(now.counter < 0){
+                    now.counter *= -1
+                    now.counter -= 1
+                    if(now.counter == 0){
+                        continue
+                    }
+                }
+                array[index].addLast(now)
+            }
         }
     }
 }
@@ -77,6 +91,22 @@ fun cleanRangeTempBuff(array: Array<ArrayDeque<RangeBuff>>){
         }
     }
 }
+
+fun cleanCostTempBuff(array: Array<ArrayDeque<CostBuff>>){
+    for(index in array.indices){
+        if(index % 2 == 0){
+            array[index].clear()
+        }
+        else{
+            for(buff in array[index]){
+                if(buff.counter < 0){
+                    buff.counter *= -1
+                }
+            }
+        }
+    }
+}
+
 enum class BufTag(){
     INSERT,
     CHANGE_EACH,

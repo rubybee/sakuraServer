@@ -51,7 +51,11 @@ enum class CommandEnum() {
     USE_CARD_IN_HAND,
     USE_CARD_IN_SPEICAL,
     DO_NOT_REACT,
-    MOVE_TOKEN;
+    MOVE_TOKEN,
+    USE_CARD_YOUR,
+    USE_CARD_OTHER,
+    USE_CARD_YOUR_REACTION,
+    USE_CARD_OTHER_REACTION;
 
     fun Opposite(): CommandEnum{
         when(this){
@@ -73,6 +77,10 @@ enum class CommandEnum() {
             MAKE_ATTACK_COMPLETE_OTHER -> return MAKE_ATTACK_COMPLETE_YOUR
             ATTACK_INFORMATION_YOUR -> return ATTACK_INFORMATION_OTHER
             ATTACK_INFORMATION_OTHER -> return ATTACK_INFORMATION_YOUR
+            USE_CARD_YOUR -> return USE_CARD_OTHER
+            USE_CARD_OTHER -> return USE_CARD_YOUR
+            USE_CARD_YOUR_REACTION -> return USE_CARD_OTHER_REACTION
+            USE_CARD_OTHER_REACTION -> return USE_CARD_YOUR_REACTION
             else -> return DISCARD_CARD_YOUR
         }
     }

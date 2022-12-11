@@ -6,10 +6,11 @@ import com.sakurageto.protocol.SakuraSendData
 class PlayerStatus {
     var full_action = false
 
+    var max_hand = 2
     var max_aura = 5
     var aura = 3
 
-    var using_card: ArrayDeque<Card> = ArrayDeque()
+    var using_card = ArrayDeque<Card>()
 
     var hand: MutableList<Card> = mutableListOf()
 
@@ -30,6 +31,17 @@ class PlayerStatus {
                 return
             }
         }
+    }
+
+    fun fromHandToCover(card_name: CardName): Boolean {
+        for(i in hand.indices){
+            if(hand[i].card_data.card_name == card_name){
+                cover_card.addLast(hand[i])
+                hand.removeAt(i)
+                return true
+            }
+        }
+        return false
     }
 
     var enchantment_card: HashMap<CardName, Card> = HashMap()
@@ -57,12 +69,13 @@ class PlayerStatus {
         }
     }
 
-    var normal_card_deck: ArrayDeque<Card> = ArrayDeque<Card>()
-    var used_special_card: ArrayDeque<Card> = ArrayDeque<Card>()
+    var normal_card_deck = ArrayDeque<Card>()
+    var used_special_card = ArrayDeque<Card>()
 
-    var discard: ArrayDeque<Card> = ArrayDeque<Card>()
+    var discard = ArrayDeque<Card>()
+    var cover_card = ArrayDeque<Card>()
 
-    var end_turn: Boolean = false
+    var end_turn = false
 
     fun usedToSpecial(card_name: CardName): Boolean{
         for(i in 0..used_special_card.size){
@@ -110,6 +123,11 @@ class PlayerStatus {
         return 2
     }
 
+    fun decreaseConcentration(): Boolean{
+        if(concentration == 0) return false
+        concentration -= 1
+        return true
+    }
 
 
     lateinit var megami_1: MegamiEnum

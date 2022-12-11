@@ -49,9 +49,11 @@ enum class DistanceType {
 enum class TextEffectTimingTag(){
     CONSTANT_EFFECT,
     AFTER_DESTRUCTION,
+    START_DEPLOYMENT,
     IN_DEPLOYMENT,
     USED,
     USING,
+    AFTER_ATTACK,
 }
 
 enum class TextEffectTag() {
@@ -69,11 +71,14 @@ enum class TextEffectTag() {
     REACT_ATTACK_NO_DAMAGE,
     REACT_ATTACK_INVALID,
     IF_REACT_BUFF,
+    ADJUST_NAP,
     COST_BUFF,
     COST_X,
 }
 
 enum class CardName() {
+    CARD_UNNAME,
+
     YURINA_CHAM,
     YURINA_ILSUM,
     YURINA_JARUCHIGI,

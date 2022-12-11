@@ -1,5 +1,6 @@
 package com.sakurageto.card
 
+import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.MegamiEnum
 
 class MadeAttack(
@@ -116,7 +117,9 @@ class MadeAttack(
     }
 
     //{-1, 1, 2, 3, 4, 5, -1, 3, 5, 20, 0, 0, 0}
-    //{uncont, distance..., uncont, auro, life, megami, reactable}
+    //{uncont, distance..., uncont, auro, life, megami, reactable, reactable_normal, reactable_special}
+    //{-2, 1, 4, -2, 4, 5, -1, 3, 5, 20, 0, 0, 0}
+    //{cont, distance..., cont, auro, life, megami, reactable, reactable_normal, reactable_special}
     fun Information(): MutableList<Int>{
         var return_data = mutableListOf<Int>()
         when(distance_type){
@@ -142,6 +145,16 @@ class MadeAttack(
         if(cannot_react_special) return_data.add(1) else return_data.add(0)
 
         return return_data
+    }
+
+    suspend fun afterAttackProcess(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?){
+        this.effect?.let{
+            for(text in it){
+                if(text.timing_tag == TextEffectTimingTag.AFTER_ATTACK){
+                    text.effect!!(player, game_status, react_attack)
+                }
+            }
+        }
     }
 
 }

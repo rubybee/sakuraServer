@@ -4,20 +4,24 @@ import com.sakurageto.Connection
 import com.sakurageto.card.Card
 import com.sakurageto.card.CardName
 import com.sakurageto.card.PlayerEnum
-import com.sakurageto.protocol.CommandEnum
-import com.sakurageto.protocol.SakuraCardSetSend
-import com.sakurageto.protocol.SakuraSendData
-import com.sakurageto.protocol.sendStartTurn
+import com.sakurageto.protocol.*
 import io.ktor.websocket.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.random.Random
 
-class SakuraGame(private val player1: Connection, private val player2: Connection) {
+class SakuraGame(val player1: Connection, val player2: Connection) {
     private var game_mode: Int //0 = no ban 1 = pick ban
     private var game_status: GameStatus
+
+    private var turn_number = 0
     private var first_turn = PlayerEnum.PLAYER1
+    private var turn_player = PlayerEnum.PLAYER1
+
+    inline fun getSocket(player: PlayerEnum): Connection{
+        return if(player ==  PlayerEnum.PLAYER1) player1 else player2
+    }
 
     init {
         game_mode = 0
@@ -200,10 +204,10 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
         player1.session.send(Json.encodeToString(end_player1_select))
         player2.session.send(Json.encodeToString(end_player2_select))
 
-        Card.Companion.cardInitInsert(game_status.player1.normal_card_deck, card_data_player1, PlayerEnum.PLAYER1)
-        Card.Companion.cardInitInsert(game_status.player1.special_card_deck, specialcard_data_player1, PlayerEnum.PLAYER1)
-        Card.Companion.cardInitInsert(game_status.player2.normal_card_deck, card_data_player2, PlayerEnum.PLAYER2)
-        Card.Companion.cardInitInsert(game_status.player2.special_card_deck, specialcard_data_player2, PlayerEnum.PLAYER2)
+        Card.cardInitInsert(game_status.player1.normal_card_deck, card_data_player1, PlayerEnum.PLAYER1)
+        Card.cardInitInsert(game_status.player1.special_card_deck, specialcard_data_player1, PlayerEnum.PLAYER1)
+        Card.cardInitInsert(game_status.player2.normal_card_deck, card_data_player2, PlayerEnum.PLAYER2)
+        Card.cardInitInsert(game_status.player2.special_card_deck, specialcard_data_player2, PlayerEnum.PLAYER2)
     }
 
     suspend fun selectFirst(){
@@ -227,19 +231,6 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
         player2.session.send(Json.encodeToString(player2_data))
     }
 
-    suspend fun drawCard(player: PlayerEnum, number: Int){
-        val data = SakuraCardSetSend(CommandEnum.DRAW, game_status.drawCard(player, number), null)
-        when(player){
-            PlayerEnum.PLAYER1 -> {
-                player1.session.send(Json.encodeToString(data))
-            }
-            PlayerEnum.PLAYER2 -> {
-                player2.session.send(Json.encodeToString(data))
-            }
-        }
-
-    }
-
     suspend fun muligun(){
         val data = SakuraSendData(CommandEnum.MULIGUN, null)
         player1.session.send(Json.encodeToString(data))
@@ -254,7 +245,7 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
                 }
             }
         }
-        val muligun_end_data_player1 = SakuraCardSetSend(CommandEnum.MULIGUN_END, game_status.drawCard(PlayerEnum.PLAYER1, count), null)
+        game_status.drawCard(PlayerEnum.PLAYER1, count)
 
         count = 0
         player2_data!!.normal_card?.also {
@@ -264,30 +255,88 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
                 }
             }
         }
-        val muligun_end_data_player2 = SakuraCardSetSend(CommandEnum.MULIGUN_END, game_status.drawCard(PlayerEnum.PLAYER2, count), null)
-
-        player1.session.send(Json.encodeToString(muligun_end_data_player1))
-        player2.session.send(Json.encodeToString(muligun_end_data_player2))
+        game_status.drawCard(PlayerEnum.PLAYER2, count)
+        sendMuligunEnd(player1, player2)
     }
 
-    suspend fun startTurn(){
-        when(game_status.getTurnPlayer()){
-            PlayerEnum.PLAYER1 -> {
-                sendStartTurn(player1)
-                game_status.addConcentration(PlayerEnum.PLAYER1)
+    suspend fun startPhaseDefault(){
+        game_status.addConcentration(this.turn_player)
+        game_status.enchantmentReduceAll(this.turn_player)
+        if(receiveReconstructRequest(getSocket(this.turn_player))){
+            game_status.deckReconstruct(this.turn_player, true)
+        }
+        game_status.drawCard(this.turn_player, 2)
+    }
+
+    suspend fun startPhase(){
+        sendStartPhaseStart(getSocket(this.turn_player), getSocket(this.turn_player.Opposite()))
+        game_status.start_distance = game_status.distance
+        game_status.startPhaseEffectProcess()
+        if(turn_number == 0 || turn_number == 1){
+            return
+        }
+        startPhaseDefault()
+    }
+
+    suspend fun mainPhase(){
+        sendMainPhaseStart(getSocket(this.turn_player), getSocket(this.turn_player.Opposite()))
+        game_status.mainPhaseEffectProcess()
+        if(receiveFullPowerRequest(getSocket(this.turn_player))){
+            game_status.setPlayerFullAction(this.turn_player, true)
+            while (true){
+                var data = receiveFullPowerActionRequest(getSocket(this.turn_player))
+                if(data.first == CommandEnum.ACTION_END_TURN){
+                    return
+                }
+                else if(game_status.cardUseNormaly(this.turn_player, data.first, data.second)){
+                    return
+                }
+                else{
+                    continue
+                }
             }
-            PlayerEnum.PLAYER2 -> {
-                sendStartTurn(player2)
-                game_status.addConcentration(PlayerEnum.PLAYER1)
+        }
+        else{
+            game_status.setPlayerFullAction(this.turn_player, false)
+            while (true){
+                var data = receiveActionRequest(getSocket(this.turn_player))
+                if(data.first == CommandEnum.ACTION_END_TURN || game_status.getEndTurn(this.turn_player)){
+                    return
+                }
+                else if(data.first == CommandEnum.ACTION_USE_CARD_HAND || data.first == CommandEnum.ACTION_USE_CARD_SPECIAL){
+                    print(this.turn_player)
+                    print(": use card " + data.second + "\ndistance:")
+                    print(game_status.distance)
+                    game_status.cardUseNormaly(this.turn_player, data.first, data.second)
+                }
+                else{
+                    if(game_status.canDoBasicOperation(this.turn_player, data.first)){
+                        if(game_status.basicOperationCost(this.turn_player, data.second)){
+                            game_status.doBasicOperation(this.turn_player, data.first)
+                        }
+                    }
+                }
             }
         }
     }
 
+    suspend fun endPhase(){
+        sendEndPhaseStart(getSocket(this.turn_player), getSocket(this.turn_player.Opposite()))
+        game_status.endPhaseEffectProcess()
+        game_status.setEndTurn(PlayerEnum.PLAYER1, false)
+        game_status.setEndTurn(PlayerEnum.PLAYER2, false)
+        game_status.endTurnHandCheck(this.turn_player)
+        this.turn_player = this.turn_player.Opposite()
+        this.turn_number += 1
+    }
 
-    suspend fun simulateStart(){
-        game_status.setTurn(first_turn)
+    suspend fun gameStart(){
+        this.turn_player = this.first_turn
+
         while(true){
-
+            startPhase()
+            mainPhase()
+            endPhase()
         }
     }
 
@@ -302,9 +351,9 @@ class SakuraGame(private val player1: Connection, private val player2: Connectio
         checkFinalMegami()
         selectCard()
         selectFirst()
-        drawCard(PlayerEnum.PLAYER1, 3)
-        drawCard(PlayerEnum.PLAYER2, 3)
+        game_status.drawCard(PlayerEnum.PLAYER1, 3)
+        game_status.drawCard(PlayerEnum.PLAYER2, 3)
         muligun()
-        simulateStart()
+        gameStart()
     }
 }

@@ -3,6 +3,7 @@ package com.sakurageto.card
 import com.sakurageto.card.CardSet.returnCardDataByName
 import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.PlayerStatus
+import com.sakurageto.protocol.receiveNapInformation
 import kotlin.collections.ArrayDeque
 
 class Card(val card_data: CardData, val player: PlayerEnum, var special_card_state: SpecialCardEnum?) {
@@ -32,15 +33,23 @@ class Card(val card_data: CardData, val player: PlayerEnum, var special_card_sta
                 dest.add(cardMakerByName(card_name, player))
             }
         }
+
+        fun cardReconstructInsert(src1: ArrayDeque<Card>, src2: ArrayDeque<Card>, dest: ArrayDeque<Card>){
+            dest.addAll(src1)
+            dest.addAll(src2)
+            dest.shuffle()
+            src1.clear()
+            src2.clear()
+        }
     }
 
-    fun reduceNapNormaly(): Boolean{
+    fun reduceNapNormaly(): Int{
        card_data.effect?.let {
            for(i in it){
                if(i.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT || i.timing_tag == TextEffectTimingTag.IN_DEPLOYMENT){
                    when(i.tag){
                        TextEffectTag.DO_NOT_NAP -> {
-                           return false
+                           return 0
                        }
                        else -> {
                            continue
@@ -50,7 +59,7 @@ class Card(val card_data: CardData, val player: PlayerEnum, var special_card_sta
            }
        }
         nap = nap!! - 1
-        return true
+        return 1
     }
 
     fun isItDestruction(): Boolean{
@@ -174,6 +183,25 @@ class Card(val card_data: CardData, val player: PlayerEnum, var special_card_sta
         return true
     }
 
+    suspend fun returnNap(player: PlayerEnum, gamestatus: GameStatus, react_attack: MadeAttack?): Int{
+        if(this.card_data.charge == null){
+            return -1
+        }
+        else{
+            this.card_data.effect?.let {
+                for(text in it){
+                    if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
+                        if(text.tag == TextEffectTag.ADJUST_NAP){
+                            return text.effect!!(player, gamestatus, react_attack)!!
+                        }
+                    }
+                }
+            }
+
+            return this.card_data.charge!!
+        }
+    }
+
     suspend fun getBaseCost(player: PlayerEnum, gameStatus: GameStatus): Int{
         if(card_data.cost != null){
             return card_data.cost!!
@@ -229,24 +257,93 @@ class Card(val card_data: CardData, val player: PlayerEnum, var special_card_sta
             return -2
         }
 
-        var cost = -2
+        var cost: Int
 
         if(card_data.card_class == CardClass.SPECIAL){
             gameStatus.addAllCardCostBuff()
             cost = gameStatus.applyAllCostBuff(player, this.getBaseCost(player, gameStatus), this)
             if(cost > gameStatus.getPlayerFlare(player)){
                 gameStatus.cleanCostBuff()
-                return 0
+                return -2
             }
         }
+        else{
+            cost = -1
+        }
 
-        if(card_data.card_type == CardType.ATTACK){
-            if(gameStatus.addPreAttackZone(player, this.makeAttack(player, gameStatus).addAttackAndReturn(this.card_data))){
-                return cost
+        when(card_data.card_type){
+            CardType.ATTACK -> {
+                if(gameStatus.addPreAttackZone(player, this.makeAttack(player, gameStatus).addAttackAndReturn(this.card_data))){
+                    return cost
+                }
+                return -2
             }
-            return -2
+            CardType.UNDEFINED -> return -2
+            else -> {}
         }
 
         return cost
     }
+
+    suspend fun attackUseNormal(player: PlayerEnum, gamestatus: GameStatus, react_attack: MadeAttack?){
+        gamestatus.afterMakeAttack(this.card_data.card_name, player, react_attack)
+    }
+
+    suspend fun behaviorUseNormal(player: PlayerEnum, gamestatus: GameStatus, react_attack: MadeAttack?){
+        card_data.effect?.let {
+            for(text in it){
+                if(text.timing_tag == TextEffectTimingTag.USING || text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
+                    text.effect!!(player, gamestatus, react_attack)
+                }
+            }
+        }
+    }
+
+    suspend fun enchantmentUseNormal(player: PlayerEnum, gamestatus: GameStatus, react_attack: MadeAttack?) {
+        val now_need_nap = returnNap(player, gamestatus, react_attack)
+        if (now_need_nap > gamestatus.getPlayerAura(player) + gamestatus.dust) {
+            gamestatus.dustToCard(player, gamestatus.dust, this)
+            gamestatus.auraToCard(player, gamestatus.getPlayerAura(player), this)
+        } else {
+            while (true) {
+                val receive_data =
+                    receiveNapInformation(gamestatus.getSocket(player), now_need_nap, this.card_data.card_name)
+                val aura = receive_data.first
+                val dust = receive_data.second
+                if (aura + dust != now_need_nap && gamestatus.getPlayerAura(player) < aura && gamestatus.dust < dust) {
+                    continue
+                }
+                gamestatus.auraToCard(player, aura, this)
+                gamestatus.dustToCard(player, dust, this)
+                break
+            }
+        }
+
+        card_data.effect?.let {
+            for (text in it) {
+                if(text.timing_tag == TextEffectTimingTag.START_DEPLOYMENT || text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
+                    text.effect!!(player, gamestatus, react_attack)
+                }
+            }
+        }
+    }
+
+    suspend fun use(player: PlayerEnum, gamestatus: GameStatus, react_attack: MadeAttack?){
+        when(this.card_data.card_type){
+            CardType.ATTACK -> {
+                attackUseNormal(player, gamestatus, react_attack)
+            }
+            CardType.BEHAVIOR -> {
+                behaviorUseNormal(player, gamestatus, react_attack)
+            }
+            CardType.ENCHANTMENT -> {
+                enchantmentUseNormal(player, gamestatus, react_attack)
+            }
+            CardType.UNDEFINED -> {}
+        }
+
+        gamestatus.afterCardUsed(player, this)
+    }
+
+
 }

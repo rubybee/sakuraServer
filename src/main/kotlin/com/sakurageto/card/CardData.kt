@@ -9,6 +9,8 @@ class CardData(
     val card_type: CardType,
     val sub_type: SubType,
 ) {
+    var can_cover = true
+
     //attack
     var distance_type: DistanceType? = null
     var distance_cont: Pair<Int, Int>? = null

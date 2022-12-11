@@ -4,6 +4,8 @@ import com.sakurageto.gamelogic.ImmediateBackListner
 import com.sakurageto.gamelogic.MegamiEnum
 
 object CardSet {
+    val unused = CardData(CardClass.NORMAL, CardName.CARD_UNNAME, MegamiEnum.YURINA, CardType.UNDEFINED, SubType.NONE)
+
     val cham = CardData(CardClass.NORMAL, CardName.YURINA_CHAM, MegamiEnum.YURINA, CardType.ATTACK, SubType.NONE)
     val ilsom = CardData(CardClass.NORMAL, CardName.YURINA_ILSUM, MegamiEnum.YURINA, CardType.ATTACK, SubType.NONE)
     val jaru_chigi = CardData(CardClass.NORMAL, CardName.YURINA_JARUCHIGI, MegamiEnum.YURINA, CardType.ATTACK, SubType.NONE)
@@ -51,8 +53,8 @@ object CardSet {
         })
         giback.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { player, game_status, _->
             game_status.addThisTurnRangeBuff(player, RangeBuff(CardName.YURINA_GIBACK,1, RangeBufTag.ADD, {_, _ -> true}, {madeattack ->
-                madeattack?.run{
-                    addRange(1, true); madeattack.canNotReactNormal()
+                madeattack.run{
+                    addRange(1, true); canNotReactNormal()
                 }
             }))
             null
@@ -76,12 +78,15 @@ object CardSet {
         wolyungnack.setSpecial(7)
         pobaram.setAttack(DistanceType.CONTINUOUS, Pair(0, 10), null, 999, 2)
         pobaram.setSpecial(3)
-        pobaram.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.REACT_ATTACK_REDUCE){ player, game_status, _ ->
-            TODO()
+        pobaram.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.REACT_ATTACK_REDUCE){ player, game_status, react_attack ->
+            react_attack!!.auraPlusMinus(-2)
             null
         })
-        pobaram.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.END_TURN, null))
-        jjockbae.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.MOVE_SAKURA_TOKEN){ player, game_status, _ ->
+        pobaram.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.END_TURN){ player, game_status, _->
+            game_status.setEndTurn(player, true)
+            null
+        })
+        jjockbae.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){ player, game_status, _ ->
             game_status.dustToAura(player, 5)
             null
         })
@@ -156,6 +161,7 @@ object CardSet {
             CardName.TOKOYO_THOUSANDBIRD -> TODO()
             CardName.TOKOYO_ENDLESSWIND -> TODO()
             CardName.TOKOYO_TOKOYOMOON -> TODO()
+            else -> return unused
         }
     }
 }

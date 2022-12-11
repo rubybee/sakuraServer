@@ -401,7 +401,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
         var now_player = getPlayer(player)
 
         var now_socket = getSocket(player)
-        var other_socket = getSocket(player)
+        var other_socket = getSocket(player.Opposite())
 
         when(now_player.addConcentration()){
             0 -> {
@@ -417,7 +417,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
         var now_player = getPlayer(player)
 
         var now_socket = getSocket(player)
-        var other_socket = getSocket(player)
+        var other_socket = getSocket(player.Opposite())
 
         if(now_player.decreaseConcentration()) sendDecreaseConcentration(now_socket, other_socket)
     }
@@ -732,6 +732,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
             now_player.hand.add(now_player.normal_card_deck.first())
             now_player.normal_card_deck.removeFirst()
         }
+
+        print(player)
+        print("have card: ")
+        for(i in now_player.hand){
+            print(i.card_data.card_name)
+        }
+        print("\n")
     }
 
     suspend fun insertHandToDeck(player: PlayerEnum, card_name: CardName): Boolean{
@@ -741,9 +748,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
         val other_socket = getSocket(player.Opposite())
 
         for(i in now_player.hand.indices){
-            if(player1.hand[i].card_data.card_name == card_name){
-                player1.normal_card_deck.addLast(player1.hand[i])
-                player1.hand.removeAt(i)
+            if(now_player.hand[i].card_data.card_name == card_name){
+                now_player.normal_card_deck.addLast(now_player.hand[i])
+                now_player.hand.removeAt(i)
                 sendHandToDeck(now_socket, other_socket, card_name, false)
                 return true
             }
@@ -785,7 +792,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
         val now_player = getPlayer(player)
 
         val now_socket = getSocket(player)
-        val other_socket = getSocket(player)
+        val other_socket = getSocket(player.Opposite())
 
         var using_successly = false
 
@@ -796,7 +803,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
                 val cost = it.canUse(player, this)
                 if(cost == -1){
                     using_successly = true
-                    sendUseCardMeesage(other_socket, now_socket, false, it.card_data.card_name)
+                    sendUseCardMeesage(now_socket, other_socket, false, it.card_data.card_name)
                     now_player.useCardFromHand(it.card_data.card_name)
                     it.use(player, this, null)
                 }
@@ -808,7 +815,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
                 if(cost >= 0){
                     using_successly = true
                     it.special_card_state = SpecialCardEnum.PLAYING
-                    sendUseCardMeesage(other_socket, now_socket, false, it.card_data.card_name)
+                    sendUseCardMeesage(now_socket, other_socket,false, it.card_data.card_name)
                     flareToDust(player.Opposite(), cost)
                     now_player.useCardFromSpecial(it.card_data.card_name)
                     cleanAfterUseCost()

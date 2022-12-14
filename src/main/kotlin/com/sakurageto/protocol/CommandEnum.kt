@@ -1,8 +1,8 @@
 package com.sakurageto.protocol
 
 import com.sakurageto.gamelogic.MegamiEnum
-
 enum class CommandEnum() {
+    NULL,
     SELECT_MODE,
     END_OF_SELECTMODE,
     SELECT_MEGAMI,

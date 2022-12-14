@@ -2,10 +2,12 @@ package com.sakurageto.protocol
 
 import com.sakurageto.Connection
 import com.sakurageto.card.CardName
+import com.sakurageto.card.PlayerEnum
 import io.ktor.websocket.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlin.Exception
 
 //send function
 suspend fun UsedCardReturn(player: Connection, card_name: CardName) {
@@ -206,16 +208,63 @@ suspend fun sendCoverCardSelect(player: Connection){
 }
 
 //receive function
-suspend fun receiveEnchantment(player: Connection): Pair<CommandEnum, CardName?> {
+suspend fun waitUntil(player: Connection, wait_command: CommandEnum): SakuraSendData {
+    val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
+
     for (frame in player.session.incoming) {
         if (frame is Frame.Text) {
             val text = frame.readText()
-            val data = Json.decodeFromString<SakuraCardCommand>(text)
-            if (data.command == CommandEnum.SELECT_ENCHANTMENT_OTHER || data.command == CommandEnum.SELECT_ENCHANTMENT_YOUR){
-                return Pair(data.command, data.card)
+            try{
+                val data = json.decodeFromString<SakuraSendData>(text)
+                if (data.command == wait_command){
+                    return data
+                }
+            }catch (e: Exception){
+                continue
             }
-            else if(data.command == CommandEnum.SELECT_ENCHANTMENT_END){
-                return Pair(data.command, null)
+
+        }
+    }
+
+    return SakuraSendData(CommandEnum.SELECT_MODE, null)
+}
+
+suspend fun waitCardSetUntil(player: Connection, wait_command: CommandEnum): SakuraCardSetSend {
+    val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
+
+    for (frame in player.session.incoming) {
+        if (frame is Frame.Text) {
+            val text = frame.readText()
+            try{
+                val data = json.decodeFromString<SakuraCardSetSend>(text)
+                if (data.command == wait_command){
+                    return data
+                }
+            }catch (e: Exception){
+                continue
+            }
+        }
+    }
+
+    return SakuraCardSetSend(CommandEnum.NULL, null, null)
+}
+
+suspend fun receiveEnchantment(player: Connection): Pair<CommandEnum, CardName?> {
+    val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
+
+    for (frame in player.session.incoming) {
+        if (frame is Frame.Text) {
+            val text = frame.readText()
+            try {
+                val data = json.decodeFromString<SakuraCardCommand>(text)
+                if (data.command == CommandEnum.SELECT_ENCHANTMENT_OTHER || data.command == CommandEnum.SELECT_ENCHANTMENT_YOUR){
+                    return Pair(data.command, data.card)
+                }
+                else if(data.command == CommandEnum.SELECT_ENCHANTMENT_END){
+                    return Pair(data.command, null)
+                }
+            }catch (e: Exception){
+                continue
             }
         }
     }
@@ -223,15 +272,21 @@ suspend fun receiveEnchantment(player: Connection): Pair<CommandEnum, CardName?>
 }
 
 suspend fun receiveReact(player: Connection): Pair<CommandEnum, CardName?> {
+    val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
+
     for (frame in player.session.incoming) {
         if (frame is Frame.Text) {
             val text = frame.readText()
-            val data = Json.decodeFromString<SakuraCardCommand>(text)
-            if (data.command == CommandEnum.USE_CARD_IN_HAND || data.command == CommandEnum.USE_CARD_IN_SPEICAL){
-                return Pair(data.command, data.card)
-            }
-            else if(data.command == CommandEnum.DO_NOT_REACT){
-                return Pair(data.command, null)
+            try {
+                val data = json.decodeFromString<SakuraCardCommand>(text)
+                if (data.command == CommandEnum.USE_CARD_IN_HAND || data.command == CommandEnum.USE_CARD_IN_SPEICAL){
+                    return Pair(data.command, data.card)
+                }
+                else if(data.command == CommandEnum.DO_NOT_REACT){
+                    return Pair(data.command, null)
+                }
+            }catch (e: Exception){
+                continue
             }
         }
     }
@@ -239,14 +294,20 @@ suspend fun receiveReact(player: Connection): Pair<CommandEnum, CardName?> {
 }
 
 suspend fun receiveChooseDamage(player: Connection): CommandEnum {
+    val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
+
     for (frame in player.session.incoming) {
         if (frame is Frame.Text) {
             val text = frame.readText()
-            val data = Json.decodeFromString<SakuraCardCommand>(text)
-            if (data.command == CommandEnum.CHOOSE_AURA || data.command == CommandEnum.CHOOSE_LIFE){
-                return data.command
-            }
-            else {
+            try {
+                val data = json.decodeFromString<SakuraCardCommand>(text)
+                if (data.command == CommandEnum.CHOOSE_AURA || data.command == CommandEnum.CHOOSE_LIFE){
+                    return data.command
+                }
+                else {
+                    continue
+                }
+            }catch (e: Exception){
                 continue
             }
         }
@@ -255,6 +316,8 @@ suspend fun receiveChooseDamage(player: Connection): CommandEnum {
 }
 
 suspend fun receiveNapInformation(player: Connection, total: Int, card_name: CardName): Pair<Int, Int> {
+    val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
+
     val pre_data = SakuraCardCommand(CommandEnum.SELECT_NAP, card_name)
     player.session.send(Json.encodeToString(pre_data))
     val data = SakuraSendData(CommandEnum.SELECT_NAP, mutableListOf(total))
@@ -262,11 +325,15 @@ suspend fun receiveNapInformation(player: Connection, total: Int, card_name: Car
     for (frame in player.session.incoming) {
         if (frame is Frame.Text) {
             val text = frame.readText()
-            val data = Json.decodeFromString<SakuraSendData>(text)
-            if (data.command == CommandEnum.SELECT_NAP){
-                return Pair(data.data!![0], data.data!![1])
-            }
-            else {
+            try {
+                val data = json.decodeFromString<SakuraSendData>(text)
+                if (data.command == CommandEnum.SELECT_NAP){
+                    return Pair(data.data!![0], data.data!![1])
+                }
+                else {
+                    continue
+                }
+            }catch (e: Exception){
                 continue
             }
         }
@@ -275,19 +342,25 @@ suspend fun receiveNapInformation(player: Connection, total: Int, card_name: Car
 }
 
 suspend fun receiveReconstructRequest(player: Connection): Boolean{
+    val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
+
     val pre_data = SakuraCardCommand(CommandEnum.DECK_RECONSTRUCT_REQUEST, null)
     player.session.send(Json.encodeToString(pre_data))
     for (frame in player.session.incoming) {
         if (frame is Frame.Text) {
             val text = frame.readText()
-            val data = Json.decodeFromString<SakuraCardCommand>(text)
-            if (data.command == CommandEnum.DECK_RECONSTRUCT_NO){
-                return false
-            }
-            else if(data.command == CommandEnum.DECK_RECONSTRUCT_YES){
-                return true
-            }
-            else {
+            try {
+                val data = json.decodeFromString<SakuraCardCommand>(text)
+                if (data.command == CommandEnum.DECK_RECONSTRUCT_NO){
+                    return false
+                }
+                else if(data.command == CommandEnum.DECK_RECONSTRUCT_YES){
+                    return true
+                }
+                else {
+                    continue
+                }
+            }catch (e: Exception){
                 continue
             }
         }
@@ -296,19 +369,25 @@ suspend fun receiveReconstructRequest(player: Connection): Boolean{
 }
 
 suspend fun receiveFullPowerRequest(player: Connection): Boolean{
+    val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
+
     val pre_data = SakuraCardCommand(CommandEnum.FULL_POWER_REQUEST, null)
     player.session.send(Json.encodeToString(pre_data))
     for (frame in player.session.incoming) {
         if (frame is Frame.Text) {
             val text = frame.readText()
-            val data = Json.decodeFromString<SakuraCardCommand>(text)
-            if (data.command == CommandEnum.FULL_POWER_NO){
-                return false
-            }
-            else if(data.command == CommandEnum.FULL_POWER_YES){
-                return true
-            }
-            else {
+            try {
+                val data = json.decodeFromString<SakuraCardCommand>(text)
+                if (data.command == CommandEnum.FULL_POWER_NO){
+                    return false
+                }
+                else if(data.command == CommandEnum.FULL_POWER_YES){
+                    return true
+                }
+                else {
+                    continue
+                }
+            }catch (e: Exception){
                 continue
             }
         }
@@ -317,17 +396,23 @@ suspend fun receiveFullPowerRequest(player: Connection): Boolean{
 }
 
 suspend fun receiveFullPowerActionRequest(player: Connection): Pair<CommandEnum, CardName>{
+    val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
+
     sendActionRequest(player)
     for (frame in player.session.incoming) {
         if (frame is Frame.Text) {
             val text = frame.readText()
-            val data = Json.decodeFromString<SakuraCardCommand>(text)
-            if (data.command == CommandEnum.ACTION_USE_CARD_HAND ||
-                data.command == CommandEnum.ACTION_USE_CARD_SPECIAL ||
-                data.command == CommandEnum.ACTION_END_TURN){
-                return Pair(data.command, data.card?: CardName.CARD_UNNAME)
-            }
-            else {
+            try{
+                val data = json.decodeFromString<SakuraCardCommand>(text)
+                if (data.command == CommandEnum.ACTION_USE_CARD_HAND ||
+                    data.command == CommandEnum.ACTION_USE_CARD_SPECIAL ||
+                    data.command == CommandEnum.ACTION_END_TURN){
+                    return Pair(data.command, data.card?: CardName.CARD_UNNAME)
+                }
+                else {
+                    continue
+                }
+            }catch (e: Exception){
                 continue
             }
         }
@@ -336,23 +421,29 @@ suspend fun receiveFullPowerActionRequest(player: Connection): Pair<CommandEnum,
 }
 
 suspend fun receiveActionRequest(player: Connection): Pair<CommandEnum, CardName>{
+    val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
+
     sendActionRequest(player)
     for (frame in player.session.incoming) {
         if (frame is Frame.Text) {
             val text = frame.readText()
-            val data = Json.decodeFromString<SakuraCardCommand>(text)
-            if (data.command == CommandEnum.ACTION_USE_CARD_HAND ||
-                data.command == CommandEnum.ACTION_USE_CARD_SPECIAL ||
-                data.command == CommandEnum.ACTION_GO_FORWARD ||
-                data.command == CommandEnum.ACTION_GO_BACKWARD ||
-                data.command == CommandEnum.ACTION_WIND_AROUND ||
-                data.command == CommandEnum.ACTION_INCUBATE ||
-                data.command == CommandEnum.ACTION_BREAK_AWAY ||
-                data.command == CommandEnum.ACTION_END_TURN
-            ){
-                return Pair(data.command, data.card?: CardName.CARD_UNNAME)
-            }
-            else {
+            try {
+                val data = json.decodeFromString<SakuraCardCommand>(text)
+                if (data.command == CommandEnum.ACTION_USE_CARD_HAND ||
+                    data.command == CommandEnum.ACTION_USE_CARD_SPECIAL ||
+                    data.command == CommandEnum.ACTION_GO_FORWARD ||
+                    data.command == CommandEnum.ACTION_GO_BACKWARD ||
+                    data.command == CommandEnum.ACTION_WIND_AROUND ||
+                    data.command == CommandEnum.ACTION_INCUBATE ||
+                    data.command == CommandEnum.ACTION_BREAK_AWAY ||
+                    data.command == CommandEnum.ACTION_END_TURN
+                ){
+                    return Pair(data.command, data.card?: CardName.CARD_UNNAME)
+                }
+                else {
+                    continue
+                }
+            }catch (e: Exception){
                 continue
             }
         }
@@ -361,18 +452,26 @@ suspend fun receiveActionRequest(player: Connection): Pair<CommandEnum, CardName
 }
 
 suspend fun receiveCoverCardSelect(player: Connection): CardName{
+    val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
+
     sendCoverCardSelect(player)
     for(frame in player.session.incoming){
         if (frame is Frame.Text) {
             val text = frame.readText()
-            val data = Json.decodeFromString<SakuraCardCommand>(text)
-            if (data.command == CommandEnum.COVER_CARD_SELECT){
-                return data.card?: CardName.CARD_UNNAME
-            }
-            else {
+            try {
+                val data = json.decodeFromString<SakuraCardCommand>(text)
+                if (data.command == CommandEnum.COVER_CARD_SELECT){
+                    return data.card?: CardName.CARD_UNNAME
+                }
+                else {
+                    continue
+                }
+            }catch (e: Exception){
                 continue
             }
+
         }
     }
     return CardName.CARD_UNNAME
 }
+

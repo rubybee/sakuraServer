@@ -6,20 +6,21 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SakuraCardCommand(
-    val command: CommandEnum,
-    val card: CardName?,
+    val command: CommandEnum = CommandEnum.NULL,
+    val card: CardName? = null,
 )
 
 @Serializable
 data class SakuraCardSetSend(
-    val command: CommandEnum,
-    val normal_card: MutableList<CardName>?,
-    var special_card: MutableList<CardName>?,
+    val command: CommandEnum = CommandEnum.NULL,
+    val normal_card: MutableList<CardName>? = null,
+    var special_card: MutableList<CardName>? = null,
 )
 
 @Serializable
 data class SakuraSendData(
-    val command: CommandEnum,
-    val data: MutableList<Int>?)
+    val command: CommandEnum = CommandEnum.NULL,
+    val data: MutableList<Int>? = null
+)
 
 

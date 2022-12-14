@@ -732,13 +732,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
             now_player.hand.add(now_player.normal_card_deck.first())
             now_player.normal_card_deck.removeFirst()
         }
-
-        print(player)
-        print("have card: ")
-        for(i in now_player.hand){
-            print(i.card_data.card_name)
-        }
-        print("\n")
     }
 
     suspend fun insertHandToDeck(player: PlayerEnum, card_name: CardName): Boolean{

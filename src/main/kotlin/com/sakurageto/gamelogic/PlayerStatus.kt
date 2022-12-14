@@ -3,6 +3,8 @@ package com.sakurageto.gamelogic
 import com.sakurageto.card.*
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.SakuraSendData
+import java.util.NoSuchElementException
+
 class PlayerStatus {
     var full_action = false
 
@@ -232,8 +234,18 @@ class PlayerStatus {
     }
 
     fun setMegamiSSangjang(data: SakuraSendData){
-        megami_1 = MegamiEnum.fromInt(data.data?.get(0)!!)
-        megami_2 = MegamiEnum.fromInt(data.data?.get(1)!!)
+        megami_1 = try{
+            MegamiEnum.fromInt(data.data?.get(0)?: 10)
+        }catch (e: NoSuchElementException){
+            MegamiEnum.fromInt(10)
+        }
+
+        megami_2 = try{
+            MegamiEnum.fromInt(data.data?.get(1)?: 20)
+        }catch (e: NoSuchElementException){
+            MegamiEnum.fromInt(20)
+        }
+
         if(megami_1 == megami_2){
             megami_1 = MegamiEnum.YURINA
             megami_2 = MegamiEnum.HIMIKA
@@ -241,9 +253,24 @@ class PlayerStatus {
     }
 
     fun setMegamiSamSep(data: SakuraSendData){
-        megami_1 = MegamiEnum.fromInt(data.data?.get(0)!!)
-        megami_2 = MegamiEnum.fromInt(data.data?.get(1)!!)
-        megami_ban = MegamiEnum.fromInt(data.data?.get(2)!!)
+        megami_1 = try{
+            MegamiEnum.fromInt(data.data?.get(0)?: 10)
+        }catch (e: NoSuchElementException){
+            MegamiEnum.fromInt(10)
+        }
+
+        megami_2 = try{
+            MegamiEnum.fromInt(data.data?.get(1)?: 20)
+        }catch (e: NoSuchElementException){
+            MegamiEnum.fromInt(20)
+        }
+
+        megami_ban = try{
+            MegamiEnum.fromInt(data.data?.get(2)?: 30)
+        }catch (e: NoSuchElementException){
+            MegamiEnum.fromInt(30)
+        }
+
         if(megami_2 == megami_1){
             megami_1 = MegamiEnum.YURINA
             megami_2 = MegamiEnum.HIMIKA
@@ -270,7 +297,7 @@ class PlayerStatus {
     }
 
     fun banMegami(data: SakuraSendData){
-        val ben_megami = data.data?.get(0)!!
+        val ben_megami = data.data?.get(0)?: megami_1
         if (ben_megami != megami_ban.real_number){
             if(ben_megami == megami_1.real_number){
                 megami_1 = megami_ban
@@ -283,5 +310,23 @@ class PlayerStatus {
 
     fun makeMegamiData(command: CommandEnum): SakuraSendData {
         return SakuraSendData(command, mutableListOf(megami_1.real_number, megami_2.real_number))
+    }
+
+    fun deleteNormalUsedCard(card: MutableList<CardName>){
+        for(name in card){
+            val now = unselected_card.indexOf(name)
+            if(now != -1){
+                unselected_card.removeAt(now)
+            }
+        }
+    }
+
+    fun deleteSpeicalUsedCard(card: MutableList<CardName>){
+        for(name in card){
+            val now = unselected_card.indexOf(name)
+            if(now != -1){
+                unselected_specialcard.removeAt(now)
+            }
+        }
     }
 }

@@ -292,7 +292,7 @@ class Card(val card_data: CardData, val player: PlayerEnum, var special_card_sta
     suspend fun behaviorUseNormal(player: PlayerEnum, gamestatus: GameStatus, react_attack: MadeAttack?){
         card_data.effect?.let {
             for(text in it){
-                if(text.timing_tag == TextEffectTimingTag.USING || text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
+                if(text.timing_tag == TextEffectTimingTag.USING){
                     text.effect!!(player, gamestatus, react_attack)
                 }
             }
@@ -321,7 +321,7 @@ class Card(val card_data: CardData, val player: PlayerEnum, var special_card_sta
 
         card_data.effect?.let {
             for (text in it) {
-                if(text.timing_tag == TextEffectTimingTag.START_DEPLOYMENT || text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
+                if(text.timing_tag == TextEffectTimingTag.START_DEPLOYMENT){
                     text.effect!!(player, gamestatus, react_attack)
                 }
             }
@@ -345,5 +345,13 @@ class Card(val card_data: CardData, val player: PlayerEnum, var special_card_sta
         gamestatus.afterCardUsed(player, this)
     }
 
+    fun chasmCheck(): Boolean{
+        this.card_data.effect?.let {
+            for(text in it){
+                if(text.tag == TextEffectTag.CHASM) return true
+            }
+        }
+        return false
+    }
 
 }

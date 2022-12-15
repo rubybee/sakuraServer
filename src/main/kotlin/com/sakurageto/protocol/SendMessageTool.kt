@@ -8,6 +8,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.Exception
+import kotlin.contracts.contract
 
 //send function
 suspend fun UsedCardReturn(player: Connection, card_name: CardName) {
@@ -38,18 +39,34 @@ suspend fun sendRequestEnchantmentCard(player: Connection, card_list_your: Mutab
     player.session.send(Json.encodeToString(data_other))
 }
 
-suspend fun sendDestructionEnchant(mine: Connection, other: Connection, card_name: CardName){
-    val data_your = SakuraCardCommand(CommandEnum.DESTRUCTION_ENCHANTMENT_YOUR, card_name)
-    val data_other = SakuraCardCommand(CommandEnum.DESTRUCTION0_ENCHANTMENT_OTHER, card_name)
+suspend fun sendDestructionNotNormal(mine: Connection, other: Connection, card_name: CardName){
+    val data_your = SakuraCardCommand(CommandEnum.DESTRUCTION_NOT_NORMALY_ENCHANTENT_YOUR, card_name)
+    val data_other = SakuraCardCommand(CommandEnum.DESTRUCTION_NOT_NORMALY_ENCHANTMENT_OTHER, card_name)
     mine.session.send(Json.encodeToString(data_your))
     other.session.send(Json.encodeToString(data_other))
 }
+suspend fun sendDestructionEnchant(mine: Connection, other: Connection, card_name: CardName){
+    val data_your = SakuraCardCommand(CommandEnum.DESTRUCTION_ENCHANTMENT_YOUR, card_name)
+    val data_other = SakuraCardCommand(CommandEnum.DESTRUCTION_ENCHANTMENT_OTHER, card_name)
+    mine.session.send(Json.encodeToString(data_your))
+    other.session.send(Json.encodeToString(data_other))
+}
+
 suspend fun sendEnchantmentZone(mine: Connection, other: Connection, card_name: CardName){
     val data_your = SakuraCardCommand(CommandEnum.ENCHANTMENT_CARD_YOUR, card_name)
     val data_other = SakuraCardCommand(CommandEnum.ENCHANTMENT_CARD_OTHER, card_name)
     mine.session.send(Json.encodeToString(data_your))
     other.session.send(Json.encodeToString(data_other))
 }
+
+suspend fun sendCoverZone(mine: Connection, other: Connection, card_name: CardName, public: Boolean){
+    val data_your = SakuraCardCommand(CommandEnum.COVER_CARD_YOUR, card_name)
+    val data_other = if(public) SakuraCardCommand(CommandEnum.COVER_CARD_OTHER, card_name)
+        else SakuraCardCommand(CommandEnum.COVER_CARD_OTHER, null)
+    mine.session.send(Json.encodeToString(data_your))
+    other.session.send(Json.encodeToString(data_other))
+}
+
 suspend fun sendDiscardZone(mine: Connection, other: Connection, card_name: CardName){
     val data_your = SakuraCardCommand(CommandEnum.DISCARD_CARD_YOUR, card_name)
     val data_other = SakuraCardCommand(CommandEnum.DISCARD_CARD_OTHER, card_name)
@@ -282,7 +299,7 @@ suspend fun receiveReact(player: Connection): Pair<CommandEnum, CardName?> {
                 if (data.command == CommandEnum.USE_CARD_IN_HAND || data.command == CommandEnum.USE_CARD_IN_SPEICAL){
                     return Pair(data.command, data.card)
                 }
-                else if(data.command == CommandEnum.DO_NOT_REACT){
+                else if(data.command == CommandEnum.REACT_NO){
                     return Pair(data.command, null)
                 }
             }catch (e: Exception){
@@ -290,7 +307,7 @@ suspend fun receiveReact(player: Connection): Pair<CommandEnum, CardName?> {
             }
         }
     }
-    return Pair(CommandEnum.DO_NOT_REACT, null)
+    return Pair(CommandEnum.REACT_NO, null)
 }
 
 suspend fun receiveChooseDamage(player: Connection): CommandEnum {
@@ -328,7 +345,11 @@ suspend fun receiveNapInformation(player: Connection, total: Int, card_name: Car
             try {
                 val data = json.decodeFromString<SakuraSendData>(text)
                 if (data.command == CommandEnum.SELECT_NAP){
-                    return Pair(data.data!![0], data.data!![1])
+                    data.data?.let {
+                        if(it.size >= 2){
+                             return(Pair(it[0], it[1]))
+                        }
+                    }
                 }
                 else {
                     continue

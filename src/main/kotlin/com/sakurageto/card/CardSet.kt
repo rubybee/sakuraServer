@@ -60,7 +60,7 @@ object CardSet {
             null
         })
         apdo.setEnchantment(2)
-        apdo.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.CHASM, null))
+        apdo.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CHASM, null))
         apdo.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MAKE_ATTACK) {player, game_status, _ ->
             game_status.addPreAttackZone(player, MadeAttack(DistanceType.CONTINUOUS, 999,  3, Pair(1, 4), null, MegamiEnum.YURINA))
             null

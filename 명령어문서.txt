@@ -81,3 +81,11 @@
     "command": "ACTION_USE_CARD_HAND",
     "card": "YURINA_GIBACK"
 }
+
+납 선택(첫번째가 오라, 두번째가 더스트)
+{
+    "command": "SELECT_NAP",
+    "data": [
+        2, 0
+    ]
+}

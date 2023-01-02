@@ -170,5 +170,14 @@ enum class CardName() {
             }
         }
 
+        fun returnAdditionalCardNameByMegami(megami_name: MegamiEnum): List<CardName> {
+            when (megami_name){
+                MegamiEnum.YURINA -> return listOf<CardName>()
+                MegamiEnum.SAINE -> return listOf<CardName>()
+                MegamiEnum.HIMIKA -> return listOf<CardName>()
+                MegamiEnum.TOKOYO -> return listOf<CardName>()
+            }
+        }
+
     }
 }

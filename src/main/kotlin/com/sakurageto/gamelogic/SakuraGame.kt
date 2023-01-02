@@ -3,8 +3,10 @@ package com.sakurageto.gamelogic
 import com.sakurageto.Connection
 import com.sakurageto.card.Card
 import com.sakurageto.card.CardName
+import com.sakurageto.card.CardSet
 import com.sakurageto.card.PlayerEnum
 import com.sakurageto.protocol.*
+import io.ktor.util.*
 import io.ktor.websocket.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -137,20 +139,24 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
     }
 
     suspend fun selectCard(){
-        game_status.player1.unselected_card.addAll(CardName.Companion.returnNormalCardNameByMegami(game_status.player1.megami_1))
-        game_status.player1.unselected_card.addAll(CardName.Companion.returnNormalCardNameByMegami(game_status.player1.megami_2))
-        game_status.player2.unselected_card.addAll(CardName.Companion.returnNormalCardNameByMegami(game_status.player2.megami_1))
-        game_status.player2.unselected_card.addAll(CardName.Companion.returnNormalCardNameByMegami(game_status.player2.megami_2))
-        game_status.player1.unselected_specialcard.addAll(CardName.Companion.returnSpecialCardNameByMegami(game_status.player1.megami_1))
-        game_status.player1.unselected_specialcard.addAll(CardName.Companion.returnSpecialCardNameByMegami(game_status.player1.megami_2))
-        game_status.player2.unselected_specialcard.addAll(CardName.Companion.returnSpecialCardNameByMegami(game_status.player2.megami_1))
-        game_status.player2.unselected_specialcard.addAll(CardName.Companion.returnSpecialCardNameByMegami(game_status.player2.megami_2))
+        game_status.player1.unselected_card.addAll(CardName.returnNormalCardNameByMegami(game_status.player1.megami_1))
+        game_status.player1.unselected_card.addAll(CardName.returnNormalCardNameByMegami(game_status.player1.megami_2))
+        game_status.player2.unselected_card.addAll(CardName.returnNormalCardNameByMegami(game_status.player2.megami_1))
+        game_status.player2.unselected_card.addAll(CardName.returnNormalCardNameByMegami(game_status.player2.megami_2))
+        game_status.player1.unselected_specialcard.addAll(CardName.returnSpecialCardNameByMegami(game_status.player1.megami_1))
+        game_status.player1.unselected_specialcard.addAll(CardName.returnSpecialCardNameByMegami(game_status.player1.megami_2))
+        game_status.player2.unselected_specialcard.addAll(CardName.returnSpecialCardNameByMegami(game_status.player2.megami_1))
+        game_status.player2.unselected_specialcard.addAll(CardName.returnSpecialCardNameByMegami(game_status.player2.megami_2))
 
         val send_request_player1 = SakuraCardSetSend(CommandEnum.SELECT_CARD, game_status.player1.unselected_card, game_status.player1.unselected_specialcard)
         val send_request_player2 = SakuraCardSetSend(CommandEnum.SELECT_CARD, game_status.player2.unselected_card, game_status.player2.unselected_specialcard)
+        val send_othersinformation_player1 = SakuraCardSetSend(CommandEnum.SELECT_CARD_OTHER_PLAYERS, game_status.player2.unselected_card, game_status.player2.unselected_card)
+        val send_othersinformation_player2 = SakuraCardSetSend(CommandEnum.SELECT_CARD_OTHER_PLAYERS, game_status.player1.unselected_card, game_status.player1.unselected_card)
 
         player1.session.send(Json.encodeToString(send_request_player1))
         player2.session.send(Json.encodeToString(send_request_player2))
+        player1.session.send(Json.encodeToString(send_othersinformation_player1))
+        player2.session.send(Json.encodeToString(send_othersinformation_player2))
 
         val player1_data = waitCardSetUntil(player1, CommandEnum.SELECT_CARD)
         val player2_data = waitCardSetUntil(player2, CommandEnum.SELECT_CARD)
@@ -186,10 +192,43 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
         player1.session.send(Json.encodeToString(end_player1_select))
         player2.session.send(Json.encodeToString(end_player2_select))
 
-        Card.cardInitInsert(game_status.player1.normal_card_deck, card_data_player1, PlayerEnum.PLAYER1)
-        Card.cardInitInsert(game_status.player1.special_card_deck, specialcard_data_player1, PlayerEnum.PLAYER1)
-        Card.cardInitInsert(game_status.player2.normal_card_deck, card_data_player2, PlayerEnum.PLAYER2)
-        Card.cardInitInsert(game_status.player2.special_card_deck, specialcard_data_player2, PlayerEnum.PLAYER2)
+        when(first_turn){
+            PlayerEnum.PLAYER1 -> {
+                Card.cardInitInsert(true, game_status.player1.normal_card_deck, card_data_player1, PlayerEnum.PLAYER1)
+                Card.cardInitInsert(true, game_status.player1.special_card_deck, specialcard_data_player1, PlayerEnum.PLAYER1)
+                Card.cardInitInsert(false, game_status.player2.normal_card_deck, card_data_player2, PlayerEnum.PLAYER2)
+                Card.cardInitInsert(false, game_status.player2.special_card_deck, specialcard_data_player2, PlayerEnum.PLAYER2)
+            }
+            PlayerEnum.PLAYER2 -> {
+                Card.cardInitInsert(false, game_status.player1.normal_card_deck, card_data_player1, PlayerEnum.PLAYER1)
+                Card.cardInitInsert(false, game_status.player1.special_card_deck, specialcard_data_player1, PlayerEnum.PLAYER1)
+                Card.cardInitInsert(true, game_status.player2.normal_card_deck, card_data_player2, PlayerEnum.PLAYER2)
+                Card.cardInitInsert(true, game_status.player2.special_card_deck, specialcard_data_player2, PlayerEnum.PLAYER2)
+            }
+        }
+
+        val additional_card_player1 = mutableListOf<CardName>()
+        val additional_card_player2 = mutableListOf<CardName>()
+        additional_card_player1.addAll(CardName.returnAdditionalCardNameByMegami(game_status.player1.megami_1))
+        additional_card_player2.addAll(CardName.returnAdditionalCardNameByMegami(game_status.player2.megami_1))
+        additional_card_player1.addAll(CardName.returnAdditionalCardNameByMegami(game_status.player1.megami_2))
+        additional_card_player2.addAll(CardName.returnAdditionalCardNameByMegami(game_status.player2.megami_2))
+
+        if(!additional_card_player1.isEmpty()){
+            val turn_check = first_turn == PlayerEnum.PLAYER1
+            for(card_name in additional_card_player1){
+                var card = Card.cardMakerByName(turn_check, card_name, PlayerEnum.PLAYER1)
+                game_status.player1.additional_hand[card.card_number] = card
+            }
+        }
+
+        if(!additional_card_player2.isEmpty()){
+            val turn_check = first_turn == PlayerEnum.PLAYER2
+            for(card_name in additional_card_player2){
+                var card = Card.cardMakerByName(turn_check, card_name, PlayerEnum.PLAYER2)
+                game_status.player2.additional_hand[card.card_number] = card
+            }
+        }
 
         game_status.player1.deleteNormalUsedCard(card_data_player1)
         game_status.player1.deleteSpeicalUsedCard(specialcard_data_player1)
@@ -337,8 +376,8 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
             selectBan()
         }
         checkFinalMegami()
-        selectCard()
         selectFirst()
+        selectCard()
         game_status.drawCard(PlayerEnum.PLAYER1, 3)
         game_status.drawCard(PlayerEnum.PLAYER2, 3)
         muligun()

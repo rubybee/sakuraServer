@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SakuraCardCommand(
     val command: CommandEnum = CommandEnum.NULL,
-    val card: CardName? = null,
+    val card: Int = -1,
 )
 
 @Serializable

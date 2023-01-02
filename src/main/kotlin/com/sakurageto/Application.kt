@@ -7,7 +7,7 @@ import io.ktor.server.netty.*
 import com.sakurageto.plugins.*
 
 fun main() {
-    CardSet.cardInitialization()
+    CardSet.init()
     embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
         .start(wait = true)
 }

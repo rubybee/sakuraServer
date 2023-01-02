@@ -4,6 +4,10 @@ import com.sakurageto.gamelogic.ImmediateBackListner
 import com.sakurageto.gamelogic.MegamiEnum
 
 object CardSet {
+    val cardname_hashmap_for_start_turn = HashMap<CardName, Int>()
+    val cardname_hashmap_for_second_turn = HashMap<CardName, Int>()
+    val cardnumber_hashmap = HashMap<CardName, Int>()
+
     val unused = CardData(CardClass.NORMAL, CardName.CARD_UNNAME, MegamiEnum.YURINA, CardType.UNDEFINED, SubType.NONE)
 
     val cham = CardData(CardClass.NORMAL, CardName.YURINA_CHAM, MegamiEnum.YURINA, CardType.ATTACK, SubType.NONE)
@@ -18,7 +22,7 @@ object CardSet {
     val pobaram = CardData(CardClass.SPECIAL, CardName.YURINA_POBARAM, MegamiEnum.YURINA, CardType.ATTACK, SubType.REACTION)
     val juruck = CardData(CardClass.SPECIAL, CardName.YURINA_JURUCK, MegamiEnum.YURINA, CardType.ATTACK, SubType.FULLPOWER)
 
-    fun YurinaCardInitialization(){
+    fun YurinaCardInit(){
         cham.setAttack(DistanceType.CONTINUOUS, Pair(3, 4), null, 3, 1)
         ilsom.setAttack(DistanceType.CONTINUOUS, Pair(3, 3), null, 2, 2)
         ilsom.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { player, game_status, _->
@@ -110,8 +114,110 @@ object CardSet {
         })
     }
 
-    fun cardInitialization(){
-        YurinaCardInitialization()
+    fun hashMapInit(){
+        //for first turn player 0~9999
+        cardname_hashmap_for_start_turn[CardName.YURINA_CHAM] = 0
+        cardname_hashmap_for_start_turn[CardName.YURINA_ILSUM] = 1
+        cardname_hashmap_for_start_turn[CardName.YURINA_JARUCHIGI] = 2
+        cardname_hashmap_for_start_turn[CardName.YURINA_GUHAB] = 3
+        cardname_hashmap_for_start_turn[CardName.YURINA_GIBACK] = 4
+        cardname_hashmap_for_start_turn[CardName.YURINA_APDO] = 5
+        cardname_hashmap_for_start_turn[CardName.YURINA_GIYENBANJO] = 6
+        cardname_hashmap_for_start_turn[CardName.YURINA_WOLYUNGNACK] = 7
+        cardname_hashmap_for_start_turn[CardName.YURINA_POBARAM] = 8
+        cardname_hashmap_for_start_turn[CardName.YURINA_JJOCKBAE] = 9
+        cardname_hashmap_for_start_turn[CardName.YURINA_JURUCK] = 10
+
+        cardname_hashmap_for_start_turn[CardName.SAINE_DOUBLEBEGI] = 100
+        cardname_hashmap_for_start_turn[CardName.SAINE_HURUBEGI] = 101
+        cardname_hashmap_for_start_turn[CardName.SAINE_MOOGECHOO] = 102
+        cardname_hashmap_for_start_turn[CardName.SAINE_GANPA] = 103
+        cardname_hashmap_for_start_turn[CardName.SAINE_GWONYUCK] = 104
+        cardname_hashmap_for_start_turn[CardName.SAINE_CHOONGEMJUNG] = 105
+        cardname_hashmap_for_start_turn[CardName.SAINE_MOOEMBUCK] = 106
+        cardname_hashmap_for_start_turn[CardName.SAINE_YULDONGHOGEK] = 107
+        cardname_hashmap_for_start_turn[CardName.SAINE_HANGMUNGGONGJIN] = 108
+        cardname_hashmap_for_start_turn[CardName.SAINE_EMMOOSHOEBING] = 109
+        cardname_hashmap_for_start_turn[CardName.SAINE_JONGGEK] = 110
+
+        cardname_hashmap_for_start_turn[CardName.HIMIKA_SHOOT] = 200
+        cardname_hashmap_for_start_turn[CardName.HIMIKA_RAPIDFIRE] = 201
+        cardname_hashmap_for_start_turn[CardName.HIMIKA_MAGNUMCANON] = 202
+        cardname_hashmap_for_start_turn[CardName.HIMIKA_FULLBURST] = 203
+        cardname_hashmap_for_start_turn[CardName.HIMIKA_BACKSTEP] = 204
+        cardname_hashmap_for_start_turn[CardName.HIMIKA_BACKDRAFT] = 205
+        cardname_hashmap_for_start_turn[CardName.HIMIKA_SMOKE] = 206
+        cardname_hashmap_for_start_turn[CardName.HIMIKA_REDBULLET] = 207
+        cardname_hashmap_for_start_turn[CardName.HIMIKA_CRIMSONZERO] = 208
+        cardname_hashmap_for_start_turn[CardName.HIMIKA_SCARLETIMAGINE] = 209
+        cardname_hashmap_for_start_turn[CardName.HIMIKA_BURMILIONFIELD] = 210
+
+        cardname_hashmap_for_start_turn[CardName.TOKOYO_BITSUNERIGI] = 300
+        cardname_hashmap_for_start_turn[CardName.TOKOYO_WOOAHHANTAGUCK] = 301
+        cardname_hashmap_for_start_turn[CardName.TOKOYO_RUNNINGRABIT] = 302
+        cardname_hashmap_for_start_turn[CardName.TOKOYO_POETDANCE] = 303
+        cardname_hashmap_for_start_turn[CardName.TOKOYO_FLIPFAN] = 304
+        cardname_hashmap_for_start_turn[CardName.TOKOYO_WINDSTAGE] = 305
+        cardname_hashmap_for_start_turn[CardName.TOKOYO_SUNSTAGE] = 306
+        cardname_hashmap_for_start_turn[CardName.TOKOYO_KUON] = 307
+        cardname_hashmap_for_start_turn[CardName.TOKOYO_THOUSANDBIRD] = 308
+        cardname_hashmap_for_start_turn[CardName.TOKOYO_ENDLESSWIND] = 309
+        cardname_hashmap_for_start_turn[CardName.TOKOYO_TOKOYOMOON] = 310
+
+        //for second turn player 10000~19999
+        cardname_hashmap_for_second_turn[CardName.YURINA_CHAM] = 10000
+        cardname_hashmap_for_second_turn[CardName.YURINA_ILSUM] = 10001
+        cardname_hashmap_for_second_turn[CardName.YURINA_JARUCHIGI] = 10002
+        cardname_hashmap_for_second_turn[CardName.YURINA_GUHAB] = 10003
+        cardname_hashmap_for_second_turn[CardName.YURINA_GIBACK] = 10004
+        cardname_hashmap_for_second_turn[CardName.YURINA_APDO] = 10005
+        cardname_hashmap_for_second_turn[CardName.YURINA_GIYENBANJO] = 10006
+        cardname_hashmap_for_second_turn[CardName.YURINA_WOLYUNGNACK] = 10007
+        cardname_hashmap_for_second_turn[CardName.YURINA_POBARAM] = 10008
+        cardname_hashmap_for_second_turn[CardName.YURINA_JJOCKBAE] = 10009
+        cardname_hashmap_for_second_turn[CardName.YURINA_JURUCK] = 10010
+
+        cardname_hashmap_for_second_turn[CardName.SAINE_DOUBLEBEGI] = 10100
+        cardname_hashmap_for_second_turn[CardName.SAINE_HURUBEGI] = 10101
+        cardname_hashmap_for_second_turn[CardName.SAINE_MOOGECHOO] = 10102
+        cardname_hashmap_for_second_turn[CardName.SAINE_GANPA] = 10103
+        cardname_hashmap_for_second_turn[CardName.SAINE_GWONYUCK] = 10104
+        cardname_hashmap_for_second_turn[CardName.SAINE_CHOONGEMJUNG] = 10105
+        cardname_hashmap_for_second_turn[CardName.SAINE_MOOEMBUCK] = 10106
+        cardname_hashmap_for_second_turn[CardName.SAINE_YULDONGHOGEK] = 10107
+        cardname_hashmap_for_second_turn[CardName.SAINE_HANGMUNGGONGJIN] = 10108
+        cardname_hashmap_for_second_turn[CardName.SAINE_EMMOOSHOEBING] = 10109
+        cardname_hashmap_for_second_turn[CardName.SAINE_JONGGEK] = 10110
+
+        cardname_hashmap_for_second_turn[CardName.HIMIKA_SHOOT] = 10200
+        cardname_hashmap_for_second_turn[CardName.HIMIKA_RAPIDFIRE] = 10201
+        cardname_hashmap_for_second_turn[CardName.HIMIKA_MAGNUMCANON] = 10202
+        cardname_hashmap_for_second_turn[CardName.HIMIKA_FULLBURST] = 10203
+        cardname_hashmap_for_second_turn[CardName.HIMIKA_BACKSTEP] = 10204
+        cardname_hashmap_for_second_turn[CardName.HIMIKA_BACKDRAFT] = 10205
+        cardname_hashmap_for_second_turn[CardName.HIMIKA_SMOKE] = 10206
+        cardname_hashmap_for_second_turn[CardName.HIMIKA_REDBULLET] = 10207
+        cardname_hashmap_for_second_turn[CardName.HIMIKA_CRIMSONZERO] = 10208
+        cardname_hashmap_for_second_turn[CardName.HIMIKA_SCARLETIMAGINE] = 10209
+        cardname_hashmap_for_second_turn[CardName.HIMIKA_BURMILIONFIELD] = 10210
+
+        cardname_hashmap_for_second_turn[CardName.TOKOYO_BITSUNERIGI] = 10300
+        cardname_hashmap_for_second_turn[CardName.TOKOYO_WOOAHHANTAGUCK] = 10301
+        cardname_hashmap_for_second_turn[CardName.TOKOYO_RUNNINGRABIT] = 10302
+        cardname_hashmap_for_second_turn[CardName.TOKOYO_POETDANCE] = 10303
+        cardname_hashmap_for_second_turn[CardName.TOKOYO_FLIPFAN] = 10304
+        cardname_hashmap_for_second_turn[CardName.TOKOYO_WINDSTAGE] = 10305
+        cardname_hashmap_for_second_turn[CardName.TOKOYO_SUNSTAGE] = 10306
+        cardname_hashmap_for_second_turn[CardName.TOKOYO_KUON] = 10307
+        cardname_hashmap_for_second_turn[CardName.TOKOYO_THOUSANDBIRD] = 10308
+        cardname_hashmap_for_second_turn[CardName.TOKOYO_ENDLESSWIND] = 10309
+        cardname_hashmap_for_second_turn[CardName.TOKOYO_TOKOYOMOON] = 10310
+    }
+
+    fun init(){
+        hashMapInit()
+
+        YurinaCardInit()
     }
 
 

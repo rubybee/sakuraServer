@@ -19,6 +19,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
     var player1_life_listner: ArrayDeque<ImmediateBackListner> = ArrayDeque<ImmediateBackListner>()
     var player2_life_listner: ArrayDeque<ImmediateBackListner> = ArrayDeque<ImmediateBackListner>()
 
+    lateinit var first_turn: PlayerEnum
+
     inline fun getPlayer(player: PlayerEnum): PlayerStatus{
         return if(player ==  PlayerEnum.PLAYER1) player1 else player2
     }
@@ -28,6 +30,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
     }
 
     fun setFirstTurn(player: PlayerEnum){
+        first_turn = player
         when(player){
             PlayerEnum.PLAYER1 -> {
                 player2.concentration = 1
@@ -209,13 +212,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
             card.value.addAttackBuff(PlayerEnum.PLAYER1, this)
         }
         for(card in player1.used_special_card){
-            card.addAttackBuff(PlayerEnum.PLAYER1, this)
+            card.value.addAttackBuff(PlayerEnum.PLAYER1, this)
         }
         for(card in player2.enchantment_card){
             card.value.addAttackBuff(PlayerEnum.PLAYER2, this)
         }
         for(card in player2.used_special_card){
-            card.addAttackBuff(PlayerEnum.PLAYER2, this)
+            card.value.addAttackBuff(PlayerEnum.PLAYER2, this)
         }
     }
 
@@ -224,13 +227,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
             card.value.addCostBuff(PlayerEnum.PLAYER1, this)
         }
         for(card in player1.used_special_card){
-            card.addCostBuff(PlayerEnum.PLAYER1, this)
+            card.value.addCostBuff(PlayerEnum.PLAYER1, this)
         }
         for(card in player2.enchantment_card){
             card.value.addCostBuff(PlayerEnum.PLAYER2, this)
         }
         for(card in player2.used_special_card){
-            card.addCostBuff(PlayerEnum.PLAYER2, this)
+            card.value.addCostBuff(PlayerEnum.PLAYER2, this)
         }
     }
 

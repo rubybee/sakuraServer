@@ -14,65 +14,43 @@ class PlayerStatus {
 
     var using_card = ArrayDeque<Card>()
 
-    var hand: MutableList<Card> = mutableListOf()
+    var hand = HashMap<Int, Card>()
 
-    fun getCardFromHand(card_name: CardName): Card?{
-        for(card in hand){
-            if(card.card_data.card_name == card_name){
-                return card
-            }
-        }
-        return null
+    fun getCardFromHand(card_number: Int): Card?{
+        return hand[card_number]
     }
 
-    fun useCardFromHand(card_name: CardName) {
-        for(i in hand.indices){
-            if(hand[i].card_data.card_name == card_name){
-                using_card.addLast(hand[i])
-                hand.removeAt(i)
-                return
-            }
-        }
+    fun useCardFromHand(card_number: Int) {
+        using_card.addLast(hand[card_number]!!)
+        hand.remove(card_number)
     }
 
-    fun fromHandToCover(card_name: CardName): Boolean {
-        for(i in hand.indices){
-            if(hand[i].card_data.card_name == card_name){
-                cover_card.addLast(hand[i])
-                hand.removeAt(i)
-                return true
-            }
+    fun fromHandToCover(card_number: Int): Boolean {
+        if(hand[card_number] != null){
+            cover_card.addLast(hand[card_number]!!)
+            hand.remove(card_number)
+            return true
         }
-        return false
+        else{
+            return false
+        }
     }
 
     var enchantment_card: HashMap<CardName, Card> = HashMap()
 
-    var special_card_deck: ArrayDeque<Card> = ArrayDeque<Card>()
+    var special_card_deck = HashMap<Int, Card>()
 
-    fun getCardFromSpecial(card_name: CardName): Card?{
-        for(card in special_card_deck){
-            if(card.card_data.card_name == card_name){
-                return card
-            }
-        }
-        return null
+    fun getCardFromSpecial(card_number: Int): Card?{
+        return special_card_deck[card_number]
     }
 
-    fun useCardFromSpecial(card_name: CardName) {
-        for(i in special_card_deck.indices){
-            val card = special_card_deck.first()
-            special_card_deck.removeFirst()
-            if(card.card_data.card_name == card_name){
-                using_card.addLast(card)
-                return
-            }
-            special_card_deck.addLast(card)
-        }
+    fun useCardFromSpecial(card_number: Int) {
+        using_card.addLast(special_card_deck[card_number]!!)
+        special_card_deck.remove(card_number)
     }
 
     var normal_card_deck = ArrayDeque<Card>()
-    var used_special_card = ArrayDeque<Card>()
+    var used_special_card = HashMap<CardName, Card>()
 
     var discard = ArrayDeque<Card>()
     var cover_card = ArrayDeque<Card>()
@@ -80,16 +58,15 @@ class PlayerStatus {
     var end_turn = false
 
     fun usedToSpecial(card_name: CardName): Boolean{
-        for(i in 0..used_special_card.size){
-            val now = used_special_card.first()
-            used_special_card.removeFirst()
-            if(now.card_data.card_name == card_name){
-                special_card_deck.addLast(now)
-                return true
-            }
-            used_special_card.addLast(now)
+        if(used_special_card[card_name] == null){
+            return false
         }
-        return false
+        else{
+            val card = used_special_card[card_name]!!
+            special_card_deck[card.card_number] = card
+            used_special_card.remove(card_name)
+            return true
+        }
     }
 
     //return using dust
@@ -138,6 +115,8 @@ class PlayerStatus {
 
     var unselected_card: MutableList<CardName> = mutableListOf()
     var unselected_specialcard: MutableList<CardName> = mutableListOf()
+
+    var additional_hand: HashMap<Int, Card> = HashMap()
 
     var pre_attack_card: MadeAttack? = null
 

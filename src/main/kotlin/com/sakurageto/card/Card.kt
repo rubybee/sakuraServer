@@ -1,12 +1,14 @@
 package com.sakurageto.card
 
+import com.sakurageto.card.CardSet.cardname_hashmap_for_second_turn
+import com.sakurageto.card.CardSet.cardname_hashmap_for_start_turn
 import com.sakurageto.card.CardSet.returnCardDataByName
 import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.PlayerStatus
 import com.sakurageto.protocol.receiveNapInformation
 import kotlin.collections.ArrayDeque
 
-class Card(val card_data: CardData, val player: PlayerEnum, var special_card_state: SpecialCardEnum?) {
+class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum, var special_card_state: SpecialCardEnum?) {
     var vertical: Boolean
     var flipped: Boolean
     var nap: Int? = null
@@ -16,21 +18,38 @@ class Card(val card_data: CardData, val player: PlayerEnum, var special_card_sta
         flipped = true
     }
     companion object{
-        fun cardMakerByName(card_name: CardName, player: PlayerEnum): Card{
+        fun cardMakerByName(start_turn: Boolean, card_name: CardName, player: PlayerEnum): Card{
             val data = returnCardDataByName(card_name)
             if (data.isItSpecial()){
-                return Card(data, player, SpecialCardEnum.UNUSED)
+                if(start_turn){
+                    return Card(cardname_hashmap_for_start_turn[card_name]?: -1, data, player, SpecialCardEnum.UNUSED)
+                }
+                return Card(cardname_hashmap_for_second_turn[card_name]?: -1, data, player, SpecialCardEnum.UNUSED)
             }
             else{
-                return Card(data, player, null)
+                if(start_turn){
+                    return Card(cardname_hashmap_for_start_turn[card_name]?: -1, data, player, null)
+                }
+                return Card(cardname_hashmap_for_second_turn[card_name]?: -1, data, player, null)
             }
 
         }
 
-        fun cardInitInsert(dest: ArrayDeque<Card>, src: MutableList<CardName>, player: PlayerEnum) {
+        fun cardInitInsert(start_turn: Boolean, dest: ArrayDeque<Card>, src: MutableList<CardName>, player: PlayerEnum){
             src.shuffle()
             for(card_name in src){
-                dest.add(cardMakerByName(card_name, player))
+                dest.add(cardMakerByName(start_turn, card_name, player))
+            }
+        }
+
+        fun cardInitInsert(start_turn: Boolean, dest: HashMap<Int, Card>, src: MutableList<CardName>, player: PlayerEnum){
+            for(card_name in src){
+                if(start_turn){
+                    dest[cardname_hashmap_for_start_turn[card_name]?: -1] = cardMakerByName(true, card_name, player)
+                }
+                else{
+                    dest[cardname_hashmap_for_second_turn[card_name]?: -1] = cardMakerByName(false, card_name, player)
+                }
             }
         }
 

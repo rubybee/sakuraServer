@@ -331,7 +331,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
                     receiveNapInformation(gamestatus.getSocket(player), now_need_nap, this.card_number)
                 val aura = receive_data.first
                 val dust = receive_data.second
-                if (aura + dust != now_need_nap && gamestatus.getPlayerAura(player) < aura && gamestatus.dust < dust) {
+                if (aura + dust != now_need_nap || gamestatus.getPlayerAura(player) < aura || gamestatus.dust < dust) {
                     continue
                 }
                 gamestatus.auraToCard(player, aura, this)
@@ -350,6 +350,21 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
     }
 
     suspend fun use(player: PlayerEnum, gamestatus: GameStatus, react_attack: MadeAttack?){
+        this.card_data.effect?.let {
+            for(text in it){
+                if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
+                    when(text.tag){
+                        TextEffectTag.END_TURN -> {
+                            text.effect!!(player, gamestatus, react_attack)
+                        }
+                        else -> {
+
+                        }
+                    }
+                }
+            }
+        }
+
         when(this.card_data.card_type){
             CardType.ATTACK -> {
                 attackUseNormal(player, gamestatus, react_attack)
@@ -363,7 +378,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
             CardType.UNDEFINED -> {}
         }
 
-        gamestatus.afterCardUsed(player, this)
+        gamestatus.afterCardUsed(gamestatus, player, this)
     }
 
     fun chasmCheck(): Boolean{

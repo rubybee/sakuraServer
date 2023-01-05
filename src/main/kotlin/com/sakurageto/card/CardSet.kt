@@ -83,7 +83,7 @@ object CardSet {
         pobaram.setAttack(DistanceType.CONTINUOUS, Pair(0, 10), null, 2, 999)
         pobaram.setSpecial(3)
         pobaram.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.REACT_ATTACK_REDUCE){ player, game_status, react_attack ->
-            react_attack!!.auraPlusMinus(-2)
+            react_attack?.auraPlusMinus(-2)
             null
         })
         pobaram.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.END_TURN){ player, game_status, _->

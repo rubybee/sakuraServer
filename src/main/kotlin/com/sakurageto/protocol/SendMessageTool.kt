@@ -296,7 +296,7 @@ suspend fun receiveReact(player: Connection): Pair<CommandEnum, Int> {
             val text = frame.readText()
             try {
                 val data = json.decodeFromString<SakuraCardCommand>(text)
-                if (data.command == CommandEnum.REACT_USE_CARD_HAND || data.command == CommandEnum.REACT_USE_CARD_SPEICAL){
+                if (data.command == CommandEnum.REACT_USE_CARD_HAND || data.command == CommandEnum.REACT_USE_CARD_SPECIAL){
                     return Pair(data.command, data.card)
                 }
                 else if(data.command == CommandEnum.REACT_NO){

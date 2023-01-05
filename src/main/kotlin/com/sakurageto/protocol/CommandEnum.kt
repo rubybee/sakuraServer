@@ -57,8 +57,8 @@ enum class CommandEnum() {
     CHOOSE_CARD_DAMAGE,
     CHOOSE_AURA,
     CHOOSE_LIFE,
-    REACT_USE_CARD_IN_HAND,
-    REACT_USE_CARD_IN_SPEICAL,
+    REACT_USE_CARD_HAND,
+    REACT_USE_CARD_SPEICAL,
     MOVE_TOKEN,
     USE_CARD_YOUR,
     USE_CARD_OTHER,
@@ -66,8 +66,10 @@ enum class CommandEnum() {
     USE_CARD_OTHER_REACTION,
     CARD_HAND_TO_COVER_YOUR,
     CARD_HAND_TO_COVER_OTHER,
-    CARD_HAND_TO_DECK_YOUR,
-    CARD_HAND_TO_DECK_OTHER,
+    CARD_HAND_TO_DECK_BELOW_YOUR,
+    CARD_HAND_TO_DECK_BELOW_OTHER,
+    CARD_HAND_TO_DECK_UPPER_YOUR,
+    CARD_HAND_TO_DECK_UPPER_OTHER,
     DRAW_CARD_YOUR,
     DRAW_CARD_OTHER,
     SELECT_NAP,
@@ -133,8 +135,10 @@ enum class CommandEnum() {
             USE_CARD_OTHER -> return USE_CARD_YOUR
             USE_CARD_YOUR_REACTION -> return USE_CARD_OTHER_REACTION
             USE_CARD_OTHER_REACTION -> return USE_CARD_YOUR_REACTION
-            CARD_HAND_TO_DECK_YOUR -> return CARD_HAND_TO_DECK_OTHER
-            CARD_HAND_TO_DECK_OTHER -> return CARD_HAND_TO_DECK_YOUR
+            CARD_HAND_TO_DECK_BELOW_YOUR -> return CARD_HAND_TO_DECK_BELOW_OTHER
+            CARD_HAND_TO_DECK_BELOW_OTHER -> return CARD_HAND_TO_DECK_BELOW_YOUR
+            CARD_HAND_TO_DECK_UPPER_YOUR -> return CARD_HAND_TO_DECK_UPPER_OTHER
+            CARD_HAND_TO_DECK_UPPER_OTHER -> return CARD_HAND_TO_DECK_UPPER_YOUR
             ACTION_GO_FORWARD_YOUR -> return ACTION_GO_FORWARD_OTHER
             ACTION_GO_BACKWARD_YOUR -> return ACTION_GO_BACKWARD_OTHER
             ACTION_WIND_AROUND_YOUR -> return ACTION_WIND_AROUND_OTHER
@@ -142,6 +146,14 @@ enum class CommandEnum() {
             ACTION_BREAK_AWAY_YOUR -> return ACTION_BREAK_AWAY_OTHER
             else -> return DISCARD_CARD_YOUR
         }
+    }
+}
+
+enum class TokenEnum(var real_number: Int){
+    SAKURA_TOKEN(0);
+
+    companion object {
+        fun fromInt(value: Int) = MegamiEnum.values().first { it.real_number == value }
     }
 }
 
@@ -155,7 +167,9 @@ enum class LocationEnum(var real_number: Int){
     DUST(6),
     YOUR_CARD(7),
     OTHER_CARD(8),
-    DISTANCE(9);
+    DISTANCE(9),
+    COVER_CARD(10),
+    DISCARD(11);
 
     fun Opposite(): LocationEnum{
         when(this){
@@ -169,6 +183,7 @@ enum class LocationEnum(var real_number: Int){
             YOUR_CARD -> return OTHER_CARD
             OTHER_CARD -> return YOUR_CARD
             DISTANCE -> return DISTANCE
+            else -> return DISCARD
         }
     }
     companion object {

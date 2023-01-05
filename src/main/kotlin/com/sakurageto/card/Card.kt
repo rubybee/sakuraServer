@@ -222,21 +222,16 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
     }
 
     suspend fun getBaseCost(player: PlayerEnum, gameStatus: GameStatus): Int{
-        if(card_data.cost != null){
-            return card_data.cost!!
-        }
-        else{
-            card_data.effect?.let {
-                for(text in it){
-                    if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
-                        if(text.tag == TextEffectTag.COST_X){
-                            return text.effect!!(player, gameStatus, null)!!
-                        }
+        return this.card_data.cost ?: card_data.effect?.let {
+            for(text in it){
+                if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
+                    if(text.tag == TextEffectTag.COST_X){
+                        text.effect!!(player, gameStatus, null)!!
                     }
                 }
             }
-        }
-        return 1000
+            10000
+        }?: 10000
     }
 
     suspend fun textUseCheck(player: PlayerEnum, gameStatus: GameStatus): Boolean{
@@ -264,7 +259,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
             megami = this.card_data.megami
         )
     }
-    //-2: can't use -1: can use >= 0 cost
+    //-2: can't use                    -1: can use                 >= 0: cost
     suspend fun canUse(player: PlayerEnum, gameStatus: GameStatus): Int{
         if(card_data.sub_type == SubType.FULLPOWER){
             if(!gameStatus.getPlayerFullAction(player)){
@@ -276,11 +271,14 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
             return -2
         }
 
-        var cost: Int
+        val cost: Int
 
         if(card_data.card_class == CardClass.SPECIAL){
             gameStatus.addAllCardCostBuff()
             cost = gameStatus.applyAllCostBuff(player, this.getBaseCost(player, gameStatus), this)
+            println(this.card_data.card_name)
+            println(cost)
+            println(this.card_number)
             if(cost > gameStatus.getPlayerFlare(player)){
                 gameStatus.cleanCostBuff()
                 return -2
@@ -293,7 +291,11 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         when(card_data.card_type){
             CardType.ATTACK -> {
                 if(gameStatus.addPreAttackZone(player, this.makeAttack(player, gameStatus).addAttackAndReturn(this.card_data))){
+                    println(gameStatus.getPlayer(player).pre_attack_card!!)
                     return cost
+                }
+                if(card_data.card_class == CardClass.SPECIAL){
+                    gameStatus.cleanCostBuff()
                 }
                 return -2
             }
@@ -305,7 +307,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
     }
 
     suspend fun attackUseNormal(player: PlayerEnum, gamestatus: GameStatus, react_attack: MadeAttack?){
-        gamestatus.afterMakeAttack(this.card_data.card_name, player, react_attack)
+        gamestatus.afterMakeAttack(this.card_number, player, react_attack)
     }
 
     suspend fun behaviorUseNormal(player: PlayerEnum, gamestatus: GameStatus, react_attack: MadeAttack?){
@@ -326,7 +328,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         } else {
             while (true) {
                 val receive_data =
-                    receiveNapInformation(gamestatus.getSocket(player), now_need_nap, this.card_data.card_name)
+                    receiveNapInformation(gamestatus.getSocket(player), now_need_nap, this.card_number)
                 val aura = receive_data.first
                 val dust = receive_data.second
                 if (aura + dust != now_need_nap && gamestatus.getPlayerAura(player) < aura && gamestatus.dust < dust) {

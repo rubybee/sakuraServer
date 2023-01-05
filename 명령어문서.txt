@@ -29,7 +29,7 @@
     ]
 }
 
-멀리건 선택
+멀리건 선택, 여기는 카드이름으로 전송해야 됨
 {
     "command": "MULIGUN",
     "normal_card": null,

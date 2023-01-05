@@ -11,7 +11,7 @@ import kotlin.Exception
 import kotlin.contracts.contract
 
 //send function
-suspend fun UsedCardReturn(player: Connection, card_number: Int) {
+suspend fun sendUsedCardReturn(player: Connection, card_number: Int) {
     val data = SakuraCardCommand(CommandEnum.RETURN_SPECIAL_CARD, card_number)
     player.session.send(Json.encodeToString(data))
 }
@@ -105,12 +105,12 @@ suspend fun sendRequestReact(mine: Connection){
     mine.session.send(Json.encodeToString(data))
 }
 
-suspend fun sendMoveToken(mine: Connection, other: Connection, from: LocationEnum, to: LocationEnum, number: Int, card_number: Int){
+suspend fun sendMoveToken(mine: Connection, other: Connection, what: TokenEnum, from: LocationEnum, to: LocationEnum, number: Int, card_number: Int){
     val pre_data = SakuraCardCommand(CommandEnum.MOVE_TOKEN, card_number)
     mine.session.send(Json.encodeToString(pre_data))
     other.session.send(Json.encodeToString(pre_data))
-    val data_your = SakuraSendData(CommandEnum.MOVE_TOKEN, mutableListOf(from.real_number, to.real_number, number))
-    val data_other = SakuraSendData(CommandEnum.MOVE_TOKEN, mutableListOf(from.Opposite().real_number, to.Opposite().real_number, number))
+    val data_your = SakuraSendData(CommandEnum.MOVE_TOKEN, mutableListOf(what.real_number, from.real_number, to.real_number, number, card_number))
+    val data_other = SakuraSendData(CommandEnum.MOVE_TOKEN, mutableListOf(what.real_number, from.Opposite().real_number, to.Opposite().real_number, number, card_number))
     mine.session.send(Json.encodeToString(data_your))
     other.session.send(Json.encodeToString(data_other))
 }
@@ -143,9 +143,10 @@ suspend fun sendRemoveShrink(mine: Connection, other: Connection){
     other.session.send(Json.encodeToString(data_other))
 }
 
-suspend fun sendHandToDeck(mine: Connection, other: Connection, card_number: Int, public: Boolean){
-    val data_your = SakuraCardCommand(CommandEnum.CARD_HAND_TO_DECK_YOUR, card_number)
-    val data_other = if(public) SakuraCardCommand(CommandEnum.CARD_HAND_TO_DECK_OTHER, card_number) else SakuraCardCommand(CommandEnum.CARD_HAND_TO_DECK_OTHER, -1)
+suspend fun sendHandToDeck(mine: Connection, other: Connection, card_number: Int, public: Boolean, below: Boolean){
+    val data_your = SakuraCardCommand(if (below) CommandEnum.CARD_HAND_TO_DECK_BELOW_YOUR else CommandEnum.CARD_HAND_TO_DECK_UPPER_YOUR, card_number)
+    val data_other = if(public) SakuraCardCommand(if (below) CommandEnum.CARD_HAND_TO_DECK_BELOW_OTHER else CommandEnum.CARD_HAND_TO_DECK_UPPER_OTHER, card_number)
+    else SakuraCardCommand(if (below) CommandEnum.CARD_HAND_TO_DECK_BELOW_OTHER else CommandEnum.CARD_HAND_TO_DECK_UPPER_OTHER, -1)
     mine.session.send(Json.encodeToString(data_your))
     other.session.send(Json.encodeToString(data_other))
 }
@@ -295,7 +296,7 @@ suspend fun receiveReact(player: Connection): Pair<CommandEnum, Int> {
             val text = frame.readText()
             try {
                 val data = json.decodeFromString<SakuraCardCommand>(text)
-                if (data.command == CommandEnum.REACT_USE_CARD_IN_HAND || data.command == CommandEnum.REACT_USE_CARD_IN_SPEICAL){
+                if (data.command == CommandEnum.REACT_USE_CARD_HAND || data.command == CommandEnum.REACT_USE_CARD_SPEICAL){
                     return Pair(data.command, data.card)
                 }
                 else if(data.command == CommandEnum.REACT_NO){

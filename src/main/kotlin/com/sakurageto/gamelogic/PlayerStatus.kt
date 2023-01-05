@@ -6,6 +6,8 @@ import com.sakurageto.protocol.SakuraSendData
 import java.util.NoSuchElementException
 
 class PlayerStatus {
+    var first_turn = false
+
     var full_action = false
 
     var max_hand = 2
@@ -36,7 +38,7 @@ class PlayerStatus {
         }
     }
 
-    var enchantment_card: HashMap<CardName, Card> = HashMap()
+    var enchantment_card: HashMap<Int, Card> = HashMap()
 
     var special_card_deck = HashMap<Int, Card>()
 
@@ -46,25 +48,27 @@ class PlayerStatus {
 
     fun useCardFromSpecial(card_number: Int) {
         using_card.addLast(special_card_deck[card_number]!!)
+        println(special_card_deck[card_number]!!.card_data.card_name)
+        println(using_card.size)
         special_card_deck.remove(card_number)
     }
 
     var normal_card_deck = ArrayDeque<Card>()
-    var used_special_card = HashMap<CardName, Card>()
+    var used_special_card = HashMap<Int, Card>()
 
     var discard = ArrayDeque<Card>()
     var cover_card = ArrayDeque<Card>()
 
     var end_turn = false
 
-    fun usedToSpecial(card_name: CardName): Boolean{
-        if(used_special_card[card_name] == null){
+    fun usedToSpecial(card_number: Int): Boolean{
+        if(used_special_card[card_number] == null){
             return false
         }
         else{
-            val card = used_special_card[card_name]!!
+            val card = used_special_card[card_number]!!
             special_card_deck[card.card_number] = card
-            used_special_card.remove(card_name)
+            used_special_card.remove(card_number)
             return true
         }
     }
@@ -116,7 +120,7 @@ class PlayerStatus {
     var unselected_card: MutableList<CardName> = mutableListOf()
     var unselected_specialcard: MutableList<CardName> = mutableListOf()
 
-    var additional_hand: HashMap<Int, Card> = HashMap()
+    var additional_hand: HashMap<CardName, Card> = HashMap()
 
     var pre_attack_card: MadeAttack? = null
 

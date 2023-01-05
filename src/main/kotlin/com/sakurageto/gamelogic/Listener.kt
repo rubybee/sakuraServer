@@ -3,7 +3,7 @@ package com.sakurageto.gamelogic
 import com.sakurageto.card.CardName
 
 class ImmediateBackListner(
-    var card_name: CardName,
+    var card_number: Int,
     var condition: (Int, Int, Boolean) -> Boolean
 ){
 

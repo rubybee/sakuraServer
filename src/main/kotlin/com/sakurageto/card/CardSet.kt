@@ -80,7 +80,7 @@ object CardSet {
         })
         wolyungnack.setAttack(DistanceType.CONTINUOUS, Pair(3, 4), null, 3, 4)
         wolyungnack.setSpecial(7)
-        pobaram.setAttack(DistanceType.CONTINUOUS, Pair(0, 10), null, 999, 2)
+        pobaram.setAttack(DistanceType.CONTINUOUS, Pair(0, 10), null, 2, 999)
         pobaram.setSpecial(3)
         pobaram.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.REACT_ATTACK_REDUCE){ player, game_status, react_attack ->
             react_attack!!.auraPlusMinus(-2)
@@ -95,11 +95,10 @@ object CardSet {
             null
         })
         jjockbae.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){player, game_status, _ ->
-            game_status.addImmediateLifeListner(player, ImmediateBackListner(CardName.YURINA_JJOCKBAE) { before, after, _ ->
-                if(before > 3 && after <= 3){
-                    true
-                }
-                false
+            game_status.addImmediateLifeListner(player, ImmediateBackListner(
+                game_status.getCardNumber(player, CardName.YURINA_JJOCKBAE)
+            ) { before, after, _ ->
+                before > 3 && after <= 3
             })
             null
         })

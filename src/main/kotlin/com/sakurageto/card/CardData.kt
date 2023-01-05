@@ -28,7 +28,7 @@ class CardData(
     var effect: MutableList<Text>? = null
 
     fun setAttack(distance_type: DistanceType, distance_cont: Pair<Int, Int>?, distance_uncont: MutableList<Int>?,
-                  life_damage: Int, aura_damage: Int){
+                  aura_damage: Int, life_damage: Int){
         this.distance_type = distance_type
         if(distance_type == DistanceType.CONTINUOUS){
             this.distance_cont = Pair(distance_cont!!.first, distance_cont!!.second)
@@ -48,7 +48,7 @@ class CardData(
     }
 
     fun setSpecial(cost: Int){
-        this.charge = cost
+        this.cost = cost
     }
 
     fun addtext(text: Text){

@@ -218,7 +218,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
             val turn_check = first_turn == PlayerEnum.PLAYER1
             for(card_name in additional_card_player1){
                 var card = Card.cardMakerByName(turn_check, card_name, PlayerEnum.PLAYER1)
-                game_status.player1.additional_hand[card.card_number] = card
+                game_status.player1.additional_hand[card.card_data.card_name] = card
             }
         }
 
@@ -226,7 +226,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
             val turn_check = first_turn == PlayerEnum.PLAYER2
             for(card_name in additional_card_player2){
                 var card = Card.cardMakerByName(turn_check, card_name, PlayerEnum.PLAYER2)
-                game_status.player2.additional_hand[card.card_number] = card
+                game_status.player2.additional_hand[card.card_data.card_name] = card
             }
         }
 
@@ -258,6 +258,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
         player2.session.send(Json.encodeToString(player2_data))
     }
 
+    //first card is most upper
     suspend fun muligun(){
         val data = SakuraSendData(CommandEnum.MULIGUN, null)
         player1.session.send(Json.encodeToString(data))
@@ -265,9 +266,9 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
         val player1_data = waitCardSetUntil(player1, CommandEnum.MULIGUN)
         val player2_data = waitCardSetUntil(player2, CommandEnum.MULIGUN)
         var count = 0
-        player1_data.normal_card?.also {
+        player1_data.normal_card?.let {
             for(card_name in it){
-                if(game_status.insertHandToDeck(PlayerEnum.PLAYER1, card_name)){
+                if(game_status.insertHandToDeck(false, true, PlayerEnum.PLAYER1, game_status.getCardNumber(PlayerEnum.PLAYER1, card_name))){
                     count += 1
                 }
             }
@@ -275,9 +276,9 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
         game_status.drawCard(PlayerEnum.PLAYER1, count)
 
         count = 0
-        player2_data.normal_card?.also {
+        player2_data.normal_card?.let {
             for(card_name in it){
-                if(game_status.insertHandToDeck(PlayerEnum.PLAYER2, card_name)){
+                if(game_status.insertHandToDeck(false, true, PlayerEnum.PLAYER2, game_status.getCardNumber(PlayerEnum.PLAYER2, card_name))){
                     count += 1
                 }
             }
@@ -334,6 +335,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
                     print(this.turn_player)
                     print(": use card " + data.second + "\ndistance:")
                     print(game_status.distance)
+                    print("\n")
                     game_status.cardUseNormaly(this.turn_player, data.first, data.second)
                 }
                 else{

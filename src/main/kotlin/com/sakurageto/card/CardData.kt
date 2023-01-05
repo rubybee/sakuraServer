@@ -31,7 +31,7 @@ class CardData(
                   aura_damage: Int, life_damage: Int){
         this.distance_type = distance_type
         if(distance_type == DistanceType.CONTINUOUS){
-            this.distance_cont = Pair(distance_cont!!.first, distance_cont!!.second)
+            this.distance_cont = Pair(distance_cont!!.first, distance_cont.second)
         }
         else{
             this.distance_uncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false)

@@ -8,10 +8,10 @@ enum class PlayerEnum {
 
     fun Opposite(): PlayerEnum{
         if(this == PLAYER1){
-            return PlayerEnum.PLAYER2
+            return PLAYER2
         }
         else{
-            return PlayerEnum.PLAYER1
+            return PLAYER1
         }
     }
 }
@@ -46,7 +46,7 @@ enum class DistanceType {
     CONTINUOUS
 }
 
-enum class TextEffectTimingTag(){
+enum class TextEffectTimingTag {
     CONSTANT_EFFECT,
     AFTER_DESTRUCTION,
     START_DEPLOYMENT,
@@ -56,7 +56,7 @@ enum class TextEffectTimingTag(){
     AFTER_ATTACK,
 }
 
-enum class TextEffectTag() {
+enum class TextEffectTag {
     NEXT_ATTACK_ENCHANTMENT,
     CHANGE_CONCENTRATION,
     CHASM,
@@ -76,7 +76,7 @@ enum class TextEffectTag() {
     COST_X,
 }
 
-enum class CardName() {
+enum class CardName {
     CARD_UNNAME,
 
     YURINA_CHAM,

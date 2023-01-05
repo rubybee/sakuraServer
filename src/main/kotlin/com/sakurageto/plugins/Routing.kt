@@ -25,8 +25,8 @@ fun Application.configureRouting() {
 
         get("/enterroom/{roomnumber}"){
             var roomnumber: Int = call.parameters["roomnumber"]?.toInt() ?: 1
-            if ((RoomInformation.room_number_hashmap[roomnumber] ?: false)
-                and (RoomInformation.room_wait_hashmap[roomnumber] ?: false)) {
+            if ((RoomInformation.room_number_hashmap[roomnumber] == true)
+                and (RoomInformation.room_wait_hashmap[roomnumber] == true)) {
                 call.respondText("okay enter room")
                 RoomInformation.room_wait_hashmap[roomnumber] = false
             } else {

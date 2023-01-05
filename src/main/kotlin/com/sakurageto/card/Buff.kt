@@ -3,22 +3,16 @@ package com.sakurageto.card
 import com.sakurageto.gamelogic.GameStatus
 
 class CostBuff(val cardName: CardName, var counter: Int, val tag: BufTag, val condition: (PlayerEnum, GameStatus, Card) -> Boolean, val effect: (Int) -> Int
-) {
-
-}
+)
 
 
 class Buff(
  val cardName: CardName, var counter: Int, val tag: BufTag, val condition: (PlayerEnum, GameStatus) -> Boolean, val effect: (MadeAttack) -> Unit
-) {
-
-}
+)
 
 class RangeBuff(
     val cardName: CardName, var counter: Int, val tag: RangeBufTag, val condition: (PlayerEnum, GameStatus) -> Boolean, val effect: (MadeAttack) -> Unit
-) {
-
-}
+)
 
 fun cleanAttackBuff(array: Array<ArrayDeque<Buff>>){
 
@@ -107,7 +101,7 @@ fun cleanCostTempBuff(array: Array<ArrayDeque<CostBuff>>){
     }
 }
 
-enum class BufTag(){
+enum class BufTag {
     INSERT,
     CHANGE_EACH,
     MULTIPLE,
@@ -120,7 +114,7 @@ enum class BufTag(){
     PLUS_MINUS_IMMEDIATE,
 }
 
-enum class RangeBufTag(){
+enum class RangeBufTag {
     CHANGE,
     ADD,
     DELETE,

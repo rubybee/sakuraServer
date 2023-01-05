@@ -498,7 +498,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
                 val react = receiveReact(other_socket)
                 if(react.first == CommandEnum.REACT_USE_CARD_HAND){
                     var check_bit = true
-                    other_player.getCardFromHand(react.second!!)?.let {
+                    other_player.getCardFromHand(react.second)?.let {
                         if(reactCheck(player.Opposite(), it, now_attack)){
                             val cost = it.canUse(player.Opposite(), this)
                             if(cost == -1){
@@ -518,7 +518,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
                 }
                 else if(react.first == CommandEnum.REACT_USE_CARD_SPECIAL){
                     var check_bit = true
-                    other_player.getCardFromSpecial(react.second!!)?.let {
+                    other_player.getCardFromSpecial(react.second)?.let {
                         if(reactCheck(player.Opposite(), it, now_attack)){
                             val cost = it.canUse(player.Opposite(), this)
                             if(cost >= 0){
@@ -688,7 +688,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
                         CommandEnum.SELECT_ENCHANTMENT_YOUR -> {
                             if(player1_card[receive.second] == true){
                                 val card = player1.enchantment_card[receive.second]
-                                sendDestructionEnchant(player1_socket, player2_socket, receive.second!!)
+                                sendDestructionEnchant(player1_socket, player2_socket, receive.second)
                                 enchantmentDestruction(PlayerEnum.PLAYER1, card!!)
                                 player1_card.remove(receive.second)
                             }
@@ -699,7 +699,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
                         CommandEnum.SELECT_ENCHANTMENT_OTHER -> {
                             if(player2_card[receive.second] == true){
                                 val card = player2.enchantment_card[receive.second]
-                                sendDestructionEnchant(player2_socket, player1_socket, receive.second!!)
+                                sendDestructionEnchant(player2_socket, player1_socket, receive.second)
                                 enchantmentDestruction(PlayerEnum.PLAYER2, card!!)
                                 player2_card.remove(receive.second)
                             }
@@ -723,7 +723,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
                         CommandEnum.SELECT_ENCHANTMENT_YOUR -> {
                             if(player2_card[receive.second] == true){
                                 val card = player2.enchantment_card[receive.second]
-                                sendDestructionEnchant(player2_socket, player1_socket, receive.second!!)
+                                sendDestructionEnchant(player2_socket, player1_socket, receive.second)
                                 enchantmentDestruction(PlayerEnum.PLAYER2, card!!)
                                 player2_card.remove(receive.second)
                                 if(player1_card.isEmpty() && player2_card.isEmpty()){
@@ -734,7 +734,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, val playe
                         CommandEnum.SELECT_ENCHANTMENT_OTHER -> {
                             if(player1_card[receive.second] == true){
                                 val card = player1.enchantment_card[receive.second]
-                                sendDestructionEnchant(player1_socket, player2_socket, receive.second!!)
+                                sendDestructionEnchant(player1_socket, player2_socket, receive.second)
                                 enchantmentDestruction(PlayerEnum.PLAYER1, card!!)
                                 player1_card.remove(receive.second)
                                 if(player1_card.isEmpty() && player2_card.isEmpty()){

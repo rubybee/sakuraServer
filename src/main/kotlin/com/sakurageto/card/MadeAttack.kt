@@ -38,7 +38,7 @@ class MadeAttack(
     fun auraPlusMinus(number: Int){
         if(aura_damage != 999){
             aura_damage += number
-            if(aura_damage!! < 0){
+            if(aura_damage < 0){
                 aura_damage = 0
             }
         }

@@ -33,7 +33,7 @@ fun Application.configureSockets() {
 
         webSocket("/waitroom/{roomnumber}") { // websocketSession
             var roomnumber: Int = call.parameters["roomnumber"]?.toInt() ?: 1
-            if((roomnumber == 1) or !(RoomInformation.room_number_hashmap[roomnumber] ?: false)){
+            if((roomnumber == 1) or (RoomInformation.room_number_hashmap[roomnumber] != true)){
                 close(CloseReason(CloseReason.Codes.PROTOCOL_ERROR, "invalid room number"))
             }
             else{
@@ -49,11 +49,11 @@ fun Application.configureSockets() {
 
         webSocket("/play/{roomnumber}") {
             var roomnumber: Int = call.parameters["roomnumber"]?.toInt() ?: 1
-            if ((roomnumber == 1) or !(RoomInformation.room_number_hashmap[roomnumber] ?: false)){
+            if ((roomnumber == 1) or (RoomInformation.room_number_hashmap[roomnumber] != true)){
                 close(CloseReason(CloseReason.Codes.PROTOCOL_ERROR, "invalid room number"))
             }
-            else if(!(RoomInformation.room_wait_hashmap[roomnumber] ?: true)){
-                if (RoomInformation.room_connection_hashmap[roomnumber]?.isEmpty() ?: true){
+            else if(RoomInformation.room_wait_hashmap[roomnumber] == false){
+                if (RoomInformation.room_connection_hashmap[roomnumber]?.isEmpty() != false){
                     val thisconnection = Connection(this)
                     RoomInformation.room_connection_hashmap[roomnumber] = mutableListOf(thisconnection)
                     while(true){

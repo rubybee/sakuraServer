@@ -1,7 +1,7 @@
 package com.sakurageto.card
 
-import com.sakurageto.card.CardSet.cardname_hashmap_for_second_turn
-import com.sakurageto.card.CardSet.cardname_hashmap_for_start_turn
+import com.sakurageto.card.CardSet.cardNameHashmapSecond
+import com.sakurageto.card.CardSet.cardNameHashmapFirst
 import com.sakurageto.card.CardSet.returnCardDataByName
 import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.PlayerStatus
@@ -22,15 +22,15 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
             val data = returnCardDataByName(card_name)
             if (data.isItSpecial()){
                 if(start_turn){
-                    return Card(cardname_hashmap_for_start_turn[card_name]?: -1, data, player, SpecialCardEnum.UNUSED)
+                    return Card(cardNameHashmapFirst[card_name]?: -1, data, player, SpecialCardEnum.UNUSED)
                 }
-                return Card(cardname_hashmap_for_second_turn[card_name]?: -1, data, player, SpecialCardEnum.UNUSED)
+                return Card(cardNameHashmapSecond[card_name]?: -1, data, player, SpecialCardEnum.UNUSED)
             }
             else{
                 if(start_turn){
-                    return Card(cardname_hashmap_for_start_turn[card_name]?: -1, data, player, null)
+                    return Card(cardNameHashmapFirst[card_name]?: -1, data, player, null)
                 }
-                return Card(cardname_hashmap_for_second_turn[card_name]?: -1, data, player, null)
+                return Card(cardNameHashmapSecond[card_name]?: -1, data, player, null)
             }
 
         }
@@ -45,10 +45,10 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         fun cardInitInsert(start_turn: Boolean, dest: HashMap<Int, Card>, src: MutableList<CardName>, player: PlayerEnum){
             for(card_name in src){
                 if(start_turn){
-                    dest[cardname_hashmap_for_start_turn[card_name]?: -1] = cardMakerByName(true, card_name, player)
+                    dest[cardNameHashmapFirst[card_name]?: -1] = cardMakerByName(true, card_name, player)
                 }
                 else{
-                    dest[cardname_hashmap_for_second_turn[card_name]?: -1] = cardMakerByName(false, card_name, player)
+                    dest[cardNameHashmapSecond[card_name]?: -1] = cardMakerByName(false, card_name, player)
                 }
             }
         }
@@ -62,7 +62,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         }
     }
 
-    fun reduceNapNormaly(): Int{
+    fun reduceNapNormal(): Int{
        card_data.effect?.let {
            for(i in it){
                if(i.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT || i.timing_tag == TextEffectTimingTag.IN_DEPLOYMENT){
@@ -77,7 +77,6 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
                }
            }
        }
-        nap = nap!! - 1
         return 1
     }
 
@@ -261,11 +260,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
     }
     //-2: can't use                    -1: can use                 >= 0: cost
     suspend fun canUse(player: PlayerEnum, gameStatus: GameStatus): Int{
-        if(card_data.sub_type == SubType.FULLPOWER){
-            if(!gameStatus.getPlayerFullAction(player)){
-                return -2
-            }
-        }
+        if(card_data.sub_type == SubType.FULLPOWER && !gameStatus.getPlayerFullAction(player)) return -2
 
         if(!textUseCheck(player, gameStatus)){
             return -2
@@ -276,9 +271,6 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         if(card_data.card_class == CardClass.SPECIAL){
             gameStatus.addAllCardCostBuff()
             cost = gameStatus.applyAllCostBuff(player, this.getBaseCost(player, gameStatus), this)
-            println(this.card_data.card_name)
-            println(cost)
-            println(this.card_number)
             if(cost > gameStatus.getPlayerFlare(player)){
                 gameStatus.cleanCostBuff()
                 return -2
@@ -388,6 +380,26 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
             }
         }
         return false
+    }
+
+    suspend fun swellAdjust(player: PlayerEnum, game_status: GameStatus): Int{
+        this.card_data.effect?.let {
+            for(text in it){
+                if(text.tag == TextEffectTag.CHANGE_SWELL_DISTANCE){
+                    when(text.timing_tag){
+                        TextEffectTimingTag.IN_DEPLOYMENT -> {
+                            if((this.nap ?: -1) > 0 && this.card_data.card_type == CardType.ENCHANTMENT) return text.effect!!(player, game_status, null)!!
+                        }
+                        TextEffectTimingTag.USED -> {
+                            if(this.special_card_state == SpecialCardEnum.PLAYED) return text.effect!!(player, game_status, null)!!
+                        }
+                        else -> continue
+                    }
+                }
+
+            }
+        }
+        return 0
     }
 
 }

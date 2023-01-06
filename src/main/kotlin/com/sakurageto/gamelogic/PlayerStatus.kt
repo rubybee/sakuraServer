@@ -11,8 +11,9 @@ class PlayerStatus {
     var full_action = false
 
     var max_hand = 2
-    var max_aura = 5
+    var maxAura = 5
     var aura = 3
+    var freezeToken = 0
 
     var using_card = ArrayDeque<Card>()
 
@@ -75,10 +76,10 @@ class PlayerStatus {
 
     //return using dust
     fun plusAura(number: Int): Int{
-        if(max_aura > aura + number){
+        if(maxAura > aura + number){
             val temp = aura
-            aura = max_aura
-            return max_aura - temp
+            aura = maxAura
+            return maxAura - temp
         }
         else{
             aura += number

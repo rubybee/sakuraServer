@@ -298,7 +298,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
 
     suspend fun startPhase(){
         sendStartPhaseStart(getSocket(this.turn_player), getSocket(this.turn_player.Opposite()))
-        game_status.start_distance = game_status.distance
+        game_status.startDistance = game_status.thisTurnDistance
         game_status.startPhaseEffectProcess()
         if(turn_number == 0 || turn_number == 1){
             return
@@ -334,7 +334,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
                 else if(data.first == CommandEnum.ACTION_USE_CARD_HAND || data.first == CommandEnum.ACTION_USE_CARD_SPECIAL){
                     print(this.turn_player)
                     print(": use card " + data.second + "\ndistance:")
-                    print(game_status.distance)
+                    print(game_status.thisTurnDistance)
                     print("\n")
                     game_status.cardUseNormaly(this.turn_player, data.first, data.second)
                 }

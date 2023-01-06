@@ -1,32 +1,139 @@
 package com.sakurageto.card
 
+import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.ImmediateBackListner
 import com.sakurageto.gamelogic.MegamiEnum
+import com.sakurageto.gamelogic.PlayerStatus
+import com.sakurageto.protocol.CommandEnum
+import com.sakurageto.protocol.LocationEnum
 
 object CardSet {
-    val cardname_hashmap_for_start_turn = HashMap<CardName, Int>()
-    val cardname_hashmap_for_second_turn = HashMap<CardName, Int>()
-    val cardnumber_hashmap = HashMap<CardName, Int>()
+    val cardNameHashmapFirst = HashMap<CardName, Int>()
+    val cardNameHashmapSecond = HashMap<CardName, Int>()
+    val cardNumberHashmap = HashMap<CardName, Int>()
 
-    val unused = CardData(CardClass.NORMAL, CardName.CARD_UNNAME, MegamiEnum.YURINA, CardType.UNDEFINED, SubType.NONE)
+    private fun hashMapInit(){
+        //for first turn player 0~9999
+        cardNameHashmapFirst[CardName.YURINA_CHAM] = 100
+        cardNameHashmapFirst[CardName.YURINA_ILSUM] = 101
+        cardNameHashmapFirst[CardName.YURINA_JARUCHIGI] = 102
+        cardNameHashmapFirst[CardName.YURINA_GUHAB] = 103
+        cardNameHashmapFirst[CardName.YURINA_GIBACK] = 104
+        cardNameHashmapFirst[CardName.YURINA_APDO] = 105
+        cardNameHashmapFirst[CardName.YURINA_GIYENBANJO] = 106
+        cardNameHashmapFirst[CardName.YURINA_WOLYUNGNACK] = 107
+        cardNameHashmapFirst[CardName.YURINA_POBARAM] = 108
+        cardNameHashmapFirst[CardName.YURINA_JJOCKBAE] = 109
+        cardNameHashmapFirst[CardName.YURINA_JURUCK] = 110
 
-    val cham = CardData(CardClass.NORMAL, CardName.YURINA_CHAM, MegamiEnum.YURINA, CardType.ATTACK, SubType.NONE)
-    val ilsom = CardData(CardClass.NORMAL, CardName.YURINA_ILSUM, MegamiEnum.YURINA, CardType.ATTACK, SubType.NONE)
-    val jaru_chigi = CardData(CardClass.NORMAL, CardName.YURINA_JARUCHIGI, MegamiEnum.YURINA, CardType.ATTACK, SubType.NONE)
-    val guhab = CardData(CardClass.NORMAL, CardName.YURINA_GUHAB, MegamiEnum.YURINA, CardType.ATTACK, SubType.FULLPOWER)
-    val giback = CardData(CardClass.NORMAL, CardName.YURINA_GIBACK, MegamiEnum.YURINA, CardType.BEHAVIOR, SubType.NONE)
-    val apdo = CardData(CardClass.NORMAL, CardName.YURINA_APDO, MegamiEnum.YURINA, CardType.ENCHANTMENT, SubType.NONE)
-    val giyenbanzo = CardData(CardClass.NORMAL, CardName.YURINA_GIYENBANJO, MegamiEnum.YURINA, CardType.ENCHANTMENT, SubType.FULLPOWER)
-    val wolyungnack = CardData(CardClass.SPECIAL, CardName.YURINA_WOLYUNGNACK, MegamiEnum.YURINA, CardType.ATTACK, SubType.NONE)
-    val jjockbae = CardData(CardClass.SPECIAL, CardName.YURINA_JJOCKBAE, MegamiEnum.YURINA, CardType.BEHAVIOR, SubType.NONE)
-    val pobaram = CardData(CardClass.SPECIAL, CardName.YURINA_POBARAM, MegamiEnum.YURINA, CardType.ATTACK, SubType.REACTION)
-    val juruck = CardData(CardClass.SPECIAL, CardName.YURINA_JURUCK, MegamiEnum.YURINA, CardType.ATTACK, SubType.FULLPOWER)
+        cardNameHashmapFirst[CardName.SAINE_DOUBLEBEGI] = 200
+        cardNameHashmapFirst[CardName.SAINE_HURUBEGI] = 201
+        cardNameHashmapFirst[CardName.SAINE_MOOGECHOO] = 202
+        cardNameHashmapFirst[CardName.SAINE_GANPA] = 203
+        cardNameHashmapFirst[CardName.SAINE_GWONYUCK] = 204
+        cardNameHashmapFirst[CardName.SAINE_CHOONGEMJUNG] = 205
+        cardNameHashmapFirst[CardName.SAINE_MOOEMBUCK] = 206
+        cardNameHashmapFirst[CardName.SAINE_YULDONGHOGEK] = 207
+        cardNameHashmapFirst[CardName.SAINE_HANGMUNGGONGJIN] = 208
+        cardNameHashmapFirst[CardName.SAINE_EMMOOSHOEBING] = 209
+        cardNameHashmapFirst[CardName.SAINE_JONGGEK] = 210
 
-    fun YurinaCardInit(){
+        cardNameHashmapFirst[CardName.HIMIKA_SHOOT] = 300
+        cardNameHashmapFirst[CardName.HIMIKA_RAPIDFIRE] = 301
+        cardNameHashmapFirst[CardName.HIMIKA_MAGNUMCANON] = 302
+        cardNameHashmapFirst[CardName.HIMIKA_FULLBURST] = 303
+        cardNameHashmapFirst[CardName.HIMIKA_BACKSTEP] = 304
+        cardNameHashmapFirst[CardName.HIMIKA_BACKDRAFT] = 305
+        cardNameHashmapFirst[CardName.HIMIKA_SMOKE] = 306
+        cardNameHashmapFirst[CardName.HIMIKA_REDBULLET] = 307
+        cardNameHashmapFirst[CardName.HIMIKA_CRIMSONZERO] = 308
+        cardNameHashmapFirst[CardName.HIMIKA_SCARLETIMAGINE] = 309
+        cardNameHashmapFirst[CardName.HIMIKA_BURMILIONFIELD] = 310
+
+        cardNameHashmapFirst[CardName.TOKOYO_BITSUNERIGI] = 400
+        cardNameHashmapFirst[CardName.TOKOYO_WOOAHHANTAGUCK] = 401
+        cardNameHashmapFirst[CardName.TOKOYO_RUNNINGRABIT] = 402
+        cardNameHashmapFirst[CardName.TOKOYO_POETDANCE] = 403
+        cardNameHashmapFirst[CardName.TOKOYO_FLIPFAN] = 404
+        cardNameHashmapFirst[CardName.TOKOYO_WINDSTAGE] = 405
+        cardNameHashmapFirst[CardName.TOKOYO_SUNSTAGE] = 406
+        cardNameHashmapFirst[CardName.TOKOYO_KUON] = 407
+        cardNameHashmapFirst[CardName.TOKOYO_THOUSANDBIRD] = 408
+        cardNameHashmapFirst[CardName.TOKOYO_ENDLESSWIND] = 409
+        cardNameHashmapFirst[CardName.TOKOYO_TOKOYOMOON] = 410
+
+        //for second turn player 10000~19999
+        cardNameHashmapSecond[CardName.YURINA_CHAM] = 10100
+        cardNameHashmapSecond[CardName.YURINA_ILSUM] = 10101
+        cardNameHashmapSecond[CardName.YURINA_JARUCHIGI] = 10102
+        cardNameHashmapSecond[CardName.YURINA_GUHAB] = 10103
+        cardNameHashmapSecond[CardName.YURINA_GIBACK] = 10104
+        cardNameHashmapSecond[CardName.YURINA_APDO] = 10105
+        cardNameHashmapSecond[CardName.YURINA_GIYENBANJO] = 10106
+        cardNameHashmapSecond[CardName.YURINA_WOLYUNGNACK] = 10107
+        cardNameHashmapSecond[CardName.YURINA_POBARAM] = 10108
+        cardNameHashmapSecond[CardName.YURINA_JJOCKBAE] = 10109
+        cardNameHashmapSecond[CardName.YURINA_JURUCK] = 10110
+
+        cardNameHashmapSecond[CardName.SAINE_DOUBLEBEGI] = 10200
+        cardNameHashmapSecond[CardName.SAINE_HURUBEGI] = 10201
+        cardNameHashmapSecond[CardName.SAINE_MOOGECHOO] = 10202
+        cardNameHashmapSecond[CardName.SAINE_GANPA] = 10203
+        cardNameHashmapSecond[CardName.SAINE_GWONYUCK] = 10204
+        cardNameHashmapSecond[CardName.SAINE_CHOONGEMJUNG] = 10205
+        cardNameHashmapSecond[CardName.SAINE_MOOEMBUCK] = 10206
+        cardNameHashmapSecond[CardName.SAINE_YULDONGHOGEK] = 10207
+        cardNameHashmapSecond[CardName.SAINE_HANGMUNGGONGJIN] = 10208
+        cardNameHashmapSecond[CardName.SAINE_EMMOOSHOEBING] = 10209
+        cardNameHashmapSecond[CardName.SAINE_JONGGEK] = 10210
+
+        cardNameHashmapSecond[CardName.HIMIKA_SHOOT] = 10300
+        cardNameHashmapSecond[CardName.HIMIKA_RAPIDFIRE] = 10301
+        cardNameHashmapSecond[CardName.HIMIKA_MAGNUMCANON] = 10302
+        cardNameHashmapSecond[CardName.HIMIKA_FULLBURST] = 10303
+        cardNameHashmapSecond[CardName.HIMIKA_BACKSTEP] = 10304
+        cardNameHashmapSecond[CardName.HIMIKA_BACKDRAFT] = 10305
+        cardNameHashmapSecond[CardName.HIMIKA_SMOKE] = 10306
+        cardNameHashmapSecond[CardName.HIMIKA_REDBULLET] = 10307
+        cardNameHashmapSecond[CardName.HIMIKA_CRIMSONZERO] = 10308
+        cardNameHashmapSecond[CardName.HIMIKA_SCARLETIMAGINE] = 10309
+        cardNameHashmapSecond[CardName.HIMIKA_BURMILIONFIELD] = 10310
+
+        cardNameHashmapSecond[CardName.TOKOYO_BITSUNERIGI] = 10400
+        cardNameHashmapSecond[CardName.TOKOYO_WOOAHHANTAGUCK] = 10401
+        cardNameHashmapSecond[CardName.TOKOYO_RUNNINGRABIT] = 10402
+        cardNameHashmapSecond[CardName.TOKOYO_POETDANCE] = 10403
+        cardNameHashmapSecond[CardName.TOKOYO_FLIPFAN] = 10404
+        cardNameHashmapSecond[CardName.TOKOYO_WINDSTAGE] = 10405
+        cardNameHashmapSecond[CardName.TOKOYO_SUNSTAGE] = 10406
+        cardNameHashmapSecond[CardName.TOKOYO_KUON] = 10407
+        cardNameHashmapSecond[CardName.TOKOYO_THOUSANDBIRD] = 10408
+        cardNameHashmapSecond[CardName.TOKOYO_ENDLESSWIND] = 10409
+        cardNameHashmapSecond[CardName.TOKOYO_TOKOYOMOON] = 10410
+    }
+
+    private val unused = CardData(CardClass.NORMAL, CardName.CARD_UNNAME, MegamiEnum.YURINA, CardType.UNDEFINED, SubType.NONE)
+
+    private val cham = CardData(CardClass.NORMAL, CardName.YURINA_CHAM, MegamiEnum.YURINA, CardType.ATTACK, SubType.NONE)
+    private val ilsom = CardData(CardClass.NORMAL, CardName.YURINA_ILSUM, MegamiEnum.YURINA, CardType.ATTACK, SubType.NONE)
+    private val jaru_chigi = CardData(CardClass.NORMAL, CardName.YURINA_JARUCHIGI, MegamiEnum.YURINA, CardType.ATTACK, SubType.NONE)
+    private val guhab = CardData(CardClass.NORMAL, CardName.YURINA_GUHAB, MegamiEnum.YURINA, CardType.ATTACK, SubType.FULLPOWER)
+    private val giback = CardData(CardClass.NORMAL, CardName.YURINA_GIBACK, MegamiEnum.YURINA, CardType.BEHAVIOR, SubType.NONE)
+    private val apdo = CardData(CardClass.NORMAL, CardName.YURINA_APDO, MegamiEnum.YURINA, CardType.ENCHANTMENT, SubType.NONE)
+    private val giyenbanzo = CardData(CardClass.NORMAL, CardName.YURINA_GIYENBANJO, MegamiEnum.YURINA, CardType.ENCHANTMENT, SubType.FULLPOWER)
+    private val wolyungnack = CardData(CardClass.SPECIAL, CardName.YURINA_WOLYUNGNACK, MegamiEnum.YURINA, CardType.ATTACK, SubType.NONE)
+    private val jjockbae = CardData(CardClass.SPECIAL, CardName.YURINA_JJOCKBAE, MegamiEnum.YURINA, CardType.BEHAVIOR, SubType.NONE)
+    private val pobaram = CardData(CardClass.SPECIAL, CardName.YURINA_POBARAM, MegamiEnum.YURINA, CardType.ATTACK, SubType.REACTION)
+    private val juruck = CardData(CardClass.SPECIAL, CardName.YURINA_JURUCK, MegamiEnum.YURINA, CardType.ATTACK, SubType.FULLPOWER)
+
+    private fun gulSa(player: PlayerEnum, game_status: GameStatus): Boolean{
+        return game_status.getPlayerLife(player) <= 3
+    }
+    private fun yurinaCardInit(){
         cham.setAttack(DistanceType.CONTINUOUS, Pair(3, 4), null, 3, 1)
         ilsom.setAttack(DistanceType.CONTINUOUS, Pair(3, 3), null, 2, 2)
         ilsom.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { player, game_status, _->
-            if (game_status.getPlayerLife(player) <= 3) {
+            if (gulSa(player, game_status)) {
                 game_status.addThisTurnAttackBuff(player, Buff(CardName.YURINA_ILSUM, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _ -> true}, {madeAttack ->
                     madeAttack.auraPlusMinus(1)
                 }))
@@ -35,7 +142,7 @@ object CardSet {
         })
         jaru_chigi.setAttack(DistanceType.CONTINUOUS, Pair(1, 2), null, 2, 1)
         jaru_chigi.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { player, game_status, _ ->
-            if (game_status.getPlayerLife(player) <= 3) {
+            if (gulSa(player, game_status)) {
                 game_status.addThisTurnAttackBuff(player, Buff(CardName.YURINA_JARUCHIGI, 1, BufTag.PLUS_MINUS, {_, _ -> true}, {madeAttack ->
                     madeAttack.auraPlusMinus(1)
                 }))
@@ -45,7 +152,7 @@ object CardSet {
         guhab.setAttack(DistanceType.CONTINUOUS, Pair(2, 4), null, 4, 3)
         guhab.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { player, game_status, _ ->
             game_status.addThisTurnAttackBuff(player, Buff(CardName.YURINA_GUHAB, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _ -> true}, {madeAttack ->
-                if(game_status.distance <= 2){
+                if(game_status.thisTurnDistance <= 2){
                     madeAttack.lifePlusMinus(-1); madeAttack.auraPlusMinus(-1)
                 }
             }))
@@ -56,8 +163,8 @@ object CardSet {
             null
         })
         giback.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { player, game_status, _->
-            game_status.addThisTurnRangeBuff(player, RangeBuff(CardName.YURINA_GIBACK,1, RangeBufTag.ADD, {_, _ -> true}, {madeattack ->
-                madeattack.run{
+            game_status.addThisTurnRangeBuff(player, RangeBuff(CardName.YURINA_GIBACK,1, RangeBufTag.ADD, {_, _ -> true}, {attack ->
+                attack.run{
                     addRange(1, true); canNotReactNormal()
                 }
             }))
@@ -66,13 +173,13 @@ object CardSet {
         apdo.setEnchantment(2)
         apdo.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CHASM, null))
         apdo.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MAKE_ATTACK) {player, game_status, _ ->
-            game_status.addPreAttackZone(player, MadeAttack(DistanceType.CONTINUOUS, 999,  3, Pair(1, 4), null, MegamiEnum.YURINA))
+            game_status.addPreAttackZone(player, MadeAttack(DistanceType.CONTINUOUS, 3,  999, Pair(1, 4), null, MegamiEnum.YURINA))
             null
         })
         giyenbanzo.setEnchantment(4)
         giyenbanzo.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT){ player, game_status, _ ->
             game_status.addThisTurnAttackBuff(player, Buff(CardName.YURINA_GIYENBANJO, 1, BufTag.PLUS_MINUS_IMMEDIATE, { _, _ -> true}, { madeAttack ->
-                if(madeAttack.megami != MegamiEnum.YURINA) madeAttack.run {
+                if(madeAttack.megami != MegamiEnum.YURINA && gulSa(player, game_status)) madeAttack.run {
                     Chogek(); auraPlusMinus(1); lifePlusMinus(1)
                 }
             }))
@@ -82,8 +189,8 @@ object CardSet {
         wolyungnack.setSpecial(7)
         pobaram.setAttack(DistanceType.CONTINUOUS, Pair(0, 10), null, 2, 999)
         pobaram.setSpecial(3)
-        pobaram.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.REACT_ATTACK_REDUCE){ player, game_status, react_attack ->
-            react_attack?.auraPlusMinus(-2)
+        pobaram.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.REACT_ATTACK_REDUCE){ _, _, reactedAttack ->
+            reactedAttack?.auraPlusMinus(-2)
             null
         })
         pobaram.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.END_TURN){ player, game_status, _->
@@ -106,119 +213,67 @@ object CardSet {
         juruck.setAttack(DistanceType.CONTINUOUS, Pair(1, 4), null, 5, 5)
         juruck.setSpecial(5)
         juruck.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.USING_CONDITION){player, game_status, _ ->
-            if(game_status.getPlayerLife(player) <= 3){
-                1
-            }
-            0
+            if(gulSa(player, game_status)) 1
+            else 0
         })
     }
 
-    fun hashMapInit(){
-        //for first turn player 0~9999
-        cardname_hashmap_for_start_turn[CardName.YURINA_CHAM] = 0
-        cardname_hashmap_for_start_turn[CardName.YURINA_ILSUM] = 1
-        cardname_hashmap_for_start_turn[CardName.YURINA_JARUCHIGI] = 2
-        cardname_hashmap_for_start_turn[CardName.YURINA_GUHAB] = 3
-        cardname_hashmap_for_start_turn[CardName.YURINA_GIBACK] = 4
-        cardname_hashmap_for_start_turn[CardName.YURINA_APDO] = 5
-        cardname_hashmap_for_start_turn[CardName.YURINA_GIYENBANJO] = 6
-        cardname_hashmap_for_start_turn[CardName.YURINA_WOLYUNGNACK] = 7
-        cardname_hashmap_for_start_turn[CardName.YURINA_POBARAM] = 8
-        cardname_hashmap_for_start_turn[CardName.YURINA_JJOCKBAE] = 9
-        cardname_hashmap_for_start_turn[CardName.YURINA_JURUCK] = 10
-
-        cardname_hashmap_for_start_turn[CardName.SAINE_DOUBLEBEGI] = 100
-        cardname_hashmap_for_start_turn[CardName.SAINE_HURUBEGI] = 101
-        cardname_hashmap_for_start_turn[CardName.SAINE_MOOGECHOO] = 102
-        cardname_hashmap_for_start_turn[CardName.SAINE_GANPA] = 103
-        cardname_hashmap_for_start_turn[CardName.SAINE_GWONYUCK] = 104
-        cardname_hashmap_for_start_turn[CardName.SAINE_CHOONGEMJUNG] = 105
-        cardname_hashmap_for_start_turn[CardName.SAINE_MOOEMBUCK] = 106
-        cardname_hashmap_for_start_turn[CardName.SAINE_YULDONGHOGEK] = 107
-        cardname_hashmap_for_start_turn[CardName.SAINE_HANGMUNGGONGJIN] = 108
-        cardname_hashmap_for_start_turn[CardName.SAINE_EMMOOSHOEBING] = 109
-        cardname_hashmap_for_start_turn[CardName.SAINE_JONGGEK] = 110
-
-        cardname_hashmap_for_start_turn[CardName.HIMIKA_SHOOT] = 200
-        cardname_hashmap_for_start_turn[CardName.HIMIKA_RAPIDFIRE] = 201
-        cardname_hashmap_for_start_turn[CardName.HIMIKA_MAGNUMCANON] = 202
-        cardname_hashmap_for_start_turn[CardName.HIMIKA_FULLBURST] = 203
-        cardname_hashmap_for_start_turn[CardName.HIMIKA_BACKSTEP] = 204
-        cardname_hashmap_for_start_turn[CardName.HIMIKA_BACKDRAFT] = 205
-        cardname_hashmap_for_start_turn[CardName.HIMIKA_SMOKE] = 206
-        cardname_hashmap_for_start_turn[CardName.HIMIKA_REDBULLET] = 207
-        cardname_hashmap_for_start_turn[CardName.HIMIKA_CRIMSONZERO] = 208
-        cardname_hashmap_for_start_turn[CardName.HIMIKA_SCARLETIMAGINE] = 209
-        cardname_hashmap_for_start_turn[CardName.HIMIKA_BURMILIONFIELD] = 210
-
-        cardname_hashmap_for_start_turn[CardName.TOKOYO_BITSUNERIGI] = 300
-        cardname_hashmap_for_start_turn[CardName.TOKOYO_WOOAHHANTAGUCK] = 301
-        cardname_hashmap_for_start_turn[CardName.TOKOYO_RUNNINGRABIT] = 302
-        cardname_hashmap_for_start_turn[CardName.TOKOYO_POETDANCE] = 303
-        cardname_hashmap_for_start_turn[CardName.TOKOYO_FLIPFAN] = 304
-        cardname_hashmap_for_start_turn[CardName.TOKOYO_WINDSTAGE] = 305
-        cardname_hashmap_for_start_turn[CardName.TOKOYO_SUNSTAGE] = 306
-        cardname_hashmap_for_start_turn[CardName.TOKOYO_KUON] = 307
-        cardname_hashmap_for_start_turn[CardName.TOKOYO_THOUSANDBIRD] = 308
-        cardname_hashmap_for_start_turn[CardName.TOKOYO_ENDLESSWIND] = 309
-        cardname_hashmap_for_start_turn[CardName.TOKOYO_TOKOYOMOON] = 310
-
-        //for second turn player 10000~19999
-        cardname_hashmap_for_second_turn[CardName.YURINA_CHAM] = 10000
-        cardname_hashmap_for_second_turn[CardName.YURINA_ILSUM] = 10001
-        cardname_hashmap_for_second_turn[CardName.YURINA_JARUCHIGI] = 10002
-        cardname_hashmap_for_second_turn[CardName.YURINA_GUHAB] = 10003
-        cardname_hashmap_for_second_turn[CardName.YURINA_GIBACK] = 10004
-        cardname_hashmap_for_second_turn[CardName.YURINA_APDO] = 10005
-        cardname_hashmap_for_second_turn[CardName.YURINA_GIYENBANJO] = 10006
-        cardname_hashmap_for_second_turn[CardName.YURINA_WOLYUNGNACK] = 10007
-        cardname_hashmap_for_second_turn[CardName.YURINA_POBARAM] = 10008
-        cardname_hashmap_for_second_turn[CardName.YURINA_JJOCKBAE] = 10009
-        cardname_hashmap_for_second_turn[CardName.YURINA_JURUCK] = 10010
-
-        cardname_hashmap_for_second_turn[CardName.SAINE_DOUBLEBEGI] = 10100
-        cardname_hashmap_for_second_turn[CardName.SAINE_HURUBEGI] = 10101
-        cardname_hashmap_for_second_turn[CardName.SAINE_MOOGECHOO] = 10102
-        cardname_hashmap_for_second_turn[CardName.SAINE_GANPA] = 10103
-        cardname_hashmap_for_second_turn[CardName.SAINE_GWONYUCK] = 10104
-        cardname_hashmap_for_second_turn[CardName.SAINE_CHOONGEMJUNG] = 10105
-        cardname_hashmap_for_second_turn[CardName.SAINE_MOOEMBUCK] = 10106
-        cardname_hashmap_for_second_turn[CardName.SAINE_YULDONGHOGEK] = 10107
-        cardname_hashmap_for_second_turn[CardName.SAINE_HANGMUNGGONGJIN] = 10108
-        cardname_hashmap_for_second_turn[CardName.SAINE_EMMOOSHOEBING] = 10109
-        cardname_hashmap_for_second_turn[CardName.SAINE_JONGGEK] = 10110
-
-        cardname_hashmap_for_second_turn[CardName.HIMIKA_SHOOT] = 10200
-        cardname_hashmap_for_second_turn[CardName.HIMIKA_RAPIDFIRE] = 10201
-        cardname_hashmap_for_second_turn[CardName.HIMIKA_MAGNUMCANON] = 10202
-        cardname_hashmap_for_second_turn[CardName.HIMIKA_FULLBURST] = 10203
-        cardname_hashmap_for_second_turn[CardName.HIMIKA_BACKSTEP] = 10204
-        cardname_hashmap_for_second_turn[CardName.HIMIKA_BACKDRAFT] = 10205
-        cardname_hashmap_for_second_turn[CardName.HIMIKA_SMOKE] = 10206
-        cardname_hashmap_for_second_turn[CardName.HIMIKA_REDBULLET] = 10207
-        cardname_hashmap_for_second_turn[CardName.HIMIKA_CRIMSONZERO] = 10208
-        cardname_hashmap_for_second_turn[CardName.HIMIKA_SCARLETIMAGINE] = 10209
-        cardname_hashmap_for_second_turn[CardName.HIMIKA_BURMILIONFIELD] = 10210
-
-        cardname_hashmap_for_second_turn[CardName.TOKOYO_BITSUNERIGI] = 10300
-        cardname_hashmap_for_second_turn[CardName.TOKOYO_WOOAHHANTAGUCK] = 10301
-        cardname_hashmap_for_second_turn[CardName.TOKOYO_RUNNINGRABIT] = 10302
-        cardname_hashmap_for_second_turn[CardName.TOKOYO_POETDANCE] = 10303
-        cardname_hashmap_for_second_turn[CardName.TOKOYO_FLIPFAN] = 10304
-        cardname_hashmap_for_second_turn[CardName.TOKOYO_WINDSTAGE] = 10305
-        cardname_hashmap_for_second_turn[CardName.TOKOYO_SUNSTAGE] = 10306
-        cardname_hashmap_for_second_turn[CardName.TOKOYO_KUON] = 10307
-        cardname_hashmap_for_second_turn[CardName.TOKOYO_THOUSANDBIRD] = 10308
-        cardname_hashmap_for_second_turn[CardName.TOKOYO_ENDLESSWIND] = 10309
-        cardname_hashmap_for_second_turn[CardName.TOKOYO_TOKOYOMOON] = 10310
+    private val doublebegi = CardData(CardClass.NORMAL, CardName.SAINE_DOUBLEBEGI, MegamiEnum.SAINE, CardType.ATTACK, SubType.NONE)
+    private val hurubegi = CardData(CardClass.NORMAL, CardName.SAINE_HURUBEGI, MegamiEnum.SAINE, CardType.ATTACK, SubType.REACTION)
+    private val moogechoo = CardData(CardClass.NORMAL, CardName.SAINE_MOOGECHOO, MegamiEnum.SAINE, CardType.ATTACK, SubType.REACTION)
+    private val ganpa = CardData(CardClass.NORMAL, CardName.SAINE_GANPA, MegamiEnum.SAINE, CardType.BEHAVIOR, SubType.NONE)
+    private val gwonyuck = CardData(CardClass.NORMAL, CardName.SAINE_GWONYUCK, MegamiEnum.SAINE, CardType.ENCHANTMENT, SubType.NONE)
+    private fun palSang(player: PlayerEnum, game_status: GameStatus): Boolean{
+        return game_status.getPlayerAura(player) <= 1
+    }
+    private fun saineCardInit(){
+        doublebegi.setAttack(DistanceType.CONTINUOUS, Pair(4, 5), null, 2, 1)
+        doublebegi.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MAKE_ATTACK) {player, game_status, _ ->
+            if(palSang(player, game_status)){
+                game_status.addPreAttackZone(player, MadeAttack(DistanceType.CONTINUOUS, 2,  1, Pair(4, 5), null, MegamiEnum.SAINE))
+            }
+            null
+        })
+        hurubegi.setAttack(DistanceType.CONTINUOUS, Pair(4, 5), null, 3, 1)
+        moogechoo.setAttack(DistanceType.CONTINUOUS, Pair(2, 3), null, 2, 1)
+        moogechoo.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {player, game_status, _ ->
+            if(palSang(player, game_status)){
+                game_status.dustToDistance(1)
+            }
+            null
+        })
+        ganpa.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.CAN_REACTABLE) {player, game_status, _ ->
+            if(palSang(player, game_status)) 1
+            else 0
+        })
+        ganpa.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_ATTACK) {player, game_status, _ ->
+            while(true){
+                val nowCommand = game_status.receiveCardEffectSelect(player)
+                if(nowCommand == CommandEnum.SELECT_DUST_TO_DISTANCE){
+                    game_status.dustToDistance(1)
+                    break
+                }
+                else if(nowCommand == CommandEnum.SELECT_DISTANCE_TO_DUST){
+                    game_status.distanceToDust(1)
+                    break
+                }
+            }
+            null
+        })
+        gwonyuck.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.THIS_CARD_NAP_LOCATION_CHANGE) {_, _, _ ->
+            LocationEnum.DISTANCE.real_number
+        })
+        gwonyuck.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CHANGE_SWELL_DISTANCE) {_, _, _ ->
+            1
+        })
     }
 
     fun init(){
         hashMapInit()
 
-        YurinaCardInit()
+        yurinaCardInit()
+        saineCardInit()
     }
-
 
     fun returnCardDataByName(card_name: CardName): CardData {
         when (card_name){
@@ -233,11 +288,11 @@ object CardSet {
             CardName.YURINA_POBARAM -> return pobaram
             CardName.YURINA_JJOCKBAE -> return jjockbae
             CardName.YURINA_JURUCK -> return juruck
-            CardName.SAINE_DOUBLEBEGI -> TODO()
-            CardName.SAINE_HURUBEGI -> TODO()
-            CardName.SAINE_MOOGECHOO -> TODO()
-            CardName.SAINE_GANPA -> TODO()
-            CardName.SAINE_GWONYUCK -> TODO()
+            CardName.SAINE_DOUBLEBEGI -> return doublebegi
+            CardName.SAINE_HURUBEGI -> return hurubegi
+            CardName.SAINE_MOOGECHOO -> return moogechoo
+            CardName.SAINE_GANPA -> return ganpa
+            CardName.SAINE_GWONYUCK -> return gwonyuck
             CardName.SAINE_CHOONGEMJUNG -> TODO()
             CardName.SAINE_MOOEMBUCK -> TODO()
             CardName.SAINE_YULDONGHOGEK -> TODO()

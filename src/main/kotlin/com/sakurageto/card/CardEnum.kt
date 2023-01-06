@@ -66,6 +66,8 @@ enum class TextEffectTag {
     END_TURN,
     USING_CONDITION,
     DO_NOT_NAP,
+    THIS_CARD_NAP_LOCATION_CHANGE,
+    OTHER_CARD_NAP_LOCATION_CHANGE,
     CAN_REACTABLE,
     REACT_ATTACK_REDUCE,
     REACT_ATTACK_NO_DAMAGE,
@@ -74,6 +76,7 @@ enum class TextEffectTag {
     ADJUST_NAP,
     COST_BUFF,
     COST_X,
+    CHANGE_SWELL_DISTANCE,
 }
 
 enum class CardName {

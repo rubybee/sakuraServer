@@ -1,7 +1,6 @@
 package com.sakurageto.protocol
 
 import com.sakurageto.card.CardName
-import com.sakurageto.card.MadeAttack
 import kotlinx.serialization.Serializable
 
 @Serializable

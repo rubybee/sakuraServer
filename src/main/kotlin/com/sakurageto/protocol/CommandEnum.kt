@@ -109,6 +109,12 @@ enum class CommandEnum {
     GAME_END_WINNER,
     GAME_END_LOSER,
     COVER_CARD_SELECT,
+
+    SELECT_CARD_EFFECT,
+    SELECT_DUST_TO_DISTANCE,
+    SELECT_DISTANCE_TO_DUST,
+
+
     ;
 
     fun Opposite(): CommandEnum{

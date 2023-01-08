@@ -18,8 +18,8 @@ fun Application.configureRouting() {
             while (RoomInformation.room_number_hashmap.containsKey(now_room_number)){
                 now_room_number = room_number_range.random()
             }
-            RoomInformation.room_number_hashmap.put(now_room_number, true)
-            RoomInformation.room_wait_hashmap.put(now_room_number, true)
+            RoomInformation.room_number_hashmap[now_room_number] = true
+            RoomInformation.room_wait_hashmap[now_room_number] = true
             call.respondText(now_room_number.toString())
         }
 

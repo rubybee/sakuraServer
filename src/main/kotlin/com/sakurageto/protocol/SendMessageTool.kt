@@ -1,20 +1,18 @@
 package com.sakurageto.protocol
 
 import com.sakurageto.Connection
-import com.sakurageto.card.CardName
-import com.sakurageto.card.PlayerEnum
 import com.sakurageto.protocol.CommandEnum.*
 import io.ktor.websocket.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlin.Exception
-import kotlin.contracts.contract
 
 //send function
-suspend fun sendUsedCardReturn(player: Connection, card_number: Int) {
-    val data = SakuraCardCommand(RETURN_SPECIAL_CARD, card_number)
+suspend fun sendUsedCardReturn(player: Connection, other: Connection, card_number: Int) {
+    val data = SakuraCardCommand(RETURN_SPECIAL_CARD_YOUR, card_number)
+    val dataOther = SakuraCardCommand(RETURN_SPECIAL_CARD_OTHER, card_number)
     player.session.send(Json.encodeToString(data))
+    other.session.send(Json.encodeToString(dataOther))
 }
 
 suspend fun sendReduceNapStart(player: Connection){
@@ -228,8 +226,18 @@ suspend fun sendCoverCardSelect(player: Connection){
     player.session.send(Json.encodeToString(data))
 }
 
-suspend fun cardEffectSelect(player: Connection){
+suspend fun sendCardEffectSelect(player: Connection){
     val data = SakuraCardCommand(SELECT_CARD_EFFECT)
+    player.session.send(Json.encodeToString(data))
+}
+
+suspend fun sendAuraDamageSelect(player: Connection){
+    val data = SakuraCardCommand(SELECT_AURA_DAMAGE_PLACE)
+    player.session.send(Json.encodeToString(data))
+}
+
+suspend fun sendAuraDamagePlaceInformation(player: Connection, list: MutableList<Int>){
+    val data = SakuraSendData(SELECT_AURA_DAMAGE_PLACE, list)
     player.session.send(Json.encodeToString(data))
 }
 
@@ -379,13 +387,13 @@ suspend fun receiveReconstructRequest(player: Connection): Boolean{
     for (frame in player.session.incoming) {
         if (frame is Frame.Text) {
             val text = frame.readText()
-            try {
+            return try {
                 val data = json.decodeFromString<SakuraCardCommand>(text)
                 if (data.command == DECK_RECONSTRUCT_NO){
-                    return false
+                    false
                 }
                 else if(data.command == DECK_RECONSTRUCT_YES){
-                    return true
+                    true
                 }
                 else {
                     continue
@@ -406,15 +414,13 @@ suspend fun receiveFullPowerRequest(player: Connection): Boolean{
     for (frame in player.session.incoming) {
         if (frame is Frame.Text) {
             val text = frame.readText()
-            try {
+            return try {
                 val data = json.decodeFromString<SakuraCardCommand>(text)
                 if (data.command == FULL_POWER_NO){
-                    return false
-                }
-                else if(data.command == FULL_POWER_YES){
-                    return true
-                }
-                else {
+                    false
+                } else if(data.command == FULL_POWER_YES){
+                    true
+                } else {
                     continue
                 }
             }catch (e: Exception){
@@ -506,17 +512,17 @@ suspend fun receiveCoverCardSelect(player: Connection): Int{
     return -1
 }
 
-suspend fun  receiveCardEffectSelect(player: Connection): CommandEnum{
+suspend fun receiveCardEffectSelect(player: Connection): CommandEnum{
     val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
 
-    cardEffectSelect(player)
+    sendCardEffectSelect(player)
     for(frame in player.session.incoming){
         if (frame is Frame.Text) {
             val text = frame.readText()
             try {
                 val data = json.decodeFromString<SakuraCardCommand>(text)
                 when(data.command){
-                    SELECT_DUST_TO_DISTANCE, SELECT_DISTANCE_TO_DUST -> return  data.command //will be added
+                    SELECT_DUST_TO_DISTANCE, SELECT_DISTANCE_TO_DUST -> return data.command //will be added
                     else -> continue
                 }
             }catch (e: Exception){
@@ -528,3 +534,27 @@ suspend fun  receiveCardEffectSelect(player: Connection): CommandEnum{
     return NULL
 }
 
+//receive data like( [LOCATION_ENUM.AURA, 3, CARD_NUMBER, 2, CARD_NUMBER, 2] )
+suspend fun receiveAuraDamageSelect(player: Connection, place_list: MutableList<Int>): MutableList<Int>?{
+    val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
+
+    sendAuraDamageSelect(player)
+    sendAuraDamagePlaceInformation(player, place_list)
+
+    for(frame in player.session.incoming){
+        if (frame is Frame.Text) {
+            val text = frame.readText()
+            try {
+                val data = json.decodeFromString<SakuraSendData>(text)
+                when(data.command){
+                    SELECT_AURA_DAMAGE_PLACE -> return data.data //will be added
+                    else -> continue
+                }
+            }catch (e: Exception){
+                continue
+            }
+
+        }
+    }
+    return null
+}

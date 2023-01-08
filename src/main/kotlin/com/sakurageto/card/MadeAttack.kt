@@ -4,6 +4,7 @@ import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.MegamiEnum
 
 class MadeAttack(
+    var card_class: CardClass,
     var distance_type: DistanceType,
     var aura_damage: Int,
     var life_damage: Int,
@@ -12,6 +13,15 @@ class MadeAttack(
     var megami: MegamiEnum
 ) {
     var is_it_valid = true
+
+    constructor(card_class: CardClass, distance_type: DistanceType, aura_damage: Int, life_damage: Int,
+                distance_cont: Pair<Int, Int>?, distance_uncont: Array<Boolean>?, megami: MegamiEnum,
+                cannot_react_normal: Boolean, cannot_react_special: Boolean, cannot_react: Boolean):
+            this(card_class, distance_type, aura_damage, life_damage, distance_cont, distance_uncont, megami){
+                this.cannot_react_normal = cannot_react_normal
+                this.cannot_react_special = cannot_react_special
+                this.cannot_react = cannot_react
+            }
 
     var cannot_react_normal = false
     var cannot_react_special = false
@@ -110,9 +120,9 @@ class MadeAttack(
     }
 
     fun rangeCheck(now_range: Int): Boolean{
-        when(distance_type){
-            DistanceType.DISCONTINUOUS -> return distance_uncont!![now_range]
-            DistanceType.CONTINUOUS -> return distance_cont!!.first <= now_range && now_range <= distance_cont!!.second
+        return when(distance_type){
+            DistanceType.DISCONTINUOUS -> distance_uncont!![now_range]
+            DistanceType.CONTINUOUS -> distance_cont!!.first <= now_range && now_range <= distance_cont!!.second
         }
     }
 

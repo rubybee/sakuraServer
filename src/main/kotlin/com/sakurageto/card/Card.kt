@@ -4,7 +4,6 @@ import com.sakurageto.card.CardSet.cardNameHashmapSecond
 import com.sakurageto.card.CardSet.cardNameHashmapFirst
 import com.sakurageto.card.CardSet.returnCardDataByName
 import com.sakurageto.gamelogic.GameStatus
-import com.sakurageto.gamelogic.PlayerStatus
 import com.sakurageto.protocol.receiveNapInformation
 import kotlin.collections.ArrayDeque
 
@@ -82,10 +81,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
 
     fun isItDestruction(): Boolean{
         //some text can be added
-        if(nap == 0){
-            return true
-        }
-        return false
+        return nap == 0
     }
 
     fun destructionEnchantmentNormaly(): ArrayDeque<Text>{
@@ -134,10 +130,18 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         card_data.effect?.let {
             for(i in it){
                 when(i.timing_tag){
-                    TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTimingTag.USED -> {
+                    TextEffectTimingTag.CONSTANT_EFFECT -> {
                         when(i.tag){
                             TextEffectTag.COST_BUFF -> {
-                                i.effect!!(player, gameStatus, null)
+                                if(this.special_card_state != SpecialCardEnum.PLAYED) i.effect!!(player, gameStatus, null)
+                            }
+                            else -> continue
+                        }
+                    }
+                    TextEffectTimingTag.USED -> {
+                        when(i.tag){
+                            TextEffectTag.COST_BUFF -> {
+                                if(this.special_card_state == SpecialCardEnum.PLAYED) i.effect!!(player, gameStatus, null)
                             }
                             else -> continue
                         }
@@ -233,11 +237,11 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         }?: 10000
     }
 
-    suspend fun textUseCheck(player: PlayerEnum, gameStatus: GameStatus): Boolean{
+    suspend fun textUseCheck(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?): Boolean{
         card_data.effect?.let {
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT && text.tag == TextEffectTag.USING_CONDITION){
-                    if(text.effect!!(player, gameStatus, null)!! == 1){
+                    if(text.effect!!(player, game_status, react_attack)!! == 1){
                         return true
                     }
                     return false
@@ -250,6 +254,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
     suspend fun makeAttack(player: PlayerEnum, gameStatus: GameStatus): MadeAttack{
         this.addAttackBuff(player, gameStatus)
         return MadeAttack(
+            card_class = this.card_data.card_class,
             distance_type = this.card_data.distance_type!!,
             life_damage = this.card_data.life_damage!!,
             aura_damage = this.card_data.aura_damage!!,
@@ -258,17 +263,19 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
             megami = this.card_data.megami
         )
     }
+
     //-2: can't use                    -1: can use                 >= 0: cost
-    suspend fun canUse(player: PlayerEnum, gameStatus: GameStatus): Int{
+    suspend fun canUse(player: PlayerEnum, gameStatus: GameStatus, react_attack: MadeAttack?): Int{
         if(card_data.sub_type == SubType.FULLPOWER && !gameStatus.getPlayerFullAction(player)) return -2
 
-        if(!textUseCheck(player, gameStatus)){
+        if(!textUseCheck(player, gameStatus, react_attack)){
             return -2
         }
 
         val cost: Int
 
         if(card_data.card_class == CardClass.SPECIAL){
+            this.addCostBuff(player, gameStatus)
             gameStatus.addAllCardCostBuff()
             cost = gameStatus.applyAllCostBuff(player, this.getBaseCost(player, gameStatus), this)
             if(cost > gameStatus.getPlayerFlare(player)){
@@ -400,6 +407,36 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
             }
         }
         return 0
+    }
+
+    fun checkAuraReplaceable(): Boolean{
+        return this.card_data.effect?.let {
+            var check = false
+            for(text in it) {
+                if (text.timing_tag == TextEffectTimingTag.IN_DEPLOYMENT && text.tag == TextEffectTag.DAMAGE_AURA_REPLACEABLE_HERE && (nap
+                        ?: -1) > 0
+                ) {
+                    check = true
+                    break
+                }
+            }
+            check
+        }?: false
+    }
+
+    suspend fun returnCheck(player: PlayerEnum, game_status: GameStatus): Boolean{
+        return this.card_data.effect?.let {
+            var check = false
+            for (text in it){
+                if(text.timing_tag == TextEffectTimingTag.USED && text.tag == TextEffectTag.RETURN){
+                    if(text.effect!!(player, game_status, null) == 1) {
+                        check = true
+                        break
+                    }
+                }
+            }
+            check
+        }?: false
     }
 
 }

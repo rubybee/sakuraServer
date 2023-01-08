@@ -2,10 +2,11 @@ package com.sakurageto.gamelogic
 
 import com.sakurageto.card.*
 import com.sakurageto.protocol.CommandEnum
+import com.sakurageto.protocol.LocationEnum
 import com.sakurageto.protocol.SakuraSendData
 import java.util.NoSuchElementException
 
-class PlayerStatus {
+class PlayerStatus(val player_enum: PlayerEnum) {
     var first_turn = false
 
     var full_action = false
@@ -13,6 +14,35 @@ class PlayerStatus {
     var max_hand = 2
     var maxAura = 5
     var aura = 3
+
+    fun auraDamagePossible(data: MutableList<Int>?, damage: Int, possibleList: MutableList<Int>): Boolean{
+        var totalAura = 0
+        if(data == null || data.size % 2 == 1) return false
+        else{
+            val duplicateTest = mutableSetOf<Int>()
+            for (index in data.indices){
+                if(index % 2 == 0){
+                    if(duplicateTest.contains(data[index])) return false
+                    duplicateTest.add(data[index])
+                }
+            }
+            for (index in data.indices){
+                if(index % 2 == 0){
+                    if(!possibleList.contains(data[index])) return false
+                    totalAura += if(data[index] == LocationEnum.YOUR_AURA.real_number){
+                        if(data[index + 1] <= this.aura) data[index + 1]
+                        else return false
+                    } else{
+                        if(data[index + 1] <= enchantment_card[data[index]]!!.nap!!) data[index + 1]
+                        else return false
+                    }
+                }
+            }
+        }
+        if(totalAura == damage) return true
+        return false
+    }
+
     var freezeToken = 0
 
     var using_card = ArrayDeque<Card>()
@@ -29,19 +59,34 @@ class PlayerStatus {
     }
 
     fun fromHandToCover(card_number: Int): Boolean {
-        if(hand[card_number] != null){
+        return if(hand[card_number] != null){
             cover_card.addLast(hand[card_number]!!)
             hand.remove(card_number)
-            return true
-        }
-        else{
-            return false
+            true
+        } else{
+            false
         }
     }
 
     var enchantment_card: HashMap<Int, Card> = HashMap()
 
     var special_card_deck = HashMap<Int, Card>()
+
+    fun checkAuraDamage(damage: Int): MutableList<Int>?{
+        val selectable = mutableListOf<Int>()
+        var totalAura = this.aura
+        if(this.aura > 0){
+            selectable.add(LocationEnum.YOUR_AURA.real_number)
+        }
+        for(card in enchantment_card.values){
+            if(card.checkAuraReplaceable()){
+                totalAura += card.nap!!
+                selectable.add(card.card_number)
+            }
+        }
+        if(totalAura >= damage) return selectable
+        return null
+    }
 
     fun getCardFromSpecial(card_number: Int): Card?{
         return special_card_deck[card_number]
@@ -57,33 +102,39 @@ class PlayerStatus {
     var normal_card_deck = ArrayDeque<Card>()
     var used_special_card = HashMap<Int, Card>()
 
+    suspend fun usedCardReturn(game_status: GameStatus): MutableList<Int>{
+        val result = mutableListOf<Int>()
+        for (cardNumber in used_special_card.keys){
+            if (used_special_card[cardNumber]!!.returnCheck(player_enum, game_status)) result.add(cardNumber)
+        }
+        return result
+    }
+
     var discard = ArrayDeque<Card>()
     var cover_card = ArrayDeque<Card>()
 
     var end_turn = false
 
     fun usedToSpecial(card_number: Int): Boolean{
-        if(used_special_card[card_number] == null){
-            return false
-        }
-        else{
+        return if(used_special_card[card_number] == null){
+            false
+        } else{
             val card = used_special_card[card_number]!!
             special_card_deck[card.card_number] = card
             used_special_card.remove(card_number)
-            return true
+            true
         }
     }
 
     //return using dust
     fun plusAura(number: Int): Int{
-        if(maxAura > aura + number){
+        return if(maxAura > aura + number){
             val temp = aura
             aura = maxAura
-            return maxAura - temp
-        }
-        else{
+            maxAura - temp
+        } else{
             aura += number
-            return number
+            number
         }
     }
 

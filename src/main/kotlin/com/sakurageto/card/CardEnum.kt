@@ -7,11 +7,10 @@ enum class PlayerEnum {
     PLAYER2;
 
     fun Opposite(): PlayerEnum{
-        if(this == PLAYER1){
-            return PLAYER2
-        }
-        else{
-            return PLAYER1
+        return if(this == PLAYER1){
+            PLAYER2
+        } else{
+            PLAYER1
         }
     }
 }
@@ -63,6 +62,7 @@ enum class TextEffectTag {
     MAKE_ATTACK,
     MOVE_SAKURA_TOKEN,
     IMMEDIATE_RETURN,
+    RETURN,
     END_TURN,
     USING_CONDITION,
     DO_NOT_NAP,
@@ -77,6 +77,7 @@ enum class TextEffectTag {
     COST_BUFF,
     COST_X,
     CHANGE_SWELL_DISTANCE,
+    DAMAGE_AURA_REPLACEABLE_HERE,
 }
 
 enum class CardName {
@@ -157,28 +158,31 @@ enum class CardName {
         }
 
         fun returnSpecialCardNameByMegami(megami_name: MegamiEnum): List<CardName> {
-            when (megami_name){
-                MegamiEnum.YURINA -> return listOf<CardName>(
+            return when (megami_name){
+                MegamiEnum.YURINA -> listOf<CardName>(
                     YURINA_WOLYUNGNACK, YURINA_POBARAM, YURINA_JJOCKBAE, YURINA_JURUCK
                 )
-                MegamiEnum.SAINE -> return listOf<CardName>(
+
+                MegamiEnum.SAINE -> listOf<CardName>(
                     SAINE_YULDONGHOGEK, SAINE_HANGMUNGGONGJIN, SAINE_EMMOOSHOEBING, SAINE_JONGGEK
                 )
-                MegamiEnum.HIMIKA -> return listOf<CardName>(
+
+                MegamiEnum.HIMIKA -> listOf<CardName>(
                     HIMIKA_REDBULLET, HIMIKA_CRIMSONZERO, HIMIKA_SCARLETIMAGINE, HIMIKA_BURMILIONFIELD
                 )
-                MegamiEnum.TOKOYO -> return listOf<CardName>(
+
+                MegamiEnum.TOKOYO -> listOf<CardName>(
                     TOKOYO_KUON, TOKOYO_THOUSANDBIRD, TOKOYO_ENDLESSWIND, TOKOYO_TOKOYOMOON
                 )
             }
         }
 
         fun returnAdditionalCardNameByMegami(megami_name: MegamiEnum): List<CardName> {
-            when (megami_name){
-                MegamiEnum.YURINA -> return listOf<CardName>()
-                MegamiEnum.SAINE -> return listOf<CardName>()
-                MegamiEnum.HIMIKA -> return listOf<CardName>()
-                MegamiEnum.TOKOYO -> return listOf<CardName>()
+            return when (megami_name){
+                MegamiEnum.YURINA -> listOf<CardName>()
+                MegamiEnum.SAINE -> listOf<CardName>()
+                MegamiEnum.HIMIKA -> listOf<CardName>()
+                MegamiEnum.TOKOYO -> listOf<CardName>()
             }
         }
 

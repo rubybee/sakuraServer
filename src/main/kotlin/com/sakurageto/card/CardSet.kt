@@ -3,7 +3,6 @@ package com.sakurageto.card
 import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.ImmediateBackListner
 import com.sakurageto.gamelogic.MegamiEnum
-import com.sakurageto.gamelogic.PlayerStatus
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 
@@ -173,7 +172,7 @@ object CardSet {
         apdo.setEnchantment(2)
         apdo.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CHASM, null))
         apdo.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MAKE_ATTACK) {player, game_status, _ ->
-            game_status.addPreAttackZone(player, MadeAttack(DistanceType.CONTINUOUS, 3,  999, Pair(1, 4), null, MegamiEnum.YURINA))
+            game_status.addPreAttackZone(player, MadeAttack(CardClass.NORMAL, DistanceType.CONTINUOUS, 3,  999, Pair(1, 4), null, MegamiEnum.YURINA))
             null
         })
         giyenbanzo.setEnchantment(4)
@@ -223,6 +222,13 @@ object CardSet {
     private val moogechoo = CardData(CardClass.NORMAL, CardName.SAINE_MOOGECHOO, MegamiEnum.SAINE, CardType.ATTACK, SubType.REACTION)
     private val ganpa = CardData(CardClass.NORMAL, CardName.SAINE_GANPA, MegamiEnum.SAINE, CardType.BEHAVIOR, SubType.NONE)
     private val gwonyuck = CardData(CardClass.NORMAL, CardName.SAINE_GWONYUCK, MegamiEnum.SAINE, CardType.ENCHANTMENT, SubType.NONE)
+    private val choongemjung = CardData(CardClass.NORMAL, CardName.SAINE_CHOONGEMJUNG, MegamiEnum.SAINE, CardType.ENCHANTMENT, SubType.REACTION)
+    private val mooembuck = CardData(CardClass.NORMAL, CardName.SAINE_MOOEMBUCK, MegamiEnum.SAINE, CardType.ENCHANTMENT, SubType.FULLPOWER)
+    private val yuldonghogek = CardData(CardClass.SPECIAL, CardName.SAINE_YULDONGHOGEK, MegamiEnum.SAINE, CardType.BEHAVIOR, SubType.NONE)
+    private val hangmunggongjin = CardData(CardClass.SPECIAL, CardName.SAINE_HANGMUNGGONGJIN, MegamiEnum.SAINE, CardType.BEHAVIOR, SubType.NONE)
+    private val emmooshoebing = CardData(CardClass.SPECIAL, CardName.SAINE_EMMOOSHOEBING, MegamiEnum.SAINE, CardType.ATTACK, SubType.REACTION)
+    private val jonggek = CardData(CardClass.SPECIAL, CardName.SAINE_JONGGEK, MegamiEnum.SAINE, CardType.ATTACK, SubType.REACTION)
+
     private fun palSang(player: PlayerEnum, game_status: GameStatus): Boolean{
         return game_status.getPlayerAura(player) <= 1
     }
@@ -230,7 +236,7 @@ object CardSet {
         doublebegi.setAttack(DistanceType.CONTINUOUS, Pair(4, 5), null, 2, 1)
         doublebegi.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MAKE_ATTACK) {player, game_status, _ ->
             if(palSang(player, game_status)){
-                game_status.addPreAttackZone(player, MadeAttack(DistanceType.CONTINUOUS, 2,  1, Pair(4, 5), null, MegamiEnum.SAINE))
+                game_status.addPreAttackZone(player, MadeAttack(CardClass.NORMAL, DistanceType.CONTINUOUS, 2,  1, Pair(4, 5), null, MegamiEnum.SAINE))
             }
             null
         })
@@ -260,11 +266,76 @@ object CardSet {
             }
             null
         })
+        gwonyuck.setEnchantment(2)
         gwonyuck.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.THIS_CARD_NAP_LOCATION_CHANGE) {_, _, _ ->
             LocationEnum.DISTANCE.real_number
         })
         gwonyuck.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CHANGE_SWELL_DISTANCE) {_, _, _ ->
             1
+        })
+        choongemjung.setEnchantment(1)
+        choongemjung.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.REACT_ATTACK_REDUCE) {_, _, reactedAttack ->
+            reactedAttack?.auraPlusMinus(-2)
+            null
+        })
+        choongemjung.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.REACT_ATTACK_REDUCE) {player, game_status, _ ->
+            game_status.addPreAttackZone(player, MadeAttack(CardClass.NORMAL, DistanceType.CONTINUOUS, 1,  999, Pair(0, 10), null, MegamiEnum.SAINE,
+                cannot_react_normal = false,
+                cannot_react_special = false,
+                cannot_react = true
+            ))
+            null
+        })
+        choongemjung.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MOVE_SAKURA_TOKEN) {_, game_status, _ ->
+            game_status.dustToDistance(1)
+            null
+        })
+        mooembuck.setEnchantment(5)
+        //-1 means every nap token can use as aura
+        mooembuck.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.DAMAGE_AURA_REPLACEABLE_HERE) {_, _, _ ->
+            null
+        })
+        yuldonghogek.setSpecial(6)
+        yuldonghogek.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_ATTACK){ player, game_status, _ ->
+            game_status.addPreAttackZone(player, MadeAttack(CardClass.NORMAL, DistanceType.CONTINUOUS, 1,  1, Pair(3, 4), null, MegamiEnum.SAINE))
+            null
+        })
+        yuldonghogek.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_ATTACK){ player, game_status, _ ->
+            game_status.addPreAttackZone(player, MadeAttack(CardClass.NORMAL, DistanceType.CONTINUOUS, 1,  1, Pair(4, 5), null, MegamiEnum.SAINE))
+            null
+        })
+        yuldonghogek.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_ATTACK){ player, game_status, _ ->
+            game_status.addPreAttackZone(player, MadeAttack(CardClass.NORMAL, DistanceType.CONTINUOUS, 2,  2, Pair(3, 5), null, MegamiEnum.SAINE))
+            null
+        })
+        hangmunggongjin.setSpecial(8)
+        hangmunggongjin.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.COST_BUFF) { player, game_status, _->
+            game_status.addThisTurnCostBuff(player, CostBuff(CardName.SAINE_HANGMUNGGONGJIN, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, card -> (card.card_data.card_name == CardName.SAINE_HANGMUNGGONGJIN)}, {cost ->
+                cost - game_status.getPlayerAura(player.Opposite())
+            }))
+            null
+        })
+        hangmunggongjin.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_ATTACK){ player, game_status, _ ->
+            game_status.addPreAttackZone(player, MadeAttack(CardClass.NORMAL, DistanceType.CONTINUOUS, 2,  2, Pair(3, 5), null, MegamiEnum.SAINE))
+            null
+        })
+        emmooshoebing.setSpecial(2)
+        emmooshoebing.setAttack(DistanceType.CONTINUOUS, Pair(0, 10), null, 1, 1)
+        emmooshoebing.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.REACT_ATTACK_REDUCE){ _, _, reactedAttack ->
+            reactedAttack?.auraPlusMinus(-1)
+            reactedAttack?.lifePlusMinus(-1)
+            null
+        })
+        //return 1 means it can be return 0 means it can't be return
+        emmooshoebing.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.RETURN){ player, game_status, _ ->
+            if(game_status.getPlayerAura(player) <= 1) 1
+            else 0
+        })
+        jonggek.setSpecial(5)
+        jonggek.setAttack(DistanceType.CONTINUOUS, Pair(1, 5), null, 5, 5)
+        jonggek.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.USING_CONDITION) {_, _, reactedAttack->
+            if(reactedAttack != null && reactedAttack.card_class == CardClass.SPECIAL) 1
+            else 0
         })
     }
 
@@ -293,12 +364,12 @@ object CardSet {
             CardName.SAINE_MOOGECHOO -> return moogechoo
             CardName.SAINE_GANPA -> return ganpa
             CardName.SAINE_GWONYUCK -> return gwonyuck
-            CardName.SAINE_CHOONGEMJUNG -> TODO()
-            CardName.SAINE_MOOEMBUCK -> TODO()
-            CardName.SAINE_YULDONGHOGEK -> TODO()
-            CardName.SAINE_HANGMUNGGONGJIN -> TODO()
-            CardName.SAINE_EMMOOSHOEBING -> TODO()
-            CardName.SAINE_JONGGEK -> TODO()
+            CardName.SAINE_CHOONGEMJUNG -> return choongemjung
+            CardName.SAINE_MOOEMBUCK -> return mooembuck
+            CardName.SAINE_YULDONGHOGEK -> return yuldonghogek
+            CardName.SAINE_HANGMUNGGONGJIN -> return hangmunggongjin
+            CardName.SAINE_EMMOOSHOEBING -> return emmooshoebing
+            CardName.SAINE_JONGGEK -> return jonggek
             CardName.HIMIKA_SHOOT -> TODO()
             CardName.HIMIKA_RAPIDFIRE -> TODO()
             CardName.HIMIKA_MAGNUMCANON -> TODO()

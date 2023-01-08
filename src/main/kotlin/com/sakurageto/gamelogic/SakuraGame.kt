@@ -3,12 +3,9 @@ package com.sakurageto.gamelogic
 import com.sakurageto.Connection
 import com.sakurageto.card.Card
 import com.sakurageto.card.CardName
-import com.sakurageto.card.CardSet
 import com.sakurageto.card.PlayerEnum
 import com.sakurageto.protocol.*
-import io.ktor.util.*
 import io.ktor.websocket.*
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.random.Random
@@ -32,7 +29,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
 
     init {
         game_mode = GameMode.SSANG_JANG_YO_LAN
-        game_status = GameStatus(PlayerStatus(), PlayerStatus(), player1, player2)
+        game_status = GameStatus(PlayerStatus(PlayerEnum.PLAYER1), PlayerStatus(PlayerEnum.PLAYER2), player1, player2)
     }
 
     suspend fun selectMode(){
@@ -166,25 +163,27 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
         var card_data_player2 : MutableList<CardName>
         var specialcard_data_player2 : MutableList<CardName>
 
-        if(checkCardSet(game_status.player1.unselected_card, player1_data.normal_card, 7))
-            card_data_player1 = player1_data.normal_card!!
+        card_data_player1 = if(checkCardSet(game_status.player1.unselected_card, player1_data.normal_card, 7))
+            player1_data.normal_card!!
         else
-            card_data_player1 = game_status.player1.unselected_card.subList(0, 7)
+            game_status.player1.unselected_card.subList(0, 7)
 
-        if(checkCardSet(game_status.player2.unselected_card, player2_data.normal_card, 7))
-            card_data_player2 = player2_data.normal_card!!
+        card_data_player2 = if(checkCardSet(game_status.player2.unselected_card, player2_data.normal_card, 7))
+            player2_data.normal_card!!
         else
-            card_data_player2 = game_status.player2.unselected_card.subList(0, 7)
+            game_status.player2.unselected_card.subList(0, 7)
 
-        if(checkCardSet(game_status.player1.unselected_specialcard, player1_data.special_card, 3))
-            specialcard_data_player1 = player1_data.special_card!!
-        else
-            specialcard_data_player1 = game_status.player1.unselected_specialcard.subList(0, 3)
+        specialcard_data_player1 =
+            if(checkCardSet(game_status.player1.unselected_specialcard, player1_data.special_card, 3))
+                player1_data.special_card!!
+            else
+                game_status.player1.unselected_specialcard.subList(0, 3)
 
-        if(checkCardSet(game_status.player2.unselected_specialcard, player2_data.special_card, 3))
-            specialcard_data_player2 = player2_data.special_card!!
-        else
-            specialcard_data_player2 = game_status.player2.unselected_specialcard.subList(0, 3)
+        specialcard_data_player2 =
+            if(checkCardSet(game_status.player2.unselected_specialcard, player2_data.special_card, 3))
+                player2_data.special_card!!
+            else
+                game_status.player2.unselected_specialcard.subList(0, 3)
 
         val end_player1_select = SakuraCardSetSend(CommandEnum.END_SELECT_CARD, card_data_player1, specialcard_data_player1)
         val end_player2_select = SakuraCardSetSend(CommandEnum.END_SELECT_CARD, card_data_player2, specialcard_data_player2)
@@ -351,7 +350,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
 
     suspend fun endPhase(){
         sendEndPhaseStart(getSocket(this.turn_player), getSocket(this.turn_player.Opposite()))
-        game_status.endPhaseEffectProcess()
+        game_status.endPhaseEffectProcess(this.turn_player)
         game_status.setEndTurn(PlayerEnum.PLAYER1, false)
         game_status.setEndTurn(PlayerEnum.PLAYER2, false)
         game_status.endTurnHandCheck(this.turn_player)

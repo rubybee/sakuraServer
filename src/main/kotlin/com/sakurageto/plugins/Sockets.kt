@@ -65,8 +65,8 @@ fun Application.configureSockets() {
                     if(RoomInformation.room_connection_hashmap[roomnumber]!!.size == 1){
                         val thisconnection = Connection(this)
                         RoomInformation.room_connection_hashmap[roomnumber]!!.add(thisconnection)
-                        val now1 = RoomInformation.room_connection_hashmap[roomnumber]!!.get(0)
-                        val now2 = RoomInformation.room_connection_hashmap[roomnumber]!!.get(1)
+                        val now1 = RoomInformation.room_connection_hashmap[roomnumber]!![0]
+                        val now2 = RoomInformation.room_connection_hashmap[roomnumber]!![1]
                         val game = SakuraGame(now1, now2)
                         game.startGame()
                     }

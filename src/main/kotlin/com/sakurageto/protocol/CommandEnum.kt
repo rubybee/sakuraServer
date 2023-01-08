@@ -15,7 +15,8 @@ enum class CommandEnum {
     SELECT_CARD,
     SELECT_CARD_OTHER_PLAYERS,
     END_SELECT_CARD,
-    RETURN_SPECIAL_CARD,
+    RETURN_SPECIAL_CARD_YOUR,
+    RETURN_SPECIAL_CARD_OTHER,
     FIRST_TURN,
     SECOND_TURN,
     MULIGUN,
@@ -114,6 +115,7 @@ enum class CommandEnum {
     SELECT_DUST_TO_DISTANCE,
     SELECT_DISTANCE_TO_DUST,
 
+    SELECT_AURA_DAMAGE_PLACE,
 
     ;
 
@@ -178,18 +180,18 @@ enum class LocationEnum(var real_number: Int){
     DISCARD(11);
 
     fun Opposite(): LocationEnum{
-        when(this){
-            YOUR_AURA -> return OTHER_AURA
-            OTHER_AURA -> return YOUR_AURA
-            YOUR_FLARE -> return OTHER_FLARE
-            OTHER_FLARE -> return YOUR_FLARE
-            YOUR_LIFE -> return OTHER_LIFE
-            OTHER_LIFE -> return YOUR_LIFE
-            DUST -> return DUST
-            YOUR_CARD -> return OTHER_CARD
-            OTHER_CARD -> return YOUR_CARD
-            DISTANCE -> return DISTANCE
-            else -> return DISCARD
+        return when(this){
+            YOUR_AURA -> OTHER_AURA
+            OTHER_AURA -> YOUR_AURA
+            YOUR_FLARE -> OTHER_FLARE
+            OTHER_FLARE -> YOUR_FLARE
+            YOUR_LIFE -> OTHER_LIFE
+            OTHER_LIFE -> YOUR_LIFE
+            DUST -> DUST
+            YOUR_CARD -> OTHER_CARD
+            OTHER_CARD -> YOUR_CARD
+            DISTANCE -> DISTANCE
+            else -> DISCARD
         }
     }
     companion object {

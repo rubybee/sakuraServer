@@ -79,48 +79,34 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         return 1
     }
 
+    suspend fun destructionEnchantmentNormaly(player: PlayerEnum, game_status: GameStatus){
+        card_data.effect?.let {
+            for(text in it){
+                if(text.timing_tag == TextEffectTimingTag.AFTER_DESTRUCTION){
+                    when(text.tag){
+                        TextEffectTag.MAKE_ATTACK -> {
+                            text.effect!!(this.card_number, player, game_status, null)
+                            game_status.afterMakeAttack(this.card_number, player, null)
+                        }
+                        else -> text.effect!!(this.card_number, player, game_status, null)
+                    }
+                }
+            }
+        }
+    }
     fun isItDestruction(): Boolean{
         //some text can be added
         return nap == 0
     }
 
-    fun destructionEnchantmentNormaly(): ArrayDeque<Text>{
-        val return_data: ArrayDeque<Text> = ArrayDeque()
-        card_data.effect?.let {
-            for(i in it){
-                when(i.timing_tag){
-                    TextEffectTimingTag.AFTER_DESTRUCTION -> {
-                        return_data.add(i)
-                    }
-                    else -> {}
-                }
-            }
-        }
-        return return_data
-    }
     suspend fun addAttackBuff(player: PlayerEnum, gameStatus: GameStatus){
         card_data.effect?.let {
-            for(i in it){
-                when(i.timing_tag){
-                    TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTimingTag.USED -> {
-                        when(i.tag){
-                            TextEffectTag.NEXT_ATTACK_ENCHANTMENT -> {
-                               i.effect!!(player, gameStatus, null)
-                            }
-                            else -> continue
-                        }
-                    }
-                    TextEffectTimingTag.IN_DEPLOYMENT -> {
-                        if((nap ?:0) >= 1 && card_data.card_type == CardType.ENCHANTMENT){
-                            when(i.tag){
-                                TextEffectTag.NEXT_ATTACK_ENCHANTMENT -> {
-                                    i.effect!!(player, gameStatus, null)
-                                }
-                                else -> continue
-                            }
-                        }
-                    }
-                    else -> continue
+            for(text in it){
+                if(text.timing_tag == TextEffectTimingTag.USED && this.special_card_state == SpecialCardEnum.PLAYED){
+                    if(text.tag == TextEffectTag.NEXT_ATTACK_ENCHANTMENT) text.effect!!(this.card_number, player, gameStatus, null)
+                }
+                else if(text.timing_tag == TextEffectTimingTag.IN_DEPLOYMENT && (nap?: 0) > 0){
+                    if(text.tag == TextEffectTag.NEXT_ATTACK_ENCHANTMENT) text.effect!!(this.card_number, player, gameStatus, null)
                 }
             }
         }
@@ -133,7 +119,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
                     TextEffectTimingTag.CONSTANT_EFFECT -> {
                         when(i.tag){
                             TextEffectTag.COST_BUFF -> {
-                                if(this.special_card_state != SpecialCardEnum.PLAYED) i.effect!!(player, gameStatus, null)
+                                if(this.special_card_state != SpecialCardEnum.PLAYED) i.effect!!(this.card_number, player, gameStatus, null)
                             }
                             else -> continue
                         }
@@ -141,7 +127,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
                     TextEffectTimingTag.USED -> {
                         when(i.tag){
                             TextEffectTag.COST_BUFF -> {
-                                if(this.special_card_state == SpecialCardEnum.PLAYED) i.effect!!(player, gameStatus, null)
+                                if(this.special_card_state == SpecialCardEnum.PLAYED) i.effect!!(this.card_number, player, gameStatus, null)
                             }
                             else -> continue
                         }
@@ -150,7 +136,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
                         if((nap ?:0) >= 1 && card_data.card_type == CardType.ENCHANTMENT){
                             when(i.tag){
                                 TextEffectTag.COST_BUFF -> {
-                                    i.effect!!(player, gameStatus, null)
+                                    i.effect!!(this.card_number, player, gameStatus, null)
                                 }
                                 else -> continue
                             }
@@ -166,26 +152,17 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         if(card_data.sub_type == SubType.REACTION){
             return true
         }
-        card_data.effect?.let {
+        return card_data.effect?.let {
+            var result = false
             for(text in it){
-                when(text.timing_tag){
-                    TextEffectTimingTag.CONSTANT_EFFECT -> {
-                        when(text.tag){
-                            TextEffectTag.CAN_REACTABLE -> {
-                                if(text.effect!!(player, gameStatus, null)!! == 1){
-                                    return true
-                                }
-                                return false
-                            }
-                            else -> continue
-                        }
-                    }
-                    else -> continue
-
+                if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT && text.tag == TextEffectTag.CAN_REACTABLE){
+                    result =  text.effect!!(this.card_number, player, gameStatus, null)!! == 1
+                    break
                 }
+
             }
-        }
-        return false
+            result
+        }?: false
     }
 
     fun canReactable(attack: MadeAttack): Boolean{
@@ -214,7 +191,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
                 for(text in it){
                     if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
                         if(text.tag == TextEffectTag.ADJUST_NAP){
-                            return text.effect!!(player, gamestatus, react_attack)!!
+                            return text.effect!!(this.card_number, player, gamestatus, react_attack)!!
                         }
                     }
                 }
@@ -229,7 +206,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
                     if(text.tag == TextEffectTag.COST_X){
-                        text.effect!!(player, gameStatus, null)!!
+                        text.effect!!(this.card_number, player, gameStatus, null)!!
                     }
                 }
             }
@@ -241,7 +218,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         card_data.effect?.let {
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT && text.tag == TextEffectTag.USING_CONDITION){
-                    if(text.effect!!(player, game_status, react_attack)!! == 1){
+                    if(text.effect!!(this.card_number, player, game_status, react_attack)!! == 1){
                         return true
                     }
                     return false
@@ -251,9 +228,16 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         return true
     }
 
-    suspend fun makeAttack(player: PlayerEnum, gameStatus: GameStatus): MadeAttack{
-        this.addAttackBuff(player, gameStatus)
+    suspend fun makeAttack(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?): MadeAttack{
+        card_data.effect?.let {
+            for(text in it){
+                if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT && text.tag == TextEffectTag.NEXT_ATTACK_ENCHANTMENT){
+                    text.effect!!(this.card_number, player, game_status, react_attack)
+                }
+            }
+        }
         return MadeAttack(
+            card_number = this.card_number,
             card_class = this.card_data.card_class,
             distance_type = this.card_data.distance_type!!,
             life_damage = this.card_data.life_damage!!,
@@ -289,8 +273,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
 
         when(card_data.card_type){
             CardType.ATTACK -> {
-                if(gameStatus.addPreAttackZone(player, this.makeAttack(player, gameStatus).addAttackAndReturn(this.card_data))){
-                    println(gameStatus.getPlayer(player).pre_attack_card!!)
+                if(gameStatus.addPreAttackZone(player, this.makeAttack(player, gameStatus, react_attack).addAttackAndReturn(this.card_data))){
                     return cost
                 }
                 if(card_data.card_class == CardClass.SPECIAL){
@@ -305,36 +288,43 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         return cost
     }
 
-    suspend fun attackUseNormal(player: PlayerEnum, gamestatus: GameStatus, react_attack: MadeAttack?){
-        gamestatus.afterMakeAttack(this.card_number, player, react_attack)
+    suspend fun attackUseNormal(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?){
+        game_status.afterMakeAttack(this.card_number, player, react_attack)
     }
 
-    suspend fun behaviorUseNormal(player: PlayerEnum, gamestatus: GameStatus, react_attack: MadeAttack?){
+    suspend fun behaviorUseNormal(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?){
         card_data.effect?.let {
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.USING){
-                    text.effect!!(player, gamestatus, react_attack)
+                    when(text.tag){
+                        TextEffectTag.MAKE_ATTACK -> {
+                            text.effect!!(this.card_number, player, game_status, null)
+                            game_status.afterMakeAttack(this.card_number, player, null)
+                        }
+                        else -> text.effect!!(this.card_number, player, game_status, react_attack)
+                    }
+
                 }
             }
         }
     }
 
-    suspend fun enchantmentUseNormal(player: PlayerEnum, gamestatus: GameStatus, react_attack: MadeAttack?) {
-        val now_need_nap = returnNap(player, gamestatus, react_attack)
-        if (now_need_nap > gamestatus.getPlayerAura(player) + gamestatus.dust) {
-            gamestatus.dustToCard(player, gamestatus.dust, this)
-            gamestatus.auraToCard(player, gamestatus.getPlayerAura(player), this)
+    suspend fun enchantmentUseNormal(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?) {
+        val now_need_nap = returnNap(player, game_status, react_attack)
+        if (now_need_nap > game_status.getPlayerAura(player) + game_status.dust) {
+            game_status.dustToCard(player, game_status.dust, this)
+            game_status.auraToCard(player, game_status.getPlayerAura(player), this)
         } else {
             while (true) {
                 val receive_data =
-                    receiveNapInformation(gamestatus.getSocket(player), now_need_nap, this.card_number)
+                    receiveNapInformation(game_status.getSocket(player), now_need_nap, this.card_number)
                 val aura = receive_data.first
                 val dust = receive_data.second
-                if (aura + dust != now_need_nap || gamestatus.getPlayerAura(player) < aura || gamestatus.dust < dust) {
+                if (aura + dust != now_need_nap || game_status.getPlayerAura(player) < aura || game_status.dust < dust) {
                     continue
                 }
-                gamestatus.auraToCard(player, aura, this)
-                gamestatus.dustToCard(player, dust, this)
+                game_status.auraToCard(player, aura, this)
+                game_status.dustToCard(player, dust, this)
                 break
             }
         }
@@ -342,19 +332,25 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         card_data.effect?.let {
             for (text in it) {
                 if(text.timing_tag == TextEffectTimingTag.START_DEPLOYMENT){
-                    text.effect!!(player, gamestatus, react_attack)
+                    when(text.tag){
+                        TextEffectTag.MAKE_ATTACK -> {
+                            text.effect!!(this.card_number, player, game_status, null)
+                            game_status.afterMakeAttack(this.card_number, player, null)
+                        }
+                        else -> text.effect!!(this.card_number, player, game_status, react_attack)
+                    }
                 }
             }
         }
     }
 
-    suspend fun use(player: PlayerEnum, gamestatus: GameStatus, react_attack: MadeAttack?){
+    suspend fun use(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?){
         this.card_data.effect?.let {
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
                     when(text.tag){
-                        TextEffectTag.END_TURN -> {
-                            text.effect!!(player, gamestatus, react_attack)
+                        TextEffectTag.TERMINATION -> {
+                            game_status.setEndTurn(player, true)
                         }
                         else -> {
 
@@ -366,18 +362,18 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
 
         when(this.card_data.card_type){
             CardType.ATTACK -> {
-                attackUseNormal(player, gamestatus, react_attack)
+                attackUseNormal(player, game_status, react_attack)
             }
             CardType.BEHAVIOR -> {
-                behaviorUseNormal(player, gamestatus, react_attack)
+                behaviorUseNormal(player, game_status, react_attack)
             }
             CardType.ENCHANTMENT -> {
-                enchantmentUseNormal(player, gamestatus, react_attack)
+                enchantmentUseNormal(player, game_status, react_attack)
             }
             CardType.UNDEFINED -> {}
         }
 
-        gamestatus.afterCardUsed(gamestatus, player, this)
+        game_status.afterCardUsed(game_status, player, this)
     }
 
     fun chasmCheck(): Boolean{
@@ -395,10 +391,10 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
                 if(text.tag == TextEffectTag.CHANGE_SWELL_DISTANCE){
                     when(text.timing_tag){
                         TextEffectTimingTag.IN_DEPLOYMENT -> {
-                            if((this.nap ?: -1) > 0 && this.card_data.card_type == CardType.ENCHANTMENT) return text.effect!!(player, game_status, null)!!
+                            if((this.nap ?: -1) > 0 && this.card_data.card_type == CardType.ENCHANTMENT) return text.effect!!(this.card_number, player, game_status, null)!!
                         }
                         TextEffectTimingTag.USED -> {
-                            if(this.special_card_state == SpecialCardEnum.PLAYED) return text.effect!!(player, game_status, null)!!
+                            if(this.special_card_state == SpecialCardEnum.PLAYED) return text.effect!!(this.card_number, player, game_status, null)!!
                         }
                         else -> continue
                     }
@@ -429,7 +425,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
             var check = false
             for (text in it){
                 if(text.timing_tag == TextEffectTimingTag.USED && text.tag == TextEffectTag.RETURN){
-                    if(text.effect!!(player, game_status, null) == 1) {
+                    if(text.effect!!(this.card_number, player, game_status, null) == 1) {
                         check = true
                         break
                     }
@@ -437,6 +433,16 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
             }
             check
         }?: false
+    }
+
+    suspend fun addReturnListener(player: PlayerEnum, game_status: GameStatus){
+        this.card_data.effect?.let{
+            for(text in it){
+                if(text.tag == TextEffectTag.IMMEDIATE_RETURN){
+                    text.effect!!(this.card_number, player, game_status, null)
+                }
+            }
+        }
     }
 
 }

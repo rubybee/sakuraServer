@@ -105,6 +105,7 @@ suspend fun sendRequestReact(mine: Connection){
 }
 
 suspend fun sendMoveToken(mine: Connection, other: Connection, what: TokenEnum, from: LocationEnum, to: LocationEnum, number: Int, card_number: Int){
+    if(number == 0) return
     val pre_data = SakuraCardCommand(MOVE_TOKEN, card_number)
     mine.session.send(Json.encodeToString(pre_data))
     other.session.send(Json.encodeToString(pre_data))

@@ -138,6 +138,13 @@ suspend fun sendUseCardMeesage(mine: Connection, other: Connection, reaction: Bo
     other.session.send(Json.encodeToString(data_other))
 }
 
+suspend fun sendSetShrink(mine: Connection, other: Connection){
+    val data_your = SakuraCardCommand(REMOVE_SHRINK_YOUR, -1)
+    val data_other = SakuraCardCommand(REMOVE_SHRINK_OTHER, -1)
+    mine.session.send(Json.encodeToString(data_your))
+    other.session.send(Json.encodeToString(data_other))
+}
+
 suspend fun sendRemoveShrink(mine: Connection, other: Connection){
     val data_your = SakuraCardCommand(REMOVE_SHRINK_YOUR, -1)
     val data_other = SakuraCardCommand(REMOVE_SHRINK_OTHER, -1)

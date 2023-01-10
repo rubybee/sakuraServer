@@ -131,26 +131,26 @@ object CardSet {
     private fun yurinaCardInit(){
         cham.setAttack(DistanceType.CONTINUOUS, Pair(3, 4), null, 3, 1)
         ilsom.setAttack(DistanceType.CONTINUOUS, Pair(3, 3), null, 2, 2)
-        ilsom.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {_, player, game_status, _->
+        ilsom.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
             if (gulSa(player, game_status)) {
-                game_status.addThisTurnAttackBuff(player, Buff(CardName.YURINA_ILSUM, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
+                game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
                     madeAttack.auraPlusMinus(1)
                 }))
             }
             null
         })
         jaru_chigi.setAttack(DistanceType.CONTINUOUS, Pair(1, 2), null, 2, 1)
-        jaru_chigi.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {_, player, game_status, _ ->
+        jaru_chigi.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _ ->
             if (gulSa(player, game_status)) {
-                game_status.addThisTurnAttackBuff(player, Buff(CardName.YURINA_JARUCHIGI, 1, BufTag.PLUS_MINUS, {_, _, _ -> true}, {madeAttack ->
+                game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS, {_, _, _ -> true}, {madeAttack ->
                     madeAttack.auraPlusMinus(1)
                 }))
             }
             null
         })
         guhab.setAttack(DistanceType.CONTINUOUS, Pair(2, 4), null, 4, 3)
-        guhab.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {_, player, game_status, _ ->
-            game_status.addThisTurnAttackBuff(player, Buff(CardName.YURINA_GUHAB, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
+        guhab.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _ ->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
                 if(game_status.thisTurnDistance <= 2){
                     madeAttack.lifePlusMinus(-1); madeAttack.auraPlusMinus(-1)
                 }
@@ -161,12 +161,14 @@ object CardSet {
             game_status.addConcentration(player)
             null
         })
-        giback.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {_, player, game_status, _->
-            game_status.addThisTurnRangeBuff(player, RangeBuff(CardName.YURINA_GIBACK,1, RangeBufTag.ADD, {_, _, attack -> (attack.megami != MegamiEnum.YURINA) && (attack.card_class != CardClass.SPECIAL)},
-                { attack -> attack.run{
-                    addRange(1, true); canNotReactNormal()
-                }
+        giback.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnRangeBuff(player, RangeBuff(card_number,1, RangeBufTag.ADD, {_, _, attack -> (attack.megami != MegamiEnum.YURINA) && (attack.card_class != CardClass.SPECIAL)},
+                { attack -> attack.addRange(1, true)
+
             }))
+            game_status.addThisTurnAttackBuff(player, Buff(card_number,1, BufTag.CHANGE_EACH, { _, _, attack -> (attack.megami != MegamiEnum.YURINA) && (attack.card_class != CardClass.SPECIAL)},
+                { attack -> attack.canNotReactNormal()
+                }))
             null
         })
         apdo.setEnchantment(2)
@@ -176,8 +178,8 @@ object CardSet {
             null
         })
         giyenbanzo.setEnchantment(4)
-        giyenbanzo.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT){_, player, game_status, _ ->
-            game_status.addThisTurnAttackBuff(player, Buff(CardName.YURINA_GIYENBANJO, 1, BufTag.PLUS_MINUS_IMMEDIATE, { _, _, _ -> true}, { madeAttack ->
+        giyenbanzo.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT){card_number, player, game_status, _ ->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, { _, _, _ -> true}, { madeAttack ->
                 if(madeAttack.megami != MegamiEnum.YURINA && gulSa(player, game_status)) madeAttack.run {
                     Chogek(); auraPlusMinus(1); lifePlusMinus(1)
                 }
@@ -308,8 +310,8 @@ object CardSet {
             null
         })
         hangmunggongjin.setSpecial(8)
-        hangmunggongjin.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.COST_BUFF) {_, player, game_status, _->
-            game_status.addThisTurnCostBuff(player, CostBuff(CardName.SAINE_HANGMUNGGONGJIN, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, card -> (card.card_data.card_name == CardName.SAINE_HANGMUNGGONGJIN)}, {cost ->
+        hangmunggongjin.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.COST_BUFF) {card_number, player, game_status, _->
+            game_status.addThisTurnCostBuff(player, CostBuff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, card -> (card.card_data.card_name == CardName.SAINE_HANGMUNGGONGJIN)}, {cost ->
                 cost - game_status.getPlayerAura(player.Opposite())
             }))
             null
@@ -338,11 +340,124 @@ object CardSet {
         })
     }
 
+    private fun yeonwhaAttack(player: PlayerEnum, game_status: GameStatus): Boolean{
+        return game_status.logger.playerUseCardNumber(player) >= 2
+    }
+
+    private fun yeonwha(player: PlayerEnum, game_status: GameStatus): Boolean{
+        return game_status.logger.playerUseCardNumber(player) >= 3
+    }
+
+    private val shoot = CardData(CardClass.NORMAL, CardName.HIMIKA_SHOOT, MegamiEnum.HIMIKA, CardType.ATTACK, SubType.NONE)
+    private val rapidfire = CardData(CardClass.NORMAL, CardName.HIMIKA_RAPIDFIRE, MegamiEnum.HIMIKA, CardType.ATTACK, SubType.NONE)
+    private val magnumcanon = CardData(CardClass.NORMAL, CardName.HIMIKA_MAGNUMCANON, MegamiEnum.HIMIKA, CardType.ATTACK, SubType.NONE)
+    private val fullburst = CardData(CardClass.NORMAL, CardName.HIMIKA_FULLBURST, MegamiEnum.HIMIKA, CardType.ATTACK, SubType.FULLPOWER)
+    private val backstep = CardData(CardClass.NORMAL, CardName.HIMIKA_BACKSTEP, MegamiEnum.HIMIKA, CardType.BEHAVIOR, SubType.NONE)
+    private val backdraft = CardData(CardClass.NORMAL, CardName.HIMIKA_BACKDRAFT, MegamiEnum.HIMIKA, CardType.BEHAVIOR, SubType.NONE)
+    private val smoke = CardData(CardClass.NORMAL, CardName.HIMIKA_SMOKE, MegamiEnum.HIMIKA, CardType.ENCHANTMENT, SubType.NONE)
+    private val redbullet = CardData(CardClass.SPECIAL, CardName.HIMIKA_REDBULLET, MegamiEnum.HIMIKA, CardType.ATTACK, SubType.NONE)
+    private val crimsonzero = CardData(CardClass.SPECIAL, CardName.HIMIKA_CRIMSONZERO, MegamiEnum.HIMIKA, CardType.ATTACK, SubType.NONE)
+    private val scarletimagine = CardData(CardClass.SPECIAL, CardName.HIMIKA_SCARLETIMAGINE, MegamiEnum.HIMIKA, CardType.BEHAVIOR, SubType.NONE)
+    private val burmilionfield = CardData(CardClass.SPECIAL, CardName.HIMIKA_BURMILIONFIELD, MegamiEnum.HIMIKA, CardType.BEHAVIOR, SubType.NONE)
+
+    private fun himikaCardInit(){
+        shoot.setAttack(DistanceType.CONTINUOUS, Pair(4, 10), null, 2, 1)
+        rapidfire.setAttack(DistanceType.CONTINUOUS, Pair(6, 8), null, 2, 1)
+        rapidfire.addtext((Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            if (yeonwhaAttack(player, game_status)) {
+                game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
+                    madeAttack.auraPlusMinus(1)
+                    madeAttack.lifePlusMinus(1)
+                }))
+            }
+            null
+        }))
+        magnumcanon.setAttack(DistanceType.CONTINUOUS, Pair(5, 8), null, 3, 2)
+        magnumcanon.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
+            if(game_status.lifeToDust(player, 1)){
+                game_status.gameEnd(player.Opposite())
+            }
+            null
+        })
+        fullburst.setAttack(DistanceType.CONTINUOUS, Pair(5, 9), null, 3, 1)
+        fullburst.addtext((Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CHANGE_EACH_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
+                madeAttack.setBothSideDamage()
+            }))
+            null
+        }))
+        backstep.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.DRAW_CARD) {_, player, game_status, _ ->
+            game_status.drawCard(player, 1)
+            null
+        })
+        backstep.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, _, game_status, _ ->
+            game_status.dustToDistance(1)
+            null
+        })
+        backdraft.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_SHRINK) {_, player, game_status, _ ->
+            game_status.setShrink(player.Opposite())
+            null
+        })
+        backdraft.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            if(yeonwha(player, game_status)){
+                game_status.addThisTurnAttackBuff(player, Buff(card_number,1, BufTag.PLUS_MINUS, {_, _, attack -> (attack.megami != MegamiEnum.HIMIKA) && (attack.aura_damage != 999)},
+                    { attack -> attack.run{
+                        auraPlusMinus(1); lifePlusMinus(1)
+                    }
+                    }))
+            }
+            null
+        })
+        smoke.setEnchantment(3)
+        //FORBID_MOVE_TOKEN return ToLocationEnum * 100 + FromLocationEnum (if anywhere it will be 99)
+        smoke.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.FORBID_MOVE_TOKEN){_, _, _, _ ->
+            LocationEnum.DISTANCE.real_number * 100 + 99
+            null
+        })
+        redbullet.setAttack(DistanceType.CONTINUOUS, Pair(5, 10), null, 3, 1)
+        redbullet.setSpecial(0)
+        crimsonzero.setAttack(DistanceType.CONTINUOUS, Pair(0, 2), null, 2, 2)
+        crimsonzero.setSpecial(5)
+        crimsonzero.addtext((Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CHANGE_EACH_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
+                madeAttack.setBothSideDamage()
+            }))
+            null
+        }))
+        crimsonzero.addtext((Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CHANGE_EACH_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
+                madeAttack.canNotReact()
+            }))
+            null
+        }))
+        scarletimagine.setSpecial(3)
+        scarletimagine.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.DRAW_CARD) {_, player, game_status, _->
+            game_status.drawCard(player, 3)
+            null
+        })
+        scarletimagine.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CARD_TO_COVER) {_, player, game_status, _->
+            game_status.coverCard(player)
+            null
+        })
+        burmilionfield.setSpecial(2)
+        burmilionfield.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.DRAW_CARD) {_, player, game_status, _->
+            if(yeonwha(player, game_status)){
+                game_status.dustToDistance(2)
+            }
+            null
+        })
+        burmilionfield.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.RETURN){_, player, game_status, _ ->
+            if(game_status.getPlayerHandSize(player) <= 1) 1
+            else 0
+        })
+    }
+
     fun init(){
         hashMapInit()
 
         yurinaCardInit()
         saineCardInit()
+        himikaCardInit()
     }
 
     fun returnCardDataByName(card_name: CardName): CardData {
@@ -369,17 +484,17 @@ object CardSet {
             CardName.SAINE_HANGMUNGGONGJIN -> return hangmunggongjin
             CardName.SAINE_EMMOOSHOEBING -> return emmooshoebing
             CardName.SAINE_JONGGEK -> return jonggek
-            CardName.HIMIKA_SHOOT -> TODO()
-            CardName.HIMIKA_RAPIDFIRE -> TODO()
-            CardName.HIMIKA_MAGNUMCANON -> TODO()
-            CardName.HIMIKA_FULLBURST -> TODO()
-            CardName.HIMIKA_BACKSTEP -> TODO()
-            CardName.HIMIKA_BACKDRAFT -> TODO()
-            CardName.HIMIKA_SMOKE -> TODO()
-            CardName.HIMIKA_REDBULLET -> TODO()
-            CardName.HIMIKA_CRIMSONZERO -> TODO()
-            CardName.HIMIKA_SCARLETIMAGINE -> TODO()
-            CardName.HIMIKA_BURMILIONFIELD -> TODO()
+            CardName.HIMIKA_SHOOT -> return shoot
+            CardName.HIMIKA_RAPIDFIRE -> return rapidfire
+            CardName.HIMIKA_MAGNUMCANON -> return magnumcanon
+            CardName.HIMIKA_FULLBURST -> return fullburst
+            CardName.HIMIKA_BACKSTEP -> return backstep
+            CardName.HIMIKA_BACKDRAFT -> return backdraft
+            CardName.HIMIKA_SMOKE -> return smoke
+            CardName.HIMIKA_REDBULLET -> return redbullet
+            CardName.HIMIKA_CRIMSONZERO -> return crimsonzero
+            CardName.HIMIKA_SCARLETIMAGINE -> return scarletimagine
+            CardName.HIMIKA_BURMILIONFIELD -> return burmilionfield
             CardName.TOKOYO_BITSUNERIGI -> TODO()
             CardName.TOKOYO_WOOAHHANTAGUCK -> TODO()
             CardName.TOKOYO_RUNNINGRABIT -> TODO()

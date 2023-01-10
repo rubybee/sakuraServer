@@ -3,16 +3,17 @@ package com.sakurageto.card
 import com.sakurageto.gamelogic.GameStatus
 
 //condition은 어떠한 공격에 어떠한것을 적용한다에서만 사용한다(다음 오라 3데미지 이하인 공격에 적용 등)
-class CostBuff(val cardName: CardName, var counter: Int, val tag: BufTag, val condition: (PlayerEnum, GameStatus, Card) -> Boolean, val effect: (Int) -> Int
+//양면 대미지와 대응불가의 경우 CHANGE_EACH_IMMEDIATE에 기입하였다
+class CostBuff(val cardNumber: Int, var counter: Int, val tag: BufTag, val condition: (PlayerEnum, GameStatus, Card) -> Boolean, val effect: (Int) -> Int
 )
 
 
 class Buff(
- val cardName: CardName, var counter: Int, val tag: BufTag, val condition: (PlayerEnum, GameStatus, MadeAttack) -> Boolean, val effect: (MadeAttack) -> Unit
+ val cardNumber: Int, var counter: Int, val tag: BufTag, val condition: (PlayerEnum, GameStatus, MadeAttack) -> Boolean, val effect: (MadeAttack) -> Unit
 )
 
 class RangeBuff(
-    val cardName: CardName, var counter: Int, val tag: RangeBufTag, val condition: (PlayerEnum, GameStatus, MadeAttack) -> Boolean, val effect: (MadeAttack) -> Unit
+    val cardNumber: Int, var counter: Int, val tag: RangeBufTag, val condition: (PlayerEnum, GameStatus, MadeAttack) -> Boolean, val effect: (MadeAttack) -> Unit
 )
 
 fun cleanAttackBuff(array: Array<ArrayDeque<Buff>>){

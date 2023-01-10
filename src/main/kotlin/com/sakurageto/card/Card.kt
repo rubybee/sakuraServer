@@ -445,4 +445,16 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         }
     }
 
+    suspend fun forbidTokenMove(player: PlayerEnum, game_status: GameStatus): Int{
+        this.card_data.effect?.let{
+            for(text in it){
+                if (text.timing_tag == TextEffectTimingTag.IN_DEPLOYMENT && text.tag == TextEffectTag.DAMAGE_AURA_REPLACEABLE_HERE && (nap
+                        ?: -1) > 0
+                ) {
+                    return text.effect!!(this.card_number, player, game_status, null)!!
+                }
+            }
+        }
+        return -1
+    }
 }

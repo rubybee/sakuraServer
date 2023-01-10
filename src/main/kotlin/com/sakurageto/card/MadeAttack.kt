@@ -13,7 +13,12 @@ class MadeAttack(
     var distance_uncont: Array<Boolean>?,
     var megami: MegamiEnum
 ) {
-    var is_it_valid = true
+    var isItValid= true
+    var bothSideDamage = false
+
+    fun setBothSideDamage(){
+        bothSideDamage = true
+    }
 
     constructor(card_number: Int, card_class: CardClass, distance_type: DistanceType, aura_damage: Int, life_damage: Int,
                 distance_cont: Pair<Int, Int>?, distance_uncont: Array<Boolean>?, megami: MegamiEnum,
@@ -68,6 +73,10 @@ class MadeAttack(
         cannot_react_normal = true
     }
 
+    fun canNotReact(){
+        cannot_react = true
+    }
+
     //closable true -> increment range from left
     fun addRange(number: Int, closable: Boolean){
         when(distance_type){
@@ -120,6 +129,7 @@ class MadeAttack(
         }
     }
 
+    //it is true if it can use
     fun rangeCheck(now_range: Int): Boolean{
         return when(distance_type){
             DistanceType.DISCONTINUOUS -> distance_uncont!![now_range]

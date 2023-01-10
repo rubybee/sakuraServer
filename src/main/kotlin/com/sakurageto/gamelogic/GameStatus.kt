@@ -12,6 +12,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         const val swellDistance = 2
     }
 
+    val logger = Logger()
+
     var startDistance = 10
 
     suspend fun getAdjustSwellDistance(player: PlayerEnum): Int{
@@ -55,6 +57,61 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         else cardNameHashmapSecond[card_name]?: -1
     }
 
+    fun getPlayerLife(player: PlayerEnum): Int{
+        return when (player){
+            PlayerEnum.PLAYER1 -> player1.life
+            PlayerEnum.PLAYER2 -> player2.life
+        }
+    }
+
+    fun getPlayerAura(player: PlayerEnum): Int{
+        return when (player){
+            PlayerEnum.PLAYER1 -> player1.aura
+            PlayerEnum.PLAYER2 -> player2.aura
+        }
+    }
+
+    fun getPlayerFullAction(player: PlayerEnum): Boolean{
+        return when (player){
+            PlayerEnum.PLAYER1 -> player1.full_action
+            PlayerEnum.PLAYER2 -> player2.full_action
+        }
+    }
+
+    fun getPlayerFlare(player: PlayerEnum): Int{
+        return when(player){
+            PlayerEnum.PLAYER1 -> player1.flare
+            PlayerEnum.PLAYER2 -> player2.flare
+        }
+    }
+
+    fun getEndTurn(player: PlayerEnum): Boolean{
+        return when(player){
+            PlayerEnum.PLAYER1 -> player1.end_turn
+            PlayerEnum.PLAYER2 -> player2.end_turn
+        }
+    }
+
+    fun getPlayerHandSize(player: PlayerEnum): Int{
+        return when(player){
+            PlayerEnum.PLAYER1 -> player1.hand.size
+            PlayerEnum.PLAYER2 -> player2.hand.size
+        }
+    }
+
+    fun setPlayerFullAction(player: PlayerEnum, full: Boolean){
+        when (player){
+            PlayerEnum.PLAYER1 -> player1.full_action = full
+            PlayerEnum.PLAYER2 -> player2.full_action = full
+        }
+    }
+
+    suspend fun setShrink(player: PlayerEnum){
+        val nowPlayer = getPlayer(player)
+        nowPlayer.shrink = true
+        sendSetShrink(getSocket(player), getSocket(player.Opposite()))
+    }
+
     fun setFirstTurn(player: PlayerEnum){
         first_turn = player
         when(player){
@@ -66,6 +123,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 player2.first_turn = true
                 player1.concentration = 1
             }
+        }
+    }
+
+    fun setEndTurn(player: PlayerEnum, turn: Boolean){
+        when(player){
+            PlayerEnum.PLAYER1 -> player1.end_turn = turn
+            PlayerEnum.PLAYER2 -> player2.end_turn = turn
         }
     }
 
@@ -86,6 +150,23 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             TODO("부여패에서 다른곳으로 보내느 카드 추가시 이곳에서 추가해야 됨")
         }
     }
+
+    //true means cannot move
+    suspend fun moveTokenCheck(from: LocationEnum, to: LocationEnum): Boolean{
+        var now: Int
+        for(card in player1.enchantment_card.values){
+            now = card.forbidTokenMove(PlayerEnum.PLAYER1, this)
+            if(now == -1) continue
+            if(now % 100 == from.real_number || now / 100 == to.real_number) return true
+        }
+        for(card in player2.enchantment_card.values){
+            now = card.forbidTokenMove(PlayerEnum.PLAYER2, this)
+            if(now == -1) continue
+            if(now % 100 == from.real_number || now / 100 == to.real_number) return true
+        }
+        return false
+    }
+
 
     suspend fun auraToDistance(player: PlayerEnum, number: Int){
         if(number == 0) return
@@ -118,6 +199,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun distanceToDust(number: Int){
+        if(moveTokenCheck(LocationEnum.DISTANCE, LocationEnum.DUST) || number == 0) return
+
         var value = number
 
         if(distanceToken < value){
@@ -134,6 +217,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun dustToDistance(number: Int){
+        if(number == 0) return
         var value = number
 
         if(distanceToken + value > 10){
@@ -154,6 +238,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun distanceToAura(player: PlayerEnum, number: Int){
+        if(moveTokenCheck(LocationEnum.DISTANCE, LocationEnum.YOUR_AURA) || number == 0) return
+
         var value = number
         val nowPlayer = getPlayer(player)
         val emptyPlace = nowPlayer.maxAura - nowPlayer.aura - nowPlayer.freezeToken
@@ -357,15 +443,36 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
+    suspend fun lifeToDust(player: PlayerEnum, number: Int): Boolean{
+        val nowPlayer = getPlayer(player)
+
+        val before = nowPlayer.life
+
+        if(nowPlayer.life > number){
+            nowPlayer.life -= number
+            dust += number
+        }
+        else{
+            return true
+        }
+
+        lifeListnerProcess(player, before, false)
+        chasmProcess(player)
+
+        sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
+            LocationEnum.YOUR_LIFE, LocationEnum.DUST, number, -1)
+        return false
+    }
+
     //return endgame
     suspend fun lifeToSelfFlare(player: PlayerEnum, number: Int, reconstruct: Boolean): Boolean{
-        val now_player = getPlayer(player)
+        val nowPlayer = getPlayer(player)
 
-        val before = now_player.life
+        val before = nowPlayer.life
 
-        if(now_player.life > number){
-            now_player.life -= number
-            now_player.flare += number
+        if(nowPlayer.life > number){
+            nowPlayer.life -= number
+            nowPlayer.flare += number
         }
         else{
             return true
@@ -533,54 +640,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             false
         }
     }
-    fun getPlayerLife(player: PlayerEnum): Int{
-        return when (player){
-            PlayerEnum.PLAYER1 -> player1.life
-            PlayerEnum.PLAYER2 -> player2.life
-        }
-    }
-
-    fun getPlayerAura(player: PlayerEnum): Int{
-        return when (player){
-            PlayerEnum.PLAYER1 -> player1.aura
-            PlayerEnum.PLAYER2 -> player2.aura
-        }
-    }
-
-    fun getPlayerFullAction(player: PlayerEnum): Boolean{
-        return when (player){
-            PlayerEnum.PLAYER1 -> player1.full_action
-            PlayerEnum.PLAYER2 -> player2.full_action
-        }
-    }
-
-    fun setPlayerFullAction(player: PlayerEnum, full: Boolean){
-        when (player){
-            PlayerEnum.PLAYER1 -> player1.full_action = full
-            PlayerEnum.PLAYER2 -> player2.full_action = full
-        }
-    }
-
-    fun getPlayerFlare(player: PlayerEnum): Int{
-        return when(player){
-            PlayerEnum.PLAYER1 -> player1.flare
-            PlayerEnum.PLAYER2 -> player2.flare
-        }
-    }
-
-    fun getEndTurn(player: PlayerEnum): Boolean{
-        return when(player){
-            PlayerEnum.PLAYER1 -> player1.end_turn
-            PlayerEnum.PLAYER2 -> player2.end_turn
-        }
-    }
-
-    fun setEndTurn(player: PlayerEnum, turn: Boolean){
-        when(player){
-            PlayerEnum.PLAYER1 -> player1.end_turn = turn
-            PlayerEnum.PLAYER2 -> player2.end_turn = turn
-        }
-    }
 
     fun addThisTurnCostBuff(player: PlayerEnum, effect: CostBuff){
         when (player){
@@ -665,6 +724,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                             val cost = it.canUse(player.Opposite(), this, now_attack)
                             if(cost == -1){
                                 check_bit = false
+                                logger.insert(Log(player, LogText.USE_CARD_REACT, card_number, card_number))
                                 sendUseCardMeesage(other_socket, now_socket, true, it.card_number)
                                 other_player.useCardFromHand(it.card_number)
                                 it.use(player.Opposite(), this, now_attack)
@@ -686,6 +746,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                             if(cost >= 0){
                                 check_bit = false
                                 it.special_card_state = SpecialCardEnum.PLAYING
+                                logger.insert(Log(player, LogText.USE_CARD_REACT, card_number, card_number))
                                 sendUseCardMeesage(other_socket, now_socket, true, it.card_number)
                                 flareToDust(player.Opposite(), cost)
                                 other_player.useCardFromSpecial(it.card_number)
@@ -707,10 +768,16 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
         }
 
-        if(now_attack.is_it_valid){
+        if(now_attack.isItValid && now_attack.rangeCheck(thisTurnDistance)){
             sendChooseDamage(other_socket, CommandEnum.CHOOSE_CARD_DAMAGE, now_attack.aura_damage, now_attack.life_damage)
             val chosen = receiveChooseDamage(other_socket)
-            processDamage(player.Opposite(), chosen, Pair(now_attack.aura_damage, now_attack.life_damage), false)
+            if(now_attack.bothSideDamage){
+                auraToDust(player.Opposite(), now_attack.aura_damage)
+                lifeToSelfFlare(player.Opposite(), now_attack.life_damage, false)
+            }
+            else{
+                processDamage(player.Opposite(), chosen, Pair(now_attack.aura_damage, now_attack.life_damage), false)
+            }
             now_attack.afterAttackProcess(player, this, react_attack)
         }
     }
@@ -1053,6 +1120,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
            }
         }
         thisTurnDistance = distanceToken
+        logger.reset()
     }
 
     suspend fun deckReconstruct(player: PlayerEnum, damage: Boolean){
@@ -1085,6 +1153,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 val cost = it.canUse(player, this, null)
                 if(cost == -1){
                     using_successly = true
+                    logger.insert(Log(player, LogText.USE_CARD, card_number, card_number))
                     sendUseCardMeesage(now_socket, other_socket, false, it.card_number)
                     now_player.useCardFromHand(it.card_number)
                     it.use(player, this, null)
@@ -1097,6 +1166,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 if(cost >= 0){
                     using_successly = true
                     it.special_card_state = SpecialCardEnum.PLAYING
+                    logger.insert(Log(player, LogText.USE_CARD, card_number, card_number))
                     sendUseCardMeesage(now_socket, other_socket,false, it.card_number)
                     flareToDust(player, cost)
                     now_player.useCardFromSpecial(it.card_number)
@@ -1241,25 +1311,34 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    suspend fun endTurnHandCheck(player: PlayerEnum){
-        val now_player = getPlayer(player)
+    suspend fun coverCard(player: PlayerEnum){
+        val nowPlayer = getPlayer(player)
+        val nowSocket = getSocket(player)
 
-        val now_socket = getSocket(player)
+        for(card in nowPlayer.hand.values){
+            if(card.card_data.can_cover){
+                val cardName = receiveCoverCardSelect(nowSocket)
+                if(nowPlayer.fromHandToCover(cardName)){
+                    sendHandToCover(getSocket(player), getSocket(player.Opposite()), cardName, false)
+                    return
+                }
+                else{
+                    coverCard(player)
+                    return
+                }
+            }
+        }
+    }
+
+    suspend fun endTurnHandCheck(player: PlayerEnum){
+        val nowPlayer = getPlayer(player)
 
         while (true){
-            if(now_player.hand.size <= now_player.max_hand){
+            if(nowPlayer.hand.size <= nowPlayer.max_hand){
                 return
             }
 
-            for(card in now_player.hand.values){
-                if(card.card_data.can_cover){
-                    val card_name = receiveCoverCardSelect(now_socket)
-                    if(now_player.fromHandToCover(card_name)){
-                        sendHandToCover(getSocket(player), getSocket(player.Opposite()), card_name, false)
-                    }
-                    break
-                }
-            }
+            coverCard(player)
         }
     }
 }

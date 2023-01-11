@@ -373,7 +373,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
             CardType.UNDEFINED -> {}
         }
 
-        game_status.afterCardUsed(game_status, player, this)
+        game_status.afterCardUsed(this.card_number, player)
     }
 
     fun chasmCheck(): Boolean{

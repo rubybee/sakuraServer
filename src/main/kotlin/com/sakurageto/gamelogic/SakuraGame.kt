@@ -147,8 +147,8 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
 
         val send_request_player1 = SakuraCardSetSend(CommandEnum.SELECT_CARD, game_status.player1.unselected_card, game_status.player1.unselected_specialcard)
         val send_request_player2 = SakuraCardSetSend(CommandEnum.SELECT_CARD, game_status.player2.unselected_card, game_status.player2.unselected_specialcard)
-        val send_othersinformation_player1 = SakuraCardSetSend(CommandEnum.SELECT_CARD_OTHER_PLAYERS, game_status.player2.unselected_card, game_status.player2.unselected_card)
-        val send_othersinformation_player2 = SakuraCardSetSend(CommandEnum.SELECT_CARD_OTHER_PLAYERS, game_status.player1.unselected_card, game_status.player1.unselected_card)
+        val send_othersinformation_player1 = SakuraCardSetSend(CommandEnum.SELECT_CARD_OTHER_PLAYERS, game_status.player2.unselected_card, game_status.player2.unselected_specialcard)
+        val send_othersinformation_player2 = SakuraCardSetSend(CommandEnum.SELECT_CARD_OTHER_PLAYERS, game_status.player1.unselected_card, game_status.player1.unselected_specialcard)
 
         player1.session.send(Json.encodeToString(send_request_player1))
         player2.session.send(Json.encodeToString(send_request_player2))
@@ -158,32 +158,30 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
         val player1_data = waitCardSetUntil(player1, CommandEnum.SELECT_CARD)
         val player2_data = waitCardSetUntil(player2, CommandEnum.SELECT_CARD)
 
-        var card_data_player1: MutableList<CardName>
-        var specialcard_data_player1: MutableList<CardName>
-        var card_data_player2 : MutableList<CardName>
-        var specialcard_data_player2 : MutableList<CardName>
+        var card_data_player1: MutableList<CardName> = mutableListOf()
+        var specialcard_data_player1: MutableList<CardName> = mutableListOf()
+        var card_data_player2 : MutableList<CardName> = mutableListOf()
+        var specialcard_data_player2 : MutableList<CardName> = mutableListOf()
 
-        card_data_player1 = if(checkCardSet(game_status.player1.unselected_card, player1_data.normal_card, 7))
-            player1_data.normal_card!!
+        if(checkCardSet(game_status.player1.unselected_card, player1_data.normal_card, 7))
+            card_data_player1.addAll(player1_data.normal_card!!)
         else
-            game_status.player1.unselected_card.subList(0, 7)
+            card_data_player1.addAll(game_status.player1.unselected_card.subList(0, 7))
 
-        card_data_player2 = if(checkCardSet(game_status.player2.unselected_card, player2_data.normal_card, 7))
-            player2_data.normal_card!!
+        if(checkCardSet(game_status.player2.unselected_card, player2_data.normal_card, 7))
+            card_data_player2.addAll(player2_data.normal_card!!)
         else
-            game_status.player2.unselected_card.subList(0, 7)
+            card_data_player2.addAll(game_status.player2.unselected_card.subList(0, 7))
 
-        specialcard_data_player1 =
-            if(checkCardSet(game_status.player1.unselected_specialcard, player1_data.special_card, 3))
-                player1_data.special_card!!
-            else
-                game_status.player1.unselected_specialcard.subList(0, 3)
+        if(checkCardSet(game_status.player1.unselected_specialcard, player1_data.special_card, 3))
+            specialcard_data_player1.addAll(player1_data.special_card!!)
+        else
+            specialcard_data_player1.addAll(game_status.player1.unselected_specialcard.subList(0, 3))
 
-        specialcard_data_player2 =
-            if(checkCardSet(game_status.player2.unselected_specialcard, player2_data.special_card, 3))
-                player2_data.special_card!!
-            else
-                game_status.player2.unselected_specialcard.subList(0, 3)
+        if(checkCardSet(game_status.player2.unselected_specialcard, player2_data.special_card, 3))
+            specialcard_data_player2.addAll(player2_data.special_card!!)
+        else
+            specialcard_data_player2.addAll(game_status.player2.unselected_specialcard.subList(0, 3))
 
         val end_player1_select = SakuraCardSetSend(CommandEnum.END_SELECT_CARD, card_data_player1, specialcard_data_player1)
         val end_player2_select = SakuraCardSetSend(CommandEnum.END_SELECT_CARD, card_data_player2, specialcard_data_player2)

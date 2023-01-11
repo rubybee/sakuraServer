@@ -1,0 +1,94 @@
+카드 선택
+{
+    "command": "SELECT_CARD",
+    "normal_card": [
+        "YURINA_CHAM",
+        "YURINA_ILSUM",
+        "YURINA_JARUCHIGI",
+        "YURINA_GUHAB",
+        "YURINA_GIBACK",
+        "YURINA_APDO",
+        "YURINA_GIYENBANJO"
+    ],
+    "special_card": [
+        "YURINA_WOLYUNGNACK",
+        "YURINA_POBARAM",
+        "YURINA_JJOCKBAE"
+    ]
+}
+
+카드 선택
+{
+    "command": "SELECT_CARD",
+    "normal_card": [
+        "YURINA_CHAM",
+        "YURINA_ILSUM",
+        "SAINE_MOOGECHOO",
+        "SAINE_DOUBLEBEGI",
+        "YURINA_GIBACK",
+        "SAINE_CHOONGEMJUNG",
+        "YURINA_GIYENBANJO"
+    ],
+    "special_card": [
+        "SAINE_YULDONGHOGEK",
+        "YURINA_POBARAM",
+        "SAINE_EMMOOSHOEBING"
+    ]
+}
+
+카드 선택
+{
+    "command": "SELECT_CARD",
+    "normal_card": [
+        "YURINA_CHAM",
+        "YURINA_ILSUM",
+        "YURINA_JARUCHIGI",
+        "SAINE_MOOGECHOO",
+        "SAINE_GANPA",
+        "SAINE_MOOEMBUCK",
+        "YURINA_APDO"
+    ],
+    "special_card": [
+        "YURINA_JJOCKBAE",
+        "YURINA_JURUCK",
+        "SAINE_HANGMUNGGONGJIN"
+    ]
+}
+
+카드선택
+{
+    "command": "SELECT_CARD",
+    "normal_card": [
+        "SAINE_GANPA",
+        "SAINE_GWONYUCK",
+        "SAINE_CHOONGEMJUNG",
+        "HIMIKA_SHOOT",
+        "HIMIKA_RAPIDFIRE",
+        "HIMIKA_MAGNUMCANON",
+        "HIMIKA_BACKSTEP"
+    ],
+    "special_card": [
+        "SAINE_JONGGEK",
+        "HIMIKA_SCARLETIMAGINE",
+        "HIMIKA_BURMILIONFIELD"
+    ]
+}
+
+카드선택
+{
+    "command": "SELECT_CARD",
+    "normal_card": [
+        "SAINE_HURUBEGI",
+        "SAINE_DOUBLEBEGI",
+        "SAINE_CHOONGEMJUNG",
+        "HIMIKA_FULLBURST",
+        "HIMIKA_BACKSTEP",
+        "HIMIKA_BACKDRAFT",
+        "HIMIKA_SMOKE"
+    ],
+    "special_card": [
+        "SAINE_YULDONGHOGEK",
+        "HIMIKA_REDBULLET",
+        "HIMIKA_CRIMSONZERO"
+    ]
+}

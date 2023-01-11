@@ -151,7 +151,7 @@ object CardSet {
         guhab.setAttack(DistanceType.CONTINUOUS, Pair(2, 4), null, 4, 3)
         guhab.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _ ->
             game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
-                if(game_status.thisTurnDistance <= 2){
+                if(game_status.getDistance() <= 2){
                     madeAttack.lifePlusMinus(-1); madeAttack.auraPlusMinus(-1)
                 }
             }))
@@ -253,14 +253,14 @@ object CardSet {
             if(palSang(player, game_status)) 1
             else 0
         })
-        ganpa.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_ATTACK) {_, player, game_status, _ ->
+        ganpa.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
             while(true){
                 val nowCommand = game_status.receiveCardEffectSelect(player)
-                if(nowCommand == CommandEnum.SELECT_DUST_TO_DISTANCE){
+                if(nowCommand == CommandEnum.SELECT_ONE){
                     game_status.dustToDistance(1)
                     break
                 }
-                else if(nowCommand == CommandEnum.SELECT_DISTANCE_TO_DUST){
+                else if(nowCommand == CommandEnum.SELECT_TWO){
                     game_status.distanceToDust(1)
                     break
                 }
@@ -409,7 +409,7 @@ object CardSet {
             null
         })
         smoke.setEnchantment(3)
-        //FORBID_MOVE_TOKEN return ToLocationEnum * 100 + FromLocationEnum (if anywhere it will be 99)
+        //FORBID_MOVE_TOKEN return FromLocationEnum * 100 + ToLocationEnum (if anywhere it will be 99)
         smoke.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.FORBID_MOVE_TOKEN){_, _, _, _ ->
             LocationEnum.DISTANCE.real_number * 100 + 99
             null
@@ -425,9 +425,11 @@ object CardSet {
             null
         }))
         crimsonzero.addtext((Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
-            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CHANGE_EACH_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
-                madeAttack.canNotReact()
-            }))
+            if(game_status.getDistance() == 0){
+                game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CHANGE_EACH_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
+                    madeAttack.canNotReact()
+                }))
+            }
             null
         }))
         scarletimagine.setSpecial(3)
@@ -447,8 +449,121 @@ object CardSet {
             null
         })
         burmilionfield.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.RETURN){_, player, game_status, _ ->
-            if(game_status.getPlayerHandSize(player) <= 1) 1
+            if(game_status.getPlayerHandSize(player) == 0) 1
             else 0
+        })
+    }
+
+    private fun kyochi(player: PlayerEnum, game_status: GameStatus): Boolean{
+        return game_status.getConcentration(player) == 2
+    }
+
+    private val bitsunerigi = CardData(CardClass.NORMAL, CardName.TOKOYO_BITSUNERIGI, MegamiEnum.TOKOYO, CardType.ATTACK, SubType.NONE)
+    private val wooahhantaguck = CardData(CardClass.NORMAL, CardName.TOKOYO_WOOAHHANTAGUCK, MegamiEnum.TOKOYO, CardType.ATTACK, SubType.REACTION)
+    private val runningrabit = CardData(CardClass.NORMAL, CardName.TOKOYO_RUNNINGRABIT, MegamiEnum.TOKOYO, CardType.BEHAVIOR, SubType.NONE)
+    private val poetdance = CardData(CardClass.NORMAL, CardName.TOKOYO_POETDANCE, MegamiEnum.TOKOYO, CardType.BEHAVIOR, SubType.REACTION)
+    private val flipfan = CardData(CardClass.NORMAL, CardName.TOKOYO_FLIPFAN, MegamiEnum.TOKOYO, CardType.BEHAVIOR, SubType.FULLPOWER)
+    private val windstage = CardData(CardClass.NORMAL, CardName.TOKOYO_WINDSTAGE, MegamiEnum.TOKOYO, CardType.ENCHANTMENT, SubType.NONE)
+    private val sunstage = CardData(CardClass.NORMAL, CardName.TOKOYO_SUNSTAGE, MegamiEnum.TOKOYO, CardType.ENCHANTMENT, SubType.NONE)
+    private val kuon = CardData(CardClass.SPECIAL, CardName.TOKOYO_KUON, MegamiEnum.TOKOYO, CardType.ATTACK, SubType.REACTION)
+    private val thousandbird = CardData(CardClass.SPECIAL, CardName.TOKOYO_THOUSANDBIRD, MegamiEnum.TOKOYO, CardType.ATTACK, SubType.NONE)
+    private val endlesswind = CardData(CardClass.SPECIAL, CardName.TOKOYO_ENDLESSWIND, MegamiEnum.TOKOYO, CardType.ATTACK, SubType.NONE)
+    private val tokoyomoon = CardData(CardClass.SPECIAL, CardName.TOKOYO_TOKOYOMOON, MegamiEnum.TOKOYO, CardType.BEHAVIOR, SubType.NONE)
+
+    private fun tokoyoCardInit(){
+        bitsunerigi.setAttack(DistanceType.CONTINUOUS, Pair(4, 4), null, 999, 1)
+        bitsunerigi.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.CARD_DISCARD_PLACE_CHANGE) {_, player, game_status, _ ->
+            if(kyochi(player, game_status)){
+                game_status.movePlayingCard(player, LocationEnum.YOUR_DECK_TOP)
+            }
+            null
+        })
+        wooahhantaguck.setAttack(DistanceType.CONTINUOUS, Pair(2, 4), null, 2, 1)
+        wooahhantaguck.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.REACT_ATTACK_INVALID) {_, player, game_status, reactedAttack ->
+            if(kyochi(player, game_status) && reactedAttack?.card_class != CardClass.SPECIAL){
+                reactedAttack?.makeNotValid()
+            }
+            null
+        })
+        runningrabit.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _->
+            if(game_status.getDistance() <= 3){
+                game_status.dustToDistance(2)
+            }
+            null
+        })
+        poetdance.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _->
+            while(true){
+                val nowCommand = game_status.receiveCardEffectSelect(player)
+                if(nowCommand == CommandEnum.SELECT_ONE){
+                    game_status.flareToSelfAura(player, 1)
+                    break
+                }
+                else if(nowCommand == CommandEnum.SELECT_TWO){
+                    game_status.auraToDistance(player, 1)
+                    break
+                }
+            }
+            null
+        })
+        flipfan.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {_, player, game_status, _->
+            TODO()
+            null
+        })
+        windstage.setEnchantment(2)
+        windstage.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
+            game_status.distanceToAura(player, 2)
+            null
+        })
+        windstage.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
+            game_status.auraToDistance(player, 2)
+            null
+        })
+        sunstage.setEnchantment(2)
+        sunstage.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.TERMINATION){_, _, _, _->
+            null
+        })
+        sunstage.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.CHANGE_CONCENTRATION) {_, player, game_status, _ ->
+            game_status.setConcentration(player, 2)
+            null
+        })
+        sunstage.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
+            game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 999,  1, Pair(3, 6), null, MegamiEnum.TOKOYO))
+            null
+        })
+        kuon.setSpecial(5)
+        kuon.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.CARD_DISCARD_PLACE_CHANGE) {_, player, game_status, reactedAttack ->
+            if(kyochi(player, game_status)){
+                reactedAttack?.makeNotValid()
+            }
+            null
+        })
+        thousandbird.setSpecial(2)
+        thousandbird.setAttack(DistanceType.CONTINUOUS, Pair(3, 4), null, 2, 2)
+        thousandbird.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.RECONSTRUCT) {_, player, game_status, _ ->
+            game_status.deckReconstruct(player, false)
+            null
+        })
+        endlesswind.setSpecial(1)
+        endlesswind.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CHANGE_EACH_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
+                madeAttack.canNotReact()
+            }))
+            null
+        })
+        endlesswind.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.CARD_DISCARD_PLACE_CHANGE) {_, player, game_status, reactedAttack ->
+            TODO()
+            null
+        })
+        endlesswind.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.RETURN){_, player, game_status, _ ->
+            if(kyochi(player, game_status)) 1
+            else 0
+        })
+        tokoyomoon.setSpecial(2)
+        tokoyomoon.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _->
+            game_status.setConcentration(player, 2)
+            game_status.setConcentration(player.Opposite(), 0)
+            game_status.setShrink(player.Opposite())
+            null
         })
     }
 
@@ -458,6 +573,7 @@ object CardSet {
         yurinaCardInit()
         saineCardInit()
         himikaCardInit()
+        tokoyoCardInit()
     }
 
     fun returnCardDataByName(card_name: CardName): CardData {
@@ -495,17 +611,17 @@ object CardSet {
             CardName.HIMIKA_CRIMSONZERO -> return crimsonzero
             CardName.HIMIKA_SCARLETIMAGINE -> return scarletimagine
             CardName.HIMIKA_BURMILIONFIELD -> return burmilionfield
-            CardName.TOKOYO_BITSUNERIGI -> TODO()
-            CardName.TOKOYO_WOOAHHANTAGUCK -> TODO()
-            CardName.TOKOYO_RUNNINGRABIT -> TODO()
-            CardName.TOKOYO_POETDANCE -> TODO()
-            CardName.TOKOYO_FLIPFAN -> TODO()
-            CardName.TOKOYO_WINDSTAGE -> TODO()
-            CardName.TOKOYO_SUNSTAGE -> TODO()
-            CardName.TOKOYO_KUON -> TODO()
-            CardName.TOKOYO_THOUSANDBIRD -> TODO()
-            CardName.TOKOYO_ENDLESSWIND -> TODO()
-            CardName.TOKOYO_TOKOYOMOON -> TODO()
+            CardName.TOKOYO_BITSUNERIGI -> return bitsunerigi
+            CardName.TOKOYO_WOOAHHANTAGUCK -> return wooahhantaguck
+            CardName.TOKOYO_RUNNINGRABIT -> return runningrabit
+            CardName.TOKOYO_POETDANCE -> return poetdance
+            CardName.TOKOYO_FLIPFAN -> return flipfan
+            CardName.TOKOYO_WINDSTAGE -> return windstage
+            CardName.TOKOYO_SUNSTAGE -> return sunstage
+            CardName.TOKOYO_KUON -> return kuon
+            CardName.TOKOYO_THOUSANDBIRD -> return thousandbird
+            CardName.TOKOYO_ENDLESSWIND -> return endlesswind
+            CardName.TOKOYO_TOKOYOMOON -> return tokoyomoon
             else -> return unused
         }
     }

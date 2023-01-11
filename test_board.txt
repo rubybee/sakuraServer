@@ -1,0 +1,54 @@
+거리: 10
+플레이어1:
+체력: 10 오라: 3, 플레어:0
+플레이어2:
+체력: 10 오라: 3, 플레어:0
+
+cardNameHashmapFirst[CardName.YURINA_CHAM] = 100
+cardNameHashmapFirst[CardName.YURINA_ILSUM] = 101
+cardNameHashmapFirst[CardName.YURINA_JARUCHIGI] = 102
+cardNameHashmapFirst[CardName.YURINA_GUHAB] = 103
+cardNameHashmapFirst[CardName.YURINA_GIBACK] = 104
+cardNameHashmapFirst[CardName.YURINA_APDO] = 105
+cardNameHashmapFirst[CardName.YURINA_GIYENBANJO] = 106
+cardNameHashmapFirst[CardName.YURINA_WOLYUNGNACK] = 107
+cardNameHashmapFirst[CardName.YURINA_POBARAM] = 108
+cardNameHashmapFirst[CardName.YURINA_JJOCKBAE] = 109
+cardNameHashmapFirst[CardName.YURINA_JURUCK] = 110
+
+cardNameHashmapFirst[CardName.SAINE_DOUBLEBEGI] = 200
+cardNameHashmapFirst[CardName.SAINE_HURUBEGI] = 201
+cardNameHashmapFirst[CardName.SAINE_MOOGECHOO] = 202
+cardNameHashmapFirst[CardName.SAINE_GANPA] = 203
+cardNameHashmapFirst[CardName.SAINE_GWONYUCK] = 204
+cardNameHashmapFirst[CardName.SAINE_CHOONGEMJUNG] = 205
+cardNameHashmapFirst[CardName.SAINE_MOOEMBUCK] = 206
+cardNameHashmapFirst[CardName.SAINE_YULDONGHOGEK] = 207
+cardNameHashmapFirst[CardName.SAINE_HANGMUNGGONGJIN] = 208
+cardNameHashmapFirst[CardName.SAINE_EMMOOSHOEBING] = 209
+cardNameHashmapFirst[CardName.SAINE_JONGGEK] = 210
+
+cardNameHashmapFirst[CardName.HIMIKA_SHOOT] = 300
+cardNameHashmapFirst[CardName.HIMIKA_RAPIDFIRE] = 301
+cardNameHashmapFirst[CardName.HIMIKA_MAGNUMCANON] = 302
+cardNameHashmapFirst[CardName.HIMIKA_FULLBURST] = 303
+cardNameHashmapFirst[CardName.HIMIKA_BACKSTEP] = 304
+cardNameHashmapFirst[CardName.HIMIKA_BACKDRAFT] = 305
+cardNameHashmapFirst[CardName.HIMIKA_SMOKE] = 306
+cardNameHashmapFirst[CardName.HIMIKA_REDBULLET] = 307
+cardNameHashmapFirst[CardName.HIMIKA_CRIMSONZERO] = 308
+cardNameHashmapFirst[CardName.HIMIKA_SCARLETIMAGINE] = 309
+cardNameHashmapFirst[CardName.HIMIKA_BURMILIONFIELD] = 310
+
+YOUR_AURA(0),
+OTHER_AURA(1),
+YOUR_FLARE(2),
+OTHER_FLARE(3),
+YOUR_LIFE(4),
+OTHER_LIFE(5),
+DUST(6),
+YOUR_ENCHANTMENT_ZONE_CARD(7),
+OTHER_ENCHANTMENT_ZONE_CARD(8),
+DISTANCE(9),
+COVER_CARD(10),
+DISCARD(11);

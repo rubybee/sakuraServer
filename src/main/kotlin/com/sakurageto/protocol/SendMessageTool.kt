@@ -65,18 +65,26 @@ suspend fun sendCoverZone(mine: Connection, other: Connection, card_number: Int,
     other.session.send(Json.encodeToString(data_other))
 }
 
-suspend fun sendDiscardZone(mine: Connection, other: Connection, card_number: Int){
-    val data_your = SakuraCardCommand(DISCARD_CARD_YOUR, card_number)
-    val data_other = SakuraCardCommand(DISCARD_CARD_OTHER, card_number)
-    mine.session.send(Json.encodeToString(data_your))
-    other.session.send(Json.encodeToString(data_other))
+suspend fun sendPopPlayingZone(mine: Connection, other: Connection, card_number: Int){
+    val dataYour = SakuraCardCommand(POP_PLAYING_YOUR, card_number)
+    val dataOther = SakuraCardCommand(POP_PLAYING_OTHER, card_number)
+    mine.session.send(Json.encodeToString(dataYour))
+    other.session.send(Json.encodeToString(dataOther))
 }
 
-suspend fun sendUsedZone(mine: Connection, other: Connection, card_number: Int){
-    val data_your = SakuraCardCommand(USED_CARD_YOUR, card_number)
-    val data_other = SakuraCardCommand(USED_CARD_OTHER, card_number)
-    mine.session.send(Json.encodeToString(data_your))
-    other.session.send(Json.encodeToString(data_other))
+suspend fun sendAddCardZone(mine: Connection, other: Connection, card_number: Int, public: Boolean, command: CommandEnum){
+    val dataYour = SakuraCardCommand(command, card_number)
+    val dataOther = if(public) SakuraCardCommand(command.Opposite(), card_number) else SakuraCardCommand(command.Opposite(), -1)
+    mine.session.send(Json.encodeToString(dataYour))
+    other.session.send(Json.encodeToString(dataOther))
+}
+
+suspend fun sendAddDiscardZone(mine: Connection, other: Connection, card_number: Int){
+    sendAddCardZone(mine, other, card_number, public = true, DISCARD_CARD_YOUR)
+}
+
+suspend fun sendAddUsedZone(mine: Connection, other: Connection, card_number: Int){
+    sendAddCardZone(mine, other, card_number, public = true, USED_CARD_YOUR)
 }
 
 suspend fun makeAttackComplete(mine: Connection, other: Connection, card_number: Int){
@@ -130,17 +138,24 @@ suspend fun sendDecreaseConcentration(mine: Connection, other: Connection){
 }
 
 suspend fun sendUseCardMeesage(mine: Connection, other: Connection, reaction: Boolean, card_number: Int){
-    val data_your = if(reaction) SakuraCardCommand(USE_CARD_YOUR_REACTION, card_number) else SakuraCardCommand(
+    val dataYour = if(reaction) SakuraCardCommand(USE_CARD_YOUR_REACTION, card_number) else SakuraCardCommand(
         USE_CARD_YOUR, card_number)
-    val data_other = if(reaction) SakuraCardCommand(USE_CARD_OTHER_REACTION, card_number) else SakuraCardCommand(
+    val dataOther = if(reaction) SakuraCardCommand(USE_CARD_OTHER_REACTION, card_number) else SakuraCardCommand(
         USE_CARD_OTHER, card_number)
-    mine.session.send(Json.encodeToString(data_your))
-    other.session.send(Json.encodeToString(data_other))
+    mine.session.send(Json.encodeToString(dataYour))
+    other.session.send(Json.encodeToString(dataOther))
+}
+
+suspend fun sendSetConcentration(mine: Connection, other: Connection, number: Int){
+    val dataYour = SakuraCardCommand(SET_CONCENTRATION_YOUR, number)
+    val dataOther = SakuraCardCommand(SET_CONCENTRATION_OTHER, number)
+    mine.session.send(Json.encodeToString(dataYour))
+    other.session.send(Json.encodeToString(dataOther))
 }
 
 suspend fun sendSetShrink(mine: Connection, other: Connection){
-    val data_your = SakuraCardCommand(REMOVE_SHRINK_YOUR, -1)
-    val data_other = SakuraCardCommand(REMOVE_SHRINK_OTHER, -1)
+    val data_your = SakuraCardCommand(SET_SHRINK_YOUR, -1)
+    val data_other = SakuraCardCommand(SET_SHRINK_OTHER, -1)
     mine.session.send(Json.encodeToString(data_your))
     other.session.send(Json.encodeToString(data_other))
 }
@@ -530,7 +545,7 @@ suspend fun receiveCardEffectSelect(player: Connection): CommandEnum{
             try {
                 val data = json.decodeFromString<SakuraCardCommand>(text)
                 when(data.command){
-                    SELECT_DUST_TO_DISTANCE, SELECT_DISTANCE_TO_DUST -> return data.command //will be added
+                    SELECT_ONE, SELECT_TWO, SELECT_THREE, SELECT_FOUR, SELECT_NOT -> return data.command //will be added
                     else -> continue
                 }
             }catch (e: Exception){

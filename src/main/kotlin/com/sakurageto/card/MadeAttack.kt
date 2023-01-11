@@ -14,6 +14,11 @@ class MadeAttack(
     var megami: MegamiEnum
 ) {
     var isItValid= true
+
+    fun makeNotValid(){
+        isItValid = false
+    }
+
     var bothSideDamage = false
 
     fun setBothSideDamage(){

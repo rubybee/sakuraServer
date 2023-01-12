@@ -9,7 +9,8 @@ class CardData(
     val card_type: CardType,
     val sub_type: SubType,
 ) {
-    var can_cover = true
+    var canCover = true
+    var canDiscard = true
 
     //attack
     var distance_type: DistanceType? = null

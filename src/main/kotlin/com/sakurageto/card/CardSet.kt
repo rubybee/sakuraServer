@@ -5,11 +5,12 @@ import com.sakurageto.gamelogic.ImmediateBackListner
 import com.sakurageto.gamelogic.MegamiEnum
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
+import com.sakurageto.protocol.sendPopCardZone
 
 object CardSet {
     val cardNameHashmapFirst = HashMap<CardName, Int>()
     val cardNameHashmapSecond = HashMap<CardName, Int>()
-    val cardNumberHashmap = HashMap<CardName, Int>()
+    val cardNumberHashmap = HashMap<Int, CardName>()
 
     private fun hashMapInit(){
         //for first turn player 0~9999
@@ -109,6 +110,101 @@ object CardSet {
         cardNameHashmapSecond[CardName.TOKOYO_THOUSANDBIRD] = 10408
         cardNameHashmapSecond[CardName.TOKOYO_ENDLESSWIND] = 10409
         cardNameHashmapSecond[CardName.TOKOYO_TOKOYOMOON] = 10410
+
+        cardNumberHashmap[100] = CardName.YURINA_CHAM
+        cardNumberHashmap[101] = CardName.YURINA_ILSUM
+        cardNumberHashmap[102] = CardName.YURINA_JARUCHIGI
+        cardNumberHashmap[103] = CardName.YURINA_GUHAB
+        cardNumberHashmap[104] = CardName.YURINA_GIBACK
+        cardNumberHashmap[105] = CardName.YURINA_APDO
+        cardNumberHashmap[106] = CardName.YURINA_GIYENBANJO
+        cardNumberHashmap[107] = CardName.YURINA_WOLYUNGNACK
+        cardNumberHashmap[108] = CardName.YURINA_POBARAM
+        cardNumberHashmap[109] = CardName.YURINA_JJOCKBAE
+        cardNumberHashmap[110] = CardName.YURINA_JURUCK
+
+        cardNumberHashmap[200] = CardName.SAINE_DOUBLEBEGI
+        cardNumberHashmap[201] = CardName.SAINE_HURUBEGI
+        cardNumberHashmap[202] = CardName.SAINE_MOOGECHOO
+        cardNumberHashmap[203] = CardName.SAINE_GANPA
+        cardNumberHashmap[204] = CardName.SAINE_GWONYUCK
+        cardNumberHashmap[205] = CardName.SAINE_CHOONGEMJUNG
+        cardNumberHashmap[206] = CardName.SAINE_MOOEMBUCK
+        cardNumberHashmap[207] = CardName.SAINE_YULDONGHOGEK
+        cardNumberHashmap[208] = CardName.SAINE_HANGMUNGGONGJIN
+        cardNumberHashmap[209] = CardName.SAINE_EMMOOSHOEBING
+        cardNumberHashmap[210] = CardName.SAINE_JONGGEK
+
+        cardNumberHashmap[300] = CardName.HIMIKA_SHOOT
+        cardNumberHashmap[301] = CardName.HIMIKA_RAPIDFIRE
+        cardNumberHashmap[302] = CardName.HIMIKA_MAGNUMCANON
+        cardNumberHashmap[303] = CardName.HIMIKA_FULLBURST
+        cardNumberHashmap[304] = CardName.HIMIKA_BACKSTEP
+        cardNumberHashmap[305] = CardName.HIMIKA_BACKDRAFT
+        cardNumberHashmap[306] = CardName.HIMIKA_SMOKE
+        cardNumberHashmap[307] = CardName.HIMIKA_REDBULLET
+        cardNumberHashmap[308] = CardName.HIMIKA_CRIMSONZERO
+        cardNumberHashmap[309] = CardName.HIMIKA_SCARLETIMAGINE
+        cardNumberHashmap[310] = CardName.HIMIKA_BURMILIONFIELD
+
+        cardNumberHashmap[400] = CardName.TOKOYO_BITSUNERIGI
+        cardNumberHashmap[401] = CardName.TOKOYO_WOOAHHANTAGUCK
+        cardNumberHashmap[402] = CardName.TOKOYO_RUNNINGRABIT
+        cardNumberHashmap[403] = CardName.TOKOYO_POETDANCE
+        cardNumberHashmap[404] = CardName.TOKOYO_FLIPFAN
+        cardNumberHashmap[405] = CardName.TOKOYO_WINDSTAGE
+        cardNumberHashmap[406] = CardName.TOKOYO_SUNSTAGE
+        cardNumberHashmap[407] = CardName.TOKOYO_KUON
+        cardNumberHashmap[408] = CardName.TOKOYO_THOUSANDBIRD
+        cardNumberHashmap[409] = CardName.TOKOYO_ENDLESSWIND
+        cardNumberHashmap[410] = CardName.TOKOYO_TOKOYOMOON
+
+        cardNumberHashmap[10100] = CardName.YURINA_CHAM
+        cardNumberHashmap[10101] = CardName.YURINA_ILSUM
+        cardNumberHashmap[10102] = CardName.YURINA_JARUCHIGI
+        cardNumberHashmap[10103] = CardName.YURINA_GUHAB
+        cardNumberHashmap[10104] = CardName.YURINA_GIBACK
+        cardNumberHashmap[10105] = CardName.YURINA_APDO
+        cardNumberHashmap[10106] = CardName.YURINA_GIYENBANJO
+        cardNumberHashmap[10107] = CardName.YURINA_WOLYUNGNACK
+        cardNumberHashmap[10108] = CardName.YURINA_POBARAM
+        cardNumberHashmap[10109] = CardName.YURINA_JJOCKBAE
+        cardNumberHashmap[10110] = CardName.YURINA_JURUCK
+
+        cardNumberHashmap[10200] = CardName.SAINE_DOUBLEBEGI
+        cardNumberHashmap[10201] = CardName.SAINE_HURUBEGI
+        cardNumberHashmap[10202] = CardName.SAINE_MOOGECHOO
+        cardNumberHashmap[10203] = CardName.SAINE_GANPA
+        cardNumberHashmap[10204] = CardName.SAINE_GWONYUCK
+        cardNumberHashmap[10205] = CardName.SAINE_CHOONGEMJUNG
+        cardNumberHashmap[10206] = CardName.SAINE_MOOEMBUCK
+        cardNumberHashmap[10207] = CardName.SAINE_YULDONGHOGEK
+        cardNumberHashmap[10208] = CardName.SAINE_HANGMUNGGONGJIN
+        cardNumberHashmap[10209] = CardName.SAINE_EMMOOSHOEBING
+        cardNumberHashmap[10210] = CardName.SAINE_JONGGEK
+
+        cardNumberHashmap[10300] = CardName.HIMIKA_SHOOT
+        cardNumberHashmap[10301] = CardName.HIMIKA_RAPIDFIRE
+        cardNumberHashmap[10302] = CardName.HIMIKA_MAGNUMCANON
+        cardNumberHashmap[10303] = CardName.HIMIKA_FULLBURST
+        cardNumberHashmap[10304] = CardName.HIMIKA_BACKSTEP
+        cardNumberHashmap[10305] = CardName.HIMIKA_BACKDRAFT
+        cardNumberHashmap[10306] = CardName.HIMIKA_SMOKE
+        cardNumberHashmap[10307] = CardName.HIMIKA_REDBULLET
+        cardNumberHashmap[10308] = CardName.HIMIKA_CRIMSONZERO
+        cardNumberHashmap[10309] = CardName.HIMIKA_SCARLETIMAGINE
+        cardNumberHashmap[10310] = CardName.HIMIKA_BURMILIONFIELD
+
+        cardNumberHashmap[10401] = CardName.TOKOYO_WOOAHHANTAGUCK
+        cardNumberHashmap[10402] = CardName.TOKOYO_RUNNINGRABIT
+        cardNumberHashmap[10403] = CardName.TOKOYO_POETDANCE
+        cardNumberHashmap[10404] = CardName.TOKOYO_FLIPFAN
+        cardNumberHashmap[10405] = CardName.TOKOYO_WINDSTAGE
+        cardNumberHashmap[10406] = CardName.TOKOYO_SUNSTAGE
+        cardNumberHashmap[10407] = CardName.TOKOYO_KUON
+        cardNumberHashmap[10408] = CardName.TOKOYO_THOUSANDBIRD
+        cardNumberHashmap[10409] = CardName.TOKOYO_ENDLESSWIND
+        cardNumberHashmap[10410] = CardName.TOKOYO_TOKOYOMOON
     }
 
     private val unused = CardData(CardClass.NORMAL, CardName.CARD_UNNAME, MegamiEnum.YURINA, CardType.UNDEFINED, SubType.NONE)
@@ -506,7 +602,25 @@ object CardSet {
             null
         })
         flipfan.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {_, player, game_status, _->
-            TODO()
+            while (true){
+                val set = mutableSetOf<Int>()
+                val list = game_status.selectCardFrom(player, player, listOf(LocationEnum.COVER_CARD, LocationEnum.DISCARD))
+                set.addAll(list)
+                if (set.size < 2){
+                    for (cardNumber in list){
+                        game_status.popCardFrom(player, cardNumber, LocationEnum.DISCARD, true)?.let {
+                            game_status.insertCardTo(player, it, LocationEnum.YOUR_DECK_BELOW, true)
+                        }?: game_status.popCardFrom(player, cardNumber, LocationEnum.COVER_CARD, false)?.let {
+                            game_status.insertCardTo(player, it, LocationEnum.YOUR_DECK_BELOW, false)
+                        }
+                    }
+                    break
+                }
+            }
+            null
+        })
+        flipfan.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _->
+            game_status.dustToAura(player, 2)
             null
         })
         windstage.setEnchantment(2)
@@ -544,14 +658,29 @@ object CardSet {
             null
         })
         endlesswind.setSpecial(1)
+        endlesswind.setAttack(DistanceType.CONTINUOUS, Pair(3, 8), null, 1, 1)
         endlesswind.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
             game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CHANGE_EACH_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
                 madeAttack.canNotReact()
             }))
             null
         })
-        endlesswind.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.CARD_DISCARD_PLACE_CHANGE) {_, player, game_status, reactedAttack ->
-            TODO()
+        endlesswind.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) {_, player, game_status, _ ->
+            if (game_status.endlessWindCheck(player.Opposite())){
+                game_status.showHands(player.Opposite())
+            }
+            else{
+                while (true){
+                    val list = game_status.selectCardFrom(player, player, listOf(LocationEnum.HAND))
+                    if (list.size == 1){
+                        if(cardNumberHashmap[list[0]]?.let { returnCardDataByName(it).canDiscard && returnCardDataByName(it).card_type != CardType.ATTACK } == true){
+                            val card = game_status.popCardFrom(player, list[0], LocationEnum.HAND, true)?: continue
+                            game_status.insertCardTo(player, card, LocationEnum.DISCARD, true)
+                            break
+                        }
+                    }
+                }
+            }
             null
         })
         endlesswind.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.RETURN){_, player, game_status, _ ->

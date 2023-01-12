@@ -6,7 +6,7 @@ import io.ktor.server.response.*
 import com.sakurageto.RoomInformation
 
 fun Application.configureRouting() {
-    val room_number_range = (2..10000)
+    val roomNumberRange = (2..10000)
 
     routing {
         get("/") {
@@ -14,9 +14,9 @@ fun Application.configureRouting() {
         }
 
         get("/makeroom") {
-            var now_room_number = room_number_range.random()
+            var now_room_number = roomNumberRange.random()
             while (RoomInformation.room_number_hashmap.containsKey(now_room_number)){
-                now_room_number = room_number_range.random()
+                now_room_number = roomNumberRange.random()
             }
             RoomInformation.room_number_hashmap[now_room_number] = true
             RoomInformation.room_wait_hashmap[now_room_number] = true

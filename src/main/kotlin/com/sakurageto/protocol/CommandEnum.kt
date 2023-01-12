@@ -45,6 +45,14 @@ enum class CommandEnum {
     DESTRUCTION_NOT_NORMALY_ENCHANTMENT_OTHER,
     POP_PLAYING_YOUR,
     POP_PLAYING_OTHER,
+    POP_COVER_YOUR,
+    POP_COVER_OTHER,
+    POP_DISCARD_YOUR,
+    POP_DISCARD_OTHER,
+    POP_HAND_YOUR,
+    POP_HAND_OTHER,
+    POP_DECK_YOUR,
+    POP_DECK_OTHER,
     ENCHANTMENT_CARD_YOUR,
     DISCARD_CARD_YOUR,
     USED_CARD_YOUR,
@@ -120,6 +128,8 @@ enum class CommandEnum {
     GAME_END_WINNER,
     GAME_END_LOSER,
     COVER_CARD_SELECT,
+    SHOW_OTHER_HAND,
+    SHOW_YOUR_HAND,
 
     SELECT_CARD_EFFECT,
     SELECT_ONE,
@@ -128,9 +138,10 @@ enum class CommandEnum {
     SELECT_THREE,
     SELECT_FOUR,
 
+    //from mooembuck
     SELECT_AURA_DAMAGE_PLACE,
 
-    ;
+    SELECT_CARD_FROM_LIST;
 
     fun Opposite(): CommandEnum{
         when(this){
@@ -151,7 +162,17 @@ enum class CommandEnum {
             DECK_TOP_YOUR -> return DECK_TOP_OTHER
             DECK_BELOW_YOUR -> return DECK_BELOW_OTHER
             DECK_TOP_OTHER -> return DECK_TOP_YOUR
-            DECK_BELOW_YOUR -> return DECK_BELOW_OTHER
+            DECK_BELOW_OTHER -> return DECK_BELOW_YOUR
+            POP_COVER_YOUR -> return POP_COVER_OTHER
+            POP_PLAYING_YOUR -> return POP_PLAYING_OTHER
+            POP_DISCARD_YOUR -> return POP_DISCARD_OTHER
+            POP_HAND_YOUR -> return POP_HAND_OTHER
+            POP_DECK_YOUR -> return POP_DECK_OTHER
+            POP_COVER_OTHER -> return POP_COVER_YOUR
+            POP_HAND_OTHER -> return POP_HAND_YOUR
+            POP_DECK_OTHER -> return POP_DECK_YOUR
+            POP_PLAYING_OTHER -> return POP_PLAYING_YOUR
+            POP_DISCARD_OTHER -> return POP_DISCARD_YOUR
             MAKE_ATTACK_COMPLETE_YOUR -> return MAKE_ATTACK_COMPLETE_OTHER
             MAKE_ATTACK_COMPLETE_OTHER -> return MAKE_ATTACK_COMPLETE_YOUR
             ATTACK_INFORMATION_YOUR -> return ATTACK_INFORMATION_OTHER
@@ -169,7 +190,7 @@ enum class CommandEnum {
             ACTION_WIND_AROUND_YOUR -> return ACTION_WIND_AROUND_OTHER
             ACTION_INCUBATE_YOUR -> return ACTION_INCUBATE_OTHER
             ACTION_BREAK_AWAY_YOUR -> return ACTION_BREAK_AWAY_OTHER
-            else -> return DISCARD_CARD_YOUR
+            else -> return TODO()
         }
     }
 }
@@ -193,14 +214,16 @@ enum class LocationEnum(var real_number: Int){
     YOUR_ENCHANTMENT_ZONE_CARD(7),
     OTHER_ENCHANTMENT_ZONE_CARD(8),
     DISTANCE(9),
-    COVER_CARD(10),
-    DISCARD(11),
 
     //they are all only used to select card move location
-    YOUR_DECK_TOP(12),
-    OTHER_DECK_TOP(13),
-    YOUR_DECK_BELOW(14),
-    OTHER_DECK_BELOW(15);
+    COVER_CARD(10),
+    DISCARD(11),
+    DECK(12),
+    HAND(13),
+    YOUR_DECK_TOP(14),
+    OTHER_DECK_TOP(15),
+    YOUR_DECK_BELOW(16),
+    OTHER_DECK_BELOW(17);
 
     fun Opposite(): LocationEnum{
         return when(this){

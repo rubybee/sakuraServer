@@ -364,4 +364,14 @@ class PlayerStatus(val player_enum: PlayerEnum) {
             }
         }
     }
+
+    fun insertCardNumber(location: LocationEnum, list: MutableList<Int>){
+        when(location){
+            LocationEnum.DISCARD -> for (card in discard) list.add(card.card_number)
+            LocationEnum.DECK -> for (card in normal_card_deck) list.add(card.card_number)
+            LocationEnum.HAND -> for (cardNumber in hand.keys) list.add(cardNumber)
+            LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD -> for (cardNumber in enchantment_card.keys) list.add(cardNumber)
+            else -> TODO()
+        }
+    }
 }

@@ -1370,7 +1370,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val nowSocket = getSocket(player)
 
         for(card in nowPlayer.hand.values){
-            if(card.card_data.can_cover){
+            if(card.card_data.canCover){
                 val cardName = receiveCoverCardSelect(nowSocket)
                 if(nowPlayer.fromHandToCover(cardName)){
                     sendHandToCover(getSocket(player), getSocket(player.Opposite()), cardName, false)
@@ -1394,5 +1394,96 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
             coverCard(player)
         }
+    }
+
+    suspend fun selectCardFrom(player: PlayerEnum, select_player: PlayerEnum, location_list: List<LocationEnum>): MutableList<Int>{
+        val cardList = mutableListOf<Int>()
+        val searchPlayer = getPlayer(player)
+
+        for (location in location_list){
+            searchPlayer.insertCardNumber(location, cardList)
+        }
+
+        while (true){
+            val list = receiveSelectCard(getSocket(select_player), cardList) ?: continue
+            var flag = false
+            for (cardNumber in list){
+                if(cardNumber !in cardList) {
+                    flag = true
+                    break
+                }
+            }
+            if (flag) continue
+            return list
+        }
+    }
+
+    suspend fun popCardFrom(player: PlayerEnum, card_number: Int, location: LocationEnum, public: Boolean): Card?{
+        val nowPlayer = getPlayer(player)
+        val nowSocket = getSocket(player)
+        val otherSocket = getSocket(player.Opposite())
+        when(location){
+            LocationEnum.COVER_CARD -> for(card in nowPlayer.cover_card) if (card.card_number == card_number) {
+                sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_COVER_YOUR)
+                nowPlayer.cover_card.remove(card)
+                return card
+            }
+            LocationEnum.DISCARD -> for(card in nowPlayer.discard) if (card.card_number == card_number) {
+                sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_DISCARD_YOUR)
+                nowPlayer.cover_card.remove(card)
+                return card
+            }
+            LocationEnum.DECK -> for(card in nowPlayer.normal_card_deck) if (card.card_number == card_number) {
+                sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_DECK_YOUR)
+                nowPlayer.cover_card.remove(card)
+                return card
+            }
+            LocationEnum.HAND -> {
+                if(card_number in nowPlayer.hand){
+                    sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_HAND_YOUR)
+                    val result = nowPlayer.hand[card_number]
+                    nowPlayer.hand.remove(card_number)
+                    return result
+                }
+
+            }
+            else -> TODO()
+        }
+        return null
+    }
+
+    suspend fun insertCardTo(player: PlayerEnum, card: Card, location: LocationEnum, public: Boolean){
+        val nowPlayer = getPlayer(player)
+        val nowSocket = getSocket(player)
+        val otherSocket = getSocket(player)
+        when(location){
+            LocationEnum.YOUR_DECK_BELOW -> {
+                nowPlayer.normal_card_deck.addLast(card)
+                sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.DECK_BELOW_YOUR)
+            }
+            LocationEnum.YOUR_DECK_TOP -> {
+                nowPlayer.normal_card_deck.addFirst(card)
+                sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.DECK_TOP_YOUR)
+            }
+            LocationEnum.DISCARD -> {
+                nowPlayer.discard.addFirst(card)
+                sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.DISCARD_CARD_YOUR)
+            }
+            else -> TODO()
+        }
+    }
+
+    fun endlessWindCheck(player: PlayerEnum): Boolean{
+        for (card in getPlayer(player).hand.values){
+            if(card.card_data.card_type != CardType.ATTACK && card.card_data.canCover) return true
+        }
+        return false
+    }
+
+    suspend fun showHands(show_player: PlayerEnum){
+        val nowPlayer = getPlayer(show_player)
+        val list = mutableListOf<Int>()
+        list.addAll(nowPlayer.hand.keys)
+        sendHandInformation(getSocket(show_player.Opposite()), list)
     }
 }

@@ -66,8 +66,12 @@ suspend fun sendCoverZone(mine: Connection, other: Connection, card_number: Int,
 }
 
 suspend fun sendPopPlayingZone(mine: Connection, other: Connection, card_number: Int){
-    val dataYour = SakuraCardCommand(POP_PLAYING_YOUR, card_number)
-    val dataOther = SakuraCardCommand(POP_PLAYING_OTHER, card_number)
+    sendPopCardZone(mine, other, card_number, true, POP_PLAYING_YOUR)
+}
+
+suspend fun sendPopCardZone(mine: Connection, other: Connection, card_number: Int, public: Boolean, command: CommandEnum){
+    val dataYour = SakuraCardCommand(command, card_number)
+    val dataOther = if(public) SakuraCardCommand(command.Opposite(), card_number) else SakuraCardCommand(command.Opposite(), -1)
     mine.session.send(Json.encodeToString(dataYour))
     other.session.send(Json.encodeToString(dataOther))
 }
@@ -262,6 +266,23 @@ suspend fun sendAuraDamageSelect(player: Connection){
 suspend fun sendAuraDamagePlaceInformation(player: Connection, list: MutableList<Int>){
     val data = SakuraSendData(SELECT_AURA_DAMAGE_PLACE, list)
     player.session.send(Json.encodeToString(data))
+}
+
+suspend fun sendPreCardSelect(player: Connection){
+    val data = SakuraCardCommand(SELECT_CARD_FROM_LIST)
+    player.session.send(Json.encodeToString(data))
+}
+
+suspend fun sendCardSelect(player: Connection, list: MutableList<Int>){
+    val data = SakuraSendData(SELECT_CARD_FROM_LIST, list)
+    player.session.send(Json.encodeToString(data))
+}
+
+suspend fun sendHandInformation(look_player: Connection, list: MutableList<Int>){
+    val preData = SakuraCardCommand(SHOW_OTHER_HAND)
+    val data = SakuraSendData(SHOW_OTHER_HAND, list)
+    look_player.session.send(Json.encodeToString(preData))
+    look_player.session.send(Json.encodeToString(data))
 }
 
 //receive function
@@ -563,6 +584,30 @@ suspend fun receiveAuraDamageSelect(player: Connection, place_list: MutableList<
 
     sendAuraDamageSelect(player)
     sendAuraDamagePlaceInformation(player, place_list)
+
+    for(frame in player.session.incoming){
+        if (frame is Frame.Text) {
+            val text = frame.readText()
+            try {
+                val data = json.decodeFromString<SakuraSendData>(text)
+                when(data.command){
+                    SELECT_AURA_DAMAGE_PLACE -> return data.data //will be added
+                    else -> continue
+                }
+            }catch (e: Exception){
+                continue
+            }
+
+        }
+    }
+    return null
+}
+
+suspend fun receiveSelectCard(player: Connection, card_list: MutableList<Int>): MutableList<Int>?{
+    val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
+
+    sendPreCardSelect(player)
+    sendCardSelect(player, card_list)
 
     for(frame in player.session.incoming){
         if (frame is Frame.Text) {

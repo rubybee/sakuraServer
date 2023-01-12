@@ -33,12 +33,12 @@ fun Application.configureSockets() {
 
         webSocket("/waitroom/{roomnumber}") { // websocketSession
             var roomnumber: Int = call.parameters["roomnumber"]?.toInt() ?: 1
-            if((roomnumber == 1) or (RoomInformation.room_number_hashmap[roomnumber] != true)){
+            if(RoomInformation.room_number_hashmap[roomnumber] == false){
                 close(CloseReason(CloseReason.Codes.PROTOCOL_ERROR, "invalid room number"))
             }
             else{
                 while (true){
-                    if(!RoomInformation.room_wait_hashmap[roomnumber]!!){
+                    if(RoomInformation.room_wait_hashmap[roomnumber] == false){
                         close(CloseReason(CloseReason.Codes.NORMAL, "player match successly"))
                         break
                     }
@@ -49,13 +49,13 @@ fun Application.configureSockets() {
 
         webSocket("/play/{roomnumber}") {
             var roomnumber: Int = call.parameters["roomnumber"]?.toInt() ?: 1
-            if ((roomnumber == 1) or (RoomInformation.room_number_hashmap[roomnumber] != true)){
+            if (RoomInformation.room_number_hashmap[roomnumber] == false){
                 close(CloseReason(CloseReason.Codes.PROTOCOL_ERROR, "invalid room number"))
             }
             else if(RoomInformation.room_wait_hashmap[roomnumber] == false){
                 if (RoomInformation.room_connection_hashmap[roomnumber]?.isEmpty() != false){
-                    val thisconnection = Connection(this)
-                    RoomInformation.room_connection_hashmap[roomnumber] = mutableListOf(thisconnection)
+                    val thisConnection = Connection(this)
+                    RoomInformation.room_connection_hashmap[roomnumber] = mutableListOf(thisConnection)
                     while(true){
                         delay(200)
                     }
@@ -63,8 +63,8 @@ fun Application.configureSockets() {
                 }
                 else{
                     if(RoomInformation.room_connection_hashmap[roomnumber]!!.size == 1){
-                        val thisconnection = Connection(this)
-                        RoomInformation.room_connection_hashmap[roomnumber]!!.add(thisconnection)
+                        val thisConnection = Connection(this)
+                        RoomInformation.room_connection_hashmap[roomnumber]!!.add(thisConnection)
                         val now1 = RoomInformation.room_connection_hashmap[roomnumber]!![0]
                         val now2 = RoomInformation.room_connection_hashmap[roomnumber]!![1]
                         val game = SakuraGame(now1, now2)

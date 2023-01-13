@@ -447,6 +447,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             PlayerEnum.PLAYER1 -> {
                 if(!player1LifeListner.isEmpty()){
                     for(i in 0..player1LifeListner.size){
+                        if(player1LifeListner.isEmpty()) break
                         val now = player1LifeListner.first()
                         player1LifeListner.removeFirst()
                         if(now.IsItBack(before, now_player.life, reconstruct)){
@@ -463,6 +464,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             PlayerEnum.PLAYER2 -> {
                 if(!player2LifeListner.isEmpty()){
                     for(i in 0..player2LifeListner.size){
+                        if(player2LifeListner.isEmpty()) break
                         val now = player2LifeListner.first()
                         player2LifeListner.removeFirst()
                         if(now.IsItBack(before, now_player.life, reconstruct)){
@@ -528,15 +530,15 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun dustToAura(player: PlayerEnum, number: Int){
         val now_player = getPlayer(player)
-        val value: Int
+        var value = number
         if(number > dust){
-            value = now_player.plusAura(dust)
-            dust -= value
+            value = dust
         }
-        else{
-            value = now_player.plusAura(number)
-            dust -= value
+        if(value > now_player.maxAura - now_player.aura){
+            value = now_player.maxAura - now_player.aura
         }
+        now_player.aura += value
+        dust -= value
         sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.DUST, LocationEnum.YOUR_AURA, value, -1)
     }
@@ -614,7 +616,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
         }
 
-        if(now_player.pre_attack_card!!.aura_damage > 5){
+        if(now_player.pre_attack_card!!.aura_damage != 999 && now_player.pre_attack_card!!.aura_damage > 5){
             if(!now_player.pre_attack_card!!.chogek){
                 now_player.pre_attack_card!!.aura_damage = 5
             }
@@ -863,7 +865,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     suspend fun afterCardUsed(card_number: Int, player: PlayerEnum){
         val playing_player = getPlayer(player)
 
-        if (playing_player.using_card.last().card_number != card_number) return
+        if (playing_player.using_card.isEmpty() || playing_player.using_card.last().card_number != card_number) return
 
         movePlayingCard(player, null)
     }
@@ -1409,6 +1411,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             var flag = false
             for (cardNumber in list){
                 if(cardNumber !in cardList) {
+                    println("card not in list")
                     flag = true
                     break
                 }
@@ -1455,7 +1458,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     suspend fun insertCardTo(player: PlayerEnum, card: Card, location: LocationEnum, public: Boolean){
         val nowPlayer = getPlayer(player)
         val nowSocket = getSocket(player)
-        val otherSocket = getSocket(player)
+        val otherSocket = getSocket(player.Opposite())
         when(location){
             LocationEnum.YOUR_DECK_BELOW -> {
                 nowPlayer.normal_card_deck.addLast(card)
@@ -1475,9 +1478,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     fun endlessWindCheck(player: PlayerEnum): Boolean{
         for (card in getPlayer(player).hand.values){
-            if(card.card_data.card_type != CardType.ATTACK && card.card_data.canCover) return true
+            if(card.card_data.card_type == CardType.ATTACK || !card.card_data.canDiscard) continue
+            return false
         }
-        return false
+        return true
     }
 
     suspend fun showHands(show_player: PlayerEnum){

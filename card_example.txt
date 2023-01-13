@@ -92,3 +92,41 @@
         "HIMIKA_CRIMSONZERO"
     ]
 }
+
+카드선택
+{
+    "command": "SELECT_CARD",
+    "normal_card": [
+        "TOKOYO_BITSUNERIGI",
+        "TOKOYO_WOOAHHANTAGUCK",
+        "TOKOYO_RUNNINGRABIT",
+        "TOKOYO_POETDANCE",
+        "TOKOYO_FLIPFAN",
+        "TOKOYO_WINDSTAGE",
+        "TOKOYO_SUNSTAGE"
+    ],
+    "special_card": [
+        "TOKOYO_THOUSANDBIRD",
+        "TOKOYO_ENDLESSWIND",
+        "TOKOYO_TOKOYOMOON"
+    ]
+}
+
+카드선택
+{
+    "command": "SELECT_CARD",
+    "normal_card": [
+        "YURINA_JARUCHIGI",
+        "YURINA_CHAM",
+        "YURINA_GUHAB",
+        "YURINA_ILSUM",
+        "TOKOYO_BITSUNERIGI",
+        "TOKOYO_WOOAHHANTAGUCK",
+        "TOKOYO_SUNSTAGE"
+    ],
+    "special_card": [
+        "YURINA_JJOCKBAE",
+        "YURINA_JURUCK",
+        "TOKOYO_THOUSANDBIRD"
+    ]
+}

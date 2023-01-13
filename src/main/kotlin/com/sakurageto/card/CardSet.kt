@@ -581,10 +581,14 @@ object CardSet {
             }
             null
         })
-        runningrabit.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _->
+        runningrabit.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, _, game_status, _->
             if(game_status.getDistance() <= 3){
                 game_status.dustToDistance(2)
             }
+            null
+        })
+        poetdance.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CHANGE_CONCENTRATION) { _, player, game_status, _ ->
+            game_status.addConcentration(player)
             null
         })
         poetdance.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _->
@@ -606,7 +610,7 @@ object CardSet {
                 val set = mutableSetOf<Int>()
                 val list = game_status.selectCardFrom(player, player, listOf(LocationEnum.COVER_CARD, LocationEnum.DISCARD))
                 set.addAll(list)
-                if (set.size < 2){
+                if (set.size <= 2){
                     for (cardNumber in list){
                         game_status.popCardFrom(player, cardNumber, LocationEnum.DISCARD, true)?.let {
                             game_status.insertCardTo(player, it, LocationEnum.YOUR_DECK_BELOW, true)
@@ -671,10 +675,11 @@ object CardSet {
             }
             else{
                 while (true){
-                    val list = game_status.selectCardFrom(player, player, listOf(LocationEnum.HAND))
+                    val list = game_status.selectCardFrom(player.Opposite(), player.Opposite(), listOf(LocationEnum.HAND))
+                    println(list)
                     if (list.size == 1){
                         if(cardNumberHashmap[list[0]]?.let { returnCardDataByName(it).canDiscard && returnCardDataByName(it).card_type != CardType.ATTACK } == true){
-                            val card = game_status.popCardFrom(player, list[0], LocationEnum.HAND, true)?: continue
+                            val card = game_status.popCardFrom(player.Opposite(), list[0], LocationEnum.HAND, true)?: continue
                             game_status.insertCardTo(player, card, LocationEnum.DISCARD, true)
                             break
                         }

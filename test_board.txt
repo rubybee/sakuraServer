@@ -40,6 +40,18 @@ cardNameHashmapFirst[CardName.HIMIKA_CRIMSONZERO] = 308
 cardNameHashmapFirst[CardName.HIMIKA_SCARLETIMAGINE] = 309
 cardNameHashmapFirst[CardName.HIMIKA_BURMILIONFIELD] = 310
 
+cardNameHashmapFirst[CardName.TOKOYO_BITSUNERIGI] = 400
+cardNameHashmapFirst[CardName.TOKOYO_WOOAHHANTAGUCK] = 401
+cardNameHashmapFirst[CardName.TOKOYO_RUNNINGRABIT] = 402
+cardNameHashmapFirst[CardName.TOKOYO_POETDANCE] = 403
+cardNameHashmapFirst[CardName.TOKOYO_FLIPFAN] = 404
+cardNameHashmapFirst[CardName.TOKOYO_WINDSTAGE] = 405
+cardNameHashmapFirst[CardName.TOKOYO_SUNSTAGE] = 406
+cardNameHashmapFirst[CardName.TOKOYO_KUON] = 407
+cardNameHashmapFirst[CardName.TOKOYO_THOUSANDBIRD] = 408
+cardNameHashmapFirst[CardName.TOKOYO_ENDLESSWIND] = 409
+cardNameHashmapFirst[CardName.TOKOYO_TOKOYOMOON] = 410
+
 YOUR_AURA(0),
 OTHER_AURA(1),
 YOUR_FLARE(2),

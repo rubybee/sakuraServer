@@ -615,7 +615,7 @@ suspend fun receiveSelectCard(player: Connection, card_list: MutableList<Int>): 
             try {
                 val data = json.decodeFromString<SakuraSendData>(text)
                 when(data.command){
-                    SELECT_AURA_DAMAGE_PLACE -> return data.data //will be added
+                    SELECT_CARD_FROM_LIST -> return data.data
                     else -> continue
                 }
             }catch (e: Exception){

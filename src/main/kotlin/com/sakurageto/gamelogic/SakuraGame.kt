@@ -324,10 +324,11 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
         else{
             game_status.setPlayerFullAction(this.turn_player, false)
             while (true){
-                var data = receiveActionRequest(getSocket(this.turn_player))
-                if(data.first == CommandEnum.ACTION_END_TURN || game_status.getEndTurn(this.turn_player)){
+                if(game_status.getEndTurn(this.turn_player)){
                     return
                 }
+                val data = receiveActionRequest(getSocket(this.turn_player))
+                if(data.first == CommandEnum.ACTION_END_TURN) return
                 else if(data.first == CommandEnum.ACTION_USE_CARD_HAND || data.first == CommandEnum.ACTION_USE_CARD_SPECIAL){
                     print(this.turn_player)
                     print(": use card " + data.second + "\ndistance:")

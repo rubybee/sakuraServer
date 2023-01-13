@@ -126,18 +126,6 @@ class PlayerStatus(val player_enum: PlayerEnum) {
         }
     }
 
-    //return using dust
-    fun plusAura(number: Int): Int{
-        return if(maxAura > aura + number){
-            val temp = aura
-            aura = maxAura
-            maxAura - temp
-        } else{
-            aura += number
-            number
-        }
-    }
-
     var life = 10
     var flare = 0
 
@@ -371,6 +359,7 @@ class PlayerStatus(val player_enum: PlayerEnum) {
             LocationEnum.DECK -> for (card in normal_card_deck) list.add(card.card_number)
             LocationEnum.HAND -> for (cardNumber in hand.keys) list.add(cardNumber)
             LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD -> for (cardNumber in enchantment_card.keys) list.add(cardNumber)
+            LocationEnum.COVER_CARD -> for (card in cover_card) list.add(card.card_number)
             else -> TODO()
         }
     }

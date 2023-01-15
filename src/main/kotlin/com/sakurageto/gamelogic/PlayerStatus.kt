@@ -53,11 +53,6 @@ class PlayerStatus(val player_enum: PlayerEnum) {
         return hand[card_number]
     }
 
-    fun useCardFromHand(card_number: Int) {
-        using_card.addLast(hand[card_number]!!)
-        hand.remove(card_number)
-    }
-
     fun fromHandToCover(card_number: Int): Boolean {
         return if(hand[card_number] != null){
             cover_card.addLast(hand[card_number]!!)
@@ -92,13 +87,6 @@ class PlayerStatus(val player_enum: PlayerEnum) {
         return special_card_deck[card_number]
     }
 
-    fun useCardFromSpecial(card_number: Int) {
-        using_card.addLast(special_card_deck[card_number]!!)
-        println(special_card_deck[card_number]!!.card_data.card_name)
-        println(using_card.size)
-        special_card_deck.remove(card_number)
-    }
-
     var normal_card_deck = ArrayDeque<Card>()
     var used_special_card = HashMap<Int, Card>()
 
@@ -110,8 +98,32 @@ class PlayerStatus(val player_enum: PlayerEnum) {
         return result
     }
 
+    fun infiniteInstallationCheck(): Boolean{
+        for (card in used_special_card.values){
+            if (card.isItInstallationInfinite()) return true
+        }
+        return false
+    }
+
     var discard = ArrayDeque<Card>()
     var cover_card = ArrayDeque<Card>()
+
+    fun getCardFromCover(card_number: Int): Card?{
+        for(card in cover_card){
+            if(card.card_number == card_number) return card
+        }
+        return null
+    }
+
+    fun getInstallationCard(): MutableList<Int>{
+        val cardList = mutableListOf<Int>()
+        for(card in cover_card){
+            if(card.isItInstallation()){
+                cardList.add(card.card_number)
+            }
+        }
+        return cardList
+    }
 
     var end_turn = false
 
@@ -156,6 +168,9 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     lateinit var megami_1: MegamiEnum
     lateinit var megami_2: MegamiEnum
     lateinit var megami_ban: MegamiEnum
+
+    var megamiCard: CardData? = null
+    var megamiCard2: CardData? = null
 
     var unselected_card: MutableList<CardName> = mutableListOf()
     var unselected_specialcard: MutableList<CardName> = mutableListOf()

@@ -608,7 +608,7 @@ object CardSet {
         flipfan.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {_, player, game_status, _->
             while (true){
                 val set = mutableSetOf<Int>()
-                val list = game_status.selectCardFrom(player, player, listOf(LocationEnum.COVER_CARD, LocationEnum.DISCARD))
+                val list = game_status.selectCardFrom(player, player, listOf(LocationEnum.COVER_CARD, LocationEnum.DISCARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT)
                 set.addAll(list)
                 if (set.size <= 2){
                     for (cardNumber in list){
@@ -675,7 +675,7 @@ object CardSet {
             }
             else{
                 while (true){
-                    val list = game_status.selectCardFrom(player.Opposite(), player.Opposite(), listOf(LocationEnum.HAND))
+                    val list = game_status.selectCardFrom(player.Opposite(), player.Opposite(), listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT)
                     println(list)
                     if (list.size == 1){
                         if(cardNumberHashmap[list[0]]?.let { returnCardDataByName(it).canDiscard && returnCardDataByName(it).card_type != CardType.ATTACK } == true){
@@ -701,6 +701,10 @@ object CardSet {
         })
     }
 
+    fun oboroCardInit(){
+
+    }
+
     fun init(){
         hashMapInit()
 
@@ -708,6 +712,7 @@ object CardSet {
         saineCardInit()
         himikaCardInit()
         tokoyoCardInit()
+        oboroCardInit()
     }
 
     fun returnCardDataByName(card_name: CardName): CardData {

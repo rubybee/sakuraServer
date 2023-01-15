@@ -736,6 +736,20 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return false
     }
 
+    suspend fun useCardFrom(player: PlayerEnum, card: Card, location: LocationEnum, react: Boolean): Boolean{
+        val cost = card.canUse(player, this, null)
+        if(cost == -1){
+            if(react) logger.insert(Log(player, LogText.USE_CARD_REACT, card.card_number, card.card_number))
+            else logger.insert(Log(player, LogText.USE_CARD, card.card_number, card.card_number))
+            popCardFrom(player, card.card_number, location, true)
+            insertCardTo(player, card, LocationEnum.PLAYING_ZONE, true)
+            sendUseCardMeesage(getSocket(player), getSocket(player.Opposite()), react, card.card_number)
+            card.use(player, this, null)
+            return true
+        }
+        return false
+    }
+
     suspend fun afterMakeAttack(card_number: Int, player: PlayerEnum, react_attack: MadeAttack?){
         val now_socket = getSocket(player)
         val other_socket = getSocket(player.Opposite())
@@ -756,25 +770,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 sendRequestReact(other_socket)
                 val react = receiveReact(other_socket)
                 if(react.first == CommandEnum.REACT_USE_CARD_HAND){
-                    var check_bit = true
-                    other_player.getCardFromHand(react.second)?.let {
-                        if(reactCheck(player.Opposite(), it, now_attack)){
-                            val cost = it.canUse(player.Opposite(), this, now_attack)
-                            if(cost == -1){
-                                check_bit = false
-                                logger.insert(Log(player, LogText.USE_CARD_REACT, card_number, card_number))
-                                sendUseCardMeesage(other_socket, now_socket, true, it.card_number)
-                                other_player.useCardFromHand(it.card_number)
-                                it.use(player.Opposite(), this, now_attack)
-                            }
-                        }
-                    }
-                    if(check_bit){
-                        continue
-                    }
-                    else{
-                        break
-                    }
+                    val card = other_player.getCardFromHand(react.second)?: continue
+                    if(useCardFrom(player.Opposite(), card, LocationEnum.HAND, true)) break
                 }
                 else if(react.first == CommandEnum.REACT_USE_CARD_SPECIAL){
                     var check_bit = true
@@ -785,10 +782,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                                 check_bit = false
                                 it.special_card_state = SpecialCardEnum.PLAYING
                                 logger.insert(Log(player, LogText.USE_CARD_REACT, card_number, card_number))
-                                sendUseCardMeesage(other_socket, now_socket, true, it.card_number)
                                 flareToDust(player.Opposite(), cost)
-                                other_player.useCardFromSpecial(it.card_number)
                                 cleanAfterUseCost()
+                                popCardFrom(player.Opposite(), it.card_number, LocationEnum.SPECIAL_CARD, true)
+                                insertCardTo(player.Opposite(), it, LocationEnum.PLAYING_ZONE, true)
+                                sendUseCardMeesage(other_socket, now_socket, true, it.card_number)
                                 it.use(player.Opposite(), this, now_attack)
                             }
                         }
@@ -1179,17 +1177,52 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         logger.reset()
     }
 
+    suspend fun installationProcess(player: PlayerEnum){
+        val nowPlayer = getPlayer(player)
+        val nowSocket = getSocket(player)
+
+        val list = nowPlayer.getInstallationCard()
+        if(list.isEmpty()) return
+        if(nowPlayer.infiniteInstallationCheck()){
+            while(true){
+                if(list.isEmpty()) break
+                val receive = receiveSelectCard(nowSocket, list, CommandEnum.SELECT_CARD_REASON_INSTALLATION)?: continue
+                if (receive.size == 1){
+                    val card = nowPlayer.getCardFromCover(receive[0])?: continue
+                    if (useCardFrom(player, card, LocationEnum.COVER_CARD, false)) {
+                        list.remove(receive[0])
+                    }
+                }
+                else if(receive.isEmpty()) break
+            }
+        }
+        else{
+            while(true){
+                val receive = receiveSelectCard(nowSocket, list, CommandEnum.SELECT_CARD_REASON_INSTALLATION)?: continue
+                if (receive.size == 1){
+                    val card = nowPlayer.getCardFromCover(receive[0])?: continue
+                    if (useCardFrom(player, card, LocationEnum.COVER_CARD, false)) {
+                        break
+                    }
+                }
+                else if(receive.isEmpty()) break
+            }
+        }
+    }
+
     suspend fun deckReconstruct(player: PlayerEnum, damage: Boolean){
-        val now_player = getPlayer(player)
+        val nowPlayer = getPlayer(player)
 
-        val now_socket = getSocket(player)
-        val other_socket = getSocket(player.Opposite())
+        val nowSocket = getSocket(player)
+        val otherSocket = getSocket(player.Opposite())
 
-        sendDeckReconstruct(now_socket, other_socket)
+        installationProcess(player)
+
+        sendDeckReconstruct(nowSocket, otherSocket)
         if(damage){
             processDamage(player, CommandEnum.CHOOSE_LIFE, Pair(999, 1), true)
         }
-        Card.cardReconstructInsert(now_player.discard, now_player.cover_card, now_player.normal_card_deck)
+        Card.cardReconstructInsert(nowPlayer.discard, nowPlayer.cover_card, nowPlayer.normal_card_deck)
     }
 
     suspend fun cardUseNormaly(player: PlayerEnum, commandEnum: CommandEnum, card_number: Int): Boolean{
@@ -1205,16 +1238,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         var using_successly = false
 
         if(commandEnum == CommandEnum.ACTION_USE_CARD_HAND){
-            now_player.getCardFromHand(card_number)?.let{
-                val cost = it.canUse(player, this, null)
-                if(cost == -1){
-                    using_successly = true
-                    logger.insert(Log(player, LogText.USE_CARD, card_number, card_number))
-                    sendUseCardMeesage(now_socket, other_socket, false, it.card_number)
-                    now_player.useCardFromHand(it.card_number)
-                    it.use(player, this, null)
-                }
-            }
+            val card = now_player.getCardFromHand(card_number)?: return false
+            using_successly = true
+            useCardFrom(player, card, LocationEnum.HAND, false)
         }
         else if(commandEnum == CommandEnum.ACTION_USE_CARD_SPECIAL){
             now_player.getCardFromSpecial(card_number)?.let {
@@ -1223,10 +1249,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     using_successly = true
                     it.special_card_state = SpecialCardEnum.PLAYING
                     logger.insert(Log(player, LogText.USE_CARD, card_number, card_number))
-                    sendUseCardMeesage(now_socket, other_socket,false, it.card_number)
                     flareToDust(player, cost)
-                    now_player.useCardFromSpecial(it.card_number)
                     cleanAfterUseCost()
+                    popCardFrom(player.Opposite(), it.card_number, LocationEnum.SPECIAL_CARD, true)
+                    insertCardTo(player.Opposite(), it, LocationEnum.PLAYING_ZONE, true)
+                    sendUseCardMeesage(other_socket, now_socket, true, it.card_number)
                     it.use(player, this, null)
                 }
             }
@@ -1398,7 +1425,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    suspend fun selectCardFrom(player: PlayerEnum, select_player: PlayerEnum, location_list: List<LocationEnum>): MutableList<Int>{
+    suspend fun selectCardFrom(player: PlayerEnum, select_player: PlayerEnum, location_list: List<LocationEnum>, reason: CommandEnum): MutableList<Int>{
         val cardList = mutableListOf<Int>()
         val searchPlayer = getPlayer(player)
 
@@ -1407,17 +1434,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
 
         while (true){
-            val list = receiveSelectCard(getSocket(select_player), cardList) ?: continue
-            var flag = false
-            for (cardNumber in list){
-                if(cardNumber !in cardList) {
-                    println("card not in list")
-                    flag = true
-                    break
-                }
-            }
-            if (flag) continue
-            return list
+            return receiveSelectCard(getSocket(select_player), cardList, reason) ?: continue
         }
     }
 
@@ -1448,7 +1465,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     nowPlayer.hand.remove(card_number)
                     return result
                 }
-
+            }
+            LocationEnum.SPECIAL_CARD -> {
+                sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_SPECIAL_YOUR)
+                val result = nowPlayer.hand[card_number]
+                nowPlayer.hand.remove(card_number)
+                return result
             }
             else -> TODO()
         }
@@ -1471,6 +1493,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             LocationEnum.DISCARD -> {
                 nowPlayer.discard.addFirst(card)
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.DISCARD_CARD_YOUR)
+            }
+            LocationEnum.PLAYING_ZONE -> {
+                nowPlayer.using_card.addLast(card)
+                sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.PLAYING_CARD_YOUR)
             }
             else -> TODO()
         }

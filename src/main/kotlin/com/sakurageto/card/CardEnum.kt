@@ -98,7 +98,20 @@ enum class CardName {
     TOKOYO_KUON,
     TOKOYO_THOUSANDBIRD,
     TOKOYO_ENDLESSWIND,
-    TOKOYO_TOKOYOMOON;
+    TOKOYO_TOKOYOMOON,
+
+    OBORO_WIRE,
+    OBORO_SHADOWCALTROP,
+    OBORO_ZANGEKIRANBU,
+    OBORO_NINJAWALK,
+    OBORO_INDUCE,
+    OBORO_CLONE,
+    OBORO_BIOACTIVITY,
+
+    OBORO_KUMASUKE,
+    OBORO_TOBIKAGE,
+    OBORO_ULOO,
+    OBORO_MIKAZRA;
 
     companion object {
         fun returnNormalCardNameByMegami(megami_name: MegamiEnum):List<CardName>{
@@ -119,6 +132,11 @@ enum class CardName {
                     TOKOYO_BITSUNERIGI, TOKOYO_WOOAHHANTAGUCK, TOKOYO_RUNNINGRABIT, TOKOYO_POETDANCE,
                     TOKOYO_FLIPFAN, TOKOYO_WINDSTAGE, TOKOYO_SUNSTAGE
                 )
+                MegamiEnum.OBORO -> return listOf<CardName>(
+                    OBORO_WIRE, OBORO_SHADOWCALTROP, OBORO_ZANGEKIRANBU, OBORO_NINJAWALK,
+                    OBORO_INDUCE, OBORO_CLONE, OBORO_BIOACTIVITY
+                )
+                else -> TODO()
             }
         }
 
@@ -139,6 +157,10 @@ enum class CardName {
                 MegamiEnum.TOKOYO -> listOf<CardName>(
                     TOKOYO_KUON, TOKOYO_THOUSANDBIRD, TOKOYO_ENDLESSWIND, TOKOYO_TOKOYOMOON
                 )
+                MegamiEnum.OBORO -> listOf<CardName>(
+                    OBORO_KUMASUKE, OBORO_TOBIKAGE, OBORO_ULOO, OBORO_MIKAZRA
+                )
+                else -> TODO()
             }
         }
 
@@ -148,6 +170,8 @@ enum class CardName {
                 MegamiEnum.SAINE -> listOf<CardName>()
                 MegamiEnum.HIMIKA -> listOf<CardName>()
                 MegamiEnum.TOKOYO -> listOf<CardName>()
+                MegamiEnum.OBORO -> listOf<CardName>()
+                else -> TODO()
             }
         }
 

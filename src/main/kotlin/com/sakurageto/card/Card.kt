@@ -457,4 +457,26 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         }
         return -1
     }
+
+    fun isItInstallation(): Boolean{
+        this.card_data.effect?.let{
+            for(text in it){
+                if (text.tag == TextEffectTag.INSTALLATION) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    fun isItInstallationInfinite(): Boolean{
+        this.card_data.effect?.let{
+            for(text in it){
+                if (text.tag == TextEffectTag.INSTALLATION_INFINITE) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
 }

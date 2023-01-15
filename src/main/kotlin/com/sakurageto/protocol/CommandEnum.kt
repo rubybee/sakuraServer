@@ -43,6 +43,8 @@ enum class CommandEnum {
     DESTRUCTION_ENCHANTMENT_OTHER,
     DESTRUCTION_NOT_NORMALY_ENCHANTENT_YOUR,
     DESTRUCTION_NOT_NORMALY_ENCHANTMENT_OTHER,
+    POP_SPECIAL_YOUR,
+    POP_SPECIAL_OTHER,
     POP_PLAYING_YOUR,
     POP_PLAYING_OTHER,
     POP_COVER_YOUR,
@@ -59,11 +61,13 @@ enum class CommandEnum {
     COVER_CARD_YOUR,
     DECK_TOP_YOUR,
     DECK_BELOW_YOUR,
+    PLAYING_CARD_YOUR,
     DISCARD_CARD_OTHER,
     USED_CARD_OTHER,
     DECK_TOP_OTHER,
     DECK_BELOW_OTHER,
     COVER_CARD_OTHER,
+    PLAYING_CARD_OTHER,
     ENCHANTMENT_CARD_OTHER,
     MAKE_ATTACK_COMPLETE_YOUR,
     MAKE_ATTACK_COMPLETE_OTHER,
@@ -141,7 +145,8 @@ enum class CommandEnum {
     //from mooembuck
     SELECT_AURA_DAMAGE_PLACE,
 
-    SELECT_CARD_FROM_LIST;
+    SELECT_CARD_REASON_CARD_EFFECT,
+    SELECT_CARD_REASON_INSTALLATION;
 
     fun Opposite(): CommandEnum{
         when(this){
@@ -190,6 +195,10 @@ enum class CommandEnum {
             ACTION_WIND_AROUND_YOUR -> return ACTION_WIND_AROUND_OTHER
             ACTION_INCUBATE_YOUR -> return ACTION_INCUBATE_OTHER
             ACTION_BREAK_AWAY_YOUR -> return ACTION_BREAK_AWAY_OTHER
+            PLAYING_CARD_YOUR -> return PLAYING_CARD_OTHER
+            PLAYING_CARD_OTHER -> return PLAYING_CARD_YOUR
+            POP_SPECIAL_YOUR -> return POP_SPECIAL_OTHER
+            POP_SPECIAL_OTHER -> return POP_SPECIAL_YOUR
             else -> return TODO()
         }
     }
@@ -223,7 +232,9 @@ enum class LocationEnum(var real_number: Int){
     YOUR_DECK_TOP(14),
     OTHER_DECK_TOP(15),
     YOUR_DECK_BELOW(16),
-    OTHER_DECK_BELOW(17);
+    OTHER_DECK_BELOW(17),
+    PLAYING_ZONE(18),
+    SPECIAL_CARD(19);
 
     fun Opposite(): LocationEnum{
         return when(this){
@@ -243,6 +254,7 @@ enum class LocationEnum(var real_number: Int){
         }
     }
     companion object {
+
         fun fromInt(value: Int) = MegamiEnum.values().first { it.real_number == value }
     }
 }

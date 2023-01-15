@@ -268,13 +268,13 @@ suspend fun sendAuraDamagePlaceInformation(player: Connection, list: MutableList
     player.session.send(Json.encodeToString(data))
 }
 
-suspend fun sendPreCardSelect(player: Connection){
-    val data = SakuraCardCommand(SELECT_CARD_FROM_LIST)
+suspend fun sendPreCardSelect(player: Connection, reason: CommandEnum){
+    val data = SakuraCardCommand(reason)
     player.session.send(Json.encodeToString(data))
 }
 
-suspend fun sendCardSelect(player: Connection, list: MutableList<Int>){
-    val data = SakuraSendData(SELECT_CARD_FROM_LIST, list)
+suspend fun sendCardSelect(player: Connection, list: MutableList<Int>, reason: CommandEnum){
+    val data = SakuraSendData(reason, list)
     player.session.send(Json.encodeToString(data))
 }
 
@@ -603,11 +603,11 @@ suspend fun receiveAuraDamageSelect(player: Connection, place_list: MutableList<
     return null
 }
 
-suspend fun receiveSelectCard(player: Connection, card_list: MutableList<Int>): MutableList<Int>?{
+suspend fun receiveSelectCard(player: Connection, card_list: MutableList<Int>, reason: CommandEnum): MutableList<Int>?{
     val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
 
-    sendPreCardSelect(player)
-    sendCardSelect(player, card_list)
+    sendPreCardSelect(player, reason)
+    sendCardSelect(player, card_list, reason)
 
     for(frame in player.session.incoming){
         if (frame is Frame.Text) {
@@ -615,7 +615,20 @@ suspend fun receiveSelectCard(player: Connection, card_list: MutableList<Int>): 
             try {
                 val data = json.decodeFromString<SakuraSendData>(text)
                 when(data.command){
-                    SELECT_CARD_FROM_LIST -> return data.data
+                    reason -> {
+                        var flag = true
+                        if(data.data != null){
+                            for (cardNumber in data.data){
+                                if(!data.data.contains(cardNumber)) {
+                                    flag = false
+                                    break
+                                }
+                            }
+                        }
+                        if(flag) return data.data
+                        sendPreCardSelect(player, reason)
+                        sendCardSelect(player, card_list, reason)
+                    }
                     else -> continue
                 }
             }catch (e: Exception){

@@ -4,6 +4,8 @@ import com.sakurageto.Connection
 import com.sakurageto.card.*
 import com.sakurageto.card.CardSet.cardNameHashmapSecond
 import com.sakurageto.card.CardSet.cardNameHashmapFirst
+import com.sakurageto.card.CardSet.cardNumberHashmap
+import com.sakurageto.card.CardSet.returnCardDataByName
 import com.sakurageto.protocol.*
 import io.ktor.websocket.*
 
@@ -739,7 +741,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     suspend fun useCardFrom(player: PlayerEnum, card: Card, location: LocationEnum, react: Boolean): Boolean{
         val cost = card.canUse(player, this, null)
         if(cost == -1){
-            if(react) logger.insert(Log(player, LogText.USE_CARD_REACT, card.card_number, card.card_number))
+            if(location == LocationEnum.COVER_CARD) logger.insert(Log(player, LogText.USE_CARD_IN_COVER, card.card_number, card.card_number))
+            else if(react) logger.insert(Log(player, LogText.USE_CARD_REACT, card.card_number, card.card_number))
             else logger.insert(Log(player, LogText.USE_CARD, card.card_number, card.card_number))
             popCardFrom(player, card.card_number, location, true)
             insertCardTo(player, card, LocationEnum.PLAYING_ZONE, true)
@@ -1394,37 +1397,56 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    suspend fun coverCard(player: PlayerEnum){
-        val nowPlayer = getPlayer(player)
-        val nowSocket = getSocket(player)
+    suspend fun coverCard(player: PlayerEnum, select_player: PlayerEnum){
+        val nowSocket = getSocket(select_player)
 
-        for(card in nowPlayer.hand.values){
-            if(card.card_data.canCover){
-                val cardName = receiveCoverCardSelect(nowSocket)
-                if(nowPlayer.fromHandToCover(cardName)){
-                    sendHandToCover(getSocket(player), getSocket(player.Opposite()), cardName, false)
-                    return
-                }
-                else{
-                    coverCard(player)
-                    return
-                }
+        if(checkCoverAbleHand(player)){
+            val list = mutableListOf<Int>()
+            for (card in getPlayer(player).cover_card) list.add(card.card_number)
+            val cardNumber = receiveCoverCardSelect(nowSocket, list)
+            if(cardNumberHashmap[cardNumber] == null){
+                coverCard(player, select_player)
+                return
+            }
+            else if(!returnCardDataByName(cardNumberHashmap[cardNumber]!!).canCover){
+                coverCard(player, select_player)
+                return
+            }
+            val card = popCardFrom(player, cardNumber, LocationEnum.HAND, false)
+            if(card == null) {
+                coverCard(player, select_player)
+                return
+            }
+            else{
+                insertCardTo(player, card, LocationEnum.COVER_CARD, false)
+                return
             }
         }
+        else{
+            return
+        }
+    }
+
+    fun checkCoverAbleHand(player: PlayerEnum): Boolean{
+        val nowPlayer = getPlayer(player)
+
+        for(card in nowPlayer.cover_card){
+            if(card.card_data.canCover) return true
+        }
+        return false
     }
 
     suspend fun endTurnHandCheck(player: PlayerEnum){
         val nowPlayer = getPlayer(player)
 
         while (true){
-            if(nowPlayer.hand.size <= nowPlayer.max_hand){
-                return
-            }
+            if(nowPlayer.hand.size <= nowPlayer.max_hand) return
 
-            coverCard(player)
+            coverCard(player, player)
         }
     }
 
+    //select_player -> cardUser ||| player -> victim
     suspend fun selectCardFrom(player: PlayerEnum, select_player: PlayerEnum, location_list: List<LocationEnum>, reason: CommandEnum): MutableList<Int>{
         val cardList = mutableListOf<Int>()
         val searchPlayer = getPlayer(player)

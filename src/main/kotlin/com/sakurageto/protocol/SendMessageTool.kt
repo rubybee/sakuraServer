@@ -248,8 +248,10 @@ suspend fun sendGameEnd(winner: Connection, loser: Connection){
     loser.session.send(Json.encodeToString(data_loser))
 }
 
-suspend fun sendCoverCardSelect(player: Connection){
-    val data = SakuraCardCommand(COVER_CARD_SELECT, -1)
+suspend fun sendCoverCardSelect(player: Connection, list: MutableList<Int>){
+    val preData = SakuraCardCommand(COVER_CARD_SELECT, -1)
+    val data = SakuraSendData(COVER_CARD_SELECT, list)
+    player.session.send(Json.encodeToString(preData))
     player.session.send(Json.encodeToString(data))
 }
 
@@ -532,10 +534,10 @@ suspend fun receiveActionRequest(player: Connection): Pair<CommandEnum, Int>{
     return Pair(FIRST_TURN, -1)
 }
 
-suspend fun receiveCoverCardSelect(player: Connection): Int{
+suspend fun receiveCoverCardSelect(player: Connection, list: MutableList<Int>): Int{
     val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
 
-    sendCoverCardSelect(player)
+    sendCoverCardSelect(player, list)
     for(frame in player.session.incoming){
         if (frame is Frame.Text) {
             val text = frame.readText()

@@ -534,7 +534,7 @@ object CardSet {
             null
         })
         scarletimagine.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CARD_TO_COVER) {_, player, game_status, _->
-            game_status.coverCard(player)
+            game_status.coverCard(player, player)
             null
         })
         burmilionfield.setSpecial(2)
@@ -701,7 +701,30 @@ object CardSet {
         })
     }
 
+    private val wire = CardData(CardClass.NORMAL, CardName.OBORO_WIRE, MegamiEnum.OBORO, CardType.ATTACK, SubType.NONE)
+    private val shadowcaltrop = CardData(CardClass.NORMAL, CardName.OBORO_SHADOWCALTROP, MegamiEnum.OBORO, CardType.ATTACK, SubType.NONE)
+
     fun oboroCardInit(){
+        wire.setAttack(DistanceType.CONTINUOUS, Pair(3, 4), null, 2, 2)
+        wire.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.INSTALLATION) {_, _, _, _->
+            null
+        })
+        shadowcaltrop.setAttack(DistanceType.CONTINUOUS, Pair(2, 2), null, 2, 1)
+        shadowcaltrop.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.INSTALLATION) {_, _, _, _->
+            null
+        })
+        shadowcaltrop.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CHANGE_EACH_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
+                madeAttack.canNotReact()
+            }))
+            null
+        })
+        shadowcaltrop.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) {card_number, player, game_status, _ ->
+            if (game_status.logger.checkThisCardUseInCover(player, card_number)){
+                game_status.coverCard(player.Opposite(), player)
+            }
+            null
+        })
 
     }
 
@@ -761,6 +784,8 @@ object CardSet {
             CardName.TOKOYO_THOUSANDBIRD -> return thousandbird
             CardName.TOKOYO_ENDLESSWIND -> return endlesswind
             CardName.TOKOYO_TOKOYOMOON -> return tokoyomoon
+            CardName.OBORO_WIRE -> return wire
+            CardName.OBORO_SHADOWCALTROP -> return shadowcaltrop
             else -> return unused
         }
     }

@@ -506,6 +506,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     //return endgame
     suspend fun lifeToSelfFlare(player: PlayerEnum, number: Int, reconstruct: Boolean): Boolean{
+        if(number == 0) return false
+
         val nowPlayer = getPlayer(player)
 
         val before = nowPlayer.life
@@ -519,10 +521,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
 
         lifeListnerProcess(player, before, reconstruct)
-
-        if(!reconstruct){
-            chasmProcess(player)
-        }
 
         sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.YOUR_LIFE, LocationEnum.YOUR_FLARE, number, -1)
@@ -811,8 +809,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             sendChooseDamage(other_socket, CommandEnum.CHOOSE_CARD_DAMAGE, now_attack.aura_damage, now_attack.life_damage)
             val chosen = receiveChooseDamage(other_socket)
             if(now_attack.bothSideDamage){
-                auraToDust(player.Opposite(), now_attack.aura_damage)
-                lifeToSelfFlare(player.Opposite(), now_attack.life_damage, false)
+                processDamage(player.Opposite(), CommandEnum.CHOOSE_AURA, Pair(now_attack.aura_damage, 999), false)
+                processDamage(player.Opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, now_attack.life_damage), false)
             }
             else{
                 processDamage(player.Opposite(), chosen, Pair(now_attack.aura_damage, now_attack.life_damage), false)
@@ -1071,10 +1069,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
             else{
                 if(damage.first == 0){
+                    logger.insert(Log(player, LogText.GET_AURA_DAMAGE, damage.second, damage.second))
                     return
                 }
                 val selectable = nowPlayer.checkAuraDamage(damage.first)
                 if(damage.second == 999){
+                    logger.insert(Log(player, LogText.GET_AURA_DAMAGE, damage.second, damage.second))
                     if(selectable == null || (selectable.size == 1 && selectable[0] == LocationEnum.YOUR_AURA.real_number)){
                         auraToDust(player, damage.first)
                     }
@@ -1093,6 +1093,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                         processDamage(player, CommandEnum.CHOOSE_LIFE, damage, reconstruct)
                     }
                     else{
+                        logger.insert(Log(player, LogText.GET_AURA_DAMAGE, damage.second, damage.second))
                         if(selectable.size == 1 && selectable[0] == LocationEnum.YOUR_AURA.real_number){
                             auraToDust(player, damage.first)
                         }
@@ -1115,9 +1116,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 processDamage(player, CommandEnum.CHOOSE_AURA, damage, reconstruct)
             }
             else{
+                logger.insert(Log(player, LogText.GET_LIFE_DAMAGE, damage.second, damage.second))
                 if(lifeToSelfFlare(player, damage.second, reconstruct)) {
                     gameEnd(player.Opposite())
                 }
+                if(!reconstruct) chasmProcess(player)
             }
         }
     }
@@ -1180,36 +1183,41 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         logger.reset()
     }
 
-    suspend fun installationProcess(player: PlayerEnum){
+    //0 = player don't want using card more || 1 = player card use success || 2 = cannot use because there are no installation card
+    suspend fun useInstallationOnce(player: PlayerEnum): Int{
         val nowPlayer = getPlayer(player)
         val nowSocket = getSocket(player)
-
         val list = nowPlayer.getInstallationCard()
-        if(list.isEmpty()) return
+        if(list.isEmpty()) return 2
+
+        while(true){
+            val receive = receiveSelectCard(nowSocket, list, CommandEnum.SELECT_CARD_REASON_INSTALLATION)?: continue
+            if (receive.size == 1){
+                val card = nowPlayer.getCardFromCover(receive[0])?: continue
+                if (useCardFrom(player, card, LocationEnum.COVER_CARD, false)) {
+                    break
+                }
+            }
+            else if(receive.isEmpty()) return 0
+        }
+        return 1
+    }
+
+    suspend fun installationProcess(player: PlayerEnum){
+        val nowPlayer = getPlayer(player)
+
+        if(nowPlayer.getInstallationCard().isEmpty()) return
         if(nowPlayer.infiniteInstallationCheck()){
             while(true){
-                if(list.isEmpty()) break
-                val receive = receiveSelectCard(nowSocket, list, CommandEnum.SELECT_CARD_REASON_INSTALLATION)?: continue
-                if (receive.size == 1){
-                    val card = nowPlayer.getCardFromCover(receive[0])?: continue
-                    if (useCardFrom(player, card, LocationEnum.COVER_CARD, false)) {
-                        list.remove(receive[0])
-                    }
+                when(useInstallationOnce(player)){
+                    0 -> break
+                    2 -> break
+                    else -> {}
                 }
-                else if(receive.isEmpty()) break
             }
         }
         else{
-            while(true){
-                val receive = receiveSelectCard(nowSocket, list, CommandEnum.SELECT_CARD_REASON_INSTALLATION)?: continue
-                if (receive.size == 1){
-                    val card = nowPlayer.getCardFromCover(receive[0])?: continue
-                    if (useCardFrom(player, card, LocationEnum.COVER_CARD, false)) {
-                        break
-                    }
-                }
-                else if(receive.isEmpty()) break
-            }
+            useInstallationOnce(player)
         }
     }
 

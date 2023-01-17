@@ -33,4 +33,13 @@ class Logger {
         }
         return false
     }
+
+    fun checkThisTurnGetAuraDamage(player: PlayerEnum): Boolean{
+        for (log in logQueue){
+            if(log.player == player && log.text == LogText.GET_AURA_DAMAGE) return true
+        }
+        return false
+    }
+
+
 }

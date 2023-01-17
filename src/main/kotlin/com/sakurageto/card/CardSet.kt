@@ -703,6 +703,8 @@ object CardSet {
 
     private val wire = CardData(CardClass.NORMAL, CardName.OBORO_WIRE, MegamiEnum.OBORO, CardType.ATTACK, SubType.NONE)
     private val shadowcaltrop = CardData(CardClass.NORMAL, CardName.OBORO_SHADOWCALTROP, MegamiEnum.OBORO, CardType.ATTACK, SubType.NONE)
+    private val zangekiranbu = CardData(CardClass.NORMAL, CardName.OBORO_ZANGEKIRANBU, MegamiEnum.OBORO, CardType.ATTACK, SubType.FULLPOWER)
+    private val ninjawalk = CardData(CardClass.NORMAL, CardName.OBORO_NINJAWALK, MegamiEnum.OBORO, CardType.BEHAVIOR, SubType.NONE)
 
     fun oboroCardInit(){
         wire.setAttack(DistanceType.CONTINUOUS, Pair(3, 4), null, 2, 2)
@@ -725,6 +727,29 @@ object CardSet {
             }
             null
         })
+        zangekiranbu.setAttack(DistanceType.CONTINUOUS, Pair(2, 4), null, 3, 2)
+        zangekiranbu.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            if (game_status.logger.checkThisTurnGetAuraDamage(player.Opposite())) {
+                game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
+                    madeAttack.apply { auraPlusMinus(1); lifePlusMinus(1) }
+                }))
+            }
+            null
+        })
+        ninjawalk.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.INSTALLATION) {_, _, _, _->
+            null
+        })
+        ninjawalk.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, _, game_status, _ ->
+            game_status.dustToDistance(1)
+            null
+        })
+        ninjawalk.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) {card_number, player, game_status, _ ->
+            if (game_status.logger.checkThisCardUseInCover(player, card_number)){
+                game_status.useInstallationOnce(player)
+            }
+            null
+        })
+
 
     }
 
@@ -786,6 +811,8 @@ object CardSet {
             CardName.TOKOYO_TOKOYOMOON -> return tokoyomoon
             CardName.OBORO_WIRE -> return wire
             CardName.OBORO_SHADOWCALTROP -> return shadowcaltrop
+            CardName.OBORO_ZANGEKIRANBU -> return zangekiranbu
+            CardName.OBORO_NINJAWALK -> return ninjawalk
             else -> return unused
         }
     }

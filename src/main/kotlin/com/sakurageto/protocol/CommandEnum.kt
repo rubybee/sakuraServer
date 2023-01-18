@@ -132,8 +132,10 @@ enum class CommandEnum {
     GAME_END_WINNER,
     GAME_END_LOSER,
     COVER_CARD_SELECT,
-    SHOW_OTHER_HAND,
-    SHOW_YOUR_HAND,
+    SHOW_HAND_YOUR,
+    SHOW_HAND_OTHER,
+    SHOW_COVER_YOUR,
+    SHOW_COVER_OTHER,
 
     SELECT_CARD_EFFECT,
     SELECT_ONE,
@@ -199,6 +201,8 @@ enum class CommandEnum {
             PLAYING_CARD_OTHER -> return PLAYING_CARD_YOUR
             POP_SPECIAL_YOUR -> return POP_SPECIAL_OTHER
             POP_SPECIAL_OTHER -> return POP_SPECIAL_YOUR
+            SHOW_HAND_YOUR -> return SHOW_HAND_OTHER
+            SHOW_COVER_YOUR -> return SHOW_COVER_OTHER
             else -> return TODO()
         }
     }

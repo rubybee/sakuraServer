@@ -671,7 +671,7 @@ object CardSet {
         })
         endlesswind.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) {_, player, game_status, _ ->
             if (game_status.endlessWindCheck(player.Opposite())){
-                game_status.showHands(player.Opposite())
+                game_status.showSome(player.Opposite(), CommandEnum.SHOW_HAND_YOUR)
             }
             else{
                 while (true){
@@ -705,6 +705,8 @@ object CardSet {
     private val shadowcaltrop = CardData(CardClass.NORMAL, CardName.OBORO_SHADOWCALTROP, MegamiEnum.OBORO, CardType.ATTACK, SubType.NONE)
     private val zangekiranbu = CardData(CardClass.NORMAL, CardName.OBORO_ZANGEKIRANBU, MegamiEnum.OBORO, CardType.ATTACK, SubType.FULLPOWER)
     private val ninjawalk = CardData(CardClass.NORMAL, CardName.OBORO_NINJAWALK, MegamiEnum.OBORO, CardType.BEHAVIOR, SubType.NONE)
+    private val induce = CardData(CardClass.NORMAL, CardName.OBORO_INDUCE, MegamiEnum.OBORO, CardType.BEHAVIOR, SubType.REACTION)
+    private val clone = CardData(CardClass.NORMAL, CardName.OBORO_CLONE, MegamiEnum.OBORO, CardType.BEHAVIOR, SubType.FULLPOWER)
 
     fun oboroCardInit(){
         wire.setAttack(DistanceType.CONTINUOUS, Pair(3, 4), null, 2, 2)
@@ -749,6 +751,33 @@ object CardSet {
             }
             null
         })
+        induce.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.INSTALLATION) { _, _, _, _ ->
+            null
+        })
+        induce.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
+            while(true){
+                val nowCommand = game_status.receiveCardEffectSelect(player)
+                if(nowCommand == CommandEnum.SELECT_ONE){
+                    game_status.distanceToAura(player.Opposite(), 1)
+                    break
+                }
+                else if(nowCommand == CommandEnum.SELECT_TWO){
+                    game_status.auraToFlare(player.Opposite(), player.Opposite(), 1)
+                    break
+                }
+            }
+            null
+        })
+        clone.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) {_, player, game_status, _ ->
+            if(game_status.checkCoverFullPower(player)){
+                game_status.showSome(player, CommandEnum.SHOW_COVER_YOUR)
+            }
+            else{
+
+            }
+            null
+        })
+
 
 
     }
@@ -813,6 +842,8 @@ object CardSet {
             CardName.OBORO_SHADOWCALTROP -> return shadowcaltrop
             CardName.OBORO_ZANGEKIRANBU -> return zangekiranbu
             CardName.OBORO_NINJAWALK -> return ninjawalk
+            CardName.OBORO_INDUCE -> return induce
+            CardName.OBORO_CLONE -> return clone
             else -> return unused
         }
     }

@@ -280,10 +280,12 @@ suspend fun sendCardSelect(player: Connection, list: MutableList<Int>, reason: C
     player.session.send(Json.encodeToString(data))
 }
 
-suspend fun sendHandInformation(look_player: Connection, list: MutableList<Int>){
-    val preData = SakuraCardCommand(SHOW_OTHER_HAND)
-    val data = SakuraSendData(SHOW_OTHER_HAND, list)
-    look_player.session.send(Json.encodeToString(preData))
+suspend fun sendShowInformation(command: CommandEnum, show_player: Connection, look_player: Connection, list: MutableList<Int>){
+    val preDataShow = SakuraCardCommand(command)
+    val preDataLook = SakuraCardCommand(command.Opposite())
+    val data = SakuraSendData(command.Opposite(), list)
+    show_player.session.send(Json.encodeToString(preDataShow))
+    look_player.session.send(Json.encodeToString(preDataLook))
     look_player.session.send(Json.encodeToString(data))
 }
 

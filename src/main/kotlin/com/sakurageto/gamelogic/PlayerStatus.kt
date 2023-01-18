@@ -132,6 +132,7 @@ class PlayerStatus(val player_enum: PlayerEnum) {
             false
         } else{
             val card = used_special_card[card_number]!!
+            card.special_card_state = SpecialCardEnum.UNUSED
             special_card_deck[card.card_number] = card
             used_special_card.remove(card_number)
             true

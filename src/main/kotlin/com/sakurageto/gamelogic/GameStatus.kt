@@ -204,6 +204,29 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             LocationEnum.YOUR_AURA, LocationEnum.DISTANCE, value, -1)
     }
 
+    suspend fun auraToFlare(player_aura: PlayerEnum, player_flare: PlayerEnum, number: Int){
+        if(number == 0) return
+        val auraPlayer = getPlayer(player_aura)
+        val flarePlayer = getPlayer(player_flare)
+        var value = number
+
+        if(number > auraPlayer.aura){
+            value = auraPlayer.aura
+        }
+
+        auraPlayer.aura -= value
+        flarePlayer.flare += value
+
+        if(player_aura == player_flare){
+            sendMoveToken(getSocket(player_aura), getSocket(player_aura.Opposite()), TokenEnum.SAKURA_TOKEN,
+            LocationEnum.YOUR_AURA, LocationEnum.YOUR_FLARE, value, -1)
+        }
+        else{
+            sendMoveToken(getSocket(player_aura), getSocket(player_aura.Opposite()), TokenEnum.SAKURA_TOKEN,
+                LocationEnum.YOUR_AURA, LocationEnum.OTHER_FLARE, value, -1)
+        }
+    }
+
     suspend fun cardToDistance(player: PlayerEnum, number: Int, card: Card){
         if(number == 0 || card.nap == 0 || card.nap == null) return
         var value = number
@@ -1540,10 +1563,24 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return true
     }
 
-    suspend fun showHands(show_player: PlayerEnum){
+    suspend fun showSome(show_player: PlayerEnum, command: CommandEnum){
         val nowPlayer = getPlayer(show_player)
         val list = mutableListOf<Int>()
-        list.addAll(nowPlayer.hand.keys)
-        sendHandInformation(getSocket(show_player.Opposite()), list)
+        when(command){
+            CommandEnum.SHOW_COVER_YOUR -> {
+                for(card in nowPlayer.cover_card) list.add(card.card_number)
+            }
+            CommandEnum.SHOW_HAND_YOUR -> list.addAll(nowPlayer.hand.keys)
+            else -> TODO()
+        }
+        sendShowInformation(command, getSocket(show_player), getSocket(show_player.Opposite()), list)
+    }
+
+    suspend fun checkCoverFullPower(player: PlayerEnum): Boolean{
+        val nowPlayer = getPlayer(player)
+        for (card in nowPlayer.cover_card){
+            if(card.card_data.sub_type != SubType.FULLPOWER) return false
+        }
+        return true
     }
 }

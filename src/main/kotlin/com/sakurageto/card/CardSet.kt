@@ -678,7 +678,7 @@ object CardSet {
                     val list = game_status.selectCardFrom(player.Opposite(), player.Opposite(), listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT)
                     println(list)
                     if (list.size == 1){
-                        if(cardNumberHashmap[list[0]]?.let { returnCardDataByName(it).canDiscard && returnCardDataByName(it).card_type != CardType.ATTACK } == true){
+                        if(cardNumberHashmap[list[0]]?.let {returnCardDataByName(it).canDiscard && returnCardDataByName(it).card_type != CardType.ATTACK } == true){
                             val card = game_status.popCardFrom(player.Opposite(), list[0], LocationEnum.HAND, true)?: continue
                             game_status.insertCardTo(player, card, LocationEnum.DISCARD, true)
                             break
@@ -773,13 +773,22 @@ object CardSet {
                 game_status.showSome(player, CommandEnum.SHOW_COVER_YOUR)
             }
             else{
-
+                while(true){
+                    val selected = game_status.selectCardFrom(player, player, listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT)
+                    if(selected.size == 1){
+                        val selectNumber = selected[0]
+                        val card = game_status.getCardFrom(player, selectNumber, LocationEnum.COVER_CARD)?: continue
+                        if(card.card_data.sub_type == SubType.FULLPOWER) continue
+                        game_status.useCardFrom(player, card, LocationEnum.COVER_CARD, false)
+                        if(game_status.getEndTurn(player)) break
+                        val secondCard = game_status.getCardFrom(player, selectNumber, LocationEnum.DISCARD)?: break
+                        game_status.useCardFrom(player, secondCard, LocationEnum.DISCARD, false)
+                        break
+                    }
+                }
             }
             null
         })
-
-
-
     }
 
     fun init(){

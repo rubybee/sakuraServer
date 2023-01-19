@@ -1477,7 +1477,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    //select_player -> cardUser ||| player -> victim
+    //select_player -> cardUser ||| player -> victim ||| function that select card in list(list check is not needed)
     suspend fun selectCardFrom(player: PlayerEnum, select_player: PlayerEnum, location_list: List<LocationEnum>, reason: CommandEnum): MutableList<Int>{
         val cardList = mutableListOf<Int>()
         val searchPlayer = getPlayer(player)
@@ -1503,12 +1503,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
             LocationEnum.DISCARD -> for(card in nowPlayer.discard) if (card.card_number == card_number) {
                 sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_DISCARD_YOUR)
-                nowPlayer.cover_card.remove(card)
+                nowPlayer.discard.remove(card)
                 return card
             }
             LocationEnum.DECK -> for(card in nowPlayer.normal_card_deck) if (card.card_number == card_number) {
                 sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_DECK_YOUR)
-                nowPlayer.cover_card.remove(card)
+                nowPlayer.normal_card_deck.remove(card)
                 return card
             }
             LocationEnum.HAND -> {
@@ -1576,11 +1576,19 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         sendShowInformation(command, getSocket(show_player), getSocket(show_player.Opposite()), list)
     }
 
-    suspend fun checkCoverFullPower(player: PlayerEnum): Boolean{
+    fun checkCoverFullPower(player: PlayerEnum): Boolean{
         val nowPlayer = getPlayer(player)
         for (card in nowPlayer.cover_card){
             if(card.card_data.sub_type != SubType.FULLPOWER) return false
         }
         return true
+    }
+
+    fun getCardFrom(player: PlayerEnum, card_number: Int, location: LocationEnum): Card?{
+        return when(location){
+            LocationEnum.COVER_CARD -> getPlayer(player).getCardFromCover(card_number)
+            LocationEnum.DISCARD -> getPlayer(player).getCardFromDiscard(card_number)
+            else -> TODO()
+        }
     }
 }

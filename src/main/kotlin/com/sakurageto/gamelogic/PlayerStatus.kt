@@ -106,6 +106,14 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     }
 
     var discard = ArrayDeque<Card>()
+
+    fun getCardFromDiscard(card_number: Int): Card?{
+        for(card in discard){
+            if(card.card_number == card_number) return card
+        }
+        return null
+    }
+
     var cover_card = ArrayDeque<Card>()
 
     fun getCardFromCover(card_number: Int): Card?{

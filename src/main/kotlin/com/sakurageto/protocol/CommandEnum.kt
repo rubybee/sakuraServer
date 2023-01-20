@@ -15,8 +15,6 @@ enum class CommandEnum {
     SELECT_CARD,
     SELECT_CARD_OTHER_PLAYERS,
     END_SELECT_CARD,
-    RETURN_SPECIAL_CARD_YOUR,
-    RETURN_SPECIAL_CARD_OTHER,
     FIRST_TURN,
     SECOND_TURN,
     MULIGUN,
@@ -41,8 +39,11 @@ enum class CommandEnum {
     SELECT_ENCHANTMENT_END,
     DESTRUCTION_ENCHANTMENT_YOUR,
     DESTRUCTION_ENCHANTMENT_OTHER,
-    DESTRUCTION_NOT_NORMALY_ENCHANTENT_YOUR,
-    DESTRUCTION_NOT_NORMALY_ENCHANTMENT_OTHER,
+    DESTRUCTION_NOT_NORMAL_ENCHANTMENT_YOUR,
+    DESTRUCTION_NOT_NORMAL_ENCHANTMENT_OTHER,
+
+    POP_USED_YOUR,
+    POP_USED_OTHER,
     POP_SPECIAL_YOUR,
     POP_SPECIAL_OTHER,
     POP_PLAYING_YOUR,
@@ -55,6 +56,7 @@ enum class CommandEnum {
     POP_HAND_OTHER,
     POP_DECK_YOUR,
     POP_DECK_OTHER,
+    SPECIAL_YOUR,
     ENCHANTMENT_CARD_YOUR,
     DISCARD_CARD_YOUR,
     USED_CARD_YOUR,
@@ -62,6 +64,7 @@ enum class CommandEnum {
     DECK_TOP_YOUR,
     DECK_BELOW_YOUR,
     PLAYING_CARD_YOUR,
+    SPECIAL_OTHER,
     DISCARD_CARD_OTHER,
     USED_CARD_OTHER,
     DECK_TOP_OTHER,
@@ -203,6 +206,10 @@ enum class CommandEnum {
             POP_SPECIAL_OTHER -> return POP_SPECIAL_YOUR
             SHOW_HAND_YOUR -> return SHOW_HAND_OTHER
             SHOW_COVER_YOUR -> return SHOW_COVER_OTHER
+            POP_USED_YOUR -> return POP_USED_OTHER
+            POP_USED_OTHER -> return POP_USED_YOUR
+            SPECIAL_YOUR -> return SPECIAL_OTHER
+            SPECIAL_OTHER -> return SPECIAL_YOUR
             else -> return TODO()
         }
     }
@@ -238,7 +245,8 @@ enum class LocationEnum(var real_number: Int){
     YOUR_DECK_BELOW(16),
     OTHER_DECK_BELOW(17),
     PLAYING_ZONE(18),
-    SPECIAL_CARD(19);
+    SPECIAL_CARD(19),
+    USED_CARD(20);
 
     fun Opposite(): LocationEnum{
         return when(this){

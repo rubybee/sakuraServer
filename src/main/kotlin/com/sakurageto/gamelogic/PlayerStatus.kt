@@ -384,6 +384,7 @@ class PlayerStatus(val player_enum: PlayerEnum) {
             LocationEnum.HAND -> for (cardNumber in hand.keys) list.add(cardNumber)
             LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD -> for (cardNumber in enchantment_card.keys) list.add(cardNumber)
             LocationEnum.COVER_CARD -> for (card in cover_card) list.add(card.card_number)
+            LocationEnum.USED_CARD -> for (card in used_special_card.keys) list.add(card)
             else -> TODO()
         }
     }

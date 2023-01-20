@@ -8,13 +8,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 //send function
-suspend fun sendUsedCardReturn(player: Connection, other: Connection, card_number: Int) {
-    val data = SakuraCardCommand(RETURN_SPECIAL_CARD_YOUR, card_number)
-    val dataOther = SakuraCardCommand(RETURN_SPECIAL_CARD_OTHER, card_number)
-    player.session.send(Json.encodeToString(data))
-    other.session.send(Json.encodeToString(dataOther))
-}
-
 suspend fun sendReduceNapStart(player: Connection){
     val data = SakuraCardCommand(REDUCE_NAP_START, -1)
     player.session.send(Json.encodeToString(data))
@@ -38,8 +31,8 @@ suspend fun sendRequestEnchantmentCard(player: Connection, card_list_your: Mutab
 }
 
 suspend fun sendDestructionNotNormal(mine: Connection, other: Connection, card_number: Int){
-    val data_your = SakuraCardCommand(DESTRUCTION_NOT_NORMALY_ENCHANTENT_YOUR, card_number)
-    val data_other = SakuraCardCommand(DESTRUCTION_NOT_NORMALY_ENCHANTMENT_OTHER, card_number)
+    val data_your = SakuraCardCommand(DESTRUCTION_NOT_NORMAL_ENCHANTMENT_YOUR, card_number)
+    val data_other = SakuraCardCommand(DESTRUCTION_NOT_NORMAL_ENCHANTMENT_OTHER, card_number)
     mine.session.send(Json.encodeToString(data_your))
     other.session.send(Json.encodeToString(data_other))
 }

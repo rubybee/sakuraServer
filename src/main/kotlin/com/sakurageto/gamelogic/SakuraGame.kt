@@ -313,7 +313,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
                 if(data.first == CommandEnum.ACTION_END_TURN){
                     return
                 }
-                else if(game_status.cardUseNormaly(this.turn_player, data.first, data.second)){
+                else if(game_status.cardUseNormal(this.turn_player, data.first, data.second)){
                     return
                 }
                 else{
@@ -334,7 +334,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
                     print(": use card " + data.second + "\ndistance:")
                     print(game_status.thisTurnDistance)
                     print("\n")
-                    game_status.cardUseNormaly(this.turn_player, data.first, data.second)
+                    game_status.cardUseNormal(this.turn_player, data.first, data.second)
                 }
                 else{
                     if(game_status.canDoBasicOperation(this.turn_player, data.first)){

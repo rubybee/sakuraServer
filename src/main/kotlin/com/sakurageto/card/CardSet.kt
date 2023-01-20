@@ -707,8 +707,11 @@ object CardSet {
     private val ninjawalk = CardData(CardClass.NORMAL, CardName.OBORO_NINJAWALK, MegamiEnum.OBORO, CardType.BEHAVIOR, SubType.NONE)
     private val induce = CardData(CardClass.NORMAL, CardName.OBORO_INDUCE, MegamiEnum.OBORO, CardType.BEHAVIOR, SubType.REACTION)
     private val clone = CardData(CardClass.NORMAL, CardName.OBORO_CLONE, MegamiEnum.OBORO, CardType.BEHAVIOR, SubType.FULLPOWER)
+    private val bioactivity = CardData(CardClass.NORMAL, CardName.OBORO_BIOACTIVITY, MegamiEnum.OBORO, CardType.ENCHANTMENT, SubType.NONE)
+    private val kumasuke = CardData(CardClass.SPECIAL, CardName.OBORO_KUMASUKE, MegamiEnum.OBORO, CardType.ATTACK, SubType.FULLPOWER)
+    private val tobikage = CardData(CardClass.SPECIAL, CardName.OBORO_TOBIKAGE, MegamiEnum.OBORO, CardType.BEHAVIOR, SubType.REACTION)
 
-    fun oboroCardInit(){
+    private fun oboroCardInit(){
         wire.setAttack(DistanceType.CONTINUOUS, Pair(3, 4), null, 2, 2)
         wire.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.INSTALLATION) {_, _, _, _->
             null
@@ -738,9 +741,7 @@ object CardSet {
             }
             null
         })
-        ninjawalk.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.INSTALLATION) {_, _, _, _->
-            null
-        })
+        ninjawalk.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.INSTALLATION, null))
         ninjawalk.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, _, game_status, _ ->
             game_status.dustToDistance(1)
             null
@@ -751,9 +752,7 @@ object CardSet {
             }
             null
         })
-        induce.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.INSTALLATION) { _, _, _, _ ->
-            null
-        })
+        induce.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.INSTALLATION, null))
         induce.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
             while(true){
                 val nowCommand = game_status.receiveCardEffectSelect(player)
@@ -779,11 +778,52 @@ object CardSet {
                         val selectNumber = selected[0]
                         val card = game_status.getCardFrom(player, selectNumber, LocationEnum.COVER_CARD)?: continue
                         if(card.card_data.sub_type == SubType.FULLPOWER) continue
-                        game_status.useCardFrom(player, card, LocationEnum.COVER_CARD, false)
+                        game_status.useCardFrom(player, card, LocationEnum.COVER_CARD, false, null)
                         if(game_status.getEndTurn(player)) break
                         val secondCard = game_status.getCardFrom(player, selectNumber, LocationEnum.DISCARD)?: break
-                        game_status.useCardFrom(player, secondCard, LocationEnum.DISCARD, false)
+                        game_status.useCardFrom(player, secondCard, LocationEnum.DISCARD, false, null)
                         break
+                    }
+                }
+            }
+            null
+        })
+        bioactivity.setEnchantment(4)
+        bioactivity.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.INSTALLATION, null))
+        bioactivity.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CHASM, null))
+        bioactivity.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.RETURN_OTHER_CARD) {_, player, game_status, _ ->
+            if(game_status.getPlayer(player).used_special_card.isEmpty()) null
+            else{
+                while(true){
+                    val selected = game_status.selectCardFrom(player, player, listOf(LocationEnum.USED_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT)
+                    if(selected.size == 1 && game_status.returnSpecialCard(player, selected[0])){
+                        break
+                    }
+                }
+                null
+            }
+        })
+        kumasuke.setSpecial(4)
+        kumasuke.setAttack(DistanceType.CONTINUOUS, Pair(3, 4), null, 2, 2)
+        kumasuke.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
+            for (i in 1..game_status.getPlayer(player).cover_card.size){
+                game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 2,  2, Pair(3, 4), null, MegamiEnum.OBORO))
+            }
+            null
+        })
+        tobikage.setSpecial(4)
+        tobikage.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) {_, player, game_status, react_attack ->
+            if(game_status.checkCoverFullPower(player)){
+                game_status.showSome(player, CommandEnum.SHOW_COVER_YOUR)
+            }
+            else{
+                while(true){
+                    val selected = game_status.selectCardFrom(player, player, listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT)
+                    if(selected.size == 1){
+                        val selectNumber = selected[0]
+                        val card = game_status.getCardFrom(player, selectNumber, LocationEnum.COVER_CARD)?: continue
+                        if(card.card_data.sub_type == SubType.FULLPOWER) continue
+                        if(game_status.useCardFrom(player, card, LocationEnum.COVER_CARD, true, react_attack)) break
                     }
                 }
             }
@@ -853,6 +893,9 @@ object CardSet {
             CardName.OBORO_NINJAWALK -> return ninjawalk
             CardName.OBORO_INDUCE -> return induce
             CardName.OBORO_CLONE -> return clone
+            CardName.OBORO_BIOACTIVITY -> return bioactivity
+            CardName.OBORO_KUMASUKE -> return kumasuke
+            CardName.OBORO_TOBIKAGE -> return tobikage
             else -> return unused
         }
     }

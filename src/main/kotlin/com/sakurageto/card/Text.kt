@@ -49,5 +49,6 @@ enum class TextEffectTag {
     RECONSTRUCT,
     INSTALLATION,
     INSTALLATION_INFINITE,
-    USE_CARD;
+    USE_CARD,
+    RETURN_OTHER_CARD;
 }

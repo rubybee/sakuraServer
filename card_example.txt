@@ -130,3 +130,41 @@
         "TOKOYO_THOUSANDBIRD"
     ]
 }
+
+사이네, 오보로
+{
+    "command": "SELECT_CARD",
+    "normal_card": [
+        "SAINE_DOUBLEBEGI",
+        "SAINE_GANPA",
+        "SAINE_CHOONGEMJUNG",
+        "OBORO_WIRE",
+        "OBORO_ZANGEKIRANBU",
+        "OBORO_CLONE",
+        "OBORO_BIOACTIVITY"
+    ],
+    "special_card": [
+        "SAINE_YULDONGHOGEK",
+        "OBORO_TOBIKAGE",
+        "OBORO_MIKAZRA"
+    ]
+}
+
+히미카 오보로
+{
+    "command": "SELECT_CARD",
+    "normal_card": [
+        "HIMIKA_FULLBURST",
+        "HIMIKA_BACKDRAFT",
+        "OBORO_WIRE",
+        "OBORO_SHADOWCALTROP",
+        "OBORO_ZANGEKIRANBU",
+        "OBORO_NINJAWALK",
+        "OBORO_INDUCE"
+    ],
+    "special_card": [
+        "HIMIKA_REDBULLET",
+        "OBORO_KUMASUKE",
+        "OBORO_ULOO"
+    ]
+}

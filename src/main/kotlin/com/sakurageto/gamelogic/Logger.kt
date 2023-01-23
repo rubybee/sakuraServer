@@ -18,7 +18,8 @@ class Logger {
     fun playerUseCardNumber(player: PlayerEnum): Int{
         var result = 0
         for(log in logQueue){
-            if(log.player == player && (log.text == LogText.USE_CARD || log.text == LogText.USE_CARD_REACT)) result +=1
+            if(log.player == player && (log.text == LogText.USE_CARD || log.text == LogText.USE_CARD_REACT ||
+                        log.text == LogText.USE_CARD_IN_COVER_AND_REACT || log.text == LogText.USE_CARD_IN_COVER)) result +=1
         }
         return result
     }

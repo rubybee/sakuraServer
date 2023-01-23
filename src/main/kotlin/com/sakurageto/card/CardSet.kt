@@ -62,6 +62,20 @@ object CardSet {
         cardNameHashmapFirst[CardName.TOKOYO_ENDLESSWIND] = 409
         cardNameHashmapFirst[CardName.TOKOYO_TOKOYOMOON] = 410
 
+        cardNameHashmapFirst[CardName.OBORO_WIRE] = 500
+        cardNameHashmapFirst[CardName.OBORO_SHADOWCALTROP] = 501
+        cardNameHashmapFirst[CardName.OBORO_ZANGEKIRANBU] = 502
+        cardNameHashmapFirst[CardName.OBORO_NINJAWALK] = 503
+        cardNameHashmapFirst[CardName.OBORO_INDUCE] = 504
+        cardNameHashmapFirst[CardName.OBORO_CLONE] = 505
+        cardNameHashmapFirst[CardName.OBORO_BIOACTIVITY] = 506
+        cardNameHashmapFirst[CardName.OBORO_KUMASUKE] = 507
+        cardNameHashmapFirst[CardName.OBORO_TOBIKAGE] = 508
+        cardNameHashmapFirst[CardName.OBORO_ULOO] = 509
+        cardNameHashmapFirst[CardName.OBORO_MIKAZRA] = 510
+
+
+
         //for second turn player 10000~19999
         cardNameHashmapSecond[CardName.YURINA_CHAM] = 10100
         cardNameHashmapSecond[CardName.YURINA_ILSUM] = 10101
@@ -111,6 +125,20 @@ object CardSet {
         cardNameHashmapSecond[CardName.TOKOYO_ENDLESSWIND] = 10409
         cardNameHashmapSecond[CardName.TOKOYO_TOKOYOMOON] = 10410
 
+        cardNameHashmapSecond[CardName.OBORO_WIRE] = 10500
+        cardNameHashmapSecond[CardName.OBORO_SHADOWCALTROP] = 10501
+        cardNameHashmapSecond[CardName.OBORO_ZANGEKIRANBU] = 10502
+        cardNameHashmapSecond[CardName.OBORO_NINJAWALK] = 10503
+        cardNameHashmapSecond[CardName.OBORO_INDUCE] = 10504
+        cardNameHashmapSecond[CardName.OBORO_CLONE] = 10505
+        cardNameHashmapSecond[CardName.OBORO_BIOACTIVITY] = 10506
+        cardNameHashmapSecond[CardName.OBORO_KUMASUKE] = 10507
+        cardNameHashmapSecond[CardName.OBORO_TOBIKAGE] = 10508
+        cardNameHashmapSecond[CardName.OBORO_ULOO] = 10509
+        cardNameHashmapSecond[CardName.OBORO_MIKAZRA] = 10510
+
+
+
         cardNumberHashmap[100] = CardName.YURINA_CHAM
         cardNumberHashmap[101] = CardName.YURINA_ILSUM
         cardNumberHashmap[102] = CardName.YURINA_JARUCHIGI
@@ -159,6 +187,18 @@ object CardSet {
         cardNumberHashmap[409] = CardName.TOKOYO_ENDLESSWIND
         cardNumberHashmap[410] = CardName.TOKOYO_TOKOYOMOON
 
+        cardNumberHashmap[500] = CardName.OBORO_WIRE
+        cardNumberHashmap[501] = CardName.OBORO_SHADOWCALTROP
+        cardNumberHashmap[502] = CardName.OBORO_ZANGEKIRANBU
+        cardNumberHashmap[503] = CardName.OBORO_NINJAWALK
+        cardNumberHashmap[504] = CardName.OBORO_INDUCE
+        cardNumberHashmap[505] = CardName.OBORO_CLONE
+        cardNumberHashmap[506] = CardName.OBORO_BIOACTIVITY
+        cardNumberHashmap[507] = CardName.OBORO_KUMASUKE
+        cardNumberHashmap[508] = CardName.OBORO_TOBIKAGE
+        cardNumberHashmap[509] = CardName.OBORO_ULOO
+        cardNumberHashmap[510] = CardName.OBORO_MIKAZRA
+
         cardNumberHashmap[10100] = CardName.YURINA_CHAM
         cardNumberHashmap[10101] = CardName.YURINA_ILSUM
         cardNumberHashmap[10102] = CardName.YURINA_JARUCHIGI
@@ -205,6 +245,18 @@ object CardSet {
         cardNumberHashmap[10408] = CardName.TOKOYO_THOUSANDBIRD
         cardNumberHashmap[10409] = CardName.TOKOYO_ENDLESSWIND
         cardNumberHashmap[10410] = CardName.TOKOYO_TOKOYOMOON
+
+        cardNumberHashmap[10500] = CardName.OBORO_WIRE
+        cardNumberHashmap[10501] = CardName.OBORO_SHADOWCALTROP
+        cardNumberHashmap[10502] = CardName.OBORO_ZANGEKIRANBU
+        cardNumberHashmap[10503] = CardName.OBORO_NINJAWALK
+        cardNumberHashmap[10504] = CardName.OBORO_INDUCE
+        cardNumberHashmap[10505] = CardName.OBORO_CLONE
+        cardNumberHashmap[10506] = CardName.OBORO_BIOACTIVITY
+        cardNumberHashmap[10507] = CardName.OBORO_KUMASUKE
+        cardNumberHashmap[10508] = CardName.OBORO_TOBIKAGE
+        cardNumberHashmap[10509] = CardName.OBORO_ULOO
+        cardNumberHashmap[10510] = CardName.OBORO_MIKAZRA
     }
 
     private val unused = CardData(CardClass.NORMAL, CardName.CARD_UNNAME, MegamiEnum.YURINA, CardType.UNDEFINED, SubType.NONE)
@@ -568,9 +620,9 @@ object CardSet {
 
     private fun tokoyoCardInit(){
         bitsunerigi.setAttack(DistanceType.CONTINUOUS, Pair(4, 4), null, 999, 1)
-        bitsunerigi.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.CARD_DISCARD_PLACE_CHANGE) {_, player, game_status, _ ->
+        bitsunerigi.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.CARD_DISCARD_PLACE_CHANGE) {card_number, player, game_status, _ ->
             if(kyochi(player, game_status)){
-                game_status.movePlayingCard(player, LocationEnum.YOUR_DECK_TOP)
+                game_status.movePlayingCard(player, LocationEnum.YOUR_DECK_TOP, card_number)
             }
             null
         })
@@ -710,6 +762,8 @@ object CardSet {
     private val bioactivity = CardData(CardClass.NORMAL, CardName.OBORO_BIOACTIVITY, MegamiEnum.OBORO, CardType.ENCHANTMENT, SubType.NONE)
     private val kumasuke = CardData(CardClass.SPECIAL, CardName.OBORO_KUMASUKE, MegamiEnum.OBORO, CardType.ATTACK, SubType.FULLPOWER)
     private val tobikage = CardData(CardClass.SPECIAL, CardName.OBORO_TOBIKAGE, MegamiEnum.OBORO, CardType.BEHAVIOR, SubType.REACTION)
+    private val uroo = CardData(CardClass.SPECIAL, CardName.OBORO_ULOO, MegamiEnum.OBORO, CardType.BEHAVIOR, SubType.NONE)
+    private val mikazra = CardData(CardClass.SPECIAL, CardName.OBORO_MIKAZRA, MegamiEnum.OBORO, CardType.ATTACK, SubType.NONE)
 
     private fun oboroCardInit(){
         wire.setAttack(DistanceType.CONTINUOUS, Pair(3, 4), null, 2, 2)
@@ -829,6 +883,17 @@ object CardSet {
             }
             null
         })
+        uroo.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.INSTALLATION_INFINITE, null))
+        mikazra.setSpecial(0)
+        mikazra.setAttack(DistanceType.CONTINUOUS, Pair(3, 7), null, 1, 1)
+        mikazra.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
+            game_status.dustToFlare(player, 1)
+            null
+        })
+        mikazra.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.RETURN){_, player, game_status, _ ->
+            if(game_status.getPlayerFlare(player) == 0) 1
+            else 0
+        })
     }
 
     fun init(){
@@ -896,6 +961,8 @@ object CardSet {
             CardName.OBORO_BIOACTIVITY -> return bioactivity
             CardName.OBORO_KUMASUKE -> return kumasuke
             CardName.OBORO_TOBIKAGE -> return tobikage
+            CardName.OBORO_ULOO -> return uroo
+            CardName.OBORO_MIKAZRA -> return mikazra
             else -> return unused
         }
     }

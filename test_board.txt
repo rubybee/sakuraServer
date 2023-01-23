@@ -52,6 +52,18 @@ cardNameHashmapFirst[CardName.TOKOYO_THOUSANDBIRD] = 408
 cardNameHashmapFirst[CardName.TOKOYO_ENDLESSWIND] = 409
 cardNameHashmapFirst[CardName.TOKOYO_TOKOYOMOON] = 410
 
+cardNumberHashmap[500] = CardName.OBORO_WIRE
+cardNumberHashmap[501] = CardName.OBORO_SHADOWCALTROP
+cardNumberHashmap[502] = CardName.OBORO_ZANGEKIRANBU
+cardNumberHashmap[503] = CardName.OBORO_NINJAWALK
+cardNumberHashmap[504] = CardName.OBORO_INDUCE
+cardNumberHashmap[505] = CardName.OBORO_CLONE
+cardNumberHashmap[506] = CardName.OBORO_BIOACTIVITY
+cardNumberHashmap[507] = CardName.OBORO_KUMASUKE
+cardNumberHashmap[508] = CardName.OBORO_TOBIKAGE
+cardNumberHashmap[509] = CardName.OBORO_ULOO
+cardNumberHashmap[510] = CardName.OBORO_MIKAZRA
+
 YOUR_AURA(0),
 OTHER_AURA(1),
 YOUR_FLARE(2),

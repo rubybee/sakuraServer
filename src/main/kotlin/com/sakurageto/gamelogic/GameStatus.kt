@@ -154,8 +154,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    suspend fun receiveCardEffectSelect(player: PlayerEnum): CommandEnum{
-        return receiveCardEffectSelect(getSocket(player))
+    suspend fun receiveCardEffectSelect(player: PlayerEnum, card_number: Int): CommandEnum{
+        return receiveCardEffectSelect(getSocket(player), card_number)
     }
 
     fun addImmediateLifeListner(player: PlayerEnum, listner: ImmediateBackListner){
@@ -787,8 +787,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 card.special_card_state = SpecialCardEnum.PLAYING
                 flareToDust(player, cost)
                 cleanAfterUseCost()
-                popCardFrom(player.Opposite(), card.card_number, LocationEnum.SPECIAL_CARD, true)
-                insertCardTo(player.Opposite(), card, LocationEnum.PLAYING_ZONE, true)
+                popCardFrom(player, card.card_number, LocationEnum.SPECIAL_CARD, true)
+                insertCardTo(player, card, LocationEnum.PLAYING_ZONE, true)
                 sendUseCardMeesage(getSocket(player), getSocket(player.Opposite()), react, card.card_number)
                 card.use(player, this, react_attack)
                 return true
@@ -835,7 +835,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
         }
 
-        if(now_attack.isItValid && now_attack.rangeCheck(thisTurnDistance)){
+        if(now_attack.isItValid && now_attack.rangeCheck(getAdjustDistanceDuringAttack(player))){
             sendChooseDamage(other_socket, CommandEnum.CHOOSE_CARD_DAMAGE, now_attack.aura_damage, now_attack.life_damage)
             val chosen = receiveChooseDamage(other_socket)
             if(now_attack.bothSideDamage){
@@ -850,19 +850,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun movePlayingCard(player: PlayerEnum, place: LocationEnum?, card_number: Int){
-        val playingPlayer = getPlayer(player)
-
         val card = popCardFrom(player, card_number, LocationEnum.PLAYING_ZONE, true)?: return
 
-        if(place == LocationEnum.YOUR_DECK_TOP){
-            insertCardTo(card.player, card, LocationEnum.YOUR_DECK_TOP, true)
+        if(place != null){
+            insertCardTo(card.player, card, place, true)
         }
         else if(card.card_data.card_type == CardType.ENCHANTMENT){
-            val playing_socket = getSocket(player)
-            val not_playing_socket = getSocket(player.Opposite())
-            playingPlayer.enchantment_card[card.card_number] = card
-            sendEnchantmentZone(playing_socket, not_playing_socket, card.card_number)
-            if(card.nap == 0){
+            insertCardTo(player, card, LocationEnum.ENCHANTMENT_ZONE, true)
+            if(card.isItDestruction()){
                 enchantmentDestruction(player, card)
             }
         }
@@ -872,6 +867,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     card.addReturnListener(card.player, this)
                     card.special_card_state = SpecialCardEnum.PLAYED
                     insertCardTo(card.player, card, LocationEnum.USED_CARD, true)
+                    print(getPlayer(card.player).used_special_card)
                 }
                 CardClass.NORMAL -> {
                     insertCardTo(card.player, card, LocationEnum.DISCARD, true)
@@ -884,26 +880,16 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         movePlayingCard(player, null, card_number)
     }
 
-    suspend fun afterDestruction(card: Card, locationEnum: LocationEnum){
-        val owner_player = getPlayer(card.player)
-        val owner_socket = getSocket(card.player)
-        val not_owner_socket = getSocket(card.player.Opposite())
+    suspend fun afterDestruction(player: PlayerEnum, card_number: Int, location: LocationEnum){
+        val card = popCardFrom(player, card_number, LocationEnum.ENCHANTMENT_ZONE, true)?: return
         when(card.card_data.card_class){
             CardClass.SPECIAL -> {
                 card.addReturnListener(card.player, this)
                 card.special_card_state = SpecialCardEnum.PLAYED
-                owner_player.used_special_card[card.card_number] = card
-                sendAddUsedZone(owner_socket, not_owner_socket, card.card_number)
+                insertCardTo(card.player, card, LocationEnum.USED_CARD, true)
             }
             CardClass.NORMAL -> {
-                if(locationEnum == LocationEnum.COVER_CARD){
-                    owner_player.cover_card.addLast(card)
-                    sendCoverZone(owner_socket, not_owner_socket, card.card_number, true)
-                }
-                else if(locationEnum == LocationEnum.DISCARD){
-                    owner_player.discard.addLast(card)
-                    sendAddDiscardZone(owner_socket, not_owner_socket, card.card_number)
-                }
+                insertCardTo(card.player, card, location, true)
             }
         }
 
@@ -916,15 +902,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     suspend fun enchantmentDestruction(player: PlayerEnum, card: Card){
         sendDestructionEnchant(getSocket(player), getSocket(player.Opposite()), card.card_number)
         card.destructionEnchantmentNormaly(player, this)
-        getPlayer(player).enchantment_card.remove(card.card_number)
-        afterDestruction(card, LocationEnum.DISCARD)
+        afterDestruction(player, card.card_number, LocationEnum.DISCARD)
     }
 
     suspend fun enchantmentDestructionNotNormally(player: PlayerEnum, card: Card){
-        getPlayer(player).enchantment_card.remove(card.card_number)
         sendDestructionEnchant(getSocket(player), getSocket(player.Opposite()), card.card_number)
-
-        afterDestruction(card, LocationEnum.COVER_CARD)
+        afterDestruction(player, card.card_number, LocationEnum.COVER_CARD)
     }
 
     suspend fun enchantmentReduceAll(player: PlayerEnum){
@@ -1268,19 +1251,19 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun basicOperationCost(player: PlayerEnum, card_number: Int): Boolean{
-        val now_player = getPlayer(player)
+        val nowPlayer = getPlayer(player)
 
-        return if(card_number == -1){
-            if(now_player.concentration == 0) false
+        if(card_number == -1){
+            return if(nowPlayer.concentration == 0) false
             else {
                 decreaseConcentration(player)
                 true
             }
-        } else if(now_player.fromHandToCover(card_number)){
-            sendHandToCover(getSocket(player), getSocket(player.Opposite()), card_number, false)
-            true
         } else{
-            false
+            val card = nowPlayer.getCardFromHand(card_number)?: return false
+            popCardFrom(player, card_number, LocationEnum.HAND, false)
+            insertCardTo(player, card, LocationEnum.COVER_CARD, false)
+            return true
         }
     }
 
@@ -1506,6 +1489,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     return card
                 }
             }
+            LocationEnum.ENCHANTMENT_ZONE -> {
+                val result = nowPlayer.enchantment_card[card_number]?: return null
+                sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_ENCHANTMENT_YOUR)
+                nowPlayer.enchantment_card.remove(card_number)
+                return result
+            }
             else -> TODO()
         }
         return null
@@ -1534,6 +1523,19 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
             LocationEnum.USED_CARD -> {
                 nowPlayer.used_special_card[card.card_number] = card
+                sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.USED_CARD_YOUR)
+            }
+            LocationEnum.COVER_CARD -> {
+                nowPlayer.cover_card.addFirst(card)
+                sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.COVER_CARD_YOUR)
+            }
+            LocationEnum.ENCHANTMENT_ZONE -> {
+                nowPlayer.enchantment_card[card.card_number] = card
+                sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.ENCHANTMENT_CARD_YOUR)
+            }
+            LocationEnum.SPECIAL_CARD -> {
+                nowPlayer.special_card_deck[card.card_number] = card
+                sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.SPECIAL_YOUR)
             }
             else -> TODO()
         }
@@ -1580,6 +1582,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun returnSpecialCard(player: PlayerEnum, card_number: Int): Boolean{
         val card = popCardFrom(player, card_number, LocationEnum.USED_CARD, true)?: return false
+        card.special_card_state = SpecialCardEnum.UNUSED
         insertCardTo(player, card, LocationEnum.SPECIAL_CARD, true)
         return true
     }

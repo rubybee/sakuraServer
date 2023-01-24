@@ -323,6 +323,7 @@ object CardSet {
         apdo.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CHASM, null))
         apdo.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
             game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 3,  999, Pair(1, 4), null, MegamiEnum.YURINA))
+            game_status.afterMakeAttack(card_number, player, null)
             null
         })
         giyenbanzo.setEnchantment(4)
@@ -386,6 +387,7 @@ object CardSet {
         doublebegi.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
             if(palSang(player, game_status)){
                 game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 2,  1, Pair(4, 5), null, MegamiEnum.SAINE))
+                game_status.afterMakeAttack(card_number, player, null)
             }
             null
         })
@@ -401,9 +403,9 @@ object CardSet {
             if(palSang(player, game_status)) 1
             else 0
         })
-        ganpa.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
+        ganpa.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
             while(true){
-                val nowCommand = game_status.receiveCardEffectSelect(player)
+                val nowCommand = game_status.receiveCardEffectSelect(player, card_number)
                 if(nowCommand == CommandEnum.SELECT_ONE){
                     game_status.dustToDistance(1)
                     break
@@ -433,6 +435,7 @@ object CardSet {
                 cannot_react_special = false,
                 cannot_react = true
             ))
+            game_status.afterMakeAttack(card_number, player, null)
             null
         })
         choongemjung.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MOVE_SAKURA_TOKEN) {_, _, game_status, _ ->
@@ -447,14 +450,17 @@ object CardSet {
         yuldonghogek.setSpecial(6)
         yuldonghogek.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_ATTACK){card_number, player, game_status, _ ->
             game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 1,  1, Pair(3, 4), null, MegamiEnum.SAINE))
+            game_status.afterMakeAttack(card_number, player, null)
             null
         })
         yuldonghogek.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_ATTACK){card_number,  player, game_status, _ ->
             game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 1,  1, Pair(4, 5), null, MegamiEnum.SAINE))
+            game_status.afterMakeAttack(card_number, player, null)
             null
         })
         yuldonghogek.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_ATTACK){card_number, player, game_status, _ ->
             game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 2,  2, Pair(3, 5), null, MegamiEnum.SAINE))
+            game_status.afterMakeAttack(card_number, player, null)
             null
         })
         hangmunggongjin.setSpecial(8)
@@ -643,9 +649,9 @@ object CardSet {
             game_status.addConcentration(player)
             null
         })
-        poetdance.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _->
+        poetdance.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _->
             while(true){
-                val nowCommand = game_status.receiveCardEffectSelect(player)
+                val nowCommand = game_status.receiveCardEffectSelect(player, card_number)
                 if(nowCommand == CommandEnum.SELECT_ONE){
                     game_status.flareToSelfAura(player, 1)
                     break
@@ -698,6 +704,7 @@ object CardSet {
         })
         sunstage.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
             game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 999,  1, Pair(3, 6), null, MegamiEnum.TOKOYO))
+            game_status.afterMakeAttack(card_number, player, null)
             null
         })
         kuon.setSpecial(5)
@@ -762,7 +769,7 @@ object CardSet {
     private val bioactivity = CardData(CardClass.NORMAL, CardName.OBORO_BIOACTIVITY, MegamiEnum.OBORO, CardType.ENCHANTMENT, SubType.NONE)
     private val kumasuke = CardData(CardClass.SPECIAL, CardName.OBORO_KUMASUKE, MegamiEnum.OBORO, CardType.ATTACK, SubType.FULLPOWER)
     private val tobikage = CardData(CardClass.SPECIAL, CardName.OBORO_TOBIKAGE, MegamiEnum.OBORO, CardType.BEHAVIOR, SubType.REACTION)
-    private val uroo = CardData(CardClass.SPECIAL, CardName.OBORO_ULOO, MegamiEnum.OBORO, CardType.BEHAVIOR, SubType.NONE)
+    private val uloo = CardData(CardClass.SPECIAL, CardName.OBORO_ULOO, MegamiEnum.OBORO, CardType.BEHAVIOR, SubType.NONE)
     private val mikazra = CardData(CardClass.SPECIAL, CardName.OBORO_MIKAZRA, MegamiEnum.OBORO, CardType.ATTACK, SubType.NONE)
 
     private fun oboroCardInit(){
@@ -807,9 +814,9 @@ object CardSet {
             null
         })
         induce.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.INSTALLATION, null))
-        induce.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
+        induce.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
             while(true){
-                val nowCommand = game_status.receiveCardEffectSelect(player)
+                val nowCommand = game_status.receiveCardEffectSelect(player, card_number)
                 if(nowCommand == CommandEnum.SELECT_ONE){
                     game_status.distanceToAura(player.Opposite(), 1)
                     break
@@ -846,7 +853,9 @@ object CardSet {
         bioactivity.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.INSTALLATION, null))
         bioactivity.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CHASM, null))
         bioactivity.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.RETURN_OTHER_CARD) {_, player, game_status, _ ->
-            if(game_status.getPlayer(player).used_special_card.isEmpty()) null
+            if(game_status.getPlayer(player).used_special_card.isEmpty()) {
+                null
+            }
             else{
                 while(true){
                     val selected = game_status.selectCardFrom(player, player, listOf(LocationEnum.USED_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT)
@@ -862,6 +871,7 @@ object CardSet {
         kumasuke.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
             for (i in 1..game_status.getPlayer(player).cover_card.size){
                 game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 2,  2, Pair(3, 4), null, MegamiEnum.OBORO))
+                game_status.afterMakeAttack(card_number, player, null)
             }
             null
         })
@@ -883,7 +893,8 @@ object CardSet {
             }
             null
         })
-        uroo.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.INSTALLATION_INFINITE, null))
+        uloo.setSpecial(4)
+        uloo.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.INSTALLATION_INFINITE, null))
         mikazra.setSpecial(0)
         mikazra.setAttack(DistanceType.CONTINUOUS, Pair(3, 7), null, 1, 1)
         mikazra.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
@@ -961,7 +972,7 @@ object CardSet {
             CardName.OBORO_BIOACTIVITY -> return bioactivity
             CardName.OBORO_KUMASUKE -> return kumasuke
             CardName.OBORO_TOBIKAGE -> return tobikage
-            CardName.OBORO_ULOO -> return uroo
+            CardName.OBORO_ULOO -> return uloo
             CardName.OBORO_MIKAZRA -> return mikazra
             else -> return unused
         }

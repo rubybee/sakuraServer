@@ -56,6 +56,8 @@ enum class CommandEnum {
     POP_HAND_OTHER,
     POP_DECK_YOUR,
     POP_DECK_OTHER,
+    POP_ENCHANTMENT_YOUR,
+    POP_ENCHANTMENT_OTHER,
     SPECIAL_YOUR,
     ENCHANTMENT_CARD_YOUR,
     DISCARD_CARD_YOUR,
@@ -165,6 +167,10 @@ enum class CommandEnum {
             SELECT_ENCHANTMENT_OTHER -> return SELECT_ENCHANTMENT_YOUR
             DESTRUCTION_ENCHANTMENT_YOUR -> return DESTRUCTION_ENCHANTMENT_OTHER
             DESTRUCTION_ENCHANTMENT_OTHER -> return DESTRUCTION_ENCHANTMENT_YOUR
+            COVER_CARD_YOUR -> return COVER_CARD_OTHER
+            COVER_CARD_OTHER -> return COVER_CARD_YOUR
+            ENCHANTMENT_CARD_YOUR -> return ENCHANTMENT_CARD_OTHER
+            ENCHANTMENT_CARD_OTHER -> return ENCHANTMENT_CARD_YOUR
             DISCARD_CARD_YOUR -> return DISCARD_CARD_OTHER
             USED_CARD_YOUR -> return USED_CARD_OTHER
             DISCARD_CARD_OTHER -> return DISCARD_CARD_YOUR
@@ -210,6 +216,8 @@ enum class CommandEnum {
             POP_USED_OTHER -> return POP_USED_YOUR
             SPECIAL_YOUR -> return SPECIAL_OTHER
             SPECIAL_OTHER -> return SPECIAL_YOUR
+            POP_ENCHANTMENT_YOUR -> return POP_ENCHANTMENT_OTHER
+            POP_ENCHANTMENT_OTHER -> return POP_ENCHANTMENT_YOUR
             else -> return TODO()
         }
     }
@@ -246,7 +254,8 @@ enum class LocationEnum(var real_number: Int){
     OTHER_DECK_BELOW(17),
     PLAYING_ZONE(18),
     SPECIAL_CARD(19),
-    USED_CARD(20);
+    USED_CARD(20),
+    ENCHANTMENT_ZONE(21);
 
     fun Opposite(): LocationEnum{
         return when(this){

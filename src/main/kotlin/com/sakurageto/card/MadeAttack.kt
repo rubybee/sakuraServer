@@ -177,14 +177,7 @@ class MadeAttack(
         this.effect?.let{
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.AFTER_ATTACK){
-                    when(text.tag){
-                        TextEffectTag.MAKE_ATTACK -> {
-                            text.effect!!(this.card_number, player, game_status, null)
-                            game_status.afterMakeAttack(this.card_number, player, null)
-                        }
-                        else -> text.effect!!(this.card_number, player, game_status, react_attack)
-                    }
-
+                    text.effect!!(this.card_number, player, game_status, react_attack)
                 }
             }
         }

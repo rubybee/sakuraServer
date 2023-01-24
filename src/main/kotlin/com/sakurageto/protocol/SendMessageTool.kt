@@ -172,14 +172,6 @@ suspend fun sendHandToDeck(mine: Connection, other: Connection, card_number: Int
     other.session.send(Json.encodeToString(data_other))
 }
 
-suspend fun sendHandToCover(mine: Connection, other: Connection, card_number: Int, public: Boolean){
-    val data_your = SakuraCardCommand(CARD_HAND_TO_COVER_YOUR, card_number)
-    val data_other = if(public) SakuraCardCommand(CARD_HAND_TO_COVER_OTHER, card_number) else SakuraCardCommand(
-        CARD_HAND_TO_COVER_OTHER, -1)
-    mine.session.send(Json.encodeToString(data_your))
-    other.session.send(Json.encodeToString(data_other))
-}
-
 suspend fun sendDrawCard(mine: Connection, other: Connection, card_number: Int){
     val data_your = SakuraCardCommand(DRAW_CARD_YOUR, card_number)
     val data_other = SakuraCardCommand(DRAW_CARD_OTHER, -1)
@@ -248,8 +240,8 @@ suspend fun sendCoverCardSelect(player: Connection, list: MutableList<Int>){
     player.session.send(Json.encodeToString(data))
 }
 
-suspend fun sendCardEffectSelect(player: Connection){
-    val data = SakuraCardCommand(SELECT_CARD_EFFECT)
+suspend fun sendCardEffectSelect(player: Connection, card_number: Int){
+    val data = SakuraCardCommand(SELECT_CARD_EFFECT, card_number)
     player.session.send(Json.encodeToString(data))
 }
 
@@ -553,10 +545,10 @@ suspend fun receiveCoverCardSelect(player: Connection, list: MutableList<Int>): 
     return -1
 }
 
-suspend fun receiveCardEffectSelect(player: Connection): CommandEnum{
+suspend fun receiveCardEffectSelect(player: Connection, card_number: Int): CommandEnum{
     val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
 
-    sendCardEffectSelect(player)
+    sendCardEffectSelect(player, card_number)
     for(frame in player.session.incoming){
         if (frame is Frame.Text) {
             val text = frame.readText()

@@ -83,20 +83,14 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         card_data.effect?.let {
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.AFTER_DESTRUCTION){
-                    when(text.tag){
-                        TextEffectTag.MAKE_ATTACK -> {
-                            text.effect!!(this.card_number, player, game_status, null)
-                            game_status.afterMakeAttack(this.card_number, player, null)
-                        }
-                        else -> text.effect!!(this.card_number, player, game_status, null)
-                    }
+                    text.effect!!(this.card_number, player, game_status, null)
                 }
             }
         }
     }
     fun isItDestruction(): Boolean{
         //some text can be added
-        return nap == 0
+        return nap == 0 || nap == null
     }
 
     suspend fun addAttackBuff(player: PlayerEnum, gameStatus: GameStatus){
@@ -296,14 +290,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         card_data.effect?.let {
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.USING){
-                    when(text.tag){
-                        TextEffectTag.MAKE_ATTACK -> {
-                            text.effect!!(this.card_number, player, game_status, null)
-                            game_status.afterMakeAttack(this.card_number, player, null)
-                        }
-                        else -> text.effect!!(this.card_number, player, game_status, react_attack)
-                    }
-
+                    text.effect!!(this.card_number, player, game_status, react_attack)
                 }
             }
         }
@@ -332,13 +319,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         card_data.effect?.let {
             for (text in it) {
                 if(text.timing_tag == TextEffectTimingTag.START_DEPLOYMENT){
-                    when(text.tag){
-                        TextEffectTag.MAKE_ATTACK -> {
-                            text.effect!!(this.card_number, player, game_status, null)
-                            game_status.afterMakeAttack(this.card_number, player, null)
-                        }
-                        else -> text.effect!!(this.card_number, player, game_status, react_attack)
-                    }
+                    text.effect!!(this.card_number, player, game_status, react_attack)
                 }
             }
         }

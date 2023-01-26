@@ -87,27 +87,32 @@ class MadeAttack(
         when(distance_type){
             DistanceType.DISCONTINUOUS -> {
                 if (closable) {
-                    var min = 0
+                    var min = -1
                     for (i in 0..10) {
                         if(distance_uncont!![i]){
                             min = i
                             break
                         }
                     }
-                    for (i in min - number until min){
-                        distance_uncont!![i] = true
+                    if(min != -1){
+                        for (i in min - number until min){
+                            if(i < 0) continue
+                            distance_uncont!![i] = true
+                        }
                     }
                 }
                 else{
-                    var max = 10
+                    var max = 11
                     for (i in 10 downTo 0) {
                         if(distance_uncont!![i]){
                             max = i
                             break
                         }
                     }
-                    for (i in max + 1..max + number){
-                        distance_uncont!![i] = true
+                    if(max != 11){
+                        for (i in max + 1..10){
+                            distance_uncont!![i] = true
+                        }
                     }
                 }
             }

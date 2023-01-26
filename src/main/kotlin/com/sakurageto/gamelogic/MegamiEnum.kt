@@ -12,3 +12,16 @@ enum class MegamiEnum(var real_number: Int) {
         fun fromInt(value: Int) = MegamiEnum.values().first { it.real_number == value }
     }
 }
+
+enum class Umbrella(){
+    FOLD,
+    UNFOLD;
+
+    fun opposite(): Umbrella{
+        return if (this == FOLD){
+            UNFOLD
+        } else{
+            FOLD
+        }
+    }
+}

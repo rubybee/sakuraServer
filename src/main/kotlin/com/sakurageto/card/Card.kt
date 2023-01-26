@@ -61,6 +61,11 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         }
     }
 
+    fun enchantmentUsable(text: Text): Boolean =
+        text.timing_tag == TextEffectTimingTag.IN_DEPLOYMENT && (nap?: 0) > 0
+    fun usedEffectUsable(text: Text): Boolean =
+        text.timing_tag == TextEffectTimingTag.USED && this.special_card_state == SpecialCardEnum.PLAYED
+
     fun reduceNapNormal(): Int{
        card_data.effect?.let {
            for(i in it){
@@ -96,47 +101,34 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
     suspend fun addAttackBuff(player: PlayerEnum, gameStatus: GameStatus){
         card_data.effect?.let {
             for(text in it){
-                if(text.timing_tag == TextEffectTimingTag.USED && this.special_card_state == SpecialCardEnum.PLAYED){
+                if(usedEffectUsable(text)){
                     if(text.tag == TextEffectTag.NEXT_ATTACK_ENCHANTMENT) text.effect!!(this.card_number, player, gameStatus, null)
                 }
-                else if(text.timing_tag == TextEffectTimingTag.IN_DEPLOYMENT && (nap?: 0) > 0){
+                else if(enchantmentUsable(text)){
                     if(text.tag == TextEffectTag.NEXT_ATTACK_ENCHANTMENT) text.effect!!(this.card_number, player, gameStatus, null)
                 }
             }
         }
     }
 
-    suspend fun addCostBuff(player: PlayerEnum, gameStatus: GameStatus){
+    suspend fun addCostBuff(player: PlayerEnum, game_status: GameStatus){
         card_data.effect?.let {
-            for(i in it){
-                when(i.timing_tag){
-                    TextEffectTimingTag.CONSTANT_EFFECT -> {
-                        when(i.tag){
-                            TextEffectTag.COST_BUFF -> {
-                                if(this.special_card_state != SpecialCardEnum.PLAYED) i.effect!!(this.card_number, player, gameStatus, null)
-                            }
-                            else -> continue
-                        }
-                    }
-                    TextEffectTimingTag.USED -> {
-                        when(i.tag){
-                            TextEffectTag.COST_BUFF -> {
-                                if(this.special_card_state == SpecialCardEnum.PLAYED) i.effect!!(this.card_number, player, gameStatus, null)
-                            }
-                            else -> continue
-                        }
-                    }
-                    TextEffectTimingTag.IN_DEPLOYMENT -> {
-                        if((nap ?:0) >= 1 && card_data.card_type == CardType.ENCHANTMENT){
-                            when(i.tag){
-                                TextEffectTag.COST_BUFF -> {
-                                    i.effect!!(this.card_number, player, gameStatus, null)
-                                }
-                                else -> continue
-                            }
-                        }
-                    }
-                    else -> continue
+            for(text in it){
+                if(usedEffectUsable(text)){
+                    if(text.tag == TextEffectTag.COST_BUFF) text.effect!!(this.card_number, player, game_status, null)
+                }
+                else if(enchantmentUsable(text)){
+                    if(text.tag == TextEffectTag.COST_BUFF) text.effect!!(this.card_number, player, game_status, null)
+                }
+            }
+        }
+    }
+
+    suspend fun thisCardCostBuff(player: PlayerEnum, game_status: GameStatus){
+        card_data.effect?.let {
+            for(text in it){
+                if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
+                    if(text.tag == TextEffectTag.COST_BUFF) text.effect!!(this.card_number, player, game_status, null)
                 }
             }
         }
@@ -253,7 +245,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         val cost: Int
 
         if(card_data.card_class == CardClass.SPECIAL){
-            this.addCostBuff(player, gameStatus)
+            this.thisCardCostBuff(player, gameStatus)
             gameStatus.addAllCardCostBuff()
             cost = gameStatus.applyAllCostBuff(player, this.getBaseCost(player, gameStatus), this)
             if(cost > gameStatus.getPlayerFlare(player)){
@@ -459,5 +451,17 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
             }
         }
         return false
+    }
+
+    suspend fun endPhaseEffect(player: PlayerEnum, game_status: GameStatus) {
+        this.card_data.effect?.let {
+            for(text in it){
+                if (usedEffectUsable(text)) {
+                    if(text.tag == TextEffectTag.END_TURN_EFFECT){
+                        text.effect!!(card_number, player, game_status, null)
+                    }
+                }
+            }
+        }
     }
 }

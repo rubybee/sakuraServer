@@ -111,6 +111,20 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             PlayerEnum.PLAYER2 -> player2.concentration
         }
     }
+
+    fun getUmbrella(player: PlayerEnum): Umbrella?{
+        return when(player){
+            PlayerEnum.PLAYER1 -> player1.umbrella
+            PlayerEnum.PLAYER2 -> player2.umbrella
+        }
+    }
+
+    fun changeUmbrella(player: PlayerEnum){
+        when(player){
+            PlayerEnum.PLAYER1 -> player1.umbrella = player1.umbrella?.opposite()
+            PlayerEnum.PLAYER2 -> player2.umbrella = player2.umbrella?.opposite()
+        }
+    }
     
     suspend fun setConcentration(player: PlayerEnum, number: Int){
         when(player){
@@ -1176,6 +1190,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
            }
         }
         thisTurnDistance = distanceToken
+        nowPlayer.megamiCard?.endPhaseEffect(player, this)
+        nowPlayer.megamiCard2?.endPhaseEffect(player, this)
         logger.reset()
     }
 

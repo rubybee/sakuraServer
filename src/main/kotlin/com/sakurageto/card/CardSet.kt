@@ -74,6 +74,8 @@ object CardSet {
         cardNameHashmapFirst[CardName.OBORO_ULOO] = 509
         cardNameHashmapFirst[CardName.OBORO_MIKAZRA] = 510
 
+        cardNameHashmapSecond[CardName.YUKIHI_YUKIHI] = 100000
+
 
 
         //for second turn player 10000~19999
@@ -137,6 +139,8 @@ object CardSet {
         cardNameHashmapSecond[CardName.OBORO_ULOO] = 10509
         cardNameHashmapSecond[CardName.OBORO_MIKAZRA] = 10510
 
+        cardNameHashmapSecond[CardName.YUKIHI_YUKIHI] = 200000
+
 
 
         cardNumberHashmap[100] = CardName.YURINA_CHAM
@@ -199,6 +203,8 @@ object CardSet {
         cardNumberHashmap[509] = CardName.OBORO_ULOO
         cardNumberHashmap[510] = CardName.OBORO_MIKAZRA
 
+        cardNumberHashmap[100000] = CardName.YUKIHI_YUKIHI
+
         cardNumberHashmap[10100] = CardName.YURINA_CHAM
         cardNumberHashmap[10101] = CardName.YURINA_ILSUM
         cardNumberHashmap[10102] = CardName.YURINA_JARUCHIGI
@@ -257,6 +263,8 @@ object CardSet {
         cardNumberHashmap[10508] = CardName.OBORO_TOBIKAGE
         cardNumberHashmap[10509] = CardName.OBORO_ULOO
         cardNumberHashmap[10510] = CardName.OBORO_MIKAZRA
+
+        cardNumberHashmap[200000] = CardName.YUKIHI_YUKIHI
     }
 
     private val unused = CardData(CardClass.NORMAL, CardName.CARD_UNNAME, MegamiEnum.YURINA, CardType.UNDEFINED, SubType.NONE)
@@ -907,6 +915,24 @@ object CardSet {
         })
     }
 
+    private val yukihi = CardData(CardClass.SPECIAL, CardName.YUKIHI_YUKIHI, MegamiEnum.YUKIHI, CardType.BEHAVIOR, SubType.NONE)
+    fun yukihiCardInit(){
+        yukihi.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.END_TURN_EFFECT) {card_number, player, game_status, _ ->
+            while(true){
+                val nowCommand = game_status.receiveCardEffectSelect(player, card_number)
+                if(nowCommand == CommandEnum.SELECT_ONE){
+                    //not change
+                    break
+                }
+                else if(nowCommand == CommandEnum.SELECT_TWO){
+                    game_status.changeUmbrella(player)
+                    break
+                }
+            }
+            null
+        })
+    }
+
     fun init(){
         hashMapInit()
 
@@ -915,6 +941,7 @@ object CardSet {
         himikaCardInit()
         tokoyoCardInit()
         oboroCardInit()
+        yukihiCardInit()
     }
 
     fun returnCardDataByName(card_name: CardName): CardData {
@@ -974,6 +1001,7 @@ object CardSet {
             CardName.OBORO_TOBIKAGE -> return tobikage
             CardName.OBORO_ULOO -> return uloo
             CardName.OBORO_MIKAZRA -> return mikazra
+            CardName.YUKIHI_YUKIHI -> return yukihi
             else -> return unused
         }
     }

@@ -4,6 +4,7 @@ import com.sakurageto.Connection
 import com.sakurageto.card.Card
 import com.sakurageto.card.CardName
 import com.sakurageto.card.PlayerEnum
+import com.sakurageto.card.SpecialCardEnum
 import com.sakurageto.protocol.*
 import io.ktor.websocket.*
 import kotlinx.serialization.encodeToString
@@ -112,6 +113,32 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
 
         player1.session.send(Json.encodeToString(player1_player2_data))
         player2.session.send(Json.encodeToString(player2_player1_data))
+
+        //additional board setting here
+        if(game_status.player1.megami_1 == MegamiEnum.YUKIHI || game_status.player1.megami_2 == MegamiEnum.YUKIHI){
+            game_status.player1.umbrella = Umbrella.FOLD
+            if(game_status.player1.megami_1 == MegamiEnum.YUKIHI){
+                game_status.player1.megamiCard = Card.cardMakerByName(first_turn == PlayerEnum.PLAYER1, CardName.YUKIHI_YUKIHI, PlayerEnum.PLAYER1)
+                game_status.player1.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
+            }
+            else{
+                game_status.player1.megamiCard2 = Card.cardMakerByName(first_turn == PlayerEnum.PLAYER1, CardName.YUKIHI_YUKIHI, PlayerEnum.PLAYER1)
+                game_status.player1.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
+            }
+        }
+
+        if(game_status.player2.megami_2 == MegamiEnum.YUKIHI || game_status.player2.megami_2 == MegamiEnum.YUKIHI){
+            game_status.player2.umbrella = Umbrella.FOLD
+            if(game_status.player2.megami_1 == MegamiEnum.YUKIHI){
+                game_status.player2.megamiCard = Card.cardMakerByName(first_turn == PlayerEnum.PLAYER2, CardName.YUKIHI_YUKIHI, PlayerEnum.PLAYER2)
+                game_status.player2.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
+            }
+            else{
+                game_status.player2.megamiCard2 = Card.cardMakerByName(first_turn == PlayerEnum.PLAYER2, CardName.YUKIHI_YUKIHI, PlayerEnum.PLAYER2)
+                game_status.player2.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
+            }
+        }
+        //additional board setting here
     }
 
     fun checkCardSet(bigger: MutableList<CardName>, smaller: MutableList<CardName>?, size: Int): Boolean{

@@ -15,6 +15,8 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var maxAura = 5
     var aura = 3
 
+    var umbrella: Umbrella? = null
+
     fun auraDamagePossible(data: MutableList<Int>?, damage: Int, possibleList: MutableList<Int>): Boolean{
         var totalAura = 0
         if(data == null || data.size % 2 == 1) return false
@@ -178,8 +180,8 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     lateinit var megami_2: MegamiEnum
     lateinit var megami_ban: MegamiEnum
 
-    var megamiCard: CardData? = null
-    var megamiCard2: CardData? = null
+    var megamiCard: Card? = null
+    var megamiCard2: Card? = null
 
     var unselected_card: MutableList<CardName> = mutableListOf()
     var unselected_specialcard: MutableList<CardName> = mutableListOf()

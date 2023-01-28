@@ -274,6 +274,13 @@ suspend fun sendShowInformation(command: CommandEnum, show_player: Connection, l
     look_player.session.send(Json.encodeToString(data))
 }
 
+suspend fun sendChangeUmbrella(mine: Connection, other: Connection){
+    val dataYour = SakuraCardCommand(CHANGE_UMBRELLA_YOUR, -1)
+    val dataOther = SakuraCardCommand(CHANGE_UMBRELLA_OTHER, -1)
+    mine.session.send(Json.encodeToString(dataYour))
+    other.session.send(Json.encodeToString(dataOther))
+}
+
 //receive function
 suspend fun waitUntil(player: Connection, wait_command: CommandEnum): SakuraSendData {
     val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}

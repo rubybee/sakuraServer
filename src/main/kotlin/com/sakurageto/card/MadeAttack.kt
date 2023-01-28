@@ -2,6 +2,7 @@ package com.sakurageto.card
 
 import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.MegamiEnum
+import com.sakurageto.gamelogic.Umbrella
 
 class MadeAttack(
     var card_number: Int,
@@ -40,11 +41,31 @@ class MadeAttack(
 
     var effect: MutableList<Text>? = null
 
-    fun addAttackAndReturn(card_data: CardData): MadeAttack{
-        card_data.effect?.let {
-            this.effect = mutableListOf()
-            for(text in it){
-                this.effect!!.add(text)
+    fun addTextAndReturn(umbrella: Umbrella?, card_data: CardData): MadeAttack{
+        when(umbrella){
+            Umbrella.FOLD -> {
+                card_data.effectFold?.let {
+                    this.effect = mutableListOf()
+                    for(text in it){
+                        this.effect!!.add(text)
+                    }
+                }
+            }
+            Umbrella.UNFOLD -> {
+                card_data.effectUnfold?.let {
+                    this.effect = mutableListOf()
+                    for(text in it){
+                        this.effect!!.add(text)
+                    }
+                }
+            }
+            null -> {
+                card_data.effect?.let {
+                    this.effect = mutableListOf()
+                    for(text in it){
+                        this.effect!!.add(text)
+                    }
+                }
             }
         }
         return this
@@ -83,7 +104,7 @@ class MadeAttack(
     }
 
     //closable true -> increment range from left
-    fun addRange(number: Int, closable: Boolean){
+    fun plusMinusRange(number: Int, closable: Boolean){
         when(distance_type){
             DistanceType.DISCONTINUOUS -> {
                 if (closable) {
@@ -95,7 +116,7 @@ class MadeAttack(
                         }
                     }
                     if(min != -1){
-                        for (i in min - number until min){
+                        for (i in min - 1 downTo  min - number){
                             if(i < 0) continue
                             distance_uncont!![i] = true
                         }
@@ -110,7 +131,7 @@ class MadeAttack(
                         }
                     }
                     if(max != 11){
-                        for (i in max + 1..10){
+                        for (i in max + 1..max + number){
                             distance_uncont!![i] = true
                         }
                     }
@@ -134,6 +155,51 @@ class MadeAttack(
                     var now = distance_cont!!.second
                     now += number
                     distance_cont = distance_cont!!.copy(second = now)
+                }
+            }
+        }
+    }
+
+    fun addRange(range: Pair<Int, Int>){
+        when(distance_type){
+            DistanceType.DISCONTINUOUS -> {
+                for(i in range.first..range.second){
+                    distance_uncont!![i] = true
+                }
+            }
+            DistanceType.CONTINUOUS -> {
+                if(range.first <= distance_cont!!.first){
+                    if(range.second < distance_cont!!.first){
+                        distance_type = DistanceType.DISCONTINUOUS
+                        distance_uncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false)
+                        for(i in distance_cont!!.first..distance_cont!!.second){
+                            distance_uncont!![i] = true
+                        }
+                        for(i in range.first..range.second){
+                            distance_uncont!![i] = true
+                        }
+                    }
+                    else if(distance_cont!!.second < range.second){
+                        distance_cont = range
+                    }
+                    else{
+                        distance_cont = distance_cont!!.copy(first = range.first)
+                    }
+                }
+                else{
+                    if(range.first > distance_cont!!.second){
+                        distance_type = DistanceType.DISCONTINUOUS
+                        distance_uncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false)
+                        for(i in distance_cont!!.first..distance_cont!!.second){
+                            distance_uncont!![i] = true
+                        }
+                        for(i in range.first..range.second){
+                            distance_uncont!![i] = true
+                        }
+                    }
+                    else if(range.second > distance_cont!!.second){
+                        distance_cont = distance_cont!!.copy(second = range.second)
+                    }
                 }
             }
         }

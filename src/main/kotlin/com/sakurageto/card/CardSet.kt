@@ -1,11 +1,11 @@
 package com.sakurageto.card
 
 import com.sakurageto.gamelogic.GameStatus
-import com.sakurageto.gamelogic.ImmediateBackListner
+import com.sakurageto.gamelogic.ImmediateBackListener
 import com.sakurageto.gamelogic.MegamiEnum
+import com.sakurageto.gamelogic.Umbrella
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
-import com.sakurageto.protocol.sendPopCardZone
 
 object CardSet {
     val cardNameHashmapFirst = HashMap<CardName, Int>()
@@ -75,6 +75,17 @@ object CardSet {
         cardNameHashmapFirst[CardName.OBORO_MIKAZRA] = 510
 
         cardNameHashmapSecond[CardName.YUKIHI_YUKIHI] = 100000
+        cardNameHashmapFirst[CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE] = 600
+        cardNameHashmapFirst[CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS] = 601
+        cardNameHashmapFirst[CardName.YUKIHI_PUSH_OUT_SLASH_PULL] = 602
+        cardNameHashmapFirst[CardName.YUKIHI_SWING_SLASH_STAB] = 603
+        cardNameHashmapFirst[CardName.YUKIHI_TURN_UMBRELLA] = 604
+        cardNameHashmapFirst[CardName.YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN] = 605
+        cardNameHashmapFirst[CardName.YUKIHI_MAKE_CONNECTION] = 606
+        cardNameHashmapFirst[CardName.YUKIHI_FLUTTERING_SNOWFLAKE] = 607
+        cardNameHashmapFirst[CardName.YUKIHI_SWAYING_LAMPLIGHT] = 608
+        cardNameHashmapFirst[CardName.YUKIHI_CLINGY_MIND] = 609
+        cardNameHashmapFirst[CardName.YUKIHI_SWIRLING_GESTURE] = 610
 
 
 
@@ -140,6 +151,17 @@ object CardSet {
         cardNameHashmapSecond[CardName.OBORO_MIKAZRA] = 10510
 
         cardNameHashmapSecond[CardName.YUKIHI_YUKIHI] = 200000
+        cardNameHashmapSecond[CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE] = 10600
+        cardNameHashmapSecond[CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS] = 10601
+        cardNameHashmapSecond[CardName.YUKIHI_PUSH_OUT_SLASH_PULL] = 10602
+        cardNameHashmapSecond[CardName.YUKIHI_SWING_SLASH_STAB] = 10603
+        cardNameHashmapSecond[CardName.YUKIHI_TURN_UMBRELLA] = 10604
+        cardNameHashmapSecond[CardName.YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN] = 10605
+        cardNameHashmapSecond[CardName.YUKIHI_MAKE_CONNECTION] = 10606
+        cardNameHashmapSecond[CardName.YUKIHI_FLUTTERING_SNOWFLAKE] = 10607
+        cardNameHashmapSecond[CardName.YUKIHI_SWAYING_LAMPLIGHT] = 10608
+        cardNameHashmapSecond[CardName.YUKIHI_CLINGY_MIND] = 10609
+        cardNameHashmapSecond[CardName.YUKIHI_SWIRLING_GESTURE] = 10610
 
 
 
@@ -204,6 +226,17 @@ object CardSet {
         cardNumberHashmap[510] = CardName.OBORO_MIKAZRA
 
         cardNumberHashmap[100000] = CardName.YUKIHI_YUKIHI
+        cardNumberHashmap[600] = CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE
+        cardNumberHashmap[601] = CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS
+        cardNumberHashmap[602] = CardName.YUKIHI_PUSH_OUT_SLASH_PULL
+        cardNumberHashmap[603] = CardName.YUKIHI_SWING_SLASH_STAB
+        cardNumberHashmap[604] = CardName.YUKIHI_TURN_UMBRELLA
+        cardNumberHashmap[605] = CardName.YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN
+        cardNumberHashmap[606] = CardName.YUKIHI_MAKE_CONNECTION
+        cardNumberHashmap[607] = CardName.YUKIHI_FLUTTERING_SNOWFLAKE
+        cardNumberHashmap[608] = CardName.YUKIHI_SWAYING_LAMPLIGHT
+        cardNumberHashmap[609] = CardName.YUKIHI_CLINGY_MIND
+        cardNumberHashmap[610] = CardName.YUKIHI_SWIRLING_GESTURE
 
         cardNumberHashmap[10100] = CardName.YURINA_CHAM
         cardNumberHashmap[10101] = CardName.YURINA_ILSUM
@@ -265,6 +298,29 @@ object CardSet {
         cardNumberHashmap[10510] = CardName.OBORO_MIKAZRA
 
         cardNumberHashmap[200000] = CardName.YUKIHI_YUKIHI
+        cardNumberHashmap[10600] = CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE
+        cardNumberHashmap[10601] = CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS
+        cardNumberHashmap[10602] = CardName.YUKIHI_PUSH_OUT_SLASH_PULL
+        cardNumberHashmap[10603] = CardName.YUKIHI_SWING_SLASH_STAB
+        cardNumberHashmap[10604] = CardName.YUKIHI_TURN_UMBRELLA
+        cardNumberHashmap[10605] = CardName.YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN
+        cardNumberHashmap[10606] = CardName.YUKIHI_MAKE_CONNECTION
+        cardNumberHashmap[10607] = CardName.YUKIHI_FLUTTERING_SNOWFLAKE
+        cardNumberHashmap[10608] = CardName.YUKIHI_SWAYING_LAMPLIGHT
+        cardNumberHashmap[10609] = CardName.YUKIHI_CLINGY_MIND
+        cardNumberHashmap[10610] = CardName.YUKIHI_SWIRLING_GESTURE
+    }
+
+    suspend fun selectDustToDistance(nowCommand: CommandEnum, game_status: GameStatus): Boolean{
+        if(nowCommand == CommandEnum.SELECT_ONE){
+            game_status.dustToDistance(1)
+            return true
+        }
+        else if(nowCommand == CommandEnum.SELECT_TWO){
+            game_status.distanceToDust(1)
+            return true
+        }
+        return false
     }
 
     private val unused = CardData(CardClass.NORMAL, CardName.CARD_UNNAME, MegamiEnum.YURINA, CardType.UNDEFINED, SubType.NONE)
@@ -319,7 +375,7 @@ object CardSet {
         })
         giback.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
             game_status.addThisTurnRangeBuff(player, RangeBuff(card_number,1, RangeBufTag.ADD, {_, _, attack -> (attack.megami != MegamiEnum.YURINA) && (attack.card_class != CardClass.SPECIAL)},
-                { attack -> attack.addRange(1, true)
+                { attack -> attack.plusMinusRange(1, true)
 
             }))
             game_status.addThisTurnAttackBuff(player, Buff(card_number,1, BufTag.CHANGE_EACH, { _, _, attack -> (attack.megami != MegamiEnum.YURINA) && (attack.card_class != CardClass.SPECIAL)},
@@ -358,9 +414,9 @@ object CardSet {
             game_status.dustToAura(player, 5)
             null
         })
-        jjockbae.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){_, player, game_status, _ ->
-            game_status.addImmediateLifeListner(player, ImmediateBackListner(
-                game_status.getCardNumber(player, CardName.YURINA_JJOCKBAE)
+        jjockbae.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
+            game_status.addImmediateLifeListener(player, ImmediateBackListener(
+                card_number
             ) { before, after, _ ->
                 before > 3 && after <= 3
             })
@@ -414,14 +470,7 @@ object CardSet {
         ganpa.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
             while(true){
                 val nowCommand = game_status.receiveCardEffectSelect(player, card_number)
-                if(nowCommand == CommandEnum.SELECT_ONE){
-                    game_status.dustToDistance(1)
-                    break
-                }
-                else if(nowCommand == CommandEnum.SELECT_TWO){
-                    game_status.distanceToDust(1)
-                    break
-                }
+                if(selectDustToDistance(nowCommand, game_status)) break
             }
             null
         })
@@ -738,7 +787,7 @@ object CardSet {
         })
         endlesswind.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) {_, player, game_status, _ ->
             if (game_status.endlessWindCheck(player.Opposite())){
-                game_status.showSome(player.Opposite(), CommandEnum.SHOW_HAND_YOUR)
+                game_status.showSome(player.Opposite(), CommandEnum.SHOW_HAND_ALL_YOUR, -1)
             }
             else{
                 while (true){
@@ -838,7 +887,8 @@ object CardSet {
         })
         clone.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) {_, player, game_status, _ ->
             if(game_status.checkCoverFullPower(player)){
-                game_status.showSome(player, CommandEnum.SHOW_COVER_YOUR)
+                game_status.showSome(player, CommandEnum.SHOW_COVER_YOUR, -1)
+                TODO("공격카드 중에 쓸 수 없는 카드가 있을 수도 있으니 체크해야한다.")
             }
             else{
                 while(true){
@@ -886,7 +936,8 @@ object CardSet {
         tobikage.setSpecial(4)
         tobikage.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) {_, player, game_status, react_attack ->
             if(game_status.checkCoverFullPower(player)){
-                game_status.showSome(player, CommandEnum.SHOW_COVER_YOUR)
+                game_status.showSome(player, CommandEnum.SHOW_COVER_YOUR, -1)
+                TODO("공격카드 중에 쓸 수 없는 카드가 있을 수도 있으니 체크해야한다.")
             }
             else{
                 while(true){
@@ -916,19 +967,139 @@ object CardSet {
     }
 
     private val yukihi = CardData(CardClass.SPECIAL, CardName.YUKIHI_YUKIHI, MegamiEnum.YUKIHI, CardType.BEHAVIOR, SubType.NONE)
+
+    private val hiddenNeedle = CardData(CardClass.NORMAL, CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE, MegamiEnum.YUKIHI, CardType.ATTACK, SubType.NONE)
+    private val hiddenFire = CardData(CardClass.NORMAL, CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS, MegamiEnum.YUKIHI, CardType.ATTACK, SubType.NONE)
+    private val pushOut = CardData(CardClass.NORMAL, CardName.YUKIHI_PUSH_OUT_SLASH_PULL, MegamiEnum.YUKIHI, CardType.ATTACK, SubType.NONE)
+    private val swing = CardData(CardClass.NORMAL, CardName.YUKIHI_SWING_SLASH_STAB, MegamiEnum.YUKIHI, CardType.ATTACK, SubType.FULLPOWER)
+    private val turnUmbrella = CardData(CardClass.NORMAL, CardName.YUKIHI_TURN_UMBRELLA, MegamiEnum.YUKIHI, CardType.BEHAVIOR, SubType.NONE)
+    private val backwardStep = CardData(CardClass.NORMAL, CardName.YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN, MegamiEnum.YUKIHI, CardType.BEHAVIOR, SubType.REACTION)
+    private val makeConnection = CardData(CardClass.NORMAL, CardName.YUKIHI_MAKE_CONNECTION, MegamiEnum.YUKIHI, CardType.ENCHANTMENT, SubType.NONE)
+    private val flutteringSnowflake = CardData(CardClass.SPECIAL, CardName.YUKIHI_FLUTTERING_SNOWFLAKE, MegamiEnum.YUKIHI, CardType.ATTACK, SubType.NONE)
+    private val swayingLamplight = CardData(CardClass.SPECIAL, CardName.YUKIHI_SWAYING_LAMPLIGHT, MegamiEnum.YUKIHI, CardType.ATTACK, SubType.NONE)
+    private val clingyMind = CardData(CardClass.SPECIAL, CardName.YUKIHI_CLINGY_MIND, MegamiEnum.YUKIHI, CardType.ENCHANTMENT, SubType.FULLPOWER)
+    private val swirlingGesture = CardData(CardClass.SPECIAL, CardName.YUKIHI_SWIRLING_GESTURE, MegamiEnum.YUKIHI, CardType.BEHAVIOR, SubType.REACTION)
+
     fun yukihiCardInit(){
         yukihi.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.END_TURN_EFFECT) {card_number, player, game_status, _ ->
             while(true){
                 val nowCommand = game_status.receiveCardEffectSelect(player, card_number)
                 if(nowCommand == CommandEnum.SELECT_ONE){
+                    game_status.changeUmbrella(player)
+                    break
+
+                }
+                else if(nowCommand == CommandEnum.SELECT_TWO){
                     //not change
                     break
                 }
+            }
+            null
+        })
+        hiddenNeedle.setAttackFold(DistanceType.CONTINUOUS, Pair(4, 6), null, 3, 1)
+        hiddenNeedle.setAttackUnfold(DistanceType.CONTINUOUS, Pair(0, 2), null, 1, 2)
+        hiddenFire.setAttackFold(DistanceType.CONTINUOUS, Pair(5, 6), null, 1, 1)
+        hiddenFire.setAttackUnfold(DistanceType.CONTINUOUS, Pair(0, 2), null, 1, 1)
+        hiddenFire.addTextFold(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.CARD_DISCARD_PLACE_CHANGE) {card_number, player, game_status, _ ->
+            game_status.movePlayingCard(player, LocationEnum.HAND, card_number)
+            game_status.changeUmbrella(player)
+            null
+        })
+        pushOut.setAttackFold(DistanceType.CONTINUOUS, Pair(2, 5), null, 1, 1)
+        pushOut.setAttackUnfold(DistanceType.CONTINUOUS, Pair(0, 2), null, 1, 1)
+        pushOut.addTextFold(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _->
+            while(true){
+                val nowCommand = game_status.receiveCardEffectSelect(player, card_number)
+                if(selectDustToDistance(nowCommand, game_status)) break
+            }
+            null
+        })
+        pushOut.addTextUnfold(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {_, _, game_status, _->
+            game_status.distanceToDust(2)
+            null
+        })
+        swing.setAttackFold(DistanceType.CONTINUOUS, Pair(4, 6), null, 5, 999)
+        swing.setAttackUnfold(DistanceType.CONTINUOUS, Pair(0, 2), null, 999, 2)
+        turnUmbrella.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.SHOW_HAND_WHEN_CHANGE_UMBRELLA) {card_number, player, game_status, _->
+            while(true){
+                val nowCommand = game_status.receiveCardEffectSelect(player, card_number)
+                if(nowCommand == CommandEnum.SELECT_ONE){
+                    game_status.showSome(player, CommandEnum.SHOW_HAND_YOUR, card_number)
+                    game_status.dustToAura(player, 1)
+                    break
+                }
                 else if(nowCommand == CommandEnum.SELECT_TWO){
-                    game_status.changeUmbrella(player)
+                    //not show
                     break
                 }
             }
+            null
+        })
+        backwardStep.addTextFold(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){_, player, game_status, _ ->
+            game_status.dustToDistance(1)
+            null
+        })
+        backwardStep.addTextUnfold(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){_, player, game_status, _ ->
+            game_status.distanceToDust(1)
+            null
+        })
+        makeConnection.setEnchantment(2)
+        makeConnection.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
+            if(game_status.getUmbrella(player) == Umbrella.UNFOLD) game_status.dustToDistance(1)
+            else game_status.distanceToDust(1)
+            null
+        })
+        makeConnection.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
+            if(game_status.getUmbrella(player) == Umbrella.UNFOLD) game_status.distanceToDust(1)
+            else game_status.dustToDistance(1)
+            null
+        })
+        flutteringSnowflake.setSpecial(2)
+        flutteringSnowflake.setAttackFold(DistanceType.CONTINUOUS, Pair(3, 6), null, 3, 1)
+        flutteringSnowflake.setAttackUnfold(DistanceType.CONTINUOUS, Pair(0, 2), null, 0, 0)
+        flutteringSnowflake.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
+            game_status.addImmediateUmbrellaListener(player, ImmediateBackListener(
+                card_number
+            ) { _, _, _ ->
+                true
+            })
+            null
+        })
+        swayingLamplight.setSpecial(5)
+        swayingLamplight.setAttackFold(DistanceType.CONTINUOUS, Pair(4, 6), null, 0, 0)
+        swayingLamplight.setAttackUnfold(DistanceType.CONTINUOUS, Pair(0, 0), null, 4, 5)
+        clingyMind.setSpecial(3)
+        clingyMind.setEnchantment(7)
+        clingyMind.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT){card_number, player, game_status, _ ->
+            game_status.addThisTurnRangeBuff(player, RangeBuff(card_number, 1, RangeBufTag.CHANGE_IMMEDIATE, { _, _, _ -> true}, { madeAttack ->
+                when(cardNumberHashmap[madeAttack.card_number]){
+                    CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE -> {
+                        madeAttack.run { addRange(Pair(0, 2)); addRange(Pair(4, 6))}
+                    }
+                    CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS -> {
+                        madeAttack.run { addRange(Pair(0, 2)); addRange(Pair(5, 6))}
+                    }
+                    CardName.YUKIHI_PUSH_OUT_SLASH_PULL -> {
+                        madeAttack.run { addRange(Pair(0, 2)); addRange(Pair(2, 5))}
+                    }
+                    CardName.YUKIHI_SWING_SLASH_STAB -> {
+                        madeAttack.run { addRange(Pair(0, 2)); addRange(Pair(4, 6))}
+                    }
+                    CardName.YUKIHI_FLUTTERING_SNOWFLAKE -> {
+                        madeAttack.run { addRange(Pair(0, 2)); addRange(Pair(3, 6))}
+                    }
+                    CardName.YUKIHI_SWAYING_LAMPLIGHT -> {
+                        madeAttack.run { addRange(Pair(0, 0)); addRange(Pair(4, 6))}
+                    }
+                    else -> {}
+                }
+            }))
+            null
+        })
+        swirlingGesture.setSpecial(1)
+        swirlingGesture.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
+            game_status.changeUmbrella(player)
+            game_status.dustToAura(player, 1)
             null
         })
     }
@@ -1002,7 +1173,18 @@ object CardSet {
             CardName.OBORO_ULOO -> return uloo
             CardName.OBORO_MIKAZRA -> return mikazra
             CardName.YUKIHI_YUKIHI -> return yukihi
-            else -> return unused
+            CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE -> return hiddenNeedle
+            CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS -> return hiddenFire
+            CardName.YUKIHI_PUSH_OUT_SLASH_PULL -> return pushOut
+            CardName.YUKIHI_SWING_SLASH_STAB -> return swing
+            CardName.YUKIHI_TURN_UMBRELLA -> return turnUmbrella
+            CardName.YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN -> return backwardStep
+            CardName.YUKIHI_MAKE_CONNECTION -> return makeConnection
+            CardName.YUKIHI_FLUTTERING_SNOWFLAKE -> return flutteringSnowflake
+            CardName.YUKIHI_SWAYING_LAMPLIGHT -> return swayingLamplight
+            CardName.YUKIHI_CLINGY_MIND -> return clingyMind
+            CardName.YUKIHI_SWIRLING_GESTURE -> return swirlingGesture
+            CardName.CARD_UNNAME -> return unused
         }
     }
 }

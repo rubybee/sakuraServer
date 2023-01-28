@@ -4,6 +4,7 @@ import com.sakurageto.card.CardSet.cardNameHashmapSecond
 import com.sakurageto.card.CardSet.cardNameHashmapFirst
 import com.sakurageto.card.CardSet.returnCardDataByName
 import com.sakurageto.gamelogic.GameStatus
+import com.sakurageto.gamelogic.Umbrella
 import com.sakurageto.protocol.receiveNapInformation
 import kotlin.collections.ArrayDeque
 
@@ -222,16 +223,58 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
                 }
             }
         }
-        return MadeAttack(
-            card_number = this.card_number,
-            card_class = this.card_data.card_class,
-            distance_type = this.card_data.distance_type!!,
-            life_damage = this.card_data.life_damage!!,
-            aura_damage = this.card_data.aura_damage!!,
-            distance_cont = this.card_data.distance_cont,
-            distance_uncont = this.card_data.distance_uncont,
-            megami = this.card_data.megami
-        )
+        if(this.card_data.umbrellaMark){
+            when(game_status.getUmbrella(this.player)){
+                Umbrella.FOLD -> {
+                    return MadeAttack(
+                        card_number = this.card_number,
+                        card_class = this.card_data.card_class,
+                        distance_type = this.card_data.distanceTypeFold!!,
+                        life_damage = this.card_data.lifeDamageFold!!,
+                        aura_damage = this.card_data.auraDamageFold!!,
+                        distance_cont = this.card_data.distanceContFold,
+                        distance_uncont = this.card_data.distanceUncontFold,
+                        megami = this.card_data.megami
+                    )
+                }
+                Umbrella.UNFOLD -> {
+                    return MadeAttack(
+                        card_number = this.card_number,
+                        card_class = this.card_data.card_class,
+                        distance_type = this.card_data.distanceTypeUnfold!!,
+                        life_damage = this.card_data.lifeDamageUnfold!!,
+                        aura_damage = this.card_data.auraDamageUnfold!!,
+                        distance_cont = this.card_data.distanceContUnfold,
+                        distance_uncont = this.card_data.distanceUncontUnfold,
+                        megami = this.card_data.megami
+                    )
+                }
+                null -> {
+                    return MadeAttack(
+                        card_number = this.card_number,
+                        card_class = this.card_data.card_class,
+                        distance_type = DistanceType.DISCONTINUOUS,
+                        life_damage = 0,
+                        aura_damage = 0,
+                        distance_cont = null,
+                        distance_uncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false),
+                        megami = this.card_data.megami
+                    )
+                }
+            }
+        }
+        else{
+            return MadeAttack(
+                card_number = this.card_number,
+                card_class = this.card_data.card_class,
+                distance_type = this.card_data.distance_type!!,
+                life_damage = this.card_data.life_damage!!,
+                aura_damage = this.card_data.aura_damage!!,
+                distance_cont = this.card_data.distance_cont,
+                distance_uncont = this.card_data.distance_uncont,
+                megami = this.card_data.megami
+            )
+        }
     }
 
     //-2: can't use                    -1: can use                 >= 0: cost
@@ -259,7 +302,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
 
         when(card_data.card_type){
             CardType.ATTACK -> {
-                if(gameStatus.addPreAttackZone(player, this.makeAttack(player, gameStatus, react_attack).addAttackAndReturn(this.card_data))){
+                if(gameStatus.addPreAttackZone(player, this.makeAttack(player, gameStatus, react_attack).addTextAndReturn(gameStatus.getUmbrella(this.player), this.card_data))){
                     return cost
                 }
                 if(card_data.card_class == CardClass.SPECIAL){
@@ -279,10 +322,36 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
     }
 
     suspend fun behaviorUseNormal(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?){
-        card_data.effect?.let {
-            for(text in it){
-                if(text.timing_tag == TextEffectTimingTag.USING){
-                    text.effect!!(this.card_number, player, game_status, react_attack)
+        if(this.card_data.umbrellaMark) {
+            when (game_status.getUmbrella(this.player)) {
+                Umbrella.FOLD -> {
+                    card_data.effectFold?.let {
+                        for(text in it){
+                            if(text.timing_tag == TextEffectTimingTag.USING){
+                                text.effect!!(this.card_number, player, game_status, react_attack)
+                            }
+                        }
+                    }
+                }
+                Umbrella.UNFOLD -> {
+                    card_data.effectUnfold?.let {
+                        for(text in it){
+                            if(text.timing_tag == TextEffectTimingTag.USING){
+                                text.effect!!(this.card_number, player, game_status, react_attack)
+                            }
+                        }
+                    }
+                }
+                null -> {
+                }
+            }
+        }
+        else{
+            card_data.effect?.let {
+                for(text in it){
+                    if(text.timing_tag == TextEffectTimingTag.USING){
+                        text.effect!!(this.card_number, player, game_status, react_attack)
+                    }
                 }
             }
         }
@@ -464,4 +533,15 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
             }
         }
     }
+
+    suspend fun checkWhenUmbrellaChange(player: PlayerEnum, game_status: GameStatus){
+        this.card_data.effect?.let {
+            for(text in it){
+                if (text.tag == TextEffectTag.SHOW_HAND_WHEN_CHANGE_UMBRELLA){
+                    text.effect!!(card_number, player, game_status, null)
+                }
+            }
+        }
+    }
+
 }

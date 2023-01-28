@@ -114,83 +114,83 @@ enum class CardName {
     OBORO_MIKAZRA,
 
     YUKIHI_YUKIHI,
-    YUKIHI_HIDDEN_NEEDLE,
-    YUKIHI_HOLD_NEEDLE,
-    YUKIHI_HIDDEN_FIRE,
-    YUKIHI_CLAP_HANDS,
-    YUKIHI_PUSH_OUT,
-    YUKIHI_PULL,
-    YUKIHI_SWING,
-    YUKIHI_STAB,
+    YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE,
+    YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS,
+    YUKIHI_PUSH_OUT_SLASH_PULL,
+    YUKIHI_SWING_SLASH_STAB,
     YUKIHI_TURN_UMBRELLA,
-    YUKIHI_DIG_IN,
+    YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN,
     YUKIHI_MAKE_CONNECTION,
 
-    YUKIHI_FLUTTERING_SNOWFLAKE_UNFOLD,
-    YUKIHI_FLUTTERING_SNOWFLAKE_FOLD,
-    YUKIHI_SWAYING_LAMPLIGHT_UNFOLD,
-    YUKIHI_SWAYING_LAMPLIGHT_FOLD,
+    YUKIHI_FLUTTERING_SNOWFLAKE,
+    YUKIHI_SWAYING_LAMPLIGHT,
     YUKIHI_CLINGY_MIND,
     YUKIHI_SWIRLING_GESTURE;
 
     companion object {
         fun returnNormalCardNameByMegami(megami_name: MegamiEnum):List<CardName>{
             when (megami_name){
-                MegamiEnum.YURINA -> return listOf<CardName>(
+                MegamiEnum.YURINA -> return listOf(
                     YURINA_CHAM, YURINA_ILSUM, YURINA_JARUCHIGI, YURINA_GUHAB, YURINA_GIBACK,
                     YURINA_APDO, YURINA_GIYENBANJO
                 )
-                MegamiEnum.SAINE -> return listOf<CardName>(
+                MegamiEnum.SAINE -> return listOf(
                     SAINE_HURUBEGI, SAINE_DOUBLEBEGI, SAINE_MOOGECHOO, SAINE_GANPA, SAINE_GWONYUCK,
                     SAINE_CHOONGEMJUNG, SAINE_MOOEMBUCK
                 )
-                MegamiEnum.HIMIKA -> return listOf<CardName>(
+                MegamiEnum.HIMIKA -> return listOf(
                     HIMIKA_SHOOT, HIMIKA_RAPIDFIRE, HIMIKA_MAGNUMCANON, HIMIKA_FULLBURST,
                     HIMIKA_BACKSTEP, HIMIKA_BACKDRAFT, HIMIKA_SMOKE
                 )
-                MegamiEnum.TOKOYO -> return listOf<CardName>(
+                MegamiEnum.TOKOYO -> return listOf(
                     TOKOYO_BITSUNERIGI, TOKOYO_WOOAHHANTAGUCK, TOKOYO_RUNNINGRABIT, TOKOYO_POETDANCE,
                     TOKOYO_FLIPFAN, TOKOYO_WINDSTAGE, TOKOYO_SUNSTAGE
                 )
-                MegamiEnum.OBORO -> return listOf<CardName>(
+                MegamiEnum.OBORO -> return listOf(
                     OBORO_WIRE, OBORO_SHADOWCALTROP, OBORO_ZANGEKIRANBU, OBORO_NINJAWALK,
                     OBORO_INDUCE, OBORO_CLONE, OBORO_BIOACTIVITY
                 )
-                else -> TODO()
+                MegamiEnum.YUKIHI -> return listOf(
+                    YUKIHI_YUKIHI, YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE, YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS,
+                    YUKIHI_PUSH_OUT_SLASH_PULL, YUKIHI_SWING_SLASH_STAB, YUKIHI_TURN_UMBRELLA,
+                    YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN, YUKIHI_MAKE_CONNECTION
+                )
             }
         }
 
         fun returnSpecialCardNameByMegami(megami_name: MegamiEnum): List<CardName> {
             return when (megami_name){
-                MegamiEnum.YURINA -> listOf<CardName>(
+                MegamiEnum.YURINA -> listOf(
                     YURINA_WOLYUNGNACK, YURINA_POBARAM, YURINA_JJOCKBAE, YURINA_JURUCK
                 )
 
-                MegamiEnum.SAINE -> listOf<CardName>(
+                MegamiEnum.SAINE -> listOf(
                     SAINE_YULDONGHOGEK, SAINE_HANGMUNGGONGJIN, SAINE_EMMOOSHOEBING, SAINE_JONGGEK
                 )
 
-                MegamiEnum.HIMIKA -> listOf<CardName>(
+                MegamiEnum.HIMIKA -> listOf(
                     HIMIKA_REDBULLET, HIMIKA_CRIMSONZERO, HIMIKA_SCARLETIMAGINE, HIMIKA_BURMILIONFIELD
                 )
 
-                MegamiEnum.TOKOYO -> listOf<CardName>(
+                MegamiEnum.TOKOYO -> listOf(
                     TOKOYO_KUON, TOKOYO_THOUSANDBIRD, TOKOYO_ENDLESSWIND, TOKOYO_TOKOYOMOON
                 )
-                MegamiEnum.OBORO -> listOf<CardName>(
+                MegamiEnum.OBORO -> listOf(
                     OBORO_KUMASUKE, OBORO_TOBIKAGE, OBORO_ULOO, OBORO_MIKAZRA
                 )
-                else -> TODO()
+                MegamiEnum.YUKIHI -> listOf(
+                    YUKIHI_FLUTTERING_SNOWFLAKE, YUKIHI_SWAYING_LAMPLIGHT, YUKIHI_CLINGY_MIND, YUKIHI_SWIRLING_GESTURE
+                )
             }
         }
 
         fun returnAdditionalCardNameByMegami(megami_name: MegamiEnum): List<CardName> {
             return when (megami_name){
-                MegamiEnum.YURINA -> listOf<CardName>()
-                MegamiEnum.SAINE -> listOf<CardName>()
-                MegamiEnum.HIMIKA -> listOf<CardName>()
-                MegamiEnum.TOKOYO -> listOf<CardName>()
-                MegamiEnum.OBORO -> listOf<CardName>()
+                MegamiEnum.YURINA -> listOf()
+                MegamiEnum.SAINE -> listOf()
+                MegamiEnum.HIMIKA -> listOf()
+                MegamiEnum.TOKOYO -> listOf()
+                MegamiEnum.OBORO -> listOf()
                 else -> TODO()
             }
         }

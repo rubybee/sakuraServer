@@ -45,8 +45,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     var thisTurnDistance = 10
     var dust = 0
 
-    var player1LifeListner: ArrayDeque<ImmediateBackListner> = ArrayDeque<ImmediateBackListner>()
-    var player2LifeListner: ArrayDeque<ImmediateBackListner> = ArrayDeque<ImmediateBackListner>()
+    var player1LifeListener: ArrayDeque<ImmediateBackListener> = ArrayDeque<ImmediateBackListener>()
+    var player2LifeListener: ArrayDeque<ImmediateBackListener> = ArrayDeque<ImmediateBackListener>()
+
+    val player1UmbrellaListener: ArrayDeque<ImmediateBackListener> = ArrayDeque<ImmediateBackListener>()
+    val player2UmbrellaListener: ArrayDeque<ImmediateBackListener> = ArrayDeque<ImmediateBackListener>()
 
     lateinit var first_turn: PlayerEnum
 
@@ -119,10 +122,35 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    fun changeUmbrella(player: PlayerEnum){
-        when(player){
-            PlayerEnum.PLAYER1 -> player1.umbrella = player1.umbrella?.opposite()
-            PlayerEnum.PLAYER2 -> player2.umbrella = player2.umbrella?.opposite()
+    fun getUmbrellaListener(player: PlayerEnum): ArrayDeque<ImmediateBackListener>{
+        return when(player){
+            PlayerEnum.PLAYER1 -> player1UmbrellaListener
+            PlayerEnum.PLAYER2 -> player2UmbrellaListener
+        }
+    }
+
+    suspend fun changeUmbrella(player: PlayerEnum){
+        val nowPlayer = getPlayer(player)
+        nowPlayer.umbrella?.let {
+            val umbrellaListener = getUmbrellaListener(player)
+            if(!umbrellaListener.isEmpty()){
+                for(i in 0..umbrellaListener.size){
+                    if(umbrellaListener.isEmpty()) break
+                    val now = umbrellaListener.first()
+                    umbrellaListener.removeFirst()
+                    if(now.IsItBack(-1, -1, false)){
+                        returnSpecialCard(player, now.card_number)
+                    }
+                    else{
+                        player1LifeListener.addLast(now)
+                    }
+                }
+            }
+            nowPlayer.umbrella = it.opposite()
+            sendChangeUmbrella(getSocket(player), getSocket(player.Opposite()))
+            for(card in nowPlayer.hand.values){
+                card.checkWhenUmbrellaChange(player, this)
+            }
         }
     }
     
@@ -172,10 +200,17 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return receiveCardEffectSelect(getSocket(player), card_number)
     }
 
-    fun addImmediateLifeListner(player: PlayerEnum, listner: ImmediateBackListner){
+    fun addImmediateLifeListener(player: PlayerEnum, listener: ImmediateBackListener){
         when(player){
-            PlayerEnum.PLAYER1 -> player1LifeListner.addLast(listner)
-            PlayerEnum.PLAYER2 -> player2LifeListner.addLast(listner)
+            PlayerEnum.PLAYER1 -> player1LifeListener.addLast(listener)
+            PlayerEnum.PLAYER2 -> player2LifeListener.addLast(listener)
+        }
+    }
+
+    fun addImmediateUmbrellaListener(player: PlayerEnum, listener: ImmediateBackListener){
+        when(player){
+            PlayerEnum.PLAYER1 -> player1UmbrellaListener.addLast(listener)
+            PlayerEnum.PLAYER2 -> player2UmbrellaListener.addLast(listener)
         }
     }
 
@@ -509,35 +544,35 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     }
 
-    suspend fun lifeListnerProcess(player: PlayerEnum, before: Int, reconstruct: Boolean){
+    suspend fun lifeListenerProcess(player: PlayerEnum, before: Int, reconstruct: Boolean){
         val now_player = getPlayer(player)
         when(player){
             PlayerEnum.PLAYER1 -> {
-                if(!player1LifeListner.isEmpty()){
-                    for(i in 0..player1LifeListner.size){
-                        if(player1LifeListner.isEmpty()) break
-                        val now = player1LifeListner.first()
-                        player1LifeListner.removeFirst()
+                if(!player1LifeListener.isEmpty()){
+                    for(i in 0..player1LifeListener.size){
+                        if(player1LifeListener.isEmpty()) break
+                        val now = player1LifeListener.first()
+                        player1LifeListener.removeFirst()
                         if(now.IsItBack(before, now_player.life, reconstruct)){
                             returnSpecialCard(player, now.card_number)
                         }
                         else{
-                            player1LifeListner.addLast(now)
+                            player1LifeListener.addLast(now)
                         }
                     }
                 }
             }
             PlayerEnum.PLAYER2 -> {
-                if(!player2LifeListner.isEmpty()){
-                    for(i in 0..player2LifeListner.size){
-                        if(player2LifeListner.isEmpty()) break
-                        val now = player2LifeListner.first()
-                        player2LifeListner.removeFirst()
+                if(!player2LifeListener.isEmpty()){
+                    for(i in 0..player2LifeListener.size){
+                        if(player2LifeListener.isEmpty()) break
+                        val now = player2LifeListener.first()
+                        player2LifeListener.removeFirst()
                         if(now.IsItBack(before, now_player.life, reconstruct)){
                             returnSpecialCard(player, now.card_number)
                         }
                         else{
-                            player2LifeListner.addLast(now)
+                            player2LifeListener.addLast(now)
                         }
                     }
                 }
@@ -558,7 +593,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             return true
         }
 
-        lifeListnerProcess(player, before, false)
+        lifeListenerProcess(player, before, false)
         chasmProcess(player)
 
         sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
@@ -582,7 +617,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             return true
         }
 
-        lifeListnerProcess(player, before, reconstruct)
+        lifeListenerProcess(player, before, reconstruct)
 
         sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.YOUR_LIFE, LocationEnum.YOUR_FLARE, number, -1)
@@ -1553,6 +1588,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 nowPlayer.special_card_deck[card.card_number] = card
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.SPECIAL_YOUR)
             }
+            LocationEnum.HAND -> {
+                nowPlayer.hand[card.card_number] = card
+                sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.HAND_YOUR)
+            }
             else -> TODO()
         }
     }
@@ -1565,14 +1604,15 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return true
     }
 
-    suspend fun showSome(show_player: PlayerEnum, command: CommandEnum){
+    suspend fun showSome(show_player: PlayerEnum, command: CommandEnum, card_number: Int){
         val nowPlayer = getPlayer(show_player)
         val list = mutableListOf<Int>()
         when(command){
             CommandEnum.SHOW_COVER_YOUR -> {
                 for(card in nowPlayer.cover_card) list.add(card.card_number)
             }
-            CommandEnum.SHOW_HAND_YOUR -> list.addAll(nowPlayer.hand.keys)
+            CommandEnum.SHOW_HAND_ALL_YOUR -> list.addAll(nowPlayer.hand.keys)
+            CommandEnum.SHOW_HAND_YOUR -> list.addAll(arrayOf(card_number))
             else -> TODO()
         }
         sendShowInformation(command, getSocket(show_player), getSocket(show_player.Opposite()), list)

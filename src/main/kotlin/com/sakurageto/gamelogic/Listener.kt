@@ -1,6 +1,6 @@
 package com.sakurageto.gamelogic
 
-class ImmediateBackListner(
+class ImmediateBackListener(
     var card_number: Int,
     var condition: (Int, Int, Boolean) -> Boolean
 ){

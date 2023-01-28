@@ -58,6 +58,7 @@ enum class CommandEnum {
     POP_DECK_OTHER,
     POP_ENCHANTMENT_YOUR,
     POP_ENCHANTMENT_OTHER,
+
     SPECIAL_YOUR,
     ENCHANTMENT_CARD_YOUR,
     DISCARD_CARD_YOUR,
@@ -66,6 +67,7 @@ enum class CommandEnum {
     DECK_TOP_YOUR,
     DECK_BELOW_YOUR,
     PLAYING_CARD_YOUR,
+    HAND_YOUR,
     SPECIAL_OTHER,
     DISCARD_CARD_OTHER,
     USED_CARD_OTHER,
@@ -74,6 +76,8 @@ enum class CommandEnum {
     COVER_CARD_OTHER,
     PLAYING_CARD_OTHER,
     ENCHANTMENT_CARD_OTHER,
+    HAND_OTHER,
+
     MAKE_ATTACK_COMPLETE_YOUR,
     MAKE_ATTACK_COMPLETE_OTHER,
     ATTACK_INFORMATION_YOUR,
@@ -92,8 +96,6 @@ enum class CommandEnum {
     USE_CARD_OTHER,
     USE_CARD_YOUR_REACTION,
     USE_CARD_OTHER_REACTION,
-    CARD_HAND_TO_COVER_YOUR,
-    CARD_HAND_TO_COVER_OTHER,
     CARD_HAND_TO_DECK_BELOW_YOUR,
     CARD_HAND_TO_DECK_BELOW_OTHER,
     CARD_HAND_TO_DECK_UPPER_YOUR,
@@ -137,6 +139,8 @@ enum class CommandEnum {
     GAME_END_WINNER,
     GAME_END_LOSER,
     COVER_CARD_SELECT,
+    SHOW_HAND_ALL_YOUR,
+    SHOW_HAND_ALL_OTHER,
     SHOW_HAND_YOUR,
     SHOW_HAND_OTHER,
     SHOW_COVER_YOUR,
@@ -153,7 +157,10 @@ enum class CommandEnum {
     SELECT_AURA_DAMAGE_PLACE,
 
     SELECT_CARD_REASON_CARD_EFFECT,
-    SELECT_CARD_REASON_INSTALLATION;
+    SELECT_CARD_REASON_INSTALLATION,
+
+    CHANGE_UMBRELLA_YOUR,
+    CHANGE_UMBRELLA_OTHER;
 
     fun Opposite(): CommandEnum{
         when(this){
@@ -210,6 +217,7 @@ enum class CommandEnum {
             PLAYING_CARD_OTHER -> return PLAYING_CARD_YOUR
             POP_SPECIAL_YOUR -> return POP_SPECIAL_OTHER
             POP_SPECIAL_OTHER -> return POP_SPECIAL_YOUR
+            SHOW_HAND_ALL_YOUR -> return SHOW_HAND_ALL_OTHER
             SHOW_HAND_YOUR -> return SHOW_HAND_OTHER
             SHOW_COVER_YOUR -> return SHOW_COVER_OTHER
             POP_USED_YOUR -> return POP_USED_OTHER
@@ -218,6 +226,8 @@ enum class CommandEnum {
             SPECIAL_OTHER -> return SPECIAL_YOUR
             POP_ENCHANTMENT_YOUR -> return POP_ENCHANTMENT_OTHER
             POP_ENCHANTMENT_OTHER -> return POP_ENCHANTMENT_YOUR
+            HAND_YOUR -> return HAND_OTHER
+            HAND_OTHER -> return HAND_YOUR
             else -> return TODO()
         }
     }

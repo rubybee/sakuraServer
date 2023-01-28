@@ -9,8 +9,69 @@ class CardData(
     val card_type: CardType,
     val sub_type: SubType,
 ) {
-    var canCover = true
-    var canDiscard = true
+    //for yukihi
+    var umbrellaMark: Boolean = false
+
+    var effectFold: MutableList<Text>? = null
+    var effectUnfold: MutableList<Text>? = null
+
+    var distanceTypeFold: DistanceType? = null
+    var distanceContFold: Pair<Int, Int>? = null
+    var distanceUncontFold: Array<Boolean>? = null
+    var lifeDamageFold: Int? = null
+    var auraDamageFold: Int? = null
+
+    var distanceTypeUnfold: DistanceType? = null
+    var distanceContUnfold: Pair<Int, Int>? = null
+    var distanceUncontUnfold: Array<Boolean>? = null
+    var lifeDamageUnfold: Int? = null
+    var auraDamageUnfold: Int? = null
+
+    fun setAttackFold(distance_type: DistanceType, distance_cont: Pair<Int, Int>?, distance_uncont: MutableList<Int>?,
+                  aura_damage: Int, life_damage: Int){
+        this.distanceTypeFold = distance_type
+        if(distance_type == DistanceType.CONTINUOUS){
+            this.distanceContFold = Pair(distance_cont!!.first, distance_cont.second)
+        }
+        else{
+            this.distanceUncontFold = arrayOf(false, false, false, false, false, false, false, false, false, false, false)
+            for (i in distance_uncont!!){
+                this.distance_uncont!![i] = true
+            }
+        }
+        this.lifeDamageFold = life_damage
+        this.auraDamageFold = aura_damage
+    }
+
+    fun setAttackUnfold(distance_type: DistanceType, distance_cont: Pair<Int, Int>?, distance_uncont: MutableList<Int>?,
+                        aura_damage: Int, life_damage: Int){
+        this.distanceTypeUnfold = distance_type
+        if(distance_type == DistanceType.CONTINUOUS){
+            this.distanceContUnfold = Pair(distance_cont!!.first, distance_cont.second)
+        }
+        else{
+            this.distanceUncontUnfold = arrayOf(false, false, false, false, false, false, false, false, false, false, false)
+            for (i in distance_uncont!!){
+                this.distance_uncont!![i] = true
+            }
+        }
+        this.lifeDamageUnfold = life_damage
+        this.auraDamageUnfold = aura_damage
+    }
+
+    fun addTextFold(text: Text){
+        if(this.effectFold == null){
+            this.effectFold = mutableListOf()
+        }
+        this.effectFold!!.add(text)
+    }
+
+    fun addTextUnfold(text: Text){
+        if(this.effectUnfold == null){
+            this.effectUnfold = mutableListOf()
+        }
+        this.effectUnfold!!.add(text)
+    }
 
     //attack
     var distance_type: DistanceType? = null
@@ -27,6 +88,8 @@ class CardData(
 
     //general
     var effect: MutableList<Text>? = null
+    var canCover = true
+    var canDiscard = true
 
     fun setAttack(distance_type: DistanceType, distance_cont: Pair<Int, Int>?, distance_uncont: MutableList<Int>?,
                   aura_damage: Int, life_damage: Int){

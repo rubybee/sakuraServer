@@ -160,7 +160,11 @@ enum class CommandEnum {
     SELECT_CARD_REASON_INSTALLATION,
 
     CHANGE_UMBRELLA_YOUR,
-    CHANGE_UMBRELLA_OTHER;
+    CHANGE_UMBRELLA_OTHER,
+    STRATAGEM_SET_YOUR,
+    STRATAGEM_SET_OTHER,
+    STRATAGEM_GET_YOUR,
+    STRATAGEM_GET_OTHER;
 
     fun Opposite(): CommandEnum{
         when(this){

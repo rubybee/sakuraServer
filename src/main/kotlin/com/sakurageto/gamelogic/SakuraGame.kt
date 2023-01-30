@@ -127,7 +127,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
             }
         }
 
-        if(game_status.player2.megami_2 == MegamiEnum.YUKIHI || game_status.player2.megami_2 == MegamiEnum.YUKIHI){
+        if(game_status.player2.megami_1 == MegamiEnum.YUKIHI || game_status.player2.megami_2 == MegamiEnum.YUKIHI){
             game_status.player2.umbrella = Umbrella.FOLD
             if(game_status.player2.megami_1 == MegamiEnum.YUKIHI){
                 game_status.player2.megamiCard = Card.cardMakerByName(first_turn == PlayerEnum.PLAYER2, CardName.YUKIHI_YUKIHI, PlayerEnum.PLAYER2)
@@ -135,6 +135,30 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
             }
             else{
                 game_status.player2.megamiCard2 = Card.cardMakerByName(first_turn == PlayerEnum.PLAYER2, CardName.YUKIHI_YUKIHI, PlayerEnum.PLAYER2)
+                game_status.player2.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
+            }
+        }
+
+        if(game_status.player1.megami_1 == MegamiEnum.SHINRA || game_status.player1.megami_2 == MegamiEnum.SHINRA){
+            game_status.player1.stratagem = Stratagem.SHIN_SAN
+            if(game_status.player1.megami_1 == MegamiEnum.SHINRA){
+                game_status.player1.megamiCard = Card.cardMakerByName(first_turn == PlayerEnum.PLAYER1, CardName.SHINRA_SHINRA, PlayerEnum.PLAYER1)
+                game_status.player1.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
+            }
+            else{
+                game_status.player1.megamiCard2 = Card.cardMakerByName(first_turn == PlayerEnum.PLAYER1, CardName.SHINRA_SHINRA, PlayerEnum.PLAYER1)
+                game_status.player1.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
+            }
+        }
+
+        if(game_status.player2.megami_1 == MegamiEnum.SHINRA || game_status.player2.megami_2 == MegamiEnum.SHINRA){
+            game_status.player2.stratagem = Stratagem.SHIN_SAN
+            if(game_status.player2.megami_1 == MegamiEnum.SHINRA){
+                game_status.player2.megamiCard = Card.cardMakerByName(first_turn == PlayerEnum.PLAYER2, CardName.SHINRA_SHINRA, PlayerEnum.PLAYER2)
+                game_status.player2.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
+            }
+            else{
+                game_status.player2.megamiCard2 = Card.cardMakerByName(first_turn == PlayerEnum.PLAYER2, CardName.SHINRA_SHINRA, PlayerEnum.PLAYER2)
                 game_status.player2.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
             }
         }

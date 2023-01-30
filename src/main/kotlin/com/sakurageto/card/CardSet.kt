@@ -1,9 +1,6 @@
 package com.sakurageto.card
 
-import com.sakurageto.gamelogic.GameStatus
-import com.sakurageto.gamelogic.ImmediateBackListener
-import com.sakurageto.gamelogic.MegamiEnum
-import com.sakurageto.gamelogic.Umbrella
+import com.sakurageto.gamelogic.*
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 
@@ -74,7 +71,7 @@ object CardSet {
         cardNameHashmapFirst[CardName.OBORO_ULOO] = 509
         cardNameHashmapFirst[CardName.OBORO_MIKAZRA] = 510
 
-        cardNameHashmapSecond[CardName.YUKIHI_YUKIHI] = 100000
+        cardNameHashmapFirst[CardName.YUKIHI_YUKIHI] = 100000
         cardNameHashmapFirst[CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE] = 600
         cardNameHashmapFirst[CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS] = 601
         cardNameHashmapFirst[CardName.YUKIHI_PUSH_OUT_SLASH_PULL] = 602
@@ -888,7 +885,6 @@ object CardSet {
         clone.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) {_, player, game_status, _ ->
             if(game_status.checkCoverFullPower(player)){
                 game_status.showSome(player, CommandEnum.SHOW_COVER_YOUR, -1)
-                TODO("공격카드 중에 쓸 수 없는 카드가 있을 수도 있으니 체크해야한다.")
             }
             else{
                 while(true){
@@ -937,7 +933,6 @@ object CardSet {
         tobikage.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) {_, player, game_status, react_attack ->
             if(game_status.checkCoverFullPower(player)){
                 game_status.showSome(player, CommandEnum.SHOW_COVER_YOUR, -1)
-                TODO("공격카드 중에 쓸 수 없는 카드가 있을 수도 있으니 체크해야한다.")
             }
             else{
                 while(true){
@@ -946,7 +941,8 @@ object CardSet {
                         val selectNumber = selected[0]
                         val card = game_status.getCardFrom(player, selectNumber, LocationEnum.COVER_CARD)?: continue
                         if(card.card_data.sub_type == SubType.FULLPOWER) continue
-                        if(game_status.useCardFrom(player, card, LocationEnum.COVER_CARD, true, react_attack)) break
+                        game_status.useCardFrom(player, card, LocationEnum.COVER_CARD, true, react_attack)
+                        break
                     }
                 }
             }
@@ -980,7 +976,7 @@ object CardSet {
     private val clingyMind = CardData(CardClass.SPECIAL, CardName.YUKIHI_CLINGY_MIND, MegamiEnum.YUKIHI, CardType.ENCHANTMENT, SubType.FULLPOWER)
     private val swirlingGesture = CardData(CardClass.SPECIAL, CardName.YUKIHI_SWIRLING_GESTURE, MegamiEnum.YUKIHI, CardType.BEHAVIOR, SubType.REACTION)
 
-    fun yukihiCardInit(){
+    private fun yukihiCardInit(){
         yukihi.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.END_TURN_EFFECT) {card_number, player, game_status, _ ->
             while(true){
                 val nowCommand = game_status.receiveCardEffectSelect(player, card_number)
@@ -996,8 +992,10 @@ object CardSet {
             }
             null
         })
+        hiddenNeedle.umbrellaMark = true
         hiddenNeedle.setAttackFold(DistanceType.CONTINUOUS, Pair(4, 6), null, 3, 1)
         hiddenNeedle.setAttackUnfold(DistanceType.CONTINUOUS, Pair(0, 2), null, 1, 2)
+        hiddenFire.umbrellaMark = true
         hiddenFire.setAttackFold(DistanceType.CONTINUOUS, Pair(5, 6), null, 1, 1)
         hiddenFire.setAttackUnfold(DistanceType.CONTINUOUS, Pair(0, 2), null, 1, 1)
         hiddenFire.addTextFold(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.CARD_DISCARD_PLACE_CHANGE) {card_number, player, game_status, _ ->
@@ -1005,6 +1003,7 @@ object CardSet {
             game_status.changeUmbrella(player)
             null
         })
+        pushOut.umbrellaMark = true
         pushOut.setAttackFold(DistanceType.CONTINUOUS, Pair(2, 5), null, 1, 1)
         pushOut.setAttackUnfold(DistanceType.CONTINUOUS, Pair(0, 2), null, 1, 1)
         pushOut.addTextFold(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _->
@@ -1018,6 +1017,7 @@ object CardSet {
             game_status.distanceToDust(2)
             null
         })
+        swing.umbrellaMark = true
         swing.setAttackFold(DistanceType.CONTINUOUS, Pair(4, 6), null, 5, 999)
         swing.setAttackUnfold(DistanceType.CONTINUOUS, Pair(0, 2), null, 999, 2)
         turnUmbrella.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.SHOW_HAND_WHEN_CHANGE_UMBRELLA) {card_number, player, game_status, _->
@@ -1035,6 +1035,7 @@ object CardSet {
             }
             null
         })
+        backwardStep.umbrellaMark = true
         backwardStep.addTextFold(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){_, player, game_status, _ ->
             game_status.dustToDistance(1)
             null
@@ -1054,6 +1055,7 @@ object CardSet {
             else game_status.dustToDistance(1)
             null
         })
+        flutteringSnowflake.umbrellaMark = true
         flutteringSnowflake.setSpecial(2)
         flutteringSnowflake.setAttackFold(DistanceType.CONTINUOUS, Pair(3, 6), null, 3, 1)
         flutteringSnowflake.setAttackUnfold(DistanceType.CONTINUOUS, Pair(0, 2), null, 0, 0)
@@ -1065,6 +1067,7 @@ object CardSet {
             })
             null
         })
+        swayingLamplight.umbrellaMark = true
         swayingLamplight.setSpecial(5)
         swayingLamplight.setAttackFold(DistanceType.CONTINUOUS, Pair(4, 6), null, 0, 0)
         swayingLamplight.setAttackUnfold(DistanceType.CONTINUOUS, Pair(0, 0), null, 4, 5)
@@ -1104,6 +1107,28 @@ object CardSet {
         })
     }
 
+    private val shinra = CardData(CardClass.SPECIAL, CardName.SHINRA_SHINRA, MegamiEnum.YUKIHI, CardType.BEHAVIOR, SubType.NONE)
+
+    private fun shinraCardInit(){
+        shinra.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.END_TURN_EFFECT) {card_number, player, game_status, _ ->
+            if(game_status.getPlayer(player).stratagem == null){
+                while(true){
+                    val nowCommand = game_status.receiveCardEffectSelect(player, card_number)
+                    if(nowCommand == CommandEnum.SELECT_ONE){
+                        game_status.setStratagem(player, Stratagem.SHIN_SAN)
+                        break
+
+                    }
+                    else if(nowCommand == CommandEnum.SELECT_TWO){
+                        game_status.setStratagem(player, Stratagem.GUE_MO)
+                        break
+                    }
+                }
+            }
+            null
+        })
+    }
+
     fun init(){
         hashMapInit()
 
@@ -1113,10 +1138,12 @@ object CardSet {
         tokoyoCardInit()
         oboroCardInit()
         yukihiCardInit()
+        shinraCardInit()
     }
 
     fun returnCardDataByName(card_name: CardName): CardData {
         when (card_name){
+            CardName.CARD_UNNAME -> return unused
             CardName.YURINA_CHAM -> return cham
             CardName.YURINA_ILSUM -> return ilsom
             CardName.YURINA_JARUCHIGI -> return jaru_chigi
@@ -1184,7 +1211,18 @@ object CardSet {
             CardName.YUKIHI_SWAYING_LAMPLIGHT -> return swayingLamplight
             CardName.YUKIHI_CLINGY_MIND -> return clingyMind
             CardName.YUKIHI_SWIRLING_GESTURE -> return swirlingGesture
-            CardName.CARD_UNNAME -> return unused
+            CardName.SHINRA_SHINRA -> TODO()
+            CardName.SHINRA_IBLON -> TODO()
+            CardName.SHINRA_BANLON -> TODO()
+            CardName.SHINRA_KIBEN -> TODO()
+            CardName.SHINRA_INYONG -> TODO()
+            CardName.SHINRA_SEONGDONG -> TODO()
+            CardName.SHINRA_JANGDAM -> TODO()
+            CardName.SHINRA_NONPA -> TODO()
+            CardName.SHINRA_WANJEON_NONPA -> TODO()
+            CardName.SHINRA_DASIG_IHAE -> TODO()
+            CardName.SHINRA_CHEONJI_BANBAG -> TODO()
+            CardName.SHINRA_SHINRA_BAN_SHO -> TODO()
         }
     }
 }

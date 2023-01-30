@@ -527,7 +527,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
             for(text in it){
                 if (usedEffectUsable(text)) {
                     if(text.tag == TextEffectTag.END_TURN_EFFECT){
-                        text.effect!!(card_number, player, game_status, null)
+                        text.effect!!(this.card_number, player, game_status, null)
                     }
                 }
             }

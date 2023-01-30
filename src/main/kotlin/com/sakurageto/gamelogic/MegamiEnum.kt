@@ -6,7 +6,8 @@ enum class MegamiEnum(var real_number: Int) {
     HIMIKA(30),
     TOKOYO(40),
     OBORO(50),
-    YUKIHI(60);
+    YUKIHI(60),
+    SHINRA(70);
 
     companion object {
         fun fromInt(value: Int) = MegamiEnum.values().first { it.real_number == value }
@@ -24,4 +25,9 @@ enum class Umbrella(){
             FOLD
         }
     }
+}
+
+enum class Stratagem(){
+    SHIN_SAN,
+    GUE_MO,
 }

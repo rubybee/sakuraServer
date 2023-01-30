@@ -114,45 +114,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             PlayerEnum.PLAYER2 -> player2.concentration
         }
     }
-
-    fun getUmbrella(player: PlayerEnum): Umbrella?{
-        return when(player){
-            PlayerEnum.PLAYER1 -> player1.umbrella
-            PlayerEnum.PLAYER2 -> player2.umbrella
-        }
-    }
-
-    fun getUmbrellaListener(player: PlayerEnum): ArrayDeque<ImmediateBackListener>{
-        return when(player){
-            PlayerEnum.PLAYER1 -> player1UmbrellaListener
-            PlayerEnum.PLAYER2 -> player2UmbrellaListener
-        }
-    }
-
-    suspend fun changeUmbrella(player: PlayerEnum){
-        val nowPlayer = getPlayer(player)
-        nowPlayer.umbrella?.let {
-            val umbrellaListener = getUmbrellaListener(player)
-            if(!umbrellaListener.isEmpty()){
-                for(i in 0..umbrellaListener.size){
-                    if(umbrellaListener.isEmpty()) break
-                    val now = umbrellaListener.first()
-                    umbrellaListener.removeFirst()
-                    if(now.IsItBack(-1, -1, false)){
-                        returnSpecialCard(player, now.card_number)
-                    }
-                    else{
-                        player1LifeListener.addLast(now)
-                    }
-                }
-            }
-            nowPlayer.umbrella = it.opposite()
-            sendChangeUmbrella(getSocket(player), getSocket(player.Opposite()))
-            for(card in nowPlayer.hand.values){
-                card.checkWhenUmbrellaChange(player, this)
-            }
-        }
-    }
     
     suspend fun setConcentration(player: PlayerEnum, number: Int){
         when(player){
@@ -1435,13 +1396,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         if(checkCoverAbleHand(player)){
             val list = mutableListOf<Int>()
-            for (card in getPlayer(player).cover_card) list.add(card.card_number)
+            for (card in getPlayer(player).hand.values) list.add(card.card_number)
             val cardNumber = receiveCoverCardSelect(nowSocket, list)
-            if(cardNumberHashmap[cardNumber] == null){
-                coverCard(player, select_player)
-                return
-            }
-            else if(!returnCardDataByName(cardNumberHashmap[cardNumber]!!).canCover){
+            if(cardNumberHashmap[cardNumber] == null || !returnCardDataByName(cardNumberHashmap[cardNumber]!!).canCover){
                 coverCard(player, select_player)
                 return
             }
@@ -1641,5 +1598,71 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         card.special_card_state = SpecialCardEnum.UNUSED
         insertCardTo(player, card, LocationEnum.SPECIAL_CARD, true)
         return true
+    }
+
+    //megami special function
+    fun getUmbrella(player: PlayerEnum): Umbrella?{
+        return when(player){
+            PlayerEnum.PLAYER1 -> player1.umbrella
+            PlayerEnum.PLAYER2 -> player2.umbrella
+        }
+    }
+
+    fun getUmbrellaListener(player: PlayerEnum): ArrayDeque<ImmediateBackListener>{
+        return when(player){
+            PlayerEnum.PLAYER1 -> player1UmbrellaListener
+            PlayerEnum.PLAYER2 -> player2UmbrellaListener
+        }
+    }
+
+    suspend fun changeUmbrella(player: PlayerEnum){
+        val nowPlayer = getPlayer(player)
+        nowPlayer.umbrella?.let {
+            nowPlayer.umbrella = it.opposite()
+            sendChangeUmbrella(getSocket(player), getSocket(player.Opposite()))
+            val umbrellaListener = getUmbrellaListener(player)
+            if(!umbrellaListener.isEmpty()){
+                for(i in 0..umbrellaListener.size){
+                    if(umbrellaListener.isEmpty()) break
+                    val now = umbrellaListener.first()
+                    umbrellaListener.removeFirst()
+                    if(now.IsItBack(-1, -1, false)){
+                        returnSpecialCard(player, now.card_number)
+                    }
+                    else{
+                        player1LifeListener.addLast(now)
+                    }
+                }
+            }
+            for(card in nowPlayer.hand.values){
+                card.checkWhenUmbrellaChange(player, this)
+            }
+        }
+    }
+
+    suspend fun getStratagem(player: PlayerEnum): Stratagem? {
+        return when(player){
+            PlayerEnum.PLAYER1 -> {
+                if(player1.stratagem != null) sendGetStratagem(player1_socket, player2_socket, player1.stratagem!!)
+                player1.stratagem
+            }
+            PlayerEnum.PLAYER2 -> {
+                if(player2.stratagem != null) sendGetStratagem(player2_socket, player1_socket, player2.stratagem!!)
+                player2.stratagem
+            }
+        }
+    }
+
+    suspend fun setStratagem(player: PlayerEnum, stratagem: Stratagem) {
+        when(player){
+            PlayerEnum.PLAYER1 -> {
+                player1.stratagem = stratagem
+                sendSetStratagem(player1_socket, player2_socket, stratagem)
+            }
+            PlayerEnum.PLAYER2 -> {
+                player2.stratagem = stratagem
+                sendSetStratagem(player2_socket, player1_socket, stratagem)
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.sakurageto.protocol
 
 import com.sakurageto.Connection
+import com.sakurageto.gamelogic.Stratagem
 import com.sakurageto.protocol.CommandEnum.*
 import io.ktor.websocket.*
 import kotlinx.serialization.decodeFromString
@@ -277,6 +278,20 @@ suspend fun sendShowInformation(command: CommandEnum, show_player: Connection, l
 suspend fun sendChangeUmbrella(mine: Connection, other: Connection){
     val dataYour = SakuraCardCommand(CHANGE_UMBRELLA_YOUR, -1)
     val dataOther = SakuraCardCommand(CHANGE_UMBRELLA_OTHER, -1)
+    mine.session.send(Json.encodeToString(dataYour))
+    other.session.send(Json.encodeToString(dataOther))
+}
+
+suspend fun sendSetStratagem(mine: Connection, other: Connection, stratagem: Stratagem){
+    val dataYour = SakuraCardCommand(STRATAGEM_SET_YOUR, if(stratagem == Stratagem.SHIN_SAN) 0 else 1)
+    val dataOther = SakuraCardCommand(STRATAGEM_SET_OTHER, -1)
+    mine.session.send(Json.encodeToString(dataYour))
+    other.session.send(Json.encodeToString(dataOther))
+}
+
+suspend fun sendGetStratagem(mine: Connection, other: Connection, stratagem: Stratagem){
+    val dataYour = SakuraCardCommand(STRATAGEM_GET_YOUR, if(stratagem == Stratagem.SHIN_SAN) 0 else 1)
+    val dataOther = SakuraCardCommand(STRATAGEM_GET_OTHER, if(stratagem == Stratagem.SHIN_SAN) 0 else 1)
     mine.session.send(Json.encodeToString(dataYour))
     other.session.send(Json.encodeToString(dataOther))
 }

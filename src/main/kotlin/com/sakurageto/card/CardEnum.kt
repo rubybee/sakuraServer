@@ -125,7 +125,21 @@ enum class CardName {
     YUKIHI_FLUTTERING_SNOWFLAKE,
     YUKIHI_SWAYING_LAMPLIGHT,
     YUKIHI_CLINGY_MIND,
-    YUKIHI_SWIRLING_GESTURE;
+    YUKIHI_SWIRLING_GESTURE,
+
+    SHINRA_SHINRA,
+    SHINRA_IBLON,
+    SHINRA_BANLON,
+    SHINRA_KIBEN,
+    SHINRA_INYONG,
+    SHINRA_SEONGDONG,
+    SHINRA_JANGDAM,
+    SHINRA_NONPA,
+
+    SHINRA_WANJEON_NONPA,
+    SHINRA_DASIG_IHAE,
+    SHINRA_CHEONJI_BANBAG,
+    SHINRA_SHINRA_BAN_SHO;
 
     companion object {
         fun returnNormalCardNameByMegami(megami_name: MegamiEnum):List<CardName>{
@@ -151,9 +165,14 @@ enum class CardName {
                     OBORO_INDUCE, OBORO_CLONE, OBORO_BIOACTIVITY
                 )
                 MegamiEnum.YUKIHI -> return listOf(
-                    YUKIHI_YUKIHI, YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE, YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS,
+                    YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE, YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS,
                     YUKIHI_PUSH_OUT_SLASH_PULL, YUKIHI_SWING_SLASH_STAB, YUKIHI_TURN_UMBRELLA,
                     YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN, YUKIHI_MAKE_CONNECTION
+                )
+                MegamiEnum.SHINRA -> return listOf(
+                    SHINRA_IBLON, SHINRA_BANLON,
+                    SHINRA_KIBEN, SHINRA_INYONG, SHINRA_SEONGDONG,
+                    SHINRA_JANGDAM, SHINRA_NONPA
                 )
             }
         }
@@ -181,6 +200,9 @@ enum class CardName {
                 MegamiEnum.YUKIHI -> listOf(
                     YUKIHI_FLUTTERING_SNOWFLAKE, YUKIHI_SWAYING_LAMPLIGHT, YUKIHI_CLINGY_MIND, YUKIHI_SWIRLING_GESTURE
                 )
+                MegamiEnum.SHINRA -> listOf(
+                    SHINRA_WANJEON_NONPA, SHINRA_DASIG_IHAE, SHINRA_CHEONJI_BANBAG, SHINRA_SHINRA_BAN_SHO
+                )
             }
         }
 
@@ -191,7 +213,8 @@ enum class CardName {
                 MegamiEnum.HIMIKA -> listOf()
                 MegamiEnum.TOKOYO -> listOf()
                 MegamiEnum.OBORO -> listOf()
-                else -> TODO()
+                MegamiEnum.YUKIHI -> listOf()
+                MegamiEnum.SHINRA -> listOf()
             }
         }
 

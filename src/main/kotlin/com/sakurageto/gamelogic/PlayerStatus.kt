@@ -16,6 +16,7 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var aura = 3
 
     var umbrella: Umbrella? = null
+    var stratagem: Stratagem? = null
 
     fun auraDamagePossible(data: MutableList<Int>?, damage: Int, possibleList: MutableList<Int>): Boolean{
         var totalAura = 0

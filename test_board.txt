@@ -64,6 +64,19 @@ cardNumberHashmap[508] = CardName.OBORO_TOBIKAGE
 cardNumberHashmap[509] = CardName.OBORO_ULOO
 cardNumberHashmap[510] = CardName.OBORO_MIKAZRA
 
+cardNameHashmapFirst[CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE] = 600
+cardNameHashmapFirst[CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS] = 601
+cardNameHashmapFirst[CardName.YUKIHI_PUSH_OUT_SLASH_PULL] = 602
+cardNameHashmapFirst[CardName.YUKIHI_SWING_SLASH_STAB] = 603
+cardNameHashmapFirst[CardName.YUKIHI_TURN_UMBRELLA] = 604
+cardNameHashmapFirst[CardName.YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN] = 605
+cardNameHashmapFirst[CardName.YUKIHI_MAKE_CONNECTION] = 606
+cardNameHashmapFirst[CardName.YUKIHI_FLUTTERING_SNOWFLAKE] = 607
+cardNameHashmapFirst[CardName.YUKIHI_SWAYING_LAMPLIGHT] = 608
+cardNameHashmapFirst[CardName.YUKIHI_CLINGY_MIND] = 609
+cardNameHashmapFirst[CardName.YUKIHI_SWIRLING_GESTURE] = 610
+
+
 YOUR_AURA(0),
 OTHER_AURA(1),
 YOUR_FLARE(2),

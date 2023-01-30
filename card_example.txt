@@ -168,3 +168,41 @@
         "OBORO_ULOO"
     ]
 }
+
+히미카 유키히
+{
+    "command": "SELECT_CARD",
+    "normal_card": [
+        "HIMIKA_RAPIDFIRE",
+        "HIMIKA_BACKDRAFT",
+        "YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE",
+        "YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS",
+        "YUKIHI_PUSH_OUT_SLASH_PULL",
+        "YUKIHI_TURN_UMBRELLA",
+        "YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN"
+    ],
+    "special_card": [
+        "HIMIKA_REDBULLET",
+        "HIMIKA_BURMILIONFIELD",
+        "YUKIHI_FLUTTERING_SNOWFLAKE"
+    ]
+}
+
+오보로 유키히
+{
+    "command": "SELECT_CARD",
+    "normal_card": [
+        "OBORO_WIRE",
+        "OBORO_SHADOWCALTROP",
+        "OBORO_INDUCE",
+        "YUKIHI_PUSH_OUT_SLASH_PULL",
+        "YUKIHI_SWING_SLASH_STAB",
+        "YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN",
+        "YUKIHI_MAKE_CONNECTION"
+    ],
+    "special_card": [
+        "OBORO_ULOO",
+        "YUKIHI_SWAYING_LAMPLIGHT",
+        "YUKIHI_CLINGY_MIND"
+    ]
+}

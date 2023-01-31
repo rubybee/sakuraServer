@@ -45,11 +45,17 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     var thisTurnDistance = 10
     var dust = 0
 
-    var player1LifeListener: ArrayDeque<ImmediateBackListener> = ArrayDeque<ImmediateBackListener>()
-    var player2LifeListener: ArrayDeque<ImmediateBackListener> = ArrayDeque<ImmediateBackListener>()
+    var player1LifeListener: ArrayDeque<ImmediateBackListener> = ArrayDeque()
+    var player2LifeListener: ArrayDeque<ImmediateBackListener> = ArrayDeque()
 
-    val player1UmbrellaListener: ArrayDeque<ImmediateBackListener> = ArrayDeque<ImmediateBackListener>()
-    val player2UmbrellaListener: ArrayDeque<ImmediateBackListener> = ArrayDeque<ImmediateBackListener>()
+    val player1UmbrellaListener: ArrayDeque<ImmediateBackListener> = ArrayDeque()
+    val player2UmbrellaListener: ArrayDeque<ImmediateBackListener> = ArrayDeque()
+
+    private var player1TempAttackBuff = AttackBuffQueue()
+    private var player2TempAttackBuff = AttackBuffQueue()
+
+    private var player1TempRangeBuff = RangeBuffQueue()
+    private var player2TempRangeBuff = RangeBuffQueue()
 
     lateinit var first_turn: PlayerEnum
 
@@ -59,6 +65,22 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     fun getSocket(player: PlayerEnum): Connection{
         return if(player ==  PlayerEnum.PLAYER1) player1_socket else player2_socket
+    }
+
+    private fun getPlayerTempAttackBuff(player: PlayerEnum): AttackBuffQueue{
+        return if(player == PlayerEnum.PLAYER1) player1TempAttackBuff else player2TempAttackBuff
+    }
+
+    private fun getPlayerAttackBuff(player: PlayerEnum): AttackBuffQueue{
+        return if(player == PlayerEnum.PLAYER1) player1.attackBuff else player2.attackBuff
+    }
+
+    private fun getPlayerTempRangeBuff(player: PlayerEnum): RangeBuffQueue{
+        return if(player == PlayerEnum.PLAYER1) player1.rangeBuff else player2.rangeBuff
+    }
+
+    private fun getPlayerRangeBuff(player: PlayerEnum): RangeBuffQueue{
+        return if(player == PlayerEnum.PLAYER1) player1TempRangeBuff else player2TempRangeBuff
     }
 
     fun getCardNumber(player: PlayerEnum, card_name: CardName): Int{
@@ -638,30 +660,53 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return now_cost
     }
 
-    fun applyAllAttackBuff(player: PlayerEnum){
-        val now_player = getPlayer(player)
+    private fun applyTempRangeBuff(player: PlayerEnum, madeAttack: MadeAttack, nowTempRangeBuffQueue: RangeBuffQueue){
+        val nowPlayer = getPlayer(player)
 
-        for(queue in now_player.attack_buf){
-            val tempq: ArrayDeque<Buff> = ArrayDeque()
-            for(i in queue.indices){
-                val now = queue.first()
-                queue.removeFirst()
-                if(now.condition(player, this, now_player.pre_attack_card!!)){
-                    now.counter -= 1
-                    tempq.add(now)
-                }
-                if(now.counter != 0){
-                    queue.addLast(now)
-                }
+        for(i in 0..4){
+            val tempQueue: ArrayDeque<RangeBuff> = ArrayDeque()
+            nowTempRangeBuffQueue.applyBuff(i, player, this, madeAttack, tempQueue)
+            for(buff in tempQueue){
+                buff.effect(nowPlayer.pre_attack_card!!)
             }
-            for(buff in tempq){
-                buff.effect(now_player.pre_attack_card!!)
+        }
+    }
+
+    private fun applyTempAttackBuff(player: PlayerEnum, madeAttack: MadeAttack, nowTempBuffQueue: AttackBuffQueue){
+        val nowPlayer = getPlayer(player)
+
+        for(i in 0..4){
+            val tempQueue: ArrayDeque<Buff> = ArrayDeque()
+            nowTempBuffQueue.applyBuff(i, player, this, madeAttack, tempQueue)
+            for(buff in tempQueue){
+                buff.effect(nowPlayer.pre_attack_card!!)
             }
         }
 
-        if(now_player.pre_attack_card!!.aura_damage != 999 && now_player.pre_attack_card!!.aura_damage > 5){
-            if(!now_player.pre_attack_card!!.chogek){
-                now_player.pre_attack_card!!.aura_damage = 5
+        if(madeAttack.aura_damage != 999 && madeAttack.aura_damage > 5){
+            if(!madeAttack.chogek){
+                madeAttack.aura_damage = 5
+            }
+        }
+    }
+
+    private fun applyAllAttackBuff(player: PlayerEnum){
+        val nowPlayer = getPlayer(player)
+        val nowTempBuffQueue = getPlayerTempAttackBuff(player)
+        val nowBuffQueue = getPlayerAttackBuff(player)
+
+        for(i in 0..4){
+            val tempQueue: ArrayDeque<Buff> = ArrayDeque()
+            nowTempBuffQueue.applyBuff(i, player, this, nowPlayer.pre_attack_card!!, tempQueue)
+            nowBuffQueue.applyBuff(i, player, this, nowPlayer.pre_attack_card!!, tempQueue)
+            for(buff in tempQueue){
+                buff.effect(nowPlayer.pre_attack_card!!)
+            }
+        }
+
+        if(nowPlayer.pre_attack_card!!.aura_damage != 999 && nowPlayer.pre_attack_card!!.aura_damage > 5){
+            if(!nowPlayer.pre_attack_card!!.chogek){
+                nowPlayer.pre_attack_card!!.aura_damage = 5
             }
         }
     }
@@ -669,22 +714,20 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     suspend fun attackCheck(player: PlayerEnum): Boolean{
         addAllCardTextBuff()
 
-        val now_player = getPlayer(player)
+        val nowPlayer = getPlayer(player)
+        val nowTempBuffQueue = getPlayerTempRangeBuff(player)
+        val nowBuffQueue = getPlayerRangeBuff(player)
 
-        for(queue in now_player.range_buf){
-            val tempq: ArrayDeque<RangeBuff> = ArrayDeque()
-            for(buff in queue){
-                if(buff.condition(player, this, now_player.pre_attack_card!!)){
-                    buff.counter *= -1
-                    tempq.add(buff)
-                }
-            }
-            for(buff in tempq){
-                buff.effect(now_player.pre_attack_card!!)
+        for(i in 0..4){
+            val tempQueue: ArrayDeque<RangeBuff> = ArrayDeque()
+            nowTempBuffQueue.applyBuff(i, player, this, nowPlayer.pre_attack_card!!, tempQueue)
+            nowBuffQueue.applyBuff(i, player, this, nowPlayer.pre_attack_card!!, tempQueue)
+            for(buff in tempQueue){
+                buff.effect(nowPlayer.pre_attack_card!!)
             }
         }
 
-        return now_player.pre_attack_card!!.rangeCheck(getAdjustDistanceDuringAttack(player))
+        return nowPlayer.pre_attack_card!!.rangeCheck(getAdjustDistanceDuringAttack(player))
     }
 
     fun cleanAfterUseCost(){
@@ -697,27 +740,28 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         cleanCostTempBuff(player2.cost_buf)
     }
 
-    fun cleanAllBuff(){
-        cleanRangeTempBuff(player1.range_buf)
-        cleanRangeTempBuff(player2.range_buf)
-        cleanAttackTempBuff(player1.attack_buf)
-        cleanAttackTempBuff(player2.attack_buf)
+    fun cleanAllBuffWhenUnused(){
+        player1.rangeBuff.resetCounter()
+        player2.rangeBuff.resetCounter()
+        player1TempRangeBuff.clearBuff()
+        player2TempRangeBuff.clearBuff()
+        player1TempAttackBuff.clearBuff()
+        player2TempAttackBuff.clearBuff()
     }
 
     suspend fun addPreAttackZone(player: PlayerEnum, attack: MadeAttack): Boolean{
-        val now_player = getPlayer(player)
-        val other_player = getPlayer(player.Opposite())
+        val nowPlayer = getPlayer(player)
 
-        now_player.addPreAttackZone(attack)
+        nowPlayer.addPreAttackZone(attack)
 
         return if(attackCheck(player)){
-            cleanRangeTempBuff(other_player.range_buf)
-            cleanRangeBuff(now_player.range_buf)
+            getPlayerTempRangeBuff(player.Opposite()).clearBuff()
+            nowPlayer.rangeBuff.cleanUsedBuff()
             applyAllAttackBuff(player)
             true
         } else{
-            now_player.pre_attack_card = null
-            cleanAllBuff()
+            nowPlayer.pre_attack_card = null
+            cleanAllBuffWhenUnused()
             false
         }
     }
@@ -729,18 +773,27 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-
     fun addThisTurnAttackBuff(player: PlayerEnum, effect: Buff){
-        when (player){
-            PlayerEnum.PLAYER1 -> player1.addAttackBuff(effect)
-            PlayerEnum.PLAYER2 -> player2.addAttackBuff(effect)
+        val nowPlayer = getPlayer(player)
+        val nowTempAttackBuff = getPlayerTempAttackBuff(player)
+
+        when(effect.tag){
+            BufTag.INSERT, BufTag.CHANGE_EACH, BufTag.MULTIPLE, BufTag.DIVIDE, BufTag.PLUS_MINUS -> {
+                nowPlayer.attackBuff.addAttackBuff(effect)
+            }
+            else -> nowTempAttackBuff.addAttackBuff(effect)
         }
     }
 
     fun addThisTurnRangeBuff(player: PlayerEnum, effect: RangeBuff){
-        when (player){
-            PlayerEnum.PLAYER1 -> player1.addRangeBuff(effect)
-            PlayerEnum.PLAYER2 -> player2.addRangeBuff(effect)
+        val nowPlayer = getPlayer(player)
+        val nowTempRangeBuff = getPlayerTempRangeBuff(player)
+
+        when(effect.tag){
+            RangeBufTag.CHANGE, RangeBufTag.ADD, RangeBufTag.DELETE, RangeBufTag.PLUS, RangeBufTag.MINUS-> {
+                nowPlayer.rangeBuff.addRangeBuff(effect)
+            }
+            else -> nowTempRangeBuff.addRangeBuff(effect)
         }
     }
 
@@ -817,26 +870,42 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             return
         }
 
-        val now_attack = now_player.pre_attack_card!!
+        val nowTempAttackBuff = getPlayerTempAttackBuff(player)
+        val nowTempRangeBuff = getPlayerTempRangeBuff(player)
+
+        when(player){
+            PlayerEnum.PLAYER1 -> {
+                player1TempRangeBuff = RangeBuffQueue()
+                player1TempAttackBuff = AttackBuffQueue()
+                player2TempAttackBuff.clearBuff()
+            }
+            PlayerEnum.PLAYER2 -> {
+                player2TempRangeBuff = RangeBuffQueue()
+                player2TempAttackBuff = AttackBuffQueue()
+                player1TempAttackBuff.clearBuff()
+            }
+        }
+
+        val nowAttack = now_player.pre_attack_card!!
         now_player.pre_attack_card = null
 
         makeAttackComplete(now_socket, other_socket, card_number)
-        sendAttackInformation(now_socket, other_socket, now_attack.Information())
+        sendAttackInformation(now_socket, other_socket, nowAttack.Information())
         if(!other_player.end_turn && react_attack == null){
             while(true){
                 sendRequestReact(other_socket)
                 val react = receiveReact(other_socket)
                 if(react.first == CommandEnum.REACT_USE_CARD_HAND){
                     val card = other_player.getCardFromHand(react.second)?: continue
-                    if(reactCheck(player.Opposite(), card, now_attack)){
-                        if(useCardFrom(player.Opposite(), card, LocationEnum.HAND, true, now_attack)) break
+                    if(reactCheck(player.Opposite(), card, nowAttack)){
+                        if(useCardFrom(player.Opposite(), card, LocationEnum.HAND, true, nowAttack)) break
                     }
 
                 }
                 else if(react.first == CommandEnum.REACT_USE_CARD_SPECIAL){
                     val card = other_player.getCardFromSpecial(react.second)?: continue
-                    if(reactCheck(player.Opposite(), card, now_attack)){
-                        if(useCardFrom(player.Opposite(), card, LocationEnum.SPECIAL_CARD, true, now_attack)) break
+                    if(reactCheck(player.Opposite(), card, nowAttack)){
+                        if(useCardFrom(player.Opposite(), card, LocationEnum.SPECIAL_CARD, true, nowAttack)) break
                     }
                 }
                 else{
@@ -845,17 +914,19 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
         }
 
-        if(now_attack.isItValid && now_attack.rangeCheck(getAdjustDistanceDuringAttack(player))){
-            sendChooseDamage(other_socket, CommandEnum.CHOOSE_CARD_DAMAGE, now_attack.aura_damage, now_attack.life_damage)
+        applyTempAttackBuff(player, nowAttack, nowTempAttackBuff)
+        applyTempRangeBuff(player, nowAttack, nowTempRangeBuff)
+        if(nowAttack.isItValid && nowAttack.rangeCheck(getAdjustDistanceDuringAttack(player))){
+            sendChooseDamage(other_socket, CommandEnum.CHOOSE_CARD_DAMAGE, nowAttack.aura_damage, nowAttack.life_damage)
             val chosen = receiveChooseDamage(other_socket)
-            if(now_attack.bothSideDamage){
-                processDamage(player.Opposite(), CommandEnum.CHOOSE_AURA, Pair(now_attack.aura_damage, 999), false)
-                processDamage(player.Opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, now_attack.life_damage), false)
+            if(nowAttack.bothSideDamage){
+                processDamage(player.Opposite(), CommandEnum.CHOOSE_AURA, Pair(nowAttack.aura_damage, 999), false)
+                processDamage(player.Opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, nowAttack.life_damage), false)
             }
             else{
-                processDamage(player.Opposite(), chosen, Pair(now_attack.aura_damage, now_attack.life_damage), false)
+                processDamage(player.Opposite(), chosen, Pair(nowAttack.aura_damage, nowAttack.life_damage), false)
             }
-            now_attack.afterAttackProcess(player, this, react_attack)
+            nowAttack.afterAttackProcess(player, this, react_attack)
         }
     }
 

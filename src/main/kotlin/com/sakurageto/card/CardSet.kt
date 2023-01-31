@@ -341,11 +341,11 @@ object CardSet {
         cham.setAttack(DistanceType.CONTINUOUS, Pair(3, 4), null, 3, 1)
         ilsom.setAttack(DistanceType.CONTINUOUS, Pair(3, 3), null, 2, 2)
         ilsom.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
-            if (gulSa(player, game_status)) {
-                game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
-                    madeAttack.auraPlusMinus(1)
-                }))
-            }
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {buff_player, buff_game_status, madeAttack ->
+                cardNumberHashmap[madeAttack.card_number] == CardName.YURINA_ILSUM && gulSa(buff_player, buff_game_status)
+            }, {madeAttack ->
+                madeAttack.auraPlusMinus(1)
+            }))
             null
         })
         jaru_chigi.setAttack(DistanceType.CONTINUOUS, Pair(1, 2), null, 2, 1)
@@ -359,9 +359,11 @@ object CardSet {
         })
         guhab.setAttack(DistanceType.CONTINUOUS, Pair(2, 4), null, 4, 3)
         guhab.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _ ->
-            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
-                if(game_status.getDistance() <= 2){
-                    madeAttack.lifePlusMinus(-1); madeAttack.auraPlusMinus(-1)
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, buff_game_status, madeAttack ->
+                cardNumberHashmap[madeAttack.card_number] == CardName.YURINA_JURUCK && buff_game_status.getDistance() <= 2
+            }, {madeAttack ->
+                madeAttack.run {
+                    auraPlusMinus(1); lifePlusMinus(1)
                 }
             }))
             null
@@ -389,8 +391,8 @@ object CardSet {
         })
         giyenbanzo.setEnchantment(4)
         giyenbanzo.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT){card_number, player, game_status, _ ->
-            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, { _, _, _ -> true}, { madeAttack ->
-                if(madeAttack.megami != MegamiEnum.YURINA && gulSa(player, game_status)) madeAttack.run {
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, { buff_player, buff_game_status, _ -> gulSa(buff_player, buff_game_status)}, { madeAttack ->
+                if(madeAttack.megami != MegamiEnum.YURINA) madeAttack.run {
                     Chogek(); auraPlusMinus(1); lifePlusMinus(1)
                 }
             }))
@@ -573,7 +575,9 @@ object CardSet {
         rapidfire.setAttack(DistanceType.CONTINUOUS, Pair(6, 8), null, 2, 1)
         rapidfire.addtext((Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
             if (yeonwhaAttack(player, game_status)) {
-                game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
+                game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, madeAttack ->
+                    cardNumberHashmap[madeAttack.card_number] == CardName.HIMIKA_RAPIDFIRE
+                }, {madeAttack ->
                     madeAttack.auraPlusMinus(1)
                     madeAttack.lifePlusMinus(1)
                 }))
@@ -589,7 +593,9 @@ object CardSet {
         })
         fullburst.setAttack(DistanceType.CONTINUOUS, Pair(5, 9), null, 3, 1)
         fullburst.addtext((Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
-            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CHANGE_EACH_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CHANGE_EACH_IMMEDIATE, {_, _, madeAttack ->
+                cardNumberHashmap[madeAttack.card_number] == CardName.HIMIKA_FULLBURST
+            }, {madeAttack ->
                 madeAttack.setBothSideDamage()
             }))
             null
@@ -627,14 +633,17 @@ object CardSet {
         crimsonzero.setAttack(DistanceType.CONTINUOUS, Pair(0, 2), null, 2, 2)
         crimsonzero.setSpecial(5)
         crimsonzero.addtext((Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
-            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CHANGE_EACH_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CHANGE_EACH_IMMEDIATE, {_, _, madeAttack ->
+                cardNumberHashmap[madeAttack.card_number] == CardName.HIMIKA_CRIMSONZERO
+            }, {madeAttack ->
                 madeAttack.setBothSideDamage()
             }))
             null
         }))
         crimsonzero.addtext((Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
             if(game_status.getDistance() == 0){
-                game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CHANGE_EACH_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
+                game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CHANGE_EACH_IMMEDIATE, {_, _, madeAttack ->
+                    cardNumberHashmap[madeAttack.card_number] == CardName.HIMIKA_CRIMSONZERO }, {madeAttack ->
                     madeAttack.canNotReact()
                 }))
             }
@@ -777,7 +786,9 @@ object CardSet {
         endlesswind.setSpecial(1)
         endlesswind.setAttack(DistanceType.CONTINUOUS, Pair(3, 8), null, 1, 1)
         endlesswind.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
-            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CHANGE_EACH_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CHANGE_EACH_IMMEDIATE, {_, _, madeAttack ->
+                cardNumberHashmap[madeAttack.card_number] == CardName.TOKOYO_ENDLESSWIND
+            }, {madeAttack ->
                 madeAttack.canNotReact()
             }))
             null
@@ -836,7 +847,9 @@ object CardSet {
             null
         })
         shadowcaltrop.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
-            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CHANGE_EACH_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CHANGE_EACH_IMMEDIATE, {_, _, madeAttack ->
+                cardNumberHashmap[madeAttack.card_number] == CardName.OBORO_SHADOWCALTROP
+            }, {madeAttack ->
                 madeAttack.canNotReact()
             }))
             null
@@ -850,7 +863,9 @@ object CardSet {
         zangekiranbu.setAttack(DistanceType.CONTINUOUS, Pair(2, 4), null, 3, 2)
         zangekiranbu.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
             if (game_status.logger.checkThisTurnGetAuraDamage(player.Opposite())) {
-                game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true}, {madeAttack ->
+                game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, madeAttack ->
+                    cardNumberHashmap[madeAttack.card_number] == CardName.OBORO_ZANGEKIRANBU
+                }, {madeAttack ->
                     madeAttack.apply { auraPlusMinus(1); lifePlusMinus(1) }
                 }))
             }
@@ -1108,6 +1123,8 @@ object CardSet {
     }
 
     private val shinra = CardData(CardClass.SPECIAL, CardName.SHINRA_SHINRA, MegamiEnum.YUKIHI, CardType.BEHAVIOR, SubType.NONE)
+    private val iblon = CardData(CardClass.NORMAL, CardName.SHINRA_IBLON, MegamiEnum.SHINRA, CardType.ATTACK, SubType.NONE)
+    private val banlon = CardData(CardClass.NORMAL, CardName.SHINRA_BANLON, MegamiEnum.SHINRA, CardType.ATTACK, SubType.REACTION)
 
     private fun shinraCardInit(){
         shinra.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.END_TURN_EFFECT) {card_number, player, game_status, _ ->
@@ -1127,6 +1144,9 @@ object CardSet {
             }
             null
         })
+        iblon.setAttack(DistanceType.CONTINUOUS, Pair(2, 7), null, 2, 999)
+        banlon.setAttack(DistanceType.CONTINUOUS, Pair(2, 7), null, 1, 999)
+
     }
 
     fun init(){
@@ -1211,9 +1231,9 @@ object CardSet {
             CardName.YUKIHI_SWAYING_LAMPLIGHT -> return swayingLamplight
             CardName.YUKIHI_CLINGY_MIND -> return clingyMind
             CardName.YUKIHI_SWIRLING_GESTURE -> return swirlingGesture
-            CardName.SHINRA_SHINRA -> TODO()
-            CardName.SHINRA_IBLON -> TODO()
-            CardName.SHINRA_BANLON -> TODO()
+            CardName.SHINRA_SHINRA -> return shinra
+            CardName.SHINRA_IBLON -> return iblon
+            CardName.SHINRA_BANLON -> return banlon
             CardName.SHINRA_KIBEN -> TODO()
             CardName.SHINRA_INYONG -> TODO()
             CardName.SHINRA_SEONGDONG -> TODO()

@@ -195,32 +195,8 @@ class PlayerStatus(val player_enum: PlayerEnum) {
         pre_attack_card = madeAttack
     }
 
-    var attack_buf: Array<ArrayDeque<Buff>> = arrayOf(
-        ArrayDeque(),
-        ArrayDeque(),
-        ArrayDeque(),
-        ArrayDeque(),
-        ArrayDeque(),
-        ArrayDeque(),
-        ArrayDeque(),
-        ArrayDeque(),
-        ArrayDeque(),
-        ArrayDeque(),
-        ArrayDeque()
-    )
-
-    var range_buf: Array<ArrayDeque<RangeBuff>> = arrayOf(
-        ArrayDeque(),
-        ArrayDeque(),
-        ArrayDeque(),
-        ArrayDeque(),
-        ArrayDeque(),
-        ArrayDeque(),
-        ArrayDeque(),
-        ArrayDeque(),
-        ArrayDeque(),
-        ArrayDeque(),
-    )
+    var attackBuff: AttackBuffQueue = AttackBuffQueue()
+    var rangeBuff: RangeBuffQueue = RangeBuffQueue()
 
     var cost_buf: Array<ArrayDeque<CostBuff>> = arrayOf(
         ArrayDeque(),
@@ -235,37 +211,6 @@ class PlayerStatus(val player_enum: PlayerEnum) {
         ArrayDeque(),
         ArrayDeque()
     )
-
-    fun addAttackBuff(buf: Buff){
-        when(buf.tag){
-            BufTag.INSERT -> attack_buf[1].add(buf)
-            BufTag.CHANGE_EACH -> attack_buf[3].add(buf)
-            BufTag.MULTIPLE -> attack_buf[5].add(buf)
-            BufTag.DIVIDE -> attack_buf[7].add(buf)
-            BufTag.PLUS_MINUS -> attack_buf[9].add(buf)
-            BufTag.INSERT_IMMEDIATE -> attack_buf[0].add(buf)
-            BufTag.CHANGE_EACH_IMMEDIATE -> attack_buf[2].add(buf)
-            BufTag.MULTIPLE_IMMEDIATE -> attack_buf[4].add(buf)
-            BufTag.DIVIDE_IMMEDIATE -> attack_buf[6].add(buf)
-            BufTag.PLUS_MINUS_IMMEDIATE -> attack_buf[8].add(buf)
-            else -> attack_buf[11].add(buf)
-        }
-    }
-
-    fun addRangeBuff(buf: RangeBuff){
-        when(buf.tag){
-            RangeBufTag.CHANGE -> range_buf[1].add(buf)
-            RangeBufTag.ADD -> range_buf[3].add(buf)
-            RangeBufTag.DELETE -> range_buf[5].add(buf)
-            RangeBufTag.PLUS -> range_buf[7].add(buf)
-            RangeBufTag.MINUS -> range_buf[9].add(buf)
-            RangeBufTag.CHANGE_IMMEDIATE -> range_buf[0].add(buf)
-            RangeBufTag.ADD_IMMEDIATE -> range_buf[2].add(buf)
-            RangeBufTag.DELETE_IMMEDIATE -> range_buf[4].add(buf)
-            RangeBufTag.PLUS_IMMEDIATE -> range_buf[6].add(buf)
-            RangeBufTag.MINUS_IMMEDIATE -> range_buf[8].add(buf)
-        }
-    }
 
     fun addCostBuff(buf: CostBuff){
         when(buf.tag){

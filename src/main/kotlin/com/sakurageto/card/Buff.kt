@@ -1,5 +1,6 @@
 package com.sakurageto.card
 
+import com.sakurageto.card.BufTag.*
 import com.sakurageto.gamelogic.GameStatus
 
 //condition은 어떠한 공격에 어떠한것을 적용한다에서만 사용한다(다음 오라 3데미지 이하인 공격에 적용 등)
@@ -12,31 +13,122 @@ class Buff(
  val cardNumber: Int, var counter: Int, val tag: BufTag, val condition: (PlayerEnum, GameStatus, MadeAttack) -> Boolean, val effect: (MadeAttack) -> Unit
 )
 
+class AttackBuffQueue() {
+    private var attackBuff: Array<ArrayDeque<Buff>> = arrayOf(
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque()
+    )
+
+    fun addAttackBuff(buf: Buff) {
+        when (buf.tag) {
+            INSERT -> attackBuff[0].add(buf)
+            CHANGE_EACH -> attackBuff[1].add(buf)
+            MULTIPLE -> attackBuff[2].add(buf)
+            DIVIDE -> attackBuff[3].add(buf)
+            PLUS_MINUS -> attackBuff[4].add(buf)
+            INSERT_IMMEDIATE -> attackBuff[0].add(buf)
+            CHANGE_EACH_IMMEDIATE -> attackBuff[1].add(buf)
+            MULTIPLE_IMMEDIATE -> attackBuff[2].add(buf)
+            DIVIDE_IMMEDIATE -> attackBuff[3].add(buf)
+            PLUS_MINUS_IMMEDIATE -> attackBuff[4].add(buf)
+        }
+    }
+
+    fun clearBuff(){
+        for (queue in attackBuff){
+            queue.clear()
+        }
+    }
+
+    fun applyBuff(index: Int, player: PlayerEnum, game_status: GameStatus, madeAttack: MadeAttack, tempQueue: ArrayDeque<Buff> ){
+        for(i in 0 until attackBuff[index].size){
+            val now = attackBuff[index].first()
+            attackBuff[index].removeFirst()
+            if(now.condition(player, game_status, madeAttack)){
+                now.counter -= 1
+                tempQueue.add(now)
+            }
+            if(now.counter != 0){
+                attackBuff[index].addLast(now)
+            }
+        }
+    }
+}
+
 class RangeBuff(
     val cardNumber: Int, var counter: Int, val tag: RangeBufTag, val condition: (PlayerEnum, GameStatus, MadeAttack) -> Boolean, val effect: (MadeAttack) -> Unit
 )
 
-fun cleanAttackBuff(array: Array<ArrayDeque<Buff>>){
+class RangeBuffQueue() {
+    private var rangeBuff: Array<ArrayDeque<RangeBuff>> = arrayOf(
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque(),
+        ArrayDeque()
+    )
 
-}
-
-fun cleanRangeBuff(array: Array<ArrayDeque<RangeBuff>>){
-    for(index in array.indices){
-        if(index % 2 == 0){
-            array[index].clear()
+    fun addRangeBuff(buff: RangeBuff) {
+        when (buff.tag) {
+            RangeBufTag.CHANGE -> rangeBuff[0].add(buff)
+            RangeBufTag.ADD -> rangeBuff[1].add(buff)
+            RangeBufTag.DELETE -> rangeBuff[2].add(buff)
+            RangeBufTag.PLUS -> rangeBuff[3].add(buff)
+            RangeBufTag.MINUS -> rangeBuff[4].add(buff)
+            RangeBufTag.CHANGE_IMMEDIATE -> rangeBuff[0].add(buff)
+            RangeBufTag.ADD_IMMEDIATE -> rangeBuff[1].add(buff)
+            RangeBufTag.DELETE_IMMEDIATE -> rangeBuff[2].add(buff)
+            RangeBufTag.PLUS_IMMEDIATE -> rangeBuff[3].add(buff)
+            RangeBufTag.MINUS_IMMEDIATE -> rangeBuff[4].add(buff)
         }
-        else{
-            for(i in array[index].indices){
-                var now = array[index].first()
-                array[index].removeFirst()
-                if(now.counter < 0){
-                   now.counter *= -1
-                   now.counter -= 1
-                   if(now.counter == 0){
-                       continue
-                   }
+    }
+
+    fun clearBuff(){
+        for (queue in rangeBuff){
+            queue.clear()
+        }
+    }
+
+    fun resetCounter(){
+        for (queue in rangeBuff){
+            for(buff in queue){
+                if(buff.counter < 0){
+                    buff.counter *= -1
                 }
-                array[index].addLast(now)
+            }
+        }
+    }
+
+    fun cleanUsedBuff(){
+        for(index in 0..4){
+            for(i in 1..rangeBuff[index].size){
+                var now = rangeBuff[index].first()
+                rangeBuff[index].removeFirst()
+                if(now.counter < 0){
+                    now.counter *= -1
+                    now.counter -= 1
+                    if(now.counter == 0){
+                        continue
+                    }
+                }
+                rangeBuff[index].addLast(now)
+            }
+        }
+    }
+
+    fun applyBuff(index: Int, player: PlayerEnum, game_status: GameStatus, madeAttack: MadeAttack, tempQueue: ArrayDeque<RangeBuff> ){
+        for(i in 0 until rangeBuff[index].size){
+            val now = rangeBuff[index].first()
+            rangeBuff[index].removeFirst()
+            if(now.condition(player, game_status, madeAttack)){
+                now.counter *= 1
+                tempQueue.add(now)
+            }
+            if(now.counter != 0){
+                rangeBuff[index].addLast(now)
             }
         }
     }
@@ -59,30 +151,6 @@ fun cleanCostBuff(array: Array<ArrayDeque<CostBuff>>){
                     }
                 }
                 array[index].addLast(now)
-            }
-        }
-    }
-}
-
-fun cleanAttackTempBuff(array: Array<ArrayDeque<Buff>>){
-    for(index in array.indices){
-        if(index % 2 == 0){
-            array[index].clear()
-        }
-    }
-}
-
-
-fun cleanRangeTempBuff(array: Array<ArrayDeque<RangeBuff>>){
-    for(index in array.indices){
-        if(index % 2 == 0){
-            array[index].clear()
-        }
-        else{
-            for(buff in array[index]){
-                if(buff.counter < 0){
-                    buff.counter *= -1
-                }
             }
         }
     }

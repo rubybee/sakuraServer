@@ -308,7 +308,7 @@ object CardSet {
         cardNumberHashmap[10610] = CardName.YUKIHI_SWIRLING_GESTURE
     }
 
-    suspend fun selectDustToDistance(nowCommand: CommandEnum, game_status: GameStatus): Boolean{
+    private suspend fun selectDustToDistance(nowCommand: CommandEnum, game_status: GameStatus): Boolean{
         if(nowCommand == CommandEnum.SELECT_ONE){
             game_status.dustToDistance(1)
             return true
@@ -385,8 +385,9 @@ object CardSet {
         apdo.setEnchantment(2)
         apdo.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CHASM, null))
         apdo.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
-            game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 3,  999, Pair(1, 4), null, MegamiEnum.YURINA))
-            game_status.afterMakeAttack(card_number, player, null)
+            if(game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 3,  999, Pair(1, 4), null, MegamiEnum.YURINA)) ){
+                game_status.afterMakeAttack(card_number, player, null, null, null)
+            }
             null
         })
         giyenbanzo.setEnchantment(4)
@@ -449,8 +450,9 @@ object CardSet {
         doublebegi.setAttack(DistanceType.CONTINUOUS, Pair(4, 5), null, 2, 1)
         doublebegi.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
             if(palSang(player, game_status)){
-                game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 2,  1, Pair(4, 5), null, MegamiEnum.SAINE))
-                game_status.afterMakeAttack(card_number, player, null)
+                if(game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 2,  1, Pair(4, 5), null, MegamiEnum.SAINE))){
+                    game_status.afterMakeAttack(card_number, player, null, null, null)
+                }
             }
             null
         })
@@ -486,12 +488,13 @@ object CardSet {
             null
         })
         choongemjung.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
-            game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 1,  999, Pair(0, 10), null, MegamiEnum.SAINE,
-                cannot_react_normal = false,
-                cannot_react_special = false,
-                cannot_react = true
-            ))
-            game_status.afterMakeAttack(card_number, player, null)
+            if(game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 1,  999, Pair(0, 10), null, MegamiEnum.SAINE,
+                    cannot_react_normal = false,
+                    cannot_react_special = false,
+                    cannot_react = true
+                ))){
+                game_status.afterMakeAttack(card_number, player, null, null, null)
+            }
             null
         })
         choongemjung.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MOVE_SAKURA_TOKEN) {_, _, game_status, _ ->
@@ -505,18 +508,21 @@ object CardSet {
         })
         yuldonghogek.setSpecial(6)
         yuldonghogek.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_ATTACK){card_number, player, game_status, _ ->
-            game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 1,  1, Pair(3, 4), null, MegamiEnum.SAINE))
-            game_status.afterMakeAttack(card_number, player, null)
+            if(game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 1,  1, Pair(3, 4), null, MegamiEnum.SAINE)) ){
+                game_status.afterMakeAttack(card_number, player, null, null, null)
+            }
             null
         })
         yuldonghogek.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_ATTACK){card_number,  player, game_status, _ ->
-            game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 1,  1, Pair(4, 5), null, MegamiEnum.SAINE))
-            game_status.afterMakeAttack(card_number, player, null)
+            if(game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 1,  1, Pair(4, 5), null, MegamiEnum.SAINE)) ){
+                game_status.afterMakeAttack(card_number, player, null, null, null)
+            }
             null
         })
         yuldonghogek.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_ATTACK){card_number, player, game_status, _ ->
-            game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 2,  2, Pair(3, 5), null, MegamiEnum.SAINE))
-            game_status.afterMakeAttack(card_number, player, null)
+            if(game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 2,  2, Pair(3, 5), null, MegamiEnum.SAINE)) ) {
+                game_status.afterMakeAttack(card_number, player, null, null, null)
+            }
             null
         })
         hangmunggongjin.setSpecial(8)
@@ -766,8 +772,9 @@ object CardSet {
             null
         })
         sunstage.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
-            game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 999,  1, Pair(3, 6), null, MegamiEnum.TOKOYO))
-            game_status.afterMakeAttack(card_number, player, null)
+            if(game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 999,  1, Pair(3, 6), null, MegamiEnum.TOKOYO)) ){
+                game_status.afterMakeAttack(card_number, player, null, null, null)
+            }
             null
         })
         kuon.setSpecial(5)
@@ -908,10 +915,10 @@ object CardSet {
                         val selectNumber = selected[0]
                         val card = game_status.getCardFrom(player, selectNumber, LocationEnum.COVER_CARD)?: continue
                         if(card.card_data.sub_type == SubType.FULLPOWER) continue
-                        game_status.useCardFrom(player, card, LocationEnum.COVER_CARD, false, null)
+                        game_status.useCardFrom(player, card, LocationEnum.COVER_CARD, false, null, null, null)
                         if(game_status.getEndTurn(player)) break
                         val secondCard = game_status.getCardFrom(player, selectNumber, LocationEnum.DISCARD)?: break
-                        game_status.useCardFrom(player, secondCard, LocationEnum.DISCARD, false, null)
+                        game_status.useCardFrom(player, secondCard, LocationEnum.DISCARD, false, null, null, null)
                         break
                     }
                 }
@@ -939,8 +946,10 @@ object CardSet {
         kumasuke.setAttack(DistanceType.CONTINUOUS, Pair(3, 4), null, 2, 2)
         kumasuke.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
             for (i in 1..game_status.getPlayer(player).cover_card.size){
-                game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 2,  2, Pair(3, 4), null, MegamiEnum.OBORO))
-                game_status.afterMakeAttack(card_number, player, null)
+                if(game_status.addPreAttackZone(player, MadeAttack(card_number, CardClass.NORMAL, DistanceType.CONTINUOUS, 2,  2, Pair(3, 4), null, MegamiEnum.OBORO))){
+                    game_status.afterMakeAttack(card_number, player, null, null, null)
+                }
+
             }
             null
         })
@@ -956,7 +965,7 @@ object CardSet {
                         val selectNumber = selected[0]
                         val card = game_status.getCardFrom(player, selectNumber, LocationEnum.COVER_CARD)?: continue
                         if(card.card_data.sub_type == SubType.FULLPOWER) continue
-                        game_status.useCardFrom(player, card, LocationEnum.COVER_CARD, true, react_attack)
+                        game_status.useCardFrom(player, card, LocationEnum.COVER_CARD, true, react_attack, null, null)
                         break
                     }
                 }
@@ -1051,11 +1060,11 @@ object CardSet {
             null
         })
         backwardStep.umbrellaMark = true
-        backwardStep.addTextFold(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){_, player, game_status, _ ->
+        backwardStep.addTextFold(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){_, _, game_status, _ ->
             game_status.dustToDistance(1)
             null
         })
-        backwardStep.addTextUnfold(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){_, player, game_status, _ ->
+        backwardStep.addTextUnfold(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){_, _, game_status, _ ->
             game_status.distanceToDust(1)
             null
         })

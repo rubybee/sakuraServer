@@ -404,6 +404,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
         game_status.setEndTurn(PlayerEnum.PLAYER1, false)
         game_status.setEndTurn(PlayerEnum.PLAYER2, false)
         game_status.endTurnHandCheck(this.turn_player)
+        game_status.logger.reset()
         this.turn_player = this.turn_player.Opposite()
         this.turn_number += 1
     }

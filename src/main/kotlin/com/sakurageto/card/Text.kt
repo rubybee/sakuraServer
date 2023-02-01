@@ -19,6 +19,7 @@ enum class TextEffectTimingTag {
 
 enum class TextEffectTag {
     NEXT_ATTACK_ENCHANTMENT,
+    NEXT_ATTACK_ENCHANTMENT_OTHER,
     CHANGE_CONCENTRATION,
     CHASM,
     MAKE_ATTACK,

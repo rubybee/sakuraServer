@@ -99,7 +99,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         return nap == 0 || nap == null
     }
 
-    suspend fun addAttackBuff(player: PlayerEnum, gameStatus: GameStatus){
+    suspend fun addAttackBuffMine(player: PlayerEnum, gameStatus: GameStatus){
         card_data.effect?.let {
             for(text in it){
                 if(usedEffectUsable(text)){
@@ -107,6 +107,19 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
                 }
                 else if(enchantmentUsable(text)){
                     if(text.tag == TextEffectTag.NEXT_ATTACK_ENCHANTMENT) text.effect!!(this.card_number, player, gameStatus, null)
+                }
+            }
+        }
+    }
+
+    suspend fun addAttackBuffOther(player: PlayerEnum, gameStatus: GameStatus){
+        card_data.effect?.let {
+            for(text in it){
+                if(usedEffectUsable(text)){
+                    if(text.tag == TextEffectTag.NEXT_ATTACK_ENCHANTMENT_OTHER) text.effect!!(this.card_number, player, gameStatus, null)
+                }
+                else if(enchantmentUsable(text)){
+                    if(text.tag == TextEffectTag.NEXT_ATTACK_ENCHANTMENT_OTHER) text.effect!!(this.card_number, player, gameStatus, null)
                 }
             }
         }
@@ -317,8 +330,9 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         return cost
     }
 
-    suspend fun attackUseNormal(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?){
-        game_status.afterMakeAttack(this.card_number, player, react_attack)
+    suspend fun attackUseNormal(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?,
+                                reactAttackBuffQueue: AttackBuffQueue?, reactRangeBuffQueue: RangeBuffQueue?){
+        game_status.afterMakeAttack(this.card_number, player, react_attack, reactAttackBuffQueue, reactRangeBuffQueue)
     }
 
     suspend fun behaviorUseNormal(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?){
@@ -386,7 +400,8 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         }
     }
 
-    suspend fun use(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?){
+    suspend fun use(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?,
+                    reactAttackBuffQueue: AttackBuffQueue?, reactRangeBuffQueue: RangeBuffQueue?){
         this.card_data.effect?.let {
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
@@ -404,7 +419,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
 
         when(this.card_data.card_type){
             CardType.ATTACK -> {
-                attackUseNormal(player, game_status, react_attack)
+                attackUseNormal(player, game_status, react_attack, reactAttackBuffQueue, reactRangeBuffQueue)
             }
             CardType.BEHAVIOR -> {
                 behaviorUseNormal(player, game_status, react_attack)

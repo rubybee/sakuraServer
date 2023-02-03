@@ -15,6 +15,11 @@ class MadeAttack(
     var megami: MegamiEnum
 ) {
     var isItValid= true
+    var isItDamage = true
+
+    fun makeNoDamage(){
+        isItDamage = false
+    }
 
     fun makeNotValid(){
         isItValid = false
@@ -252,6 +257,17 @@ class MadeAttack(
                 }
             }
         }
+    }
+
+    suspend fun beforeProcessDamageCheck(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?): Boolean{
+        this.effect?.let {
+            for(text in it){
+                if(text.tag == TextEffectTag.EFFECT_INSTEAD_DAMAGE){
+                    return text.effect!!(this.card_number, player, game_status, react_attack) != 1
+                }
+            }
+        }
+        return true
     }
 
 }

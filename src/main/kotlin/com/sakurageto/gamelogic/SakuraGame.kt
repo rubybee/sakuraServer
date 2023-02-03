@@ -242,15 +242,15 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
 
         when(first_turn){
             PlayerEnum.PLAYER1 -> {
-                Card.cardInitInsert(true, game_status.player1.normal_card_deck, card_data_player1, PlayerEnum.PLAYER1)
+                Card.cardInitInsert(true, game_status.player1.normalCardDeck, card_data_player1, PlayerEnum.PLAYER1)
                 Card.cardInitInsert(true, game_status.player1.special_card_deck, specialcard_data_player1, PlayerEnum.PLAYER1)
-                Card.cardInitInsert(false, game_status.player2.normal_card_deck, card_data_player2, PlayerEnum.PLAYER2)
+                Card.cardInitInsert(false, game_status.player2.normalCardDeck, card_data_player2, PlayerEnum.PLAYER2)
                 Card.cardInitInsert(false, game_status.player2.special_card_deck, specialcard_data_player2, PlayerEnum.PLAYER2)
             }
             PlayerEnum.PLAYER2 -> {
-                Card.cardInitInsert(false, game_status.player1.normal_card_deck, card_data_player1, PlayerEnum.PLAYER1)
+                Card.cardInitInsert(false, game_status.player1.normalCardDeck, card_data_player1, PlayerEnum.PLAYER1)
                 Card.cardInitInsert(false, game_status.player1.special_card_deck, specialcard_data_player1, PlayerEnum.PLAYER1)
-                Card.cardInitInsert(true, game_status.player2.normal_card_deck, card_data_player2, PlayerEnum.PLAYER2)
+                Card.cardInitInsert(true, game_status.player2.normalCardDeck, card_data_player2, PlayerEnum.PLAYER2)
                 Card.cardInitInsert(true, game_status.player2.special_card_deck, specialcard_data_player2, PlayerEnum.PLAYER2)
             }
         }
@@ -345,7 +345,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
     }
 
     suspend fun startPhase(){
-        sendStartPhaseStart(getSocket(this.turn_player), getSocket(this.turn_player.Opposite()))
+        sendStartPhaseStart(getSocket(this.turn_player), getSocket(this.turn_player.opposite()))
         game_status.startDistance = game_status.thisTurnDistance
         game_status.startPhaseEffectProcess()
         if(turn_number == 0 || turn_number == 1){
@@ -355,7 +355,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
     }
 
     suspend fun mainPhase(){
-        sendMainPhaseStart(getSocket(this.turn_player), getSocket(this.turn_player.Opposite()))
+        sendMainPhaseStart(getSocket(this.turn_player), getSocket(this.turn_player.opposite()))
         game_status.mainPhaseEffectProcess()
         if(receiveFullPowerRequest(getSocket(this.turn_player))){
             game_status.setPlayerFullAction(this.turn_player, true)
@@ -399,13 +399,13 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
     }
 
     suspend fun endPhase(){
-        sendEndPhaseStart(getSocket(this.turn_player), getSocket(this.turn_player.Opposite()))
+        sendEndPhaseStart(getSocket(this.turn_player), getSocket(this.turn_player.opposite()))
         game_status.endPhaseEffectProcess(this.turn_player)
         game_status.setEndTurn(PlayerEnum.PLAYER1, false)
         game_status.setEndTurn(PlayerEnum.PLAYER2, false)
         game_status.endTurnHandCheck(this.turn_player)
         game_status.logger.reset()
-        this.turn_player = this.turn_player.Opposite()
+        this.turn_player = this.turn_player.opposite()
         this.turn_number += 1
     }
 

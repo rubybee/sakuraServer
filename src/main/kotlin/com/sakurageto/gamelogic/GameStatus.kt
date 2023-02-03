@@ -23,8 +23,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         for(card in player1.enchantment_card.values) nowSwellDistance += card.swellAdjust(player, this)
         for(card in player2.enchantment_card.values) nowSwellDistance += card.swellAdjust(player, this)
-        for(card in player1.used_special_card.values) nowSwellDistance += card.swellAdjust(player, this)
-        for(card in player2.used_special_card.values) nowSwellDistance += card.swellAdjust(player, this)
+        for(card in player1.usedSpecialCard.values) nowSwellDistance += card.swellAdjust(player, this)
+        for(card in player2.usedSpecialCard.values) nowSwellDistance += card.swellAdjust(player, this)
 
         return nowSwellDistance
     }
@@ -142,7 +142,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             PlayerEnum.PLAYER1 -> player1.concentration = number
             PlayerEnum.PLAYER2 -> player2.concentration = number
         }
-        sendSetConcentration(getSocket(player), getSocket(player.Opposite()), number)
+        sendSetConcentration(getSocket(player), getSocket(player.opposite()), number)
     }
 
     fun setPlayerFullAction(player: PlayerEnum, full: Boolean){
@@ -155,7 +155,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     suspend fun setShrink(player: PlayerEnum){
         val nowPlayer = getPlayer(player)
         nowPlayer.shrink = true
-        sendSetShrink(getSocket(player), getSocket(player.Opposite()))
+        sendSetShrink(getSocket(player), getSocket(player.opposite()))
     }
 
     fun setFirstTurn(player: PlayerEnum){
@@ -232,7 +232,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         distanceToken += value
         thisTurnDistance += value
 
-        sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
+        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.YOUR_AURA, LocationEnum.DISTANCE, value, -1)
     }
 
@@ -250,11 +250,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         flarePlayer.flare += value
 
         if(player_aura == player_flare){
-            sendMoveToken(getSocket(player_aura), getSocket(player_aura.Opposite()), TokenEnum.SAKURA_TOKEN,
+            sendMoveToken(getSocket(player_aura), getSocket(player_aura.opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.YOUR_AURA, LocationEnum.YOUR_FLARE, value, -1)
         }
         else{
-            sendMoveToken(getSocket(player_aura), getSocket(player_aura.Opposite()), TokenEnum.SAKURA_TOKEN,
+            sendMoveToken(getSocket(player_aura), getSocket(player_aura.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.YOUR_AURA, LocationEnum.OTHER_FLARE, value, -1)
         }
     }
@@ -270,7 +270,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         card.nap = card.nap!! - value
 
-        sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
+        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.DISTANCE, value, card.card_number)
     }
 
@@ -315,7 +315,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
 
         nowPlayer.aura += value
-        sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
+        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.DISTANCE, LocationEnum.YOUR_AURA, value, -1)
     }
 
@@ -348,15 +348,15 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     //메구미 카드의 경우 개시페이지 여부를 이곳에서 받아서 처리
-    suspend fun cardToDust(player: PlayerEnum, number: Int, card: Card){
-        if(number == 0 || card.nap == 0 || card.nap == null) return
+    suspend fun cardToDust(player: PlayerEnum, number: Int?, card: Card){
+        if(number == 0 || card.nap == 0 || card.nap == null || number == null) return
 
         if(cardToDustCheck(player, number, card)){
             dust += number
 
             card.nap = card.nap!! - number
 
-            sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
+            sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.DUST, number, card.card_number)
         }
     }
@@ -380,7 +380,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             it + value
         }?: value
 
-        sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
+        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.YOUR_AURA, LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, value, card.card_number)
     }
 
@@ -403,8 +403,28 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             it + value
         }?: value
 
-        sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
+        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.DUST, LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, value, card.card_number)
+    }
+
+    suspend fun dustToLife(player: PlayerEnum, number: Int){
+        if(number == 0) return
+        val nowPlayer = getPlayer(player)
+        var value = number
+
+        if(nowPlayer.life + value > 10){
+            value = 10 - nowPlayer.life
+        }
+
+        if(value > dust){
+            value = dust
+        }
+
+        dust -= value
+        nowPlayer.life += value
+
+        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
+            LocationEnum.DUST, LocationEnum.YOUR_LIFE, value, -1)
     }
 
     suspend fun dustToDistance(number: Int){
@@ -432,15 +452,18 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if (number == 0) return
         val nowPlayer = getPlayer(player)
         var value = number
+
         if(number > dust){
             value = dust
         }
+
         if(value > nowPlayer.maxAura - nowPlayer.aura){
             value = nowPlayer.maxAura - nowPlayer.aura
         }
+
         nowPlayer.aura += value
         dust -= value
-        sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
+        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.DUST, LocationEnum.YOUR_AURA, value, -1)
     }
 
@@ -453,7 +476,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
         nowPlayer.flare += value
         dust -= value
-        sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
+        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.DUST, LocationEnum.YOUR_FLARE, value, -1)
     }
 
@@ -474,7 +497,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         dust += value
 
-        sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
+        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.YOUR_AURA, LocationEnum.DUST, value, -1)
     }
 
@@ -491,7 +514,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         dust += value
 
-        sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
+        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.YOUR_FLARE, LocationEnum.DUST, value, -1)
     }
 
@@ -512,7 +535,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         nowPlayer.flare -= value
         nowPlayer.aura += value
 
-        sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
+        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.YOUR_FLARE, LocationEnum.YOUR_AURA, value, -1)
     }
 
@@ -579,7 +602,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         lifeListenerProcess(player, before, false)
         chasmProcess(player)
 
-        sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
+        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.YOUR_LIFE, LocationEnum.DUST, number, -1)
         return false
     }
@@ -602,7 +625,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         lifeListenerProcess(player, before, reconstruct)
 
-        sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
+        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.YOUR_LIFE, LocationEnum.YOUR_FLARE, number, -1)
 
         return false
@@ -612,16 +635,16 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val mine = getPlayer(player)
         val other = getPlayer(player)
         for(card in mine.enchantment_card){
-            card.value.addAttackBuffMine(player, this)
+            card.value.effectAllMaintainCard(player, this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT)
         }
-        for(card in mine.used_special_card){
-            card.value.addAttackBuffMine(player, this)
+        for(card in mine.usedSpecialCard){
+            card.value.effectAllMaintainCard(player, this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT)
         }
         for(card in other.enchantment_card){
-            card.value.addAttackBuffOther(player.Opposite(), this)
+            card.value.effectAllMaintainCard(player.opposite(), this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT_OTHER)
         }
-        for(card in other.used_special_card){
-            card.value.addAttackBuffOther(player.Opposite(), this)
+        for(card in other.usedSpecialCard){
+            card.value.effectAllMaintainCard(player.opposite(), this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT_OTHER)
         }
     }
 
@@ -629,13 +652,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         for(card in player1.enchantment_card){
             card.value.addCostBuff(PlayerEnum.PLAYER1, this)
         }
-        for(card in player1.used_special_card){
+        for(card in player1.usedSpecialCard){
             card.value.addCostBuff(PlayerEnum.PLAYER1, this)
         }
         for(card in player2.enchantment_card){
             card.value.addCostBuff(PlayerEnum.PLAYER2, this)
         }
-        for(card in player2.used_special_card){
+        for(card in player2.usedSpecialCard){
             card.value.addCostBuff(PlayerEnum.PLAYER2, this)
         }
     }
@@ -761,7 +784,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         nowPlayer.addPreAttackZone(attack)
 
         return if(attackCheck(player)){
-            getPlayerTempRangeBuff(player.Opposite()).clearBuff()
+            getPlayerTempRangeBuff(player.opposite()).clearBuff()
             nowPlayer.rangeBuff.cleanUsedBuff()
             applyAllAttackBuff(player)
             true
@@ -806,7 +829,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val now_player = getPlayer(player)
 
         val now_socket = getSocket(player)
-        val other_socket = getSocket(player.Opposite())
+        val other_socket = getSocket(player.opposite())
 
         when(now_player.addConcentration()){
             0 -> {
@@ -822,7 +845,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val now_player = getPlayer(player)
 
         val now_socket = getSocket(player)
-        val other_socket = getSocket(player.Opposite())
+        val other_socket = getSocket(player.opposite())
 
         if(now_player.decreaseConcentration()) sendDecreaseConcentration(now_socket, other_socket)
     }
@@ -848,7 +871,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             if(cost == -1){
                 popCardFrom(player, card.card_number, location, true)
                 insertCardTo(player, card, LocationEnum.PLAYING_ZONE, true)
-                sendUseCardMeesage(getSocket(player), getSocket(player.Opposite()), react, card.card_number)
+                sendUseCardMeesage(getSocket(player), getSocket(player.opposite()), react, card.card_number)
                 card.use(player, this, react_attack, reactAttackBuffQueue, reactRangeBuffQueue)
                 return true
             }
@@ -858,7 +881,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 cleanAfterUseCost()
                 popCardFrom(player, card.card_number, LocationEnum.SPECIAL_CARD, true)
                 insertCardTo(player, card, LocationEnum.PLAYING_ZONE, true)
-                sendUseCardMeesage(getSocket(player), getSocket(player.Opposite()), react, card.card_number)
+                sendUseCardMeesage(getSocket(player), getSocket(player.opposite()), react, card.card_number)
                 card.use(player, this, react_attack, reactAttackBuffQueue, reactRangeBuffQueue)
                 return true
             }
@@ -869,9 +892,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     suspend fun afterMakeAttack(card_number: Int, player: PlayerEnum, react_attack: MadeAttack?,
                                 reactAttackBuffQueue: AttackBuffQueue?, reactRangeBuffQueue: RangeBuffQueue?){
         val nowSocket = getSocket(player)
-        val otherSocket = getSocket(player.Opposite())
+        val otherSocket = getSocket(player.opposite())
         val nowPlayer = getPlayer(player)
-        val otherPlayer = getPlayer(player.Opposite())
+        val otherPlayer = getPlayer(player.opposite())
 
         if(nowPlayer.pre_attack_card == null){
             return
@@ -902,15 +925,15 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 val react = receiveReact(otherSocket)
                 if(react.first == CommandEnum.REACT_USE_CARD_HAND){
                     val card = otherPlayer.getCardFromHand(react.second)?: continue
-                    if(reactCheck(player.Opposite(), card, nowAttack)){
-                        if(useCardFrom(player.Opposite(), card, LocationEnum.HAND, true, nowAttack, nowTempAttackBuff, nowTempRangeBuff)) break
+                    if(reactCheck(player.opposite(), card, nowAttack)){
+                        if(useCardFrom(player.opposite(), card, LocationEnum.HAND, true, nowAttack, nowTempAttackBuff, nowTempRangeBuff)) break
                     }
 
                 }
                 else if(react.first == CommandEnum.REACT_USE_CARD_SPECIAL){
                     val card = otherPlayer.getCardFromSpecial(react.second)?: continue
-                    if(reactCheck(player.Opposite(), card, nowAttack)){
-                        if(useCardFrom(player.Opposite(), card, LocationEnum.SPECIAL_CARD, true, nowAttack, nowTempAttackBuff, nowTempRangeBuff)) break
+                    if(reactCheck(player.opposite(), card, nowAttack)){
+                        if(useCardFrom(player.opposite(), card, LocationEnum.SPECIAL_CARD, true, nowAttack, nowTempAttackBuff, nowTempRangeBuff)) break
                     }
                 }
                 else{
@@ -922,18 +945,22 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         applyTempAttackBuff(player, nowAttack, nowTempAttackBuff)
         applyTempRangeBuff(player, nowAttack, nowTempRangeBuff)
         if(nowAttack.isItValid && nowAttack.rangeCheck(getAdjustDistanceDuringAttack(player))){
-            sendChooseDamage(otherSocket, CommandEnum.CHOOSE_CARD_DAMAGE, nowAttack.aura_damage, nowAttack.life_damage)
-            val chosen = receiveChooseDamage(otherSocket)
-            if(nowAttack.bothSideDamage){
-                processDamage(player.Opposite(), CommandEnum.CHOOSE_AURA, Pair(nowAttack.aura_damage, 999), false)
-                processDamage(player.Opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, nowAttack.life_damage), false)
-            }
-            else{
-                processDamage(player.Opposite(), chosen, Pair(nowAttack.aura_damage, nowAttack.life_damage), false)
+            if(nowAttack.beforeProcessDamageCheck(player, this, react_attack)){
+                if(nowAttack.isItDamage){
+                    sendChooseDamage(otherSocket, CommandEnum.CHOOSE_CARD_DAMAGE, nowAttack.aura_damage, nowAttack.life_damage)
+                    val chosen = receiveChooseDamage(otherSocket)
+                    if(nowAttack.bothSideDamage){
+                        processDamage(player.opposite(), CommandEnum.CHOOSE_AURA, Pair(nowAttack.aura_damage, 999), false)
+                        processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, nowAttack.life_damage), false)
+                    }
+                    else{
+                        processDamage(player.opposite(), chosen, Pair(nowAttack.aura_damage, nowAttack.life_damage), false)
+                    }
+                }
             }
             react_attack?.let {
-                applyTempAttackBuff(player.Opposite(), it, reactAttackBuffQueue!!)
-                applyTempRangeBuff(player.Opposite(), it, reactRangeBuffQueue!!)
+                applyTempAttackBuff(player.opposite(), it, reactAttackBuffQueue!!)
+                applyTempRangeBuff(player.opposite(), it, reactRangeBuffQueue!!)
             }
             nowAttack.afterAttackProcess(player, this, react_attack)
         }
@@ -957,7 +984,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     card.addReturnListener(card.player, this)
                     card.special_card_state = SpecialCardEnum.PLAYED
                     insertCardTo(card.player, card, LocationEnum.USED_CARD, true)
-                    print(getPlayer(card.player).used_special_card)
+                    print(getPlayer(card.player).usedSpecialCard)
                 }
                 CardClass.NORMAL -> {
                     insertCardTo(card.player, card, LocationEnum.DISCARD, true)
@@ -990,13 +1017,16 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun enchantmentDestruction(player: PlayerEnum, card: Card){
-        sendDestructionEnchant(getSocket(player), getSocket(player.Opposite()), card.card_number)
+        sendDestructionEnchant(getSocket(player), getSocket(player.opposite()), card.card_number)
         card.destructionEnchantmentNormaly(player, this)
+        for(enchantmentCard in getPlayer(player).enchantment_card.values){
+            enchantmentCard.effectAllMaintainCard(player, this, TextEffectTag.EFFECT_WHEN_DESTRUCTION_OTHER_CARD)
+        }
         afterDestruction(player, card.card_number, LocationEnum.DISCARD)
     }
 
     suspend fun enchantmentDestructionNotNormally(player: PlayerEnum, card: Card){
-        sendDestructionEnchant(getSocket(player), getSocket(player.Opposite()), card.card_number)
+        sendDestructionEnchant(getSocket(player), getSocket(player.opposite()), card.card_number)
         afterDestruction(player, card.card_number, LocationEnum.COVER_CARD)
     }
 
@@ -1125,7 +1155,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun gameEnd(winner: PlayerEnum){
         val winner_socket = getSocket(winner)
-        val roser_socket = getSocket(winner.Opposite())
+        val roser_socket = getSocket(winner.opposite())
 
         sendGameEnd(winner_socket, roser_socket)
 
@@ -1206,7 +1236,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             else{
                 logger.insert(Log(player, LogText.GET_LIFE_DAMAGE, damage.second, damage.second))
                 if(lifeToSelfFlare(player, damage.second, reconstruct)) {
-                    gameEnd(player.Opposite())
+                    gameEnd(player.opposite())
                 }
                 if(!reconstruct) chasmProcess(player)
             }
@@ -1217,19 +1247,19 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val now_player = getPlayer(player)
 
         val now_socket = getSocket(player)
-        val other_socket = getSocket(player.Opposite())
+        val other_socket = getSocket(player.opposite())
 
         for(i in 1..number){
-            if(now_player.normal_card_deck.size == 0){
+            if(now_player.normalCardDeck.size == 0){
                 sendChooseDamage(now_socket, CommandEnum.CHOOSE_CHOJO, 1, 1)
                 val chosen = receiveChooseDamage(now_socket)
                 processDamage(player, chosen, Pair(1, 1), false)
                 continue
             }
-            val draw_card = now_player.normal_card_deck.first()
+            val draw_card = now_player.normalCardDeck.first()
             sendDrawCard(now_socket, other_socket, draw_card.card_number)
             now_player.hand[draw_card.card_number] = draw_card
-            now_player.normal_card_deck.removeFirst()
+            now_player.normalCardDeck.removeFirst()
         }
     }
 
@@ -1238,11 +1268,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val now_player = getPlayer(player)
 
         val now_socket = getSocket(player)
-        val other_socket = getSocket(player.Opposite())
+        val other_socket = getSocket(player.opposite())
 
         return now_player.hand[card_number]?.let {
-            if(Below) now_player.normal_card_deck.addLast(it)
-            else now_player.normal_card_deck.addFirst(it)
+            if(Below) now_player.normalCardDeck.addLast(it)
+            else now_player.normalCardDeck.addFirst(it)
             now_player.hand.remove(card_number)
             sendHandToDeck(now_socket, other_socket, card_number, public, Below)
             true
@@ -1279,7 +1309,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(list.isEmpty()) return 2
 
         while(true){
-            val receive = receiveSelectCard(nowSocket, list, CommandEnum.SELECT_CARD_REASON_INSTALLATION)?: continue
+            val receive = receiveSelectCard(nowSocket, list, CommandEnum.SELECT_CARD_REASON_INSTALLATION, -1)?: continue
             if (receive.size == 1){
                 val card = nowPlayer.getCardFromCover(receive[0])?: continue
                 if (useCardFrom(player, card, LocationEnum.COVER_CARD, false, null, null, null)) {
@@ -1313,7 +1343,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val nowPlayer = getPlayer(player)
 
         val nowSocket = getSocket(player)
-        val otherSocket = getSocket(player.Opposite())
+        val otherSocket = getSocket(player.opposite())
 
         installationProcess(player)
 
@@ -1321,7 +1351,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(damage){
             processDamage(player, CommandEnum.CHOOSE_LIFE, Pair(999, 1), true)
         }
-        Card.cardReconstructInsert(nowPlayer.discard, nowPlayer.cover_card, nowPlayer.normal_card_deck)
+        Card.cardReconstructInsert(nowPlayer.discard, nowPlayer.cover_card, nowPlayer.normalCardDeck)
     }
 
     suspend fun cardUseNormal(player: PlayerEnum, commandEnum: CommandEnum, card_number: Int): Boolean{
@@ -1387,7 +1417,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val now_player = getPlayer(player)
 
         val now_socket = getSocket(player)
-        val other_socket = getSocket(player.Opposite())
+        val other_socket = getSocket(player.opposite())
 
         if(now_player.aura == now_player.maxAura || distanceToken == 0 || thisTurnDistance <= getAdjustSwellDistance(player)) return
         else{
@@ -1398,7 +1428,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 thisTurnDistance = 0
             }
             getPlayer(player).aura += 1
-            sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
+            sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.DISTANCE, LocationEnum.YOUR_AURA, 1, -1)
         }
     }
@@ -1408,7 +1438,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val now_player = getPlayer(player)
 
         val now_socket = getSocket(player)
-        val other_socket = getSocket(player.Opposite())
+        val other_socket = getSocket(player.opposite())
 
         if(now_player.aura == 0 || distanceToken == 10) return
         else{
@@ -1416,7 +1446,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             now_player.aura -= 1
             distanceToken += 1
             thisTurnDistance += 1
-            sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
+            sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.YOUR_AURA, LocationEnum.DISTANCE, 1, -1)
         }
     }
@@ -1426,14 +1456,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val now_player = getPlayer(player)
 
         val now_socket = getSocket(player)
-        val other_socket = getSocket(player.Opposite())
+        val other_socket = getSocket(player.opposite())
 
         if(dust == 0 || now_player.aura == now_player.maxAura) return
         else{
             sendDoBasicAction(now_socket, other_socket, CommandEnum.ACTION_WIND_AROUND_YOUR)
             dust -= 1
             now_player.aura += 1
-            sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
+            sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.DUST, LocationEnum.YOUR_AURA, 1, -1)
         }
     }
@@ -1443,14 +1473,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val now_player = getPlayer(player)
 
         val now_socket = getSocket(player)
-        val other_socket = getSocket(player.Opposite())
+        val other_socket = getSocket(player.opposite())
 
         if(now_player.aura == 0) return
         else{
             sendDoBasicAction(now_socket, other_socket, CommandEnum.ACTION_INCUBATE_YOUR)
             now_player.aura -= 1
             now_player.flare += 1
-            sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
+            sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.YOUR_AURA, LocationEnum.YOUR_FLARE, 1, -1)
         }
     }
@@ -1458,7 +1488,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     //this 5 function must call after check when select
     suspend fun doBreakAway(player: PlayerEnum){
         val now_socket = getSocket(player)
-        val other_socket = getSocket(player.Opposite())
+        val other_socket = getSocket(player.opposite())
 
         if(dust == 0 || thisTurnDistance > getAdjustSwellDistance(player) || distanceToken == 10) return
         else{
@@ -1466,7 +1496,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             dust -= 1
             distanceToken += 1
             thisTurnDistance += 1
-            sendMoveToken(getSocket(player), getSocket(player.Opposite()), TokenEnum.SAKURA_TOKEN,
+            sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.YOUR_AURA, LocationEnum.YOUR_FLARE, 1, -1)
         }
     }
@@ -1517,23 +1547,47 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     //select_player -> cardUser ||| player -> victim ||| function that select card in list(list check is not needed)
-    suspend fun selectCardFrom(player: PlayerEnum, select_player: PlayerEnum, location_list: List<LocationEnum>, reason: CommandEnum): MutableList<Int>{
+    suspend fun selectCardFrom(player: PlayerEnum, select_player: PlayerEnum, location_list: List<LocationEnum>,
+                               reason: CommandEnum, card_number: Int, condition: (Card) -> Boolean): MutableList<Int>?{
         val cardList = mutableListOf<Int>()
         val searchPlayer = getPlayer(player)
 
         for (location in location_list){
-            searchPlayer.insertCardNumber(location, cardList)
+            searchPlayer.insertCardNumber(location, cardList, condition)
         }
 
+        if(cardList.isEmpty()) return null
+
         while (true){
-            return receiveSelectCard(getSocket(select_player), cardList, reason) ?: continue
+            return receiveSelectCard(getSocket(select_player), cardList, reason, card_number) ?: continue
+        }
+    }
+
+    //use this function player cannot select card select number
+    suspend fun selectCardFrom(player: PlayerEnum, select_player: PlayerEnum, location_list: List<LocationEnum>,
+                               reason: CommandEnum, card_number: Int, listSize: Int, condition: (Card) -> Boolean): MutableList<Int>?{
+        val cardList = mutableListOf<Int>()
+        val searchPlayer = getPlayer(player)
+
+        for (location in location_list){
+            searchPlayer.insertCardNumber(location, cardList, condition)
+        }
+
+        if(cardList.isEmpty()) return null
+        else if(cardList.size < listSize) return cardList
+
+        while (true){
+            val set = mutableSetOf<Int>()
+            val list = receiveSelectCard(getSocket(select_player), cardList, reason, card_number) ?: continue
+            set.addAll(list)
+            if(set.size == listSize) return cardList
         }
     }
 
     suspend fun popCardFrom(player: PlayerEnum, card_number: Int, location: LocationEnum, public: Boolean): Card?{
         val nowPlayer = getPlayer(player)
         val nowSocket = getSocket(player)
-        val otherSocket = getSocket(player.Opposite())
+        val otherSocket = getSocket(player.opposite())
         when(location){
             LocationEnum.COVER_CARD -> for(card in nowPlayer.cover_card) if (card.card_number == card_number) {
                 sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_COVER_YOUR)
@@ -1545,9 +1599,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 nowPlayer.discard.remove(card)
                 return card
             }
-            LocationEnum.DECK -> for(card in nowPlayer.normal_card_deck) if (card.card_number == card_number) {
+            LocationEnum.DECK -> for(card in nowPlayer.normalCardDeck) if (card.card_number == card_number) {
                 sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_DECK_YOUR)
-                nowPlayer.normal_card_deck.remove(card)
+                nowPlayer.normalCardDeck.remove(card)
                 return card
             }
             LocationEnum.HAND -> {
@@ -1565,9 +1619,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 return result
             }
             LocationEnum.USED_CARD -> {
-                val result = nowPlayer.used_special_card[card_number]?: return null
+                val result = nowPlayer.usedSpecialCard[card_number]?: return null
                 sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_USED_YOUR)
-                nowPlayer.used_special_card.remove(card_number)
+                nowPlayer.usedSpecialCard.remove(card_number)
                 return result
             }
             LocationEnum.PLAYING_ZONE -> {
@@ -1583,6 +1637,18 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 nowPlayer.enchantment_card.remove(card_number)
                 return result
             }
+            LocationEnum.YOUR_DECK_TOP -> {
+                if(nowPlayer.normalCardDeck.isEmpty()) return null
+                val result = nowPlayer.normalCardDeck.first()
+                nowPlayer.normalCardDeck.removeFirst()
+                return result
+            }
+            LocationEnum.SEAL_ZONE -> {
+                val result = nowPlayer.sealZone[card_number]?: return null
+                sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_SEAL_YOUR)
+                nowPlayer.sealZone.remove(card_number)
+                return result
+            }
             else -> TODO()
         }
         return null
@@ -1591,14 +1657,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     suspend fun insertCardTo(player: PlayerEnum, card: Card, location: LocationEnum, public: Boolean){
         val nowPlayer = getPlayer(player)
         val nowSocket = getSocket(player)
-        val otherSocket = getSocket(player.Opposite())
+        val otherSocket = getSocket(player.opposite())
         when(location){
             LocationEnum.YOUR_DECK_BELOW -> {
-                nowPlayer.normal_card_deck.addLast(card)
+                nowPlayer.normalCardDeck.addLast(card)
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.DECK_BELOW_YOUR)
             }
             LocationEnum.YOUR_DECK_TOP -> {
-                nowPlayer.normal_card_deck.addFirst(card)
+                nowPlayer.normalCardDeck.addFirst(card)
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.DECK_TOP_YOUR)
             }
             LocationEnum.DISCARD -> {
@@ -1610,7 +1676,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.PLAYING_CARD_YOUR)
             }
             LocationEnum.USED_CARD -> {
-                nowPlayer.used_special_card[card.card_number] = card
+                nowPlayer.usedSpecialCard[card.card_number] = card
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.USED_CARD_YOUR)
             }
             LocationEnum.COVER_CARD -> {
@@ -1629,16 +1695,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 nowPlayer.hand[card.card_number] = card
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.HAND_YOUR)
             }
+            LocationEnum.SEAL_ZONE -> {
+                nowPlayer.sealZone[card.card_number] = card
+                sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.SEAL_YOUR)
+            }
             else -> TODO()
         }
-    }
-
-    fun endlessWindCheck(player: PlayerEnum): Boolean{
-        for (card in getPlayer(player).hand.values){
-            if(card.card_data.card_type == CardType.ATTACK || !card.card_data.canDiscard) continue
-            return false
-        }
-        return true
     }
 
     suspend fun showSome(show_player: PlayerEnum, command: CommandEnum, card_number: Int){
@@ -1652,15 +1714,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             CommandEnum.SHOW_HAND_YOUR -> list.addAll(arrayOf(card_number))
             else -> TODO()
         }
-        sendShowInformation(command, getSocket(show_player), getSocket(show_player.Opposite()), list)
-    }
-
-    fun checkCoverFullPower(player: PlayerEnum): Boolean{
-        val nowPlayer = getPlayer(player)
-        for (card in nowPlayer.cover_card){
-            if(card.card_data.sub_type != SubType.FULLPOWER) return false
-        }
-        return true
+        sendShowInformation(command, getSocket(show_player), getSocket(show_player.opposite()), list)
     }
 
     fun getCardFrom(player: PlayerEnum, card_number: Int, location: LocationEnum): Card?{
@@ -1669,6 +1723,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             LocationEnum.COVER_CARD -> getPlayer(player).getCardFromCover(card_number)
             LocationEnum.DISCARD -> getPlayer(player).getCardFromDiscard(card_number)
             LocationEnum.SPECIAL_CARD -> getPlayer(player).getCardFromSpecial(card_number)
+            LocationEnum.YOUR_DECK_TOP -> getPlayer(player).getCardFromDeckTop(card_number)
             else -> TODO()
         }
     }
@@ -1681,6 +1736,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     //megami special function
+
     fun getUmbrella(player: PlayerEnum): Umbrella?{
         return when(player){
             PlayerEnum.PLAYER1 -> player1.umbrella
@@ -1699,7 +1755,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val nowPlayer = getPlayer(player)
         nowPlayer.umbrella?.let {
             nowPlayer.umbrella = it.opposite()
-            sendChangeUmbrella(getSocket(player), getSocket(player.Opposite()))
+            sendChangeUmbrella(getSocket(player), getSocket(player.opposite()))
             val umbrellaListener = getUmbrellaListener(player)
             if(!umbrellaListener.isEmpty()){
                 for(i in 0..umbrellaListener.size){
@@ -1745,4 +1801,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
         }
     }
+
+    //megami special function
 }

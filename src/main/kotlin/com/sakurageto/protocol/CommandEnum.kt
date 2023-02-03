@@ -58,7 +58,12 @@ enum class CommandEnum {
     POP_DECK_OTHER,
     POP_ENCHANTMENT_YOUR,
     POP_ENCHANTMENT_OTHER,
+    POP_SEAL_YOUR,
+    POP_SEAL_OTHER,
 
+    SEAL_YOUR,
+    SEAL_OTHER,
+    IN_ENCHANTMENT_CARD_YOUR,
     SPECIAL_YOUR,
     ENCHANTMENT_CARD_YOUR,
     DISCARD_CARD_YOUR,
@@ -68,6 +73,7 @@ enum class CommandEnum {
     DECK_BELOW_YOUR,
     PLAYING_CARD_YOUR,
     HAND_YOUR,
+    IN_ENCHANTMENT_CARD_OTHER,
     SPECIAL_OTHER,
     DISCARD_CARD_OTHER,
     USED_CARD_OTHER,
@@ -232,6 +238,12 @@ enum class CommandEnum {
             POP_ENCHANTMENT_OTHER -> return POP_ENCHANTMENT_YOUR
             HAND_YOUR -> return HAND_OTHER
             HAND_OTHER -> return HAND_YOUR
+            IN_ENCHANTMENT_CARD_YOUR -> return IN_ENCHANTMENT_CARD_OTHER
+            IN_ENCHANTMENT_CARD_OTHER -> return IN_ENCHANTMENT_CARD_YOUR
+            SEAL_YOUR -> return SEAL_OTHER
+            SEAL_OTHER -> return SEAL_YOUR
+            POP_SEAL_YOUR -> return POP_SEAL_OTHER
+            POP_SEAL_OTHER -> return POP_SEAL_YOUR
             else -> return TODO()
         }
     }
@@ -269,7 +281,8 @@ enum class LocationEnum(var real_number: Int){
     PLAYING_ZONE(18),
     SPECIAL_CARD(19),
     USED_CARD(20),
-    ENCHANTMENT_ZONE(21);
+    ENCHANTMENT_ZONE(21),
+    SEAL_ZONE(22);
 
     fun Opposite(): LocationEnum{
         return when(this){
@@ -289,7 +302,6 @@ enum class LocationEnum(var real_number: Int){
         }
     }
     companion object {
-
         fun fromInt(value: Int) = MegamiEnum.values().first { it.real_number == value }
     }
 }

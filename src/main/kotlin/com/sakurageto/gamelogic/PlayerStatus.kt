@@ -56,19 +56,12 @@ class PlayerStatus(val player_enum: PlayerEnum) {
         return hand[card_number]
     }
 
-    fun fromHandToCover(card_number: Int): Boolean {
-        return if(hand[card_number] != null){
-            cover_card.addLast(hand[card_number]!!)
-            hand.remove(card_number)
-            true
-        } else{
-            false
-        }
-    }
-
     var enchantment_card: HashMap<Int, Card> = HashMap()
 
     var special_card_deck = HashMap<Int, Card>()
+
+    var sealZone = HashMap<Int, Card>()
+    var sealInformation = HashMap<Int, Int>()
 
     fun checkAuraDamage(damage: Int): MutableList<Int>?{
         val selectable = mutableListOf<Int>()
@@ -90,19 +83,24 @@ class PlayerStatus(val player_enum: PlayerEnum) {
         return special_card_deck[card_number]
     }
 
-    var normal_card_deck = ArrayDeque<Card>()
-    var used_special_card = HashMap<Int, Card>()
+    var normalCardDeck = ArrayDeque<Card>()
+    var usedSpecialCard = HashMap<Int, Card>()
+
+    fun getCardFromDeckTop(index: Int): Card?{
+        if(normalCardDeck.size > index) return normalCardDeck[index]
+        return null
+    }
 
     suspend fun usedCardReturn(game_status: GameStatus): MutableList<Int>{
         val result = mutableListOf<Int>()
-        for (cardNumber in used_special_card.keys){
-            if (used_special_card[cardNumber]!!.returnCheck(player_enum, game_status)) result.add(cardNumber)
+        for (cardNumber in usedSpecialCard.keys){
+            if (usedSpecialCard[cardNumber]!!.returnCheck(player_enum, game_status)) result.add(cardNumber)
         }
         return result
     }
 
     fun infiniteInstallationCheck(): Boolean{
-        for (card in used_special_card.values){
+        for (card in usedSpecialCard.values){
             if (card.isItInstallationInfinite()) return true
         }
         return false
@@ -139,13 +137,13 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var end_turn = false
 
     fun usedToSpecial(card_number: Int): Boolean{
-        return if(used_special_card[card_number] == null){
+        return if(usedSpecialCard[card_number] == null){
             false
         } else{
-            val card = used_special_card[card_number]!!
+            val card = usedSpecialCard[card_number]!!
             card.special_card_state = SpecialCardEnum.UNUSED
             special_card_deck[card.card_number] = card
-            used_special_card.remove(card_number)
+            usedSpecialCard.remove(card_number)
             true
         }
     }
@@ -325,14 +323,14 @@ class PlayerStatus(val player_enum: PlayerEnum) {
         }
     }
 
-    fun insertCardNumber(location: LocationEnum, list: MutableList<Int>){
+    fun insertCardNumber(location: LocationEnum, list: MutableList<Int>, condition: (Card) -> Boolean){
         when(location){
-            LocationEnum.DISCARD -> for (card in discard) list.add(card.card_number)
-            LocationEnum.DECK -> for (card in normal_card_deck) list.add(card.card_number)
-            LocationEnum.HAND -> for (cardNumber in hand.keys) list.add(cardNumber)
-            LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD -> for (cardNumber in enchantment_card.keys) list.add(cardNumber)
-            LocationEnum.COVER_CARD -> for (card in cover_card) list.add(card.card_number)
-            LocationEnum.USED_CARD -> for (card in used_special_card.keys) list.add(card)
+            LocationEnum.DISCARD -> for (card in discard) if(condition(card)) list.add(card.card_number)
+            LocationEnum.DECK -> for (card in normalCardDeck) if(condition(card)) list.add(card.card_number)
+            LocationEnum.HAND -> for (card in hand.values) if(condition(card)) list.add(card.card_number)
+            LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD -> for (card in enchantment_card.values) if(condition(card)) list.add(card.card_number)
+            LocationEnum.COVER_CARD -> for (card in cover_card) if(condition(card)) list.add(card.card_number)
+            LocationEnum.USED_CARD -> for (card in usedSpecialCard.values) if(condition(card)) list.add(card.card_number)
             else -> TODO()
         }
     }

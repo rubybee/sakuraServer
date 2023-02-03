@@ -6,7 +6,7 @@ enum class PlayerEnum {
     PLAYER1,
     PLAYER2;
 
-    fun Opposite(): PlayerEnum{
+    fun opposite(): PlayerEnum{
         return if(this == PLAYER1){
             PLAYER2
         } else{
@@ -34,7 +34,7 @@ enum class CardType {
 }
 
 enum class SubType {
-    FULLPOWER,
+    FULL_POWER,
     REACTION,
     NONE,
     UNDEFINED,
@@ -132,14 +132,14 @@ enum class CardName {
     SHINRA_BANLON,
     SHINRA_KIBEN,
     SHINRA_INYONG,
-    SHINRA_SEONGDONG,
+    SHINRA_SEONDONG,
     SHINRA_JANGDAM,
     SHINRA_NONPA,
 
     SHINRA_WANJEON_NONPA,
     SHINRA_DASIG_IHAE,
     SHINRA_CHEONJI_BANBAG,
-    SHINRA_SHINRA_BAN_SHO;
+    SHINRA_SAMRA_BAN_SHO;
 
     companion object {
         fun returnNormalCardNameByMegami(megami_name: MegamiEnum):List<CardName>{
@@ -171,7 +171,7 @@ enum class CardName {
                 )
                 MegamiEnum.SHINRA -> return listOf(
                     SHINRA_IBLON, SHINRA_BANLON,
-                    SHINRA_KIBEN, SHINRA_INYONG, SHINRA_SEONGDONG,
+                    SHINRA_KIBEN, SHINRA_INYONG, SHINRA_SEONDONG,
                     SHINRA_JANGDAM, SHINRA_NONPA
                 )
             }
@@ -201,7 +201,7 @@ enum class CardName {
                     YUKIHI_FLUTTERING_SNOWFLAKE, YUKIHI_SWAYING_LAMPLIGHT, YUKIHI_CLINGY_MIND, YUKIHI_SWIRLING_GESTURE
                 )
                 MegamiEnum.SHINRA -> listOf(
-                    SHINRA_WANJEON_NONPA, SHINRA_DASIG_IHAE, SHINRA_CHEONJI_BANBAG, SHINRA_SHINRA_BAN_SHO
+                    SHINRA_WANJEON_NONPA, SHINRA_DASIG_IHAE, SHINRA_CHEONJI_BANBAG, SHINRA_SAMRA_BAN_SHO
                 )
             }
         }

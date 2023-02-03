@@ -99,32 +99,6 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         return nap == 0 || nap == null
     }
 
-    suspend fun addAttackBuffMine(player: PlayerEnum, gameStatus: GameStatus){
-        card_data.effect?.let {
-            for(text in it){
-                if(usedEffectUsable(text)){
-                    if(text.tag == TextEffectTag.NEXT_ATTACK_ENCHANTMENT) text.effect!!(this.card_number, player, gameStatus, null)
-                }
-                else if(enchantmentUsable(text)){
-                    if(text.tag == TextEffectTag.NEXT_ATTACK_ENCHANTMENT) text.effect!!(this.card_number, player, gameStatus, null)
-                }
-            }
-        }
-    }
-
-    suspend fun addAttackBuffOther(player: PlayerEnum, gameStatus: GameStatus){
-        card_data.effect?.let {
-            for(text in it){
-                if(usedEffectUsable(text)){
-                    if(text.tag == TextEffectTag.NEXT_ATTACK_ENCHANTMENT_OTHER) text.effect!!(this.card_number, player, gameStatus, null)
-                }
-                else if(enchantmentUsable(text)){
-                    if(text.tag == TextEffectTag.NEXT_ATTACK_ENCHANTMENT_OTHER) text.effect!!(this.card_number, player, gameStatus, null)
-                }
-            }
-        }
-    }
-
     suspend fun addCostBuff(player: PlayerEnum, game_status: GameStatus){
         card_data.effect?.let {
             for(text in it){
@@ -182,7 +156,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         return true
     }
 
-    suspend fun returnNap(player: PlayerEnum, gamestatus: GameStatus, react_attack: MadeAttack?): Int{
+    suspend fun returnNap(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?): Int{
         if(this.card_data.charge == null){
             return -1
         }
@@ -191,7 +165,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
                 for(text in it){
                     if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
                         if(text.tag == TextEffectTag.ADJUST_NAP){
-                            return text.effect!!(this.card_number, player, gamestatus, react_attack)!!
+                            return text.effect!!(this.card_number, player, game_status, react_attack)!!
                         }
                     }
                 }
@@ -214,6 +188,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         }?: 10000
     }
 
+    //true mean can use
     suspend fun textUseCheck(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?): Boolean{
         card_data.effect?.let {
             for(text in it){
@@ -292,7 +267,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
 
     //-2: can't use                    -1: can use                 >= 0: cost
     suspend fun canUse(player: PlayerEnum, gameStatus: GameStatus, react_attack: MadeAttack?): Int{
-        if(card_data.sub_type == SubType.FULLPOWER && !gameStatus.getPlayerFullAction(player)) return -2
+        if(card_data.sub_type == SubType.FULL_POWER && !gameStatus.getPlayerFullAction(player)) return -2
 
         if(!textUseCheck(player, gameStatus, react_attack)){
             return -2
@@ -559,4 +534,16 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         }
     }
 
+    suspend fun effectAllMaintainCard(player: PlayerEnum, game_status: GameStatus, effectTag: TextEffectTag){
+        card_data.effect?.let {
+            for(text in it){
+                if(usedEffectUsable(text)){
+                    if(text.tag == effectTag) text.effect!!(this.card_number, player, game_status, null)
+                }
+                else if(enchantmentUsable(text)){
+                    if(text.tag == effectTag) text.effect!!(this.card_number, player, game_status, null)
+                }
+            }
+        }
+    }
 }

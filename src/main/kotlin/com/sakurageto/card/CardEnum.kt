@@ -139,7 +139,20 @@ enum class CardName {
     SHINRA_WANJEON_NONPA,
     SHINRA_DASIG_IHAE,
     SHINRA_CHEONJI_BANBAG,
-    SHINRA_SAMRA_BAN_SHO;
+    SHINRA_SAMRA_BAN_SHO,
+
+    HAGANE_CENTRIFUGAL_ATTACK,
+    HAGANE_FOUR_WINDED_EARTHQUAKE,
+    HAGANE_GROUND_BREAKING,
+    HAGANE_HYPER_RECOIL,
+    HAGANE_WON_MU_RUYN,
+    HAGANE_RING_A_BELL,
+    HAGANE_GRAVITATION_FIELD,
+
+    HAGANE_GRAND_SKY_HOLE_CRASH,
+    HAGANE_GRAND_BELL_MEGALOBEL,
+    HAGANE_GRAND_GRAVITATION_ATTRACT,
+    HAGANE_GRAND_MOUNTAIN_RESPECT;
 
     companion object {
         fun returnNormalCardNameByMegami(megami_name: MegamiEnum):List<CardName>{
@@ -174,6 +187,12 @@ enum class CardName {
                     SHINRA_KIBEN, SHINRA_INYONG, SHINRA_SEONDONG,
                     SHINRA_JANGDAM, SHINRA_NONPA
                 )
+                MegamiEnum.HAGANE -> return listOf(
+                    HAGANE_CENTRIFUGAL_ATTACK, HAGANE_FOUR_WINDED_EARTHQUAKE,
+                    HAGANE_GROUND_BREAKING, HAGANE_HYPER_RECOIL,
+                    HAGANE_WON_MU_RUYN, HAGANE_RING_A_BELL,
+                    HAGANE_GRAVITATION_FIELD
+                )
             }
         }
 
@@ -194,14 +213,22 @@ enum class CardName {
                 MegamiEnum.TOKOYO -> listOf(
                     TOKOYO_KUON, TOKOYO_THOUSANDBIRD, TOKOYO_ENDLESSWIND, TOKOYO_TOKOYOMOON
                 )
+
                 MegamiEnum.OBORO -> listOf(
                     OBORO_KUMASUKE, OBORO_TOBIKAGE, OBORO_ULOO, OBORO_MIKAZRA
                 )
+
                 MegamiEnum.YUKIHI -> listOf(
                     YUKIHI_FLUTTERING_SNOWFLAKE, YUKIHI_SWAYING_LAMPLIGHT, YUKIHI_CLINGY_MIND, YUKIHI_SWIRLING_GESTURE
                 )
+
                 MegamiEnum.SHINRA -> listOf(
                     SHINRA_WANJEON_NONPA, SHINRA_DASIG_IHAE, SHINRA_CHEONJI_BANBAG, SHINRA_SAMRA_BAN_SHO
+                )
+
+                MegamiEnum.HAGANE -> listOf(
+                    HAGANE_GRAND_SKY_HOLE_CRASH, HAGANE_GRAND_BELL_MEGALOBEL, HAGANE_GRAND_GRAVITATION_ATTRACT,
+                    HAGANE_GRAND_MOUNTAIN_RESPECT
                 )
             }
         }
@@ -215,6 +242,7 @@ enum class CardName {
                 MegamiEnum.OBORO -> listOf()
                 MegamiEnum.YUKIHI -> listOf()
                 MegamiEnum.SHINRA -> listOf()
+                MegamiEnum.HAGANE -> listOf()
             }
         }
 

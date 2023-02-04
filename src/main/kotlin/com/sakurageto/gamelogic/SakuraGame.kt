@@ -336,6 +336,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
     }
 
     suspend fun startPhaseDefault(){
+        game_status.turnPlayer = this.turn_player
         game_status.addConcentration(this.turn_player)
         game_status.enchantmentReduceAll(this.turn_player)
         if(receiveReconstructRequest(getSocket(this.turn_player))){
@@ -346,7 +347,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
 
     suspend fun startPhase(){
         sendStartPhaseStart(getSocket(this.turn_player), getSocket(this.turn_player.opposite()))
-        game_status.startDistance = game_status.thisTurnDistance
+        game_status.startTurnDistance = game_status.distanceToken
         game_status.startPhaseEffectProcess()
         if(turn_number == 0 || turn_number == 1){
             return

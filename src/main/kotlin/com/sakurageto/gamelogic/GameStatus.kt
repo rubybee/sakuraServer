@@ -14,9 +14,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         const val swellDistance = 2
     }
 
+    var turnPlayer = PlayerEnum.PLAYER1
+
     val logger = Logger()
 
-    var startDistance = 10
+    var startTurnDistance = 10
 
     suspend fun getAdjustSwellDistance(player: PlayerEnum): Int{
         var nowSwellDistance = swellDistance
@@ -29,7 +31,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return nowSwellDistance
     }
 
-    fun getAdjustDistanceDuringAttack(player: PlayerEnum): Int{
+    fun getAdjustDistance(player: PlayerEnum): Int{
         var distance = thisTurnDistance
 
         //TODO("SOMETHING WILL BE ADDED HERE")
@@ -274,6 +276,24 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.DISTANCE, value, card.card_number)
     }
 
+    suspend fun distanceToFlare(player: PlayerEnum, number: Int){
+        if(number == 0) return
+
+        var value = number
+
+        if(distanceToken < value){
+            value = distanceToken
+        }
+
+        distanceToken -= value
+        thisTurnDistance -= value
+
+        getPlayer(player).flare += value
+
+        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
+            LocationEnum.DISTANCE, LocationEnum.YOUR_FLARE, value, -1)
+    }
+
     suspend fun distanceToDust(number: Int){
         if(moveTokenCheck(LocationEnum.DISTANCE, LocationEnum.DUST) || number == 0) return
 
@@ -501,11 +521,32 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             LocationEnum.YOUR_AURA, LocationEnum.DUST, value, -1)
     }
 
+    suspend fun flareToDistance(player: PlayerEnum, number: Int){
+        if(number == 0) return
+
+        val nowPlayer = getPlayer(player)
+        var value = number
+
+        if(nowPlayer.flare < value){
+            value = nowPlayer.flare
+        }
+        if(10 - distanceToken < number){
+            value = 10 - distanceToken
+        }
+        nowPlayer.flare -= value
+
+        distanceToken += value
+        thisTurnDistance += value
+
+        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
+            LocationEnum.YOUR_FLARE, LocationEnum.DISTANCE, value, -1)
+    }
+
     suspend fun flareToDust(player: PlayerEnum, number: Int){
         if(number == 0) return
 
         val nowPlayer = getPlayer(player)
-        var value: Int = number
+        var value = number
 
         if(nowPlayer.flare < value){
             value = nowPlayer.flare
@@ -518,25 +559,33 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             LocationEnum.YOUR_FLARE, LocationEnum.DUST, value, -1)
     }
 
-    suspend fun flareToSelfAura(player: PlayerEnum, number: Int){
+    suspend fun flareToAura(flare_player: PlayerEnum, aura_player: PlayerEnum, number: Int){
         if(number == 0) return
 
-        val nowPlayer = getPlayer(player)
+        val flarePlayer = getPlayer(flare_player)
+        val auraPlayer = getPlayer(aura_player)
         var value = number
 
-        if(nowPlayer.flare < number){
-            value = nowPlayer.flare
+        if(flarePlayer.flare < number){
+            value = flarePlayer.flare
         }
 
-        if(nowPlayer.maxAura - nowPlayer.aura > value){
-            value = nowPlayer.maxAura - nowPlayer.aura
+        if(auraPlayer.maxAura - auraPlayer.aura > value){
+            value = auraPlayer.maxAura - auraPlayer.aura
         }
 
-        nowPlayer.flare -= value
-        nowPlayer.aura += value
+        flarePlayer.flare -= value
+        auraPlayer.aura += value
 
-        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
-            LocationEnum.YOUR_FLARE, LocationEnum.YOUR_AURA, value, -1)
+        if(flare_player == aura_player){
+            sendMoveToken(getSocket(flare_player), getSocket(flare_player.opposite()), TokenEnum.SAKURA_TOKEN,
+                LocationEnum.YOUR_FLARE, LocationEnum.YOUR_AURA, value, -1)
+        }
+        else{
+            sendMoveToken(getSocket(flare_player), getSocket(flare_player.opposite()), TokenEnum.SAKURA_TOKEN,
+                LocationEnum.YOUR_FLARE, LocationEnum.OTHER_AURA, value, -1)
+        }
+
     }
 
     suspend fun chasmProcess(player: PlayerEnum){
@@ -750,7 +799,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
         }
 
-        return nowPlayer.pre_attack_card!!.rangeCheck(getAdjustDistanceDuringAttack(player))
+        return nowPlayer.pre_attack_card!!.rangeCheck(getAdjustDistance(player))
     }
 
     fun cleanAfterUseCost(){
@@ -917,6 +966,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val nowAttack = nowPlayer.pre_attack_card!!
         nowPlayer.pre_attack_card = null
 
+        logger.insert(Log(player, LogText.ATTACK, nowAttack.card_number, nowAttack.card_number))
+
         makeAttackComplete(nowSocket, otherSocket, card_number)
         sendAttackInformation(nowSocket, otherSocket, nowAttack.Information())
         if(!otherPlayer.end_turn && react_attack == null){
@@ -944,7 +995,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         applyTempAttackBuff(player, nowAttack, nowTempAttackBuff)
         applyTempRangeBuff(player, nowAttack, nowTempRangeBuff)
-        if(nowAttack.isItValid && nowAttack.rangeCheck(getAdjustDistanceDuringAttack(player))){
+        if(nowAttack.isItValid && nowAttack.rangeCheck(getAdjustDistance(player))){
             if(nowAttack.beforeProcessDamageCheck(player, this, react_attack)){
                 if(nowAttack.isItDamage){
                     sendChooseDamage(otherSocket, CommandEnum.CHOOSE_CARD_DAMAGE, nowAttack.aura_damage, nowAttack.life_damage)

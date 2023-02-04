@@ -774,7 +774,7 @@ object CardSet {
             while(true){
                 val nowCommand = game_status.receiveCardEffectSelect(player, card_number)
                 if(nowCommand == CommandEnum.SELECT_ONE){
-                    game_status.flareToSelfAura(player, 1)
+                    game_status.flareToAura(player, player, 1)
                     break
                 }
                 else if(nowCommand == CommandEnum.SELECT_TWO){
@@ -1198,7 +1198,7 @@ object CardSet {
         }
     }
 
-    private val shinra = CardData(CardClass.SPECIAL, CardName.SHINRA_SHINRA, MegamiEnum.YUKIHI, CardType.BEHAVIOR, SubType.NONE)
+    private val shinra = CardData(CardClass.SPECIAL, CardName.SHINRA_SHINRA, MegamiEnum.SHINRA, CardType.BEHAVIOR, SubType.NONE)
     private val iblon = CardData(CardClass.NORMAL, CardName.SHINRA_IBLON, MegamiEnum.SHINRA, CardType.ATTACK, SubType.NONE)
     private val banlon = CardData(CardClass.NORMAL, CardName.SHINRA_BANLON, MegamiEnum.SHINRA, CardType.ATTACK, SubType.REACTION)
     private val kiben = CardData(CardClass.NORMAL, CardName.SHINRA_KIBEN, MegamiEnum.SHINRA, CardType.ATTACK, SubType.FULL_POWER)
@@ -1466,6 +1466,88 @@ object CardSet {
         })
     }
 
+    fun centrifugal(player: PlayerEnum, game_status: GameStatus): Boolean{
+        return game_status.startTurnDistance + 1 < game_status.thisTurnDistance && !game_status.logger.checkThisTurnDoAttack(player)
+    }
+
+    private val centrifugalAttack = CardData(CardClass.NORMAL, CardName.HAGANE_CENTRIFUGAL_ATTACK, MegamiEnum.HAGANE, CardType.ATTACK, SubType.NONE)
+    private val fourWindedEarthquake = CardData(CardClass.NORMAL, CardName.HAGANE_FOUR_WINDED_EARTHQUAKE, MegamiEnum.HAGANE, CardType.ATTACK, SubType.NONE)
+    private val groundBreaking = CardData(CardClass.NORMAL, CardName.HAGANE_GROUND_BREAKING, MegamiEnum.HAGANE, CardType.ATTACK, SubType.FULL_POWER)
+    private val hyperRecoil = CardData(CardClass.NORMAL, CardName.HAGANE_HYPER_RECOIL, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
+    private val wonMuRuyn = CardData(CardClass.NORMAL, CardName.HAGANE_WON_MU_RUYN, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
+
+    fun haganeCardInit(){
+        centrifugalAttack.setAttack(DistanceType.CONTINUOUS, Pair(2, 6), null, 5, 3)
+        centrifugalAttack.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.USING_CONDITION) {_, player, game_status, _->
+            if(centrifugal(player, game_status)) 1
+            else 0
+        })
+        centrifugalAttack.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.CARD_TO_COVER) {_, player, game_status, _ ->
+            if (player == game_status.turnPlayer) {
+                game_status.setEndTurn(player, true)
+                for(card in game_status.getPlayer(player).hand.values){
+                    if(card.card_data.canCover){
+                        game_status.popCardFrom(player, card.card_number, LocationEnum.HAND, false)?.let {
+                            game_status.insertCardTo(player, it, LocationEnum.COVER_CARD, false)
+                        }
+                    }
+                }
+                for(card in game_status.getPlayer(player.opposite()).hand.values){
+                    if(card.card_data.canCover){
+                        game_status.popCardFrom(player.opposite(), card.card_number, LocationEnum.HAND, false)?.let {
+                            game_status.insertCardTo(player.opposite(), it, LocationEnum.COVER_CARD, false)
+                        }
+                    }
+                }
+                game_status.setConcentration(player, 0)
+            }
+            null
+        })
+        fourWindedEarthquake.setAttack(DistanceType.CONTINUOUS, Pair(0, 6), null, 1, 999)
+        fourWindedEarthquake.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.CARD_TO_COVER) {_, player, game_status, _ ->
+            if (game_status.startTurnDistance + 1 < game_status.thisTurnDistance || game_status.startTurnDistance - 1 > game_status.thisTurnDistance) {
+                game_status.getPlayer(player.opposite()).hand.values.randomOrNull()?.let { card ->
+                    game_status.popCardFrom(player.opposite(), card.card_number, LocationEnum.HAND, true)?.let{
+                        game_status.insertCardTo(player.opposite(), it, LocationEnum.DISCARD, true)
+                    }
+                }
+            }
+            null
+        })
+        groundBreaking.setAttack(DistanceType.CONTINUOUS, Pair(0, 3), null, 2, 999)
+        groundBreaking.addtext((Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CHANGE_EACH_IMMEDIATE, {_, _, madeAttack ->
+                cardNumberHashmap[madeAttack.card_number] == CardName.HAGANE_GROUND_BREAKING }, {madeAttack ->
+                madeAttack.canNotReact()
+            }))
+            null
+        }))
+        groundBreaking.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.CHANGE_CONCENTRATION) {_, player, game_status, _ ->
+            game_status.setConcentration(player.opposite(), 0)
+            game_status.setShrink(player.opposite())
+            null
+        })
+        hyperRecoil.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){_, player, game_status, _ ->
+            if(game_status.getAdjustDistance(player) >= 5){
+                game_status.distanceToFlare(player, 1)
+            }
+            else{
+                game_status.flareToDistance(player.opposite(), 1)
+            }
+            null
+        })
+        wonMuRuyn.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.USING_CONDITION) {_, player, game_status, _->
+            if(centrifugal(player, game_status)) 1
+            else 0
+        })
+        wonMuRuyn.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){_, player, game_status, _ ->
+            if(game_status.getPlayerFlare(player.opposite()) >= 3){
+                game_status.flareToAura(player.opposite(), player, 2)
+            }
+            null
+        })
+    }
+
     fun init(){
         hashMapInit()
 
@@ -1476,6 +1558,7 @@ object CardSet {
         oboroCardInit()
         yukihiCardInit()
         shinraCardInit()
+        haganeCardInit()
     }
 
     fun returnCardDataByName(card_name: CardName): CardData {
@@ -1560,6 +1643,17 @@ object CardSet {
             CardName.SHINRA_DASIG_IHAE -> return dasicIhae
             CardName.SHINRA_CHEONJI_BANBAG -> return cheonjiBanBag
             CardName.SHINRA_SAMRA_BAN_SHO -> return samraBanSho
+            CardName.HAGANE_CENTRIFUGAL_ATTACK -> return centrifugalAttack
+            CardName.HAGANE_FOUR_WINDED_EARTHQUAKE -> return fourWindedEarthquake
+            CardName.HAGANE_GROUND_BREAKING -> return groundBreaking
+            CardName.HAGANE_HYPER_RECOIL -> return hyperRecoil
+            CardName.HAGANE_WON_MU_RUYN -> return wonMuRuyn
+            CardName.HAGANE_RING_A_BELL -> TODO()
+            CardName.HAGANE_GRAVITATION_FIELD -> TODO()
+            CardName.HAGANE_GRAND_SKY_HOLE_CRASH -> TODO()
+            CardName.HAGANE_GRAND_BELL_MEGALOBEL -> TODO()
+            CardName.HAGANE_GRAND_GRAVITATION_ATTRACT -> TODO()
+            CardName.HAGANE_GRAND_MOUNTAIN_RESPECT -> TODO()
         }
     }
 }

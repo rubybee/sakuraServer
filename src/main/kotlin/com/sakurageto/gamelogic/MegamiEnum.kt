@@ -7,7 +7,8 @@ enum class MegamiEnum(var real_number: Int) {
     TOKOYO(40),
     OBORO(50),
     YUKIHI(60),
-    SHINRA(70);
+    SHINRA(70),
+    HAGANE(80);
 
     companion object {
         fun fromInt(value: Int) = MegamiEnum.values().first { it.real_number == value }

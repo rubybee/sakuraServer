@@ -42,5 +42,11 @@ class Logger {
         return false
     }
 
+    fun checkThisTurnDoAttack(player: PlayerEnum): Boolean{
+        for(log in logQueue){
+            if(log.player == player && log.text == LogText.ATTACK) return true
+        }
+        return false
+    }
 
 }

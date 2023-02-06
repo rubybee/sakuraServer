@@ -136,18 +136,6 @@ class PlayerStatus(val player_enum: PlayerEnum) {
 
     var end_turn = false
 
-    fun usedToSpecial(card_number: Int): Boolean{
-        return if(usedSpecialCard[card_number] == null){
-            false
-        } else{
-            val card = usedSpecialCard[card_number]!!
-            card.special_card_state = SpecialCardEnum.UNUSED
-            special_card_deck[card.card_number] = card
-            usedSpecialCard.remove(card_number)
-            true
-        }
-    }
-
     var life = 10
     var flare = 0
 

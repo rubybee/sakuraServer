@@ -17,6 +17,8 @@ class MadeAttack(
     var isItValid= true
     var isItDamage = true
 
+    var tempForGrandSkyHole: Int? = null
+
     fun makeNoDamage(){
         isItDamage = false
     }
@@ -83,7 +85,7 @@ class MadeAttack(
     }
 
     fun auraPlusMinus(number: Int){
-        if(aura_damage != 999){
+        if(aura_damage < 999){
             aura_damage += number
             if(aura_damage < 0){
                 aura_damage = 0
@@ -93,7 +95,7 @@ class MadeAttack(
     }
 
     fun lifePlusMinus(number: Int){
-        if(life_damage != 999){
+        if(life_damage < 999){
             life_damage += number
             if(life_damage < 0){
                 life_damage = 0

@@ -18,6 +18,7 @@ enum class LogText{
     USE_CARD_IN_COVER,
     USE_CARD,
     USE_CARD_REACT,
+    USE_CENTRIFUGAL,
     GET_LIFE_DAMAGE,
     GET_AURA_DAMAGE,
 }

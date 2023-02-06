@@ -3,6 +3,7 @@ package com.sakurageto.card
 import com.sakurageto.gamelogic.*
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
+import kotlin.math.abs
 
 object CardSet {
     val cardNameHashmapFirst = HashMap<CardName, Int>()
@@ -99,6 +100,18 @@ object CardSet {
         cardNameHashmapFirst[CardName.SHINRA_CHEONJI_BANBAG] = 709
         cardNameHashmapFirst[CardName.SHINRA_SAMRA_BAN_SHO] = 710
 
+        cardNameHashmapFirst[CardName.HAGANE_CENTRIFUGAL_ATTACK] = 800
+        cardNameHashmapFirst[CardName.HAGANE_FOUR_WINDED_EARTHQUAKE] = 801
+        cardNameHashmapFirst[CardName.HAGANE_GROUND_BREAKING] = 802
+        cardNameHashmapFirst[CardName.HAGANE_HYPER_RECOIL] = 803
+        cardNameHashmapFirst[CardName.HAGANE_WON_MU_RUYN] = 804
+        cardNameHashmapFirst[CardName.HAGANE_RING_A_BELL] = 805
+        cardNameHashmapFirst[CardName.HAGANE_GRAVITATION_FIELD] = 806
+        cardNameHashmapFirst[CardName.HAGANE_GRAND_SKY_HOLE_CRASH] = 807
+        cardNameHashmapFirst[CardName.HAGANE_GRAND_BELL_MEGALOBEL] = 808
+        cardNameHashmapFirst[CardName.HAGANE_GRAND_GRAVITATION_ATTRACT] = 809
+        cardNameHashmapFirst[CardName.HAGANE_GRAND_MOUNTAIN_RESPECT] = 810
+
 
         //for second turn player 10000~19999
         cardNameHashmapSecond[CardName.YURINA_CHAM] = 10100
@@ -187,6 +200,18 @@ object CardSet {
         cardNameHashmapSecond[CardName.SHINRA_CHEONJI_BANBAG] = 10709
         cardNameHashmapSecond[CardName.SHINRA_SAMRA_BAN_SHO] = 10710
 
+        cardNameHashmapSecond[CardName.HAGANE_CENTRIFUGAL_ATTACK] = 10800
+        cardNameHashmapSecond[CardName.HAGANE_FOUR_WINDED_EARTHQUAKE] = 10801
+        cardNameHashmapSecond[CardName.HAGANE_GROUND_BREAKING] = 10802
+        cardNameHashmapSecond[CardName.HAGANE_HYPER_RECOIL] = 10803
+        cardNameHashmapSecond[CardName.HAGANE_WON_MU_RUYN] = 10804
+        cardNameHashmapSecond[CardName.HAGANE_RING_A_BELL] = 10805
+        cardNameHashmapSecond[CardName.HAGANE_GRAVITATION_FIELD] = 10806
+        cardNameHashmapSecond[CardName.HAGANE_GRAND_SKY_HOLE_CRASH] = 10807
+        cardNameHashmapSecond[CardName.HAGANE_GRAND_BELL_MEGALOBEL] = 10808
+        cardNameHashmapSecond[CardName.HAGANE_GRAND_GRAVITATION_ATTRACT] = 10809
+        cardNameHashmapSecond[CardName.HAGANE_GRAND_MOUNTAIN_RESPECT] = 10810
+
 
 
         cardNumberHashmap[100] = CardName.YURINA_CHAM
@@ -274,6 +299,18 @@ object CardSet {
         cardNumberHashmap[709] = CardName.SHINRA_CHEONJI_BANBAG
         cardNumberHashmap[710] = CardName.SHINRA_SAMRA_BAN_SHO
 
+        cardNumberHashmap[800] = CardName.HAGANE_CENTRIFUGAL_ATTACK
+        cardNumberHashmap[801] = CardName.HAGANE_FOUR_WINDED_EARTHQUAKE
+        cardNumberHashmap[802] = CardName.HAGANE_GROUND_BREAKING
+        cardNumberHashmap[803] = CardName.HAGANE_HYPER_RECOIL
+        cardNumberHashmap[804] = CardName.HAGANE_WON_MU_RUYN
+        cardNumberHashmap[805] = CardName.HAGANE_RING_A_BELL
+        cardNumberHashmap[806] = CardName.HAGANE_GRAVITATION_FIELD
+        cardNumberHashmap[807] = CardName.HAGANE_GRAND_SKY_HOLE_CRASH
+        cardNumberHashmap[808] = CardName.HAGANE_GRAND_BELL_MEGALOBEL
+        cardNumberHashmap[809] = CardName.HAGANE_GRAND_GRAVITATION_ATTRACT
+        cardNumberHashmap[810] = CardName.HAGANE_GRAND_MOUNTAIN_RESPECT
+
         cardNumberHashmap[10100] = CardName.YURINA_CHAM
         cardNumberHashmap[10101] = CardName.YURINA_ILSUM
         cardNumberHashmap[10102] = CardName.YURINA_JARUCHIGI
@@ -358,6 +395,18 @@ object CardSet {
         cardNumberHashmap[10708] = CardName.SHINRA_DASIG_IHAE
         cardNumberHashmap[10709] = CardName.SHINRA_CHEONJI_BANBAG
         cardNumberHashmap[10710] = CardName.SHINRA_SAMRA_BAN_SHO
+
+        cardNumberHashmap[10800] = CardName.HAGANE_CENTRIFUGAL_ATTACK
+        cardNumberHashmap[10801] = CardName.HAGANE_FOUR_WINDED_EARTHQUAKE
+        cardNumberHashmap[10802] = CardName.HAGANE_GROUND_BREAKING
+        cardNumberHashmap[10803] = CardName.HAGANE_HYPER_RECOIL
+        cardNumberHashmap[10804] = CardName.HAGANE_WON_MU_RUYN
+        cardNumberHashmap[10805] = CardName.HAGANE_RING_A_BELL
+        cardNumberHashmap[10806] = CardName.HAGANE_GRAVITATION_FIELD
+        cardNumberHashmap[10807] = CardName.HAGANE_GRAND_SKY_HOLE_CRASH
+        cardNumberHashmap[10808] = CardName.HAGANE_GRAND_BELL_MEGALOBEL
+        cardNumberHashmap[10809] = CardName.HAGANE_GRAND_GRAVITATION_ATTRACT
+        cardNumberHashmap[10810] = CardName.HAGANE_GRAND_MOUNTAIN_RESPECT
     }
 
     private suspend fun selectDustToDistance(nowCommand: CommandEnum, game_status: GameStatus): Boolean{
@@ -425,7 +474,7 @@ object CardSet {
             null
         })
         giback.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
-            game_status.addThisTurnRangeBuff(player, RangeBuff(card_number,1, RangeBufTag.ADD, {_, _, attack -> (attack.megami != MegamiEnum.YURINA) && (attack.card_class != CardClass.SPECIAL)},
+            game_status.addThisTurnRangeBuff(player, RangeBuff(card_number,1, RangeBufTag.PLUS, {_, _, attack -> (attack.megami != MegamiEnum.YURINA) && (attack.card_class != CardClass.SPECIAL)},
                 { attack -> attack.plusMinusRange(1, true)
 
             }))
@@ -1416,7 +1465,8 @@ object CardSet {
                         if (list.size == 1){
                             val card = game_status.popCardFrom(player, list[0], LocationEnum.DISCARD, true)?:
                             game_status.popCardFrom(player, list[0], LocationEnum.USED_CARD, true)?: continue
-                            if(!card.textUseCheck(player, game_status, null)) continue
+                            if(card.card_data.card_class == CardClass.SPECIAL) card.special_card_state = SpecialCardEnum.PLAYING
+                            if(!card.textUseCheck(player, game_status, null)) break
                             card.use(player, game_status, null, null, null)
                             break
                         }
@@ -1470,17 +1520,45 @@ object CardSet {
         return game_status.startTurnDistance + 1 < game_status.thisTurnDistance && !game_status.logger.checkThisTurnDoAttack(player)
     }
 
+    fun checkAllSpecialCardUsed(player: PlayerEnum, game_status: GameStatus, except: Int): Boolean{
+        val nowPlayer = game_status.getPlayer(player)
+        if(nowPlayer.special_card_deck.isEmpty()){
+            for (card in nowPlayer.enchantment_card.values){
+                if(card.card_number == except) continue
+                if(card.player == player && card.special_card_state != null) return false
+            }
+            for (card in nowPlayer.using_card){
+                if(card.card_number == except) continue
+                if(card.player == player && card.special_card_state != null) return false
+            }
+            return true
+        }
+        else{
+            return false
+        }
+    }
+
     private val centrifugalAttack = CardData(CardClass.NORMAL, CardName.HAGANE_CENTRIFUGAL_ATTACK, MegamiEnum.HAGANE, CardType.ATTACK, SubType.NONE)
     private val fourWindedEarthquake = CardData(CardClass.NORMAL, CardName.HAGANE_FOUR_WINDED_EARTHQUAKE, MegamiEnum.HAGANE, CardType.ATTACK, SubType.NONE)
     private val groundBreaking = CardData(CardClass.NORMAL, CardName.HAGANE_GROUND_BREAKING, MegamiEnum.HAGANE, CardType.ATTACK, SubType.FULL_POWER)
     private val hyperRecoil = CardData(CardClass.NORMAL, CardName.HAGANE_HYPER_RECOIL, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
     private val wonMuRuyn = CardData(CardClass.NORMAL, CardName.HAGANE_WON_MU_RUYN, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
+    private val ringABell = CardData(CardClass.NORMAL, CardName.HAGANE_RING_A_BELL, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
+    private val gravitationField = CardData(CardClass.NORMAL, CardName.HAGANE_GRAVITATION_FIELD, MegamiEnum.HAGANE, CardType.ENCHANTMENT, SubType.NONE)
+    private val grandSkyHoleCrash = CardData(CardClass.SPECIAL, CardName.HAGANE_GRAND_SKY_HOLE_CRASH, MegamiEnum.HAGANE, CardType.ATTACK, SubType.NONE)
+    private val grandBellMegalobel = CardData(CardClass.SPECIAL, CardName.HAGANE_GRAND_BELL_MEGALOBEL, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
+    private val grandGravitationAttract = CardData(CardClass.SPECIAL, CardName.HAGANE_GRAND_GRAVITATION_ATTRACT, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
+    private val grandMountainRespect = CardData(CardClass.SPECIAL, CardName.HAGANE_GRAND_MOUNTAIN_RESPECT, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
 
     fun haganeCardInit(){
         centrifugalAttack.setAttack(DistanceType.CONTINUOUS, Pair(2, 6), null, 5, 3)
         centrifugalAttack.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.USING_CONDITION) {_, player, game_status, _->
             if(centrifugal(player, game_status)) 1
             else 0
+        })
+        centrifugalAttack.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.ADD_LOG) {card_number, player, game_status, _->
+            game_status.logger.insert(Log(player, LogText.USE_CENTRIFUGAL, card_number, card_number))
+            null
         })
         centrifugalAttack.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.CARD_TO_COVER) {_, player, game_status, _ ->
             if (player == game_status.turnPlayer) {
@@ -1540,9 +1618,141 @@ object CardSet {
             if(centrifugal(player, game_status)) 1
             else 0
         })
+        wonMuRuyn.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.ADD_LOG) {card_number, player, game_status, _->
+            game_status.logger.insert(Log(player, LogText.USE_CENTRIFUGAL, card_number, card_number))
+            null
+        })
         wonMuRuyn.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){_, player, game_status, _ ->
             if(game_status.getPlayerFlare(player.opposite()) >= 3){
                 game_status.flareToAura(player.opposite(), player, 2)
+            }
+            null
+        })
+        ringABell.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.USING_CONDITION) {_, player, game_status, _->
+            if(centrifugal(player, game_status)) 1
+            else 0
+        })
+        ringABell.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.ADD_LOG) {card_number, player, game_status, _->
+            game_status.logger.insert(Log(player, LogText.USE_CENTRIFUGAL, card_number, card_number))
+            null
+        })
+        ringABell.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            while(true){
+                val nowCommand = game_status.receiveCardEffectSelect(player, card_number)
+                if(nowCommand == CommandEnum.SELECT_ONE){
+                    game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS, {_, _, _ ->
+                    true}, {madeAttack ->
+                        madeAttack.run {
+                            auraPlusMinus(2); lifePlusMinus(1)
+                        }
+                    }))
+                    break
+                }
+                else if(nowCommand == CommandEnum.SELECT_TWO){
+                    game_status.addThisTurnRangeBuff(player, RangeBuff(card_number,1, RangeBufTag.PLUS, {_, _, _ -> true},
+                        { attack -> attack.plusMinusRange(1, false)
+                        }))
+                    game_status.addThisTurnAttackBuff(player, Buff(card_number,1, BufTag.CHANGE_EACH, { _, _, _ -> true},
+                        { attack -> attack.canNotReact()
+                        }))
+                    break
+                }
+            }
+            null
+        })
+        gravitationField.setEnchantment(2)
+        gravitationField.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
+            if(game_status.getFullAction(player)){
+                game_status.distanceToAura(player, 2)
+            }
+            game_status.distanceToAura(player, 1)
+            null
+        })
+        gravitationField.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CHANGE_SWELL_DISTANCE) {_, _, _, _ ->
+            -1
+        })
+        grandSkyHoleCrash.setSpecial(4)
+        grandSkyHoleCrash.setAttack(DistanceType.CONTINUOUS, Pair(0, 10), null, 1000, 1000)
+        grandSkyHoleCrash.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CHANGE_EACH_IMMEDIATE, {_, _, _ ->
+                true
+            }, {madeAttack ->
+                madeAttack.Chogek()
+            }))
+            null
+        })
+        grandSkyHoleCrash.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.INSERT_IMMEDIATE, {_, _, _ ->
+                true
+            }, {madeAttack ->
+                madeAttack.run {
+                    val temp = abs(game_status.getAdjustDistance(player) - game_status.startTurnDistance)
+                    tempForGrandSkyHole = temp;
+                    aura_damage = temp;
+                    life_damage = if(temp % 2 == 0) temp / 2 else temp / 2 + 1
+                }
+            }))
+            null
+        })
+        grandSkyHoleCrash.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, madeAttack ->
+                (madeAttack.tempForGrandSkyHole
+                    ?: abs(game_status.getAdjustDistance(player) - game_status.startTurnDistance)) !=
+                        abs(game_status.getAdjustDistance(player) - game_status.startTurnDistance)
+            }, {madeAttack ->
+                madeAttack.run {
+                    val beforeAura = tempForGrandSkyHole!!
+                    val beforeLife = if(tempForGrandSkyHole!! % 2 == 0) tempForGrandSkyHole!! / 2 else tempForGrandSkyHole!! / 2 + 1
+                    val nowAura = abs(game_status.getAdjustDistance(player) - game_status.startTurnDistance)
+                    val nowLife = if(nowAura % 2 == 0) nowAura / 2 else nowAura / 2 + 1
+                    lifePlusMinus(nowLife - beforeLife); auraPlusMinus(nowAura - beforeAura)
+                }
+            }))
+            null
+        })
+        grandBellMegalobel.setSpecial(2)
+        grandBellMegalobel.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
+            if(checkAllSpecialCardUsed(player, game_status, card_number)){
+                game_status.dustToLife(player, 2)
+            }
+            null
+        })
+        grandGravitationAttract.setSpecial(5)
+        grandGravitationAttract.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){_, player, game_status, _ ->
+            game_status.distanceToFlare(player, 3)
+            null
+        })
+        grandGravitationAttract.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.RETURN){card_number, player, game_status, _ ->
+            if(!game_status.logger.checkThisCardUsed(player, card_number) && game_status.logger.checkUseCentrifugal(player)) 1
+            else 0
+        })
+        grandMountainRespect.setSpecial(4)
+        grandMountainRespect.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.USING_CONDITION) {_, player, game_status, _->
+            if(centrifugal(player, game_status)) 1
+            else 0
+        })
+        grandMountainRespect.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.ADD_LOG) {card_number, player, game_status, _->
+            game_status.logger.insert(Log(player, LogText.USE_CENTRIFUGAL, card_number, card_number))
+            null
+        })
+        grandMountainRespect.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) {card_number, player, game_status, _ ->
+            while(true){
+                val selected = game_status.selectCardFrom(player, player, listOf(LocationEnum.DISCARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, card_number)
+                {card -> card.card_data.sub_type != SubType.FULL_POWER}
+                if(selected == null) break
+                else{
+                    if(selected.size == 0) break
+                    else if(selected.size <= 2){
+                        val card = game_status.getCardFrom(player, selected[0], LocationEnum.DISCARD)?: continue
+                        game_status.useCardFrom(player, card, LocationEnum.DISCARD, false, null, null, null)
+                        if(game_status.getEndTurn(player)) break
+                        if(selected.size == 2){
+                            val secondCard = game_status.getCardFrom(player, selected[1], LocationEnum.DISCARD)?: break
+                            game_status.useCardFrom(player, secondCard, LocationEnum.DISCARD, false, null, null, null)
+                            break
+                        }
+                    }
+                }
             }
             null
         })
@@ -1648,12 +1858,12 @@ object CardSet {
             CardName.HAGANE_GROUND_BREAKING -> return groundBreaking
             CardName.HAGANE_HYPER_RECOIL -> return hyperRecoil
             CardName.HAGANE_WON_MU_RUYN -> return wonMuRuyn
-            CardName.HAGANE_RING_A_BELL -> TODO()
-            CardName.HAGANE_GRAVITATION_FIELD -> TODO()
-            CardName.HAGANE_GRAND_SKY_HOLE_CRASH -> TODO()
-            CardName.HAGANE_GRAND_BELL_MEGALOBEL -> TODO()
-            CardName.HAGANE_GRAND_GRAVITATION_ATTRACT -> TODO()
-            CardName.HAGANE_GRAND_MOUNTAIN_RESPECT -> TODO()
+            CardName.HAGANE_RING_A_BELL -> return ringABell
+            CardName.HAGANE_GRAVITATION_FIELD -> return gravitationField
+            CardName.HAGANE_GRAND_SKY_HOLE_CRASH -> return grandSkyHoleCrash
+            CardName.HAGANE_GRAND_BELL_MEGALOBEL -> return grandBellMegalobel
+            CardName.HAGANE_GRAND_GRAVITATION_ATTRACT -> return grandGravitationAttract
+            CardName.HAGANE_GRAND_MOUNTAIN_RESPECT -> return grandMountainRespect
         }
     }
 }

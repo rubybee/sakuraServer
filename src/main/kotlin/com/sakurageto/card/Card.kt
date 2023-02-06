@@ -384,6 +384,9 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
                         TextEffectTag.TERMINATION -> {
                             game_status.setEndTurn(player, true)
                         }
+                        TextEffectTag.ADD_LOG -> {
+                            text.effect!!(this.card_number, player, game_status, react_attack)
+                        }
                         else -> {
 
                         }

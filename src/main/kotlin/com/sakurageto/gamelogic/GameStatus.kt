@@ -138,6 +138,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             PlayerEnum.PLAYER2 -> player2.concentration
         }
     }
+
+    fun getFullAction(player: PlayerEnum): Boolean{
+        return when(player){
+            PlayerEnum.PLAYER1 -> player1.full_action
+            PlayerEnum.PLAYER2 -> player2.full_action
+        }
+    }
     
     suspend fun setConcentration(player: PlayerEnum, number: Int){
         when(player){

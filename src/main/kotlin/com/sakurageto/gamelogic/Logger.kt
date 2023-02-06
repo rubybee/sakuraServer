@@ -49,4 +49,18 @@ class Logger {
         return false
     }
 
+    fun checkThisCardUsed(player: PlayerEnum, card_number: Int): Boolean{
+        for(log in logQueue.asReversed()){
+            if(log.player == player && log.number1 == card_number) return true
+        }
+        return false
+    }
+
+    fun checkUseCentrifugal(player: PlayerEnum): Boolean{
+        for(log in logQueue.asReversed()){
+            if(log.player == player && log.text == LogText.USE_CENTRIFUGAL) return true
+        }
+        return false
+    }
+
 }

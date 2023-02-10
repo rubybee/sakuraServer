@@ -4,6 +4,8 @@ import io.ktor.server.routing.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import com.sakurageto.RoomInformation
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 fun Application.configureRouting() {
     val roomNumberRange = (2..10000)
@@ -14,13 +16,13 @@ fun Application.configureRouting() {
         }
 
         get("/makeroom") {
-            var now_room_number = roomNumberRange.random()
-            while (RoomInformation.room_number_hashmap.containsKey(now_room_number)){
-                now_room_number = roomNumberRange.random()
+            var nowRoomNumber = roomNumberRange.random()
+            while (RoomInformation.room_number_hashmap.containsKey(nowRoomNumber)){
+                nowRoomNumber  = roomNumberRange.random()
             }
-            RoomInformation.room_number_hashmap[now_room_number] = true
-            RoomInformation.room_wait_hashmap[now_room_number] = true
-            call.respondText(now_room_number.toString())
+            RoomInformation.room_number_hashmap[nowRoomNumber] = true
+            RoomInformation.room_wait_hashmap[nowRoomNumber] = true
+            call.respondText(nowRoomNumber.toString())
         }
 
         get("/enterroom/{roomnumber}"){

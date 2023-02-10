@@ -33,10 +33,14 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
         game_status = GameStatus(PlayerStatus(PlayerEnum.PLAYER1), PlayerStatus(PlayerEnum.PLAYER2), player1, player2)
     }
 
-    suspend fun selectMode(){
-        val data = SakuraSendData(CommandEnum.SELECT_MODE, null)
-        player1.session.send(Json.encodeToString(data))
-        val mode = waitUntil(player1, CommandEnum.SELECT_MODE).data?.get(0) ?: 0
+    private suspend fun selectMode(){
+        val json = Json { ignoreUnknownKeys = true; coerceInputValues = true; encodeDefaults = true;}
+        val data = SakuraCardCommand(CommandEnum.SELECT_MODE_YOUR, -1)
+        val dataOther = SakuraCardCommand(CommandEnum.SELECT_MODE_OTHER, -1)
+        player1.session.send(json.encodeToString(data))
+        player2.session.send(json.encodeToString(dataOther))
+        val dataGet = waitUntil(player1, CommandEnum.SELECT_MODE_YOUR).data?: mutableListOf(0)
+        val mode = if (dataGet.isEmpty()) 0 else dataGet[0]
         if(mode == 0){
             this.game_mode = GameMode.SSANG_JANG_YO_LAN
         }
@@ -53,10 +57,10 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
     }
 
     suspend fun selectMegami(){
-        val data = SakuraSendData(CommandEnum.SELECT_MEGAMI, null)
-        val send_data = Json.encodeToString(data)
-        player1.session.send(send_data)
-        player2.session.send(send_data)
+        val data = SakuraCardCommand(CommandEnum.SELECT_MEGAMI, -1)
+        val sendData = Json.encodeToString(data)
+        player1.session.send(sendData)
+        player2.session.send(sendData)
         val player1_data = waitUntil(player1, CommandEnum.SELECT_MEGAMI)
         val player2_data = waitUntil(player2, CommandEnum.SELECT_MEGAMI)
         if(game_mode == GameMode.SSANG_JANG_YO_LAN){

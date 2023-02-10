@@ -247,7 +247,7 @@ suspend fun sendCardEffectSelect(player: Connection, card_number: Int){
 }
 
 suspend fun sendAuraDamageSelect(player: Connection){
-    val data = SakuraCardCommand(SELECT_AURA_DAMAGE_PLACE)
+    val data = SakuraCardCommand(SELECT_AURA_DAMAGE_PLACE, -1)
     player.session.send(Json.encodeToString(data))
 }
 
@@ -315,7 +315,7 @@ suspend fun waitUntil(player: Connection, wait_command: CommandEnum): SakuraSend
         }
     }
 
-    return SakuraSendData(SELECT_MODE, null)
+    return SakuraSendData(SELECT_MODE_YOUR, null)
 }
 
 suspend fun waitCardSetUntil(player: Connection, wait_command: CommandEnum): SakuraCardSetSend {

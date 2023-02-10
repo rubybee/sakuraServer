@@ -39,7 +39,8 @@ fun Application.configureSockets() {
             else{
                 while (true){
                     if(RoomInformation.room_wait_hashmap[roomnumber] == false){
-                        close(CloseReason(CloseReason.Codes.NORMAL, "player match successly"))
+                        this.send("player match success")
+                        close(CloseReason(CloseReason.Codes.NORMAL, "player match success"))
                         break
                     }
                     delay(1000)

@@ -66,18 +66,10 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
         if(game_mode == GameMode.SSANG_JANG_YO_LAN){
             game_status.player1.setMegamiSSangjang(player1_data)
             game_status.player2.setMegamiSSangjang(player2_data)
-            val end_data_player1 = SakuraSendData(CommandEnum.END_OF_SELECT_MEGAMI, game_status.player1.returnListMegami2())
-            val end_data_player2 = SakuraSendData(CommandEnum.END_OF_SELECT_MEGAMI, game_status.player2.returnListMegami2())
-            player1.session.send(Json.encodeToString(end_data_player1))
-            player2.session.send(Json.encodeToString(end_data_player2))
         }
         else if(game_mode == GameMode.SAM_SEUB_IL_SA){
             game_status.player1.setMegamiSamSep(player1_data)
             game_status.player2.setMegamiSamSep(player2_data)
-            val end_data_player1 = SakuraSendData(CommandEnum.END_OF_SELECT_MEGAMI, game_status.player1.returnListMegami3())
-            val end_data_player2 = SakuraSendData(CommandEnum.END_OF_SELECT_MEGAMI, game_status.player2.returnListMegami3())
-            player1.session.send(Json.encodeToString(end_data_player1))
-            player2.session.send(Json.encodeToString(end_data_player2))
         }
     }
 
@@ -89,21 +81,11 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
     }
 
     suspend fun selectBan(){
-        val select_ban = SakuraSendData(CommandEnum.SELECT_BAN, null)
-
-        player1.session.send(Json.encodeToString(select_ban))
-        player2.session.send(Json.encodeToString(select_ban))
-
         val player1_data = waitUntil(player1, CommandEnum.SELECT_BAN)
         val player2_data = waitUntil(player2, CommandEnum.SELECT_BAN)
 
         game_status.player1.banMegami(player2_data)
         game_status.player2.banMegami(player1_data)
-
-        val end_data = SakuraSendData(CommandEnum.END_SELECT_BAN, null)
-
-        player1.session.send(Json.encodeToString(end_data))
-        player2.session.send(Json.encodeToString(end_data))
     }
 
     suspend fun checkFinalMegami(){
@@ -202,13 +184,9 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
 
         val send_request_player1 = SakuraCardSetSend(CommandEnum.SELECT_CARD, game_status.player1.unselected_card, game_status.player1.unselected_specialcard)
         val send_request_player2 = SakuraCardSetSend(CommandEnum.SELECT_CARD, game_status.player2.unselected_card, game_status.player2.unselected_specialcard)
-        val send_othersinformation_player1 = SakuraCardSetSend(CommandEnum.SELECT_CARD_OTHER_PLAYERS, game_status.player2.unselected_card, game_status.player2.unselected_specialcard)
-        val send_othersinformation_player2 = SakuraCardSetSend(CommandEnum.SELECT_CARD_OTHER_PLAYERS, game_status.player1.unselected_card, game_status.player1.unselected_specialcard)
 
         player1.session.send(Json.encodeToString(send_request_player1))
         player2.session.send(Json.encodeToString(send_request_player2))
-        player1.session.send(Json.encodeToString(send_othersinformation_player1))
-        player2.session.send(Json.encodeToString(send_othersinformation_player2))
 
         val player1_data = waitCardSetUntil(player1, CommandEnum.SELECT_CARD)
         val player2_data = waitCardSetUntil(player2, CommandEnum.SELECT_CARD)
@@ -291,23 +269,14 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
 
     suspend fun selectFirst(){
         val random = Random.nextInt(2)
-        var player1_data: SakuraSendData
-        var player2_data: SakuraSendData
         if(random == 0){
-            player1_data = SakuraSendData(CommandEnum.FIRST_TURN, null)
-            player2_data = SakuraSendData(CommandEnum.SECOND_TURN, null)
             first_turn = PlayerEnum.PLAYER1
             game_status.setFirstTurn(PlayerEnum.PLAYER1)
         }
         else{
-            player1_data = SakuraSendData(CommandEnum.SECOND_TURN, null)
-            player2_data = SakuraSendData(CommandEnum.FIRST_TURN, null)
             first_turn = PlayerEnum.PLAYER2
             game_status.setFirstTurn(PlayerEnum.PLAYER2)
         }
-
-        player1.session.send(Json.encodeToString(player1_data))
-        player2.session.send(Json.encodeToString(player2_data))
     }
 
     //first card is most upper

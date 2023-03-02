@@ -1866,4 +1866,10 @@ object CardSet {
             CardName.HAGANE_GRAND_MOUNTAIN_RESPECT -> return grandMountainRespect
         }
     }
+
+    fun isPoison(card_number: Int): Boolean{
+        return when(card_number){
+            else -> false
+        }
+    }
 }

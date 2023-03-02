@@ -281,7 +281,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
 
     //first card is most upper
     suspend fun muligun(){
-        val data = SakuraSendData(CommandEnum.MULIGUN, null)
+        val data = SakuraCardCommand(CommandEnum.MULIGUN, -1)
         player1.session.send(Json.encodeToString(data))
         player2.session.send(Json.encodeToString(data))
         val player1_data = waitCardSetUntil(player1, CommandEnum.MULIGUN)

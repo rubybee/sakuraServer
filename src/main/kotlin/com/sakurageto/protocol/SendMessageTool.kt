@@ -1,6 +1,7 @@
 package com.sakurageto.protocol
 
 import com.sakurageto.Connection
+import com.sakurageto.card.CardSet
 import com.sakurageto.gamelogic.Stratagem
 import com.sakurageto.protocol.CommandEnum.*
 import io.ktor.websocket.*
@@ -65,14 +66,14 @@ suspend fun sendPopPlayingZone(mine: Connection, other: Connection, card_number:
 
 suspend fun sendPopCardZone(mine: Connection, other: Connection, card_number: Int, public: Boolean, command: CommandEnum){
     val dataYour = SakuraCardCommand(command, card_number)
-    val dataOther = if(public) SakuraCardCommand(command.Opposite(), card_number) else SakuraCardCommand(command.Opposite(), -1)
+    val dataOther = if(public) SakuraCardCommand(command.Opposite(), card_number) else SakuraCardCommand(command.Opposite(), if(CardSet.isPoison(card_number)) 1 else 0)
     mine.session.send(Json.encodeToString(dataYour))
     other.session.send(Json.encodeToString(dataOther))
 }
 
 suspend fun sendAddCardZone(mine: Connection, other: Connection, card_number: Int, public: Boolean, command: CommandEnum){
     val dataYour = SakuraCardCommand(command, card_number)
-    val dataOther = if(public) SakuraCardCommand(command.Opposite(), card_number) else SakuraCardCommand(command.Opposite(), -1)
+    val dataOther = if(public) SakuraCardCommand(command.Opposite(), card_number) else SakuraCardCommand(command.Opposite(), if(CardSet.isPoison(card_number)) 1 else 0)
     mine.session.send(Json.encodeToString(dataYour))
     other.session.send(Json.encodeToString(dataOther))
 }
@@ -168,14 +169,14 @@ suspend fun sendRemoveShrink(mine: Connection, other: Connection){
 suspend fun sendHandToDeck(mine: Connection, other: Connection, card_number: Int, public: Boolean, below: Boolean){
     val data_your = SakuraCardCommand(if (below) CARD_HAND_TO_DECK_BELOW_YOUR else CARD_HAND_TO_DECK_UPPER_YOUR, card_number)
     val data_other = if(public) SakuraCardCommand(if (below) CARD_HAND_TO_DECK_BELOW_OTHER else CARD_HAND_TO_DECK_UPPER_OTHER, card_number)
-    else SakuraCardCommand(if (below) CARD_HAND_TO_DECK_BELOW_OTHER else CARD_HAND_TO_DECK_UPPER_OTHER, -1)
+    else SakuraCardCommand(if (below) CARD_HAND_TO_DECK_BELOW_OTHER else CARD_HAND_TO_DECK_UPPER_OTHER, if(CardSet.isPoison(card_number)) 1 else 0)
     mine.session.send(Json.encodeToString(data_your))
     other.session.send(Json.encodeToString(data_other))
 }
 
 suspend fun sendDrawCard(mine: Connection, other: Connection, card_number: Int){
     val data_your = SakuraCardCommand(DRAW_CARD_YOUR, card_number)
-    val data_other = SakuraCardCommand(DRAW_CARD_OTHER, -1)
+    val data_other = SakuraCardCommand(DRAW_CARD_OTHER, if(CardSet.isPoison(card_number)) 1 else 0)
     mine.session.send(Json.encodeToString(data_your))
     other.session.send(Json.encodeToString(data_other))
 }
@@ -315,7 +316,7 @@ suspend fun waitUntil(player: Connection, wait_command: CommandEnum): SakuraSend
         }
     }
 
-    return SakuraSendData(SELECT_MODE_YOUR, null)
+    return waitUntil(player, wait_command)
 }
 
 suspend fun waitCardSetUntil(player: Connection, wait_command: CommandEnum): SakuraCardSetSend {
@@ -335,7 +336,7 @@ suspend fun waitCardSetUntil(player: Connection, wait_command: CommandEnum): Sak
         }
     }
 
-    return SakuraCardSetSend(NULL, null, null)
+    return waitCardSetUntil(player, wait_command)
 }
 
 suspend fun receiveEnchantment(player: Connection): Pair<CommandEnum, Int> {
@@ -357,7 +358,7 @@ suspend fun receiveEnchantment(player: Connection): Pair<CommandEnum, Int> {
             }
         }
     }
-    return Pair(SELECT_ENCHANTMENT_END, -1)
+    return receiveEnchantment(player)
 }
 
 suspend fun receiveReact(player: Connection): Pair<CommandEnum, Int> {
@@ -379,7 +380,7 @@ suspend fun receiveReact(player: Connection): Pair<CommandEnum, Int> {
             }
         }
     }
-    return Pair(REACT_NO, -1)
+    return receiveReact(player)
 }
 
 suspend fun receiveChooseDamage(player: Connection): CommandEnum {
@@ -401,16 +402,18 @@ suspend fun receiveChooseDamage(player: Connection): CommandEnum {
             }
         }
     }
-    return CHOOSE_AURA
+    return receiveChooseDamage(player)
 }
 
 suspend fun receiveNapInformation(player: Connection, total: Int, card_number: Int): Pair<Int, Int> {
+    player.session.send(Json.encodeToString(SakuraCardCommand(SELECT_NAP, card_number)))
+    player.session.send(Json.encodeToString(SakuraSendData(SELECT_NAP, mutableListOf(total))))
+    return receiveNapInformationMain(player, total, card_number)
+}
+
+suspend fun receiveNapInformationMain(player: Connection, total: Int, card_number: Int): Pair<Int, Int> {
     val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
 
-    val pre_data = SakuraCardCommand(SELECT_NAP, card_number)
-    player.session.send(Json.encodeToString(pre_data))
-    val data = SakuraSendData(SELECT_NAP, mutableListOf(total))
-    player.session.send(Json.encodeToString(data))
     for (frame in player.session.incoming) {
         if (frame is Frame.Text) {
             val text = frame.readText()
@@ -419,7 +422,7 @@ suspend fun receiveNapInformation(player: Connection, total: Int, card_number: I
                 if (data.command == SELECT_NAP){
                     data.data?.let {
                         if(it.size >= 2){
-                             return(Pair(it[0], it[1]))
+                            return(Pair(it[0], it[1]))
                         }
                     }
                 }
@@ -431,14 +434,17 @@ suspend fun receiveNapInformation(player: Connection, total: Int, card_number: I
             }
         }
     }
-    return Pair(0, 0)
+    return receiveNapInformationMain(player, total, card_number)
 }
 
 suspend fun receiveReconstructRequest(player: Connection): Boolean{
+    player.session.send(Json.encodeToString(SakuraCardCommand(DECK_RECONSTRUCT_REQUEST, -1)))
+    return receiveReconstructRequestMain(player)
+}
+
+suspend fun receiveReconstructRequestMain(player: Connection): Boolean{
     val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
 
-    val pre_data = SakuraCardCommand(DECK_RECONSTRUCT_REQUEST, -1)
-    player.session.send(Json.encodeToString(pre_data))
     for (frame in player.session.incoming) {
         if (frame is Frame.Text) {
             val text = frame.readText()
@@ -458,14 +464,17 @@ suspend fun receiveReconstructRequest(player: Connection): Boolean{
             }
         }
     }
-    return false
+    return receiveReconstructRequestMain(player)
 }
 
 suspend fun receiveFullPowerRequest(player: Connection): Boolean{
+    player.session.send(Json.encodeToString(SakuraCardCommand(FULL_POWER_REQUEST, -1)))
+    return receiveFullPowerRequestMain(player)
+}
+
+suspend fun receiveFullPowerRequestMain(player: Connection): Boolean{
     val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
 
-    val pre_data = SakuraCardCommand(FULL_POWER_REQUEST, -1)
-    player.session.send(Json.encodeToString(pre_data))
     for (frame in player.session.incoming) {
         if (frame is Frame.Text) {
             val text = frame.readText()
@@ -483,13 +492,17 @@ suspend fun receiveFullPowerRequest(player: Connection): Boolean{
             }
         }
     }
-    return false
+    return receiveFullPowerRequestMain(player)
 }
 
 suspend fun receiveFullPowerActionRequest(player: Connection): Pair<CommandEnum, Int>{
+    sendActionRequest(player)
+    return receiveFullPowerActionRequestMain(player)
+}
+
+suspend fun receiveFullPowerActionRequestMain(player: Connection): Pair<CommandEnum, Int>{
     val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
 
-    sendActionRequest(player)
     for (frame in player.session.incoming) {
         if (frame is Frame.Text) {
             val text = frame.readText()
@@ -509,10 +522,15 @@ suspend fun receiveFullPowerActionRequest(player: Connection): Pair<CommandEnum,
             }
         }
     }
-    return Pair(FIRST_TURN, -1)
+    return receiveFullPowerActionRequestMain(player)
 }
 
 suspend fun receiveActionRequest(player: Connection): Pair<CommandEnum, Int>{
+    sendActionRequest(player)
+    return receiveActionRequestMain(player)
+}
+
+suspend fun receiveActionRequestMain(player: Connection): Pair<CommandEnum, Int>{
     val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
 
     sendActionRequest(player)
@@ -540,13 +558,17 @@ suspend fun receiveActionRequest(player: Connection): Pair<CommandEnum, Int>{
             }
         }
     }
-    return Pair(FIRST_TURN, -1)
+    return receiveActionRequestMain(player)
 }
 
 suspend fun receiveCoverCardSelect(player: Connection, list: MutableList<Int>): Int{
+    sendCoverCardSelect(player, list)
+    return receiveCoverCardSelectMain(player, list)
+}
+
+suspend fun receiveCoverCardSelectMain(player: Connection, list: MutableList<Int>): Int{
     val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
 
-    sendCoverCardSelect(player, list)
     for(frame in player.session.incoming){
         if (frame is Frame.Text) {
             val text = frame.readText()
@@ -564,13 +586,17 @@ suspend fun receiveCoverCardSelect(player: Connection, list: MutableList<Int>): 
 
         }
     }
-    return -1
+    return receiveCoverCardSelectMain(player, list)
 }
 
 suspend fun receiveCardEffectSelect(player: Connection, card_number: Int): CommandEnum{
+    sendCardEffectSelect(player, card_number)
+    return receiveCardEffectSelectMain(player, card_number)
+}
+
+suspend fun receiveCardEffectSelectMain(player: Connection, card_number: Int): CommandEnum{
     val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
 
-    sendCardEffectSelect(player, card_number)
     for(frame in player.session.incoming){
         if (frame is Frame.Text) {
             val text = frame.readText()
@@ -586,15 +612,18 @@ suspend fun receiveCardEffectSelect(player: Connection, card_number: Int): Comma
 
         }
     }
-    return NULL
+    return receiveCardEffectSelectMain(player, card_number)
 }
 
 //receive data like( [LOCATION_ENUM.AURA, 3, CARD_NUMBER, 2, CARD_NUMBER, 2] )
 suspend fun receiveAuraDamageSelect(player: Connection, place_list: MutableList<Int>): MutableList<Int>?{
-    val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
-
     sendAuraDamageSelect(player)
     sendAuraDamagePlaceInformation(player, place_list)
+    return receiveAuraDamageSelectMain(player, place_list)
+}
+
+suspend fun receiveAuraDamageSelectMain(player: Connection, place_list: MutableList<Int>): MutableList<Int>?{
+    val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
 
     for(frame in player.session.incoming){
         if (frame is Frame.Text) {
@@ -611,14 +640,17 @@ suspend fun receiveAuraDamageSelect(player: Connection, place_list: MutableList<
 
         }
     }
-    return null
+    return receiveAuraDamageSelectMain(player, place_list)
 }
 
 suspend fun receiveSelectCard(player: Connection, card_list: MutableList<Int>, reason: CommandEnum, card_number: Int): MutableList<Int>?{
-    val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
-
     sendPreCardSelect(player, reason, card_number)
     sendCardSelect(player, card_list, reason)
+    return receiveSelectCardMain(player, card_list, reason, card_number)
+}
+
+suspend fun receiveSelectCardMain(player: Connection, card_list: MutableList<Int>, reason: CommandEnum, card_number: Int): MutableList<Int>?{
+    val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
 
     for(frame in player.session.incoming){
         if (frame is Frame.Text) {
@@ -645,5 +677,5 @@ suspend fun receiveSelectCard(player: Connection, card_list: MutableList<Int>, r
 
         }
     }
-    return null
+    return receiveSelectCardMain(player, card_list, reason, card_number)
 }

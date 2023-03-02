@@ -1405,7 +1405,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         installationProcess(player)
 
-        sendDeckReconstruct(nowSocket, otherSocket)
+        sendDeckReconstruct(nowSocket, otherSocket) // 독 카드 몇장인지 보내줘야 될 듯?
         if(damage){
             processDamage(player, CommandEnum.CHOOSE_LIFE, Pair(999, 1), true)
         }

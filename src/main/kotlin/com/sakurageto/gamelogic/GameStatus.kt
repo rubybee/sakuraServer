@@ -1206,7 +1206,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(player2_card.isNotEmpty()){
             for(card_number in player2_card.keys){
                 val card = player2.enchantment_card[card_number]
-                enchantmentDestruction(PlayerEnum.PLAYER1, card!!)
+                enchantmentDestruction(PlayerEnum.PLAYER2, card!!)
             }
         }
     }
@@ -1441,6 +1441,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
         } else{
             val card = nowPlayer.getCardFromHand(card_number)?: return false
+            if(!card.card_data.canCover) return false
             popCardFrom(player, card_number, LocationEnum.HAND, false)
             insertCardTo(player, card, LocationEnum.COVER_CARD, false)
             return true
@@ -1459,19 +1460,19 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    suspend fun doBasicOperation(player: PlayerEnum, command: CommandEnum){
+    suspend fun doBasicOperation(player: PlayerEnum, command: CommandEnum, card: Int){
         when(command){
-            CommandEnum.ACTION_GO_FORWARD -> doGoForward(player)
-            CommandEnum.ACTION_GO_BACKWARD -> doGoBackward(player)
-            CommandEnum.ACTION_WIND_AROUND -> doWindAround(player)
-            CommandEnum.ACTION_INCUBATE -> doIncubate(player)
-            CommandEnum.ACTION_BREAK_AWAY -> doBreakAway(player)
+            CommandEnum.ACTION_GO_FORWARD -> doGoForward(player, card)
+            CommandEnum.ACTION_GO_BACKWARD -> doGoBackward(player, card)
+            CommandEnum.ACTION_WIND_AROUND -> doWindAround(player, card)
+            CommandEnum.ACTION_INCUBATE -> doIncubate(player, card)
+            CommandEnum.ACTION_BREAK_AWAY -> doBreakAway(player, card)
             else -> {}
         }
     }
 
     //this 5 function must call after check when select
-    suspend fun doGoForward(player: PlayerEnum){
+    suspend fun doGoForward(player: PlayerEnum, card: Int){
         val now_player = getPlayer(player)
 
         val now_socket = getSocket(player)
@@ -1479,7 +1480,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         if(now_player.aura == now_player.maxAura || distanceToken == 0 || thisTurnDistance <= getAdjustSwellDistance(player)) return
         else{
-            sendDoBasicAction(now_socket, other_socket, CommandEnum.ACTION_GO_FORWARD_YOUR)
+            sendDoBasicAction(now_socket, other_socket, CommandEnum.ACTION_GO_FORWARD_YOUR, card)
             distanceToken -= 1
             thisTurnDistance -= 1
             if(thisTurnDistance < 0){
@@ -1492,7 +1493,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     //this 5 function must call after check when select
-    suspend fun doGoBackward(player: PlayerEnum){
+    suspend fun doGoBackward(player: PlayerEnum, card: Int){
         val now_player = getPlayer(player)
 
         val now_socket = getSocket(player)
@@ -1500,7 +1501,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         if(now_player.aura == 0 || distanceToken == 10) return
         else{
-            sendDoBasicAction(now_socket, other_socket, CommandEnum.ACTION_GO_BACKWARD_YOUR)
+            sendDoBasicAction(now_socket, other_socket, CommandEnum.ACTION_GO_BACKWARD_YOUR, card)
             now_player.aura -= 1
             distanceToken += 1
             thisTurnDistance += 1
@@ -1510,7 +1511,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     //this 5 function must call after check when select
-    suspend fun doWindAround(player: PlayerEnum){
+    suspend fun doWindAround(player: PlayerEnum, card: Int){
         val now_player = getPlayer(player)
 
         val now_socket = getSocket(player)
@@ -1518,7 +1519,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         if(dust == 0 || now_player.aura == now_player.maxAura) return
         else{
-            sendDoBasicAction(now_socket, other_socket, CommandEnum.ACTION_WIND_AROUND_YOUR)
+            sendDoBasicAction(now_socket, other_socket, CommandEnum.ACTION_WIND_AROUND_YOUR, card)
             dust -= 1
             now_player.aura += 1
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
@@ -1527,7 +1528,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     //this 5 function must call after check when select
-    suspend fun doIncubate(player: PlayerEnum){
+    suspend fun doIncubate(player: PlayerEnum, card: Int){
         val now_player = getPlayer(player)
 
         val now_socket = getSocket(player)
@@ -1535,7 +1536,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         if(now_player.aura == 0) return
         else{
-            sendDoBasicAction(now_socket, other_socket, CommandEnum.ACTION_INCUBATE_YOUR)
+            sendDoBasicAction(now_socket, other_socket, CommandEnum.ACTION_INCUBATE_YOUR, card)
             now_player.aura -= 1
             now_player.flare += 1
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
@@ -1544,13 +1545,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     //this 5 function must call after check when select
-    suspend fun doBreakAway(player: PlayerEnum){
+    suspend fun doBreakAway(player: PlayerEnum, card: Int){
         val now_socket = getSocket(player)
         val other_socket = getSocket(player.opposite())
 
         if(dust == 0 || thisTurnDistance > getAdjustSwellDistance(player) || distanceToken == 10) return
         else{
-            sendDoBasicAction(now_socket, other_socket, CommandEnum.ACTION_BREAK_AWAY_YOUR)
+            sendDoBasicAction(now_socket, other_socket, CommandEnum.ACTION_BREAK_AWAY_YOUR, card)
             dust -= 1
             distanceToken += 1
             thisTurnDistance += 1

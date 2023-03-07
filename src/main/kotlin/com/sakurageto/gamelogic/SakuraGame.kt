@@ -364,7 +364,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
                 else{
                     if(game_status.canDoBasicOperation(this.turn_player, data.first)){
                         if(game_status.basicOperationCost(this.turn_player, data.second)){
-                            game_status.doBasicOperation(this.turn_player, data.first)
+                            game_status.doBasicOperation(this.turn_player, data.first, if(data.second == -1) -1 else 0)
                         }
                     }
                 }

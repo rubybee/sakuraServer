@@ -220,10 +220,10 @@ class MadeAttack(
         }
     }
 
-    //{-1, 1, 2, 3, 4, 5, -1, 3, 5, 20, 0, 0, 0}
-    //{uncont, distance..., uncont, auro, life, megami, reactable, reactable_normal, reactable_special}
-    //{-2, 1, 4, -2, 4, 5, -1, 3, 5, 20, 0, 0, 0}
-    //{cont, distance..., cont, auro, life, megami, reactable, reactable_normal, reactable_special}
+    //{-1, 1, 2, 3, 4, 5, -1, 3, 5, 20, 0, 0, 0, 100}
+    //{uncont, distance..., uncont, auro, life, megami, reactable, reactable_normal, reactable_special, cardNumber}
+    //{-2, 1, 4, -2, 4, 5, -1, 3, 5, 20, 0, 0, 0, 100}
+    //{cont, distance..., cont, auro, life, megami, reactable, reactable_normal, reactable_special, cardNumber}
     fun Information(): MutableList<Int>{
         var return_data = mutableListOf<Int>()
         when(distance_type){
@@ -247,6 +247,7 @@ class MadeAttack(
         if(cannot_react) return_data.add(1) else return_data.add(0)
         if(cannot_react_normal) return_data.add(1) else return_data.add(0)
         if(cannot_react_special) return_data.add(1) else return_data.add(0)
+        return_data.add(card_number)
 
         return return_data
     }

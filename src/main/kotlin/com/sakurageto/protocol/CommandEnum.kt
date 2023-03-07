@@ -29,8 +29,6 @@ enum class CommandEnum {
     SET_CONCENTRATION_YOUR,
     SET_CONCENTRATION_OTHER,
     REDUCE_NAP_START,
-    REDUCE_NAP_YOUR,
-    REDUCE_NAP_OTHER,
     REDUCE_NAP_END,
     SELECT_ENCHANTMENT_START,
     SELECT_ENCHANTMENT_YOUR,
@@ -62,7 +60,6 @@ enum class CommandEnum {
 
     SEAL_YOUR,
     SEAL_OTHER,
-    IN_ENCHANTMENT_CARD_YOUR,
     SPECIAL_YOUR,
     ENCHANTMENT_CARD_YOUR,
     DISCARD_CARD_YOUR,
@@ -72,7 +69,6 @@ enum class CommandEnum {
     DECK_BELOW_YOUR,
     PLAYING_CARD_YOUR,
     HAND_YOUR,
-    IN_ENCHANTMENT_CARD_OTHER,
     SPECIAL_OTHER,
     DISCARD_CARD_OTHER,
     USED_CARD_OTHER,
@@ -177,8 +173,6 @@ enum class CommandEnum {
             ADD_CONCENTRATION_OTHER -> return ADD_CONCENTRATION_YOUR
             REMOVE_SHRINK_YOUR -> return REMOVE_SHRINK_OTHER
             REMOVE_SHRINK_OTHER -> return REMOVE_SHRINK_YOUR
-            REDUCE_NAP_YOUR -> return REDUCE_NAP_OTHER
-            REDUCE_NAP_OTHER -> return REDUCE_NAP_YOUR
             SELECT_ENCHANTMENT_YOUR -> return SELECT_ENCHANTMENT_OTHER
             SELECT_ENCHANTMENT_OTHER -> return SELECT_ENCHANTMENT_YOUR
             DESTRUCTION_ENCHANTMENT_YOUR -> return DESTRUCTION_ENCHANTMENT_OTHER
@@ -237,8 +231,6 @@ enum class CommandEnum {
             POP_ENCHANTMENT_OTHER -> return POP_ENCHANTMENT_YOUR
             HAND_YOUR -> return HAND_OTHER
             HAND_OTHER -> return HAND_YOUR
-            IN_ENCHANTMENT_CARD_YOUR -> return IN_ENCHANTMENT_CARD_OTHER
-            IN_ENCHANTMENT_CARD_OTHER -> return IN_ENCHANTMENT_CARD_YOUR
             SEAL_YOUR -> return SEAL_OTHER
             SEAL_OTHER -> return SEAL_YOUR
             POP_SEAL_YOUR -> return POP_SEAL_OTHER
@@ -252,7 +244,7 @@ enum class TokenEnum(var real_number: Int){
     SAKURA_TOKEN(0);
 
     companion object {
-        fun fromInt(value: Int) = MegamiEnum.values().first { it.real_number == value }
+        fun fromInt(value: Int) = TokenEnum.values().first { it.real_number == value }
     }
 }
 
@@ -301,6 +293,6 @@ enum class LocationEnum(var real_number: Int){
         }
     }
     companion object {
-        fun fromInt(value: Int) = MegamiEnum.values().first { it.real_number == value }
+        fun fromInt(value: Int) = LocationEnum.values().first { it.real_number == value }
     }
 }

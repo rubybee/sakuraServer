@@ -26,10 +26,14 @@ suspend fun sendStartSelectEnchantment(player: Connection){
 }
 
 suspend fun sendRequestEnchantmentCard(player: Connection, card_list_your: MutableList<Int>, card_list_other: MutableList<Int>){
-    val data_your = SakuraSendData(SELECT_ENCHANTMENT_YOUR, card_list_your)
-    val data_other = SakuraSendData(SELECT_ENCHANTMENT_OTHER, card_list_other)
-    player.session.send(Json.encodeToString(data_your))
-    player.session.send(Json.encodeToString(data_other))
+    val dataYourPre = SakuraCardCommand(SELECT_ENCHANTMENT_YOUR, -1)
+    val dataOtherPre = SakuraCardCommand(SELECT_ENCHANTMENT_OTHER, -1)
+    val dataYour = SakuraSendData(SELECT_ENCHANTMENT_YOUR, card_list_your)
+    val dataOther = SakuraSendData(SELECT_ENCHANTMENT_OTHER, card_list_other)
+    player.session.send(Json.encodeToString(dataYourPre))
+    player.session.send(Json.encodeToString(dataYour))
+    player.session.send(Json.encodeToString(dataOtherPre))
+    player.session.send(Json.encodeToString(dataOther))
 }
 
 suspend fun sendDestructionNotNormal(mine: Connection, other: Connection, card_number: Int){
@@ -113,13 +117,13 @@ suspend fun sendRequestReact(mine: Connection){
 
 suspend fun sendMoveToken(mine: Connection, other: Connection, what: TokenEnum, from: LocationEnum, to: LocationEnum, number: Int, card_number: Int){
     if(number == 0) return
-    val pre_data = SakuraCardCommand(MOVE_TOKEN, card_number)
-    mine.session.send(Json.encodeToString(pre_data))
-    other.session.send(Json.encodeToString(pre_data))
-    val data_your = SakuraSendData(MOVE_TOKEN, mutableListOf(what.real_number, from.real_number, to.real_number, number, card_number))
-    val data_other = SakuraSendData(MOVE_TOKEN, mutableListOf(what.real_number, from.Opposite().real_number, to.Opposite().real_number, number, card_number))
-    mine.session.send(Json.encodeToString(data_your))
-    other.session.send(Json.encodeToString(data_other))
+    val preData = SakuraCardCommand(MOVE_TOKEN, card_number)
+    mine.session.send(Json.encodeToString(preData))
+    other.session.send(Json.encodeToString(preData))
+    val dataYour = SakuraSendData(MOVE_TOKEN, mutableListOf(what.real_number, from.real_number, to.real_number, number, card_number))
+    val dataOther = SakuraSendData(MOVE_TOKEN, mutableListOf(what.real_number, from.Opposite().real_number, to.Opposite().real_number, number, card_number))
+    mine.session.send(Json.encodeToString(dataYour))
+    other.session.send(Json.encodeToString(dataOther))
 }
 
 suspend fun sendAddConcentration(mine: Connection, other: Connection){
@@ -221,9 +225,9 @@ suspend fun sendActionRequest(mine: Connection){
     mine.session.send(Json.encodeToString(data_your))
 }
 
-suspend fun sendDoBasicAction(mine: Connection, other: Connection, command: CommandEnum){
-    val data_your = SakuraCardCommand(command, -1)
-    val data_other = SakuraCardCommand(command.Opposite(), -1)
+suspend fun sendDoBasicAction(mine: Connection, other: Connection, command: CommandEnum, card: Int){
+    val data_your = SakuraCardCommand(command, card)
+    val data_other = SakuraCardCommand(command.Opposite(), card)
     mine.session.send(Json.encodeToString(data_your))
     other.session.send(Json.encodeToString(data_other))
 }
@@ -515,6 +519,7 @@ suspend fun receiveFullPowerActionRequestMain(player: Connection): Pair<CommandE
                     return Pair(data.command, data.card)
                 }
                 else {
+                    sendActionRequest(player)
                     continue
                 }
             }catch (e: Exception){

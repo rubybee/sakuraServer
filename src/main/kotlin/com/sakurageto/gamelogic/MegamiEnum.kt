@@ -1,6 +1,7 @@
 package com.sakurageto.gamelogic
 
 enum class MegamiEnum(var real_number: Int) {
+    NONE(0),
     YURINA(10),
     SAINE(20),
     HIMIKA(30),
@@ -8,7 +9,8 @@ enum class MegamiEnum(var real_number: Int) {
     OBORO(50),
     YUKIHI(60),
     SHINRA(70),
-    HAGANE(80);
+    HAGANE(80),
+    CHIKAGE(90);
 
     companion object {
         fun fromInt(value: Int) = MegamiEnum.values().first { it.real_number == value }

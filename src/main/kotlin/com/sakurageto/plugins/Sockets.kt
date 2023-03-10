@@ -12,8 +12,8 @@ import kotlinx.coroutines.delay
 
 fun Application.configureSockets() {
     install(WebSockets) {
-        pingPeriod = Duration.ofSeconds(180)
-        timeout = Duration.ofSeconds(180)
+        pingPeriod = Duration.ofSeconds(30)
+        timeout = Duration.ofSeconds(30)
         maxFrameSize = Long.MAX_VALUE
         masking = false
     }

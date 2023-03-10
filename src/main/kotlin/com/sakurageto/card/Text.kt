@@ -58,5 +58,6 @@ enum class TextEffectTag {
     SEAL_CARD,
     EFFECT_INSTEAD_DAMAGE,
     ADD_LOG,
+    INSERT_POISON,
     RUN_STRATAGEM;
 }

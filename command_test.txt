@@ -1,7 +1,7 @@
 모드 선택
 {
-    "command": "SELECT_MODE",
-    "data": [0]
+    "command": "SELECT_MODE_YOUR",
+    "card": 0
 }
 
 여신 선택

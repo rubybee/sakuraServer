@@ -39,6 +39,8 @@ enum class CommandEnum {
     DESTRUCTION_NOT_NORMAL_ENCHANTMENT_YOUR,
     DESTRUCTION_NOT_NORMAL_ENCHANTMENT_OTHER,
 
+    POP_POISON_BAG_YOUR,
+    POP_POISON_BAG_OTHER,
     POP_USED_YOUR,
     POP_USED_OTHER,
     POP_SPECIAL_YOUR,
@@ -58,6 +60,8 @@ enum class CommandEnum {
     POP_SEAL_YOUR,
     POP_SEAL_OTHER,
 
+    POISON_BAG_YOUR,
+    POISON_BAG_OTHER,
     SEAL_YOUR,
     SEAL_OTHER,
     SPECIAL_YOUR,
@@ -273,7 +277,8 @@ enum class LocationEnum(var real_number: Int){
     SPECIAL_CARD(19),
     USED_CARD(20),
     ENCHANTMENT_ZONE(21),
-    SEAL_ZONE(22);
+    SEAL_ZONE(22),
+    POISON_BAG(23);
 
     fun Opposite(): LocationEnum{
         return when(this){

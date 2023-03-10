@@ -152,52 +152,80 @@ enum class CardName {
     HAGANE_GRAND_SKY_HOLE_CRASH,
     HAGANE_GRAND_BELL_MEGALOBEL,
     HAGANE_GRAND_GRAVITATION_ATTRACT,
-    HAGANE_GRAND_MOUNTAIN_RESPECT;
+    HAGANE_GRAND_MOUNTAIN_RESPECT,
+
+    CHIKAGE_THROW_KUNAI,
+    CHIKAGE_POISON_NEEDLE,
+    CHIKAGE_TO_ZU_CHU,
+    CHIKAGE_CUTTING_NECK,
+    CHIKAGE_POISON_SMOKE,
+    CHIKAGE_TIP_TOEING,
+    CHIKAGE_MUDDLE,
+
+    CHIKAGE_DEADLY_POISON,
+    CHIKAGE_HAN_KI_POISON,
+    CHIKAGE_REINCARNATION_POISON,
+    CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIFE,
+
+    POISON_PARALYTIC,
+    POISON_HALLUCINOGENIC,
+    POISON_RELAXATION,
+    POISON_DEADLY,
+    POISON_DEADLY_1,
+    POISON_DEADLY_2;
+
 
     companion object {
         fun returnNormalCardNameByMegami(megami_name: MegamiEnum):List<CardName>{
-            when (megami_name){
-                MegamiEnum.YURINA -> return listOf(
+            return when (megami_name){
+                MegamiEnum.NONE -> listOf()
+                MegamiEnum.YURINA -> listOf(
                     YURINA_CHAM, YURINA_ILSUM, YURINA_JARUCHIGI, YURINA_GUHAB, YURINA_GIBACK,
                     YURINA_APDO, YURINA_GIYENBANJO
                 )
-                MegamiEnum.SAINE -> return listOf(
+                MegamiEnum.SAINE -> listOf(
                     SAINE_HURUBEGI, SAINE_DOUBLEBEGI, SAINE_MOOGECHOO, SAINE_GANPA, SAINE_GWONYUCK,
                     SAINE_CHOONGEMJUNG, SAINE_MOOEMBUCK
                 )
-                MegamiEnum.HIMIKA -> return listOf(
+                MegamiEnum.HIMIKA -> listOf(
                     HIMIKA_SHOOT, HIMIKA_RAPIDFIRE, HIMIKA_MAGNUMCANON, HIMIKA_FULLBURST,
                     HIMIKA_BACKSTEP, HIMIKA_BACKDRAFT, HIMIKA_SMOKE
                 )
-                MegamiEnum.TOKOYO -> return listOf(
+                MegamiEnum.TOKOYO -> listOf(
                     TOKOYO_BITSUNERIGI, TOKOYO_WOOAHHANTAGUCK, TOKOYO_RUNNINGRABIT, TOKOYO_POETDANCE,
                     TOKOYO_FLIPFAN, TOKOYO_WINDSTAGE, TOKOYO_SUNSTAGE
                 )
-                MegamiEnum.OBORO -> return listOf(
+                MegamiEnum.OBORO -> listOf(
                     OBORO_WIRE, OBORO_SHADOWCALTROP, OBORO_ZANGEKIRANBU, OBORO_NINJAWALK,
                     OBORO_INDUCE, OBORO_CLONE, OBORO_BIOACTIVITY
                 )
-                MegamiEnum.YUKIHI -> return listOf(
+                MegamiEnum.YUKIHI -> listOf(
                     YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE, YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS,
                     YUKIHI_PUSH_OUT_SLASH_PULL, YUKIHI_SWING_SLASH_STAB, YUKIHI_TURN_UMBRELLA,
                     YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN, YUKIHI_MAKE_CONNECTION
                 )
-                MegamiEnum.SHINRA -> return listOf(
+                MegamiEnum.SHINRA -> listOf(
                     SHINRA_IBLON, SHINRA_BANLON,
                     SHINRA_KIBEN, SHINRA_INYONG, SHINRA_SEONDONG,
                     SHINRA_JANGDAM, SHINRA_NONPA
                 )
-                MegamiEnum.HAGANE -> return listOf(
+                MegamiEnum.HAGANE -> listOf(
                     HAGANE_CENTRIFUGAL_ATTACK, HAGANE_FOUR_WINDED_EARTHQUAKE,
                     HAGANE_GROUND_BREAKING, HAGANE_HYPER_RECOIL,
                     HAGANE_WON_MU_RUYN, HAGANE_RING_A_BELL,
                     HAGANE_GRAVITATION_FIELD
+                )
+                MegamiEnum.CHIKAGE -> listOf(
+                    CHIKAGE_THROW_KUNAI, CHIKAGE_POISON_NEEDLE, CHIKAGE_TO_ZU_CHU,
+                    CHIKAGE_CUTTING_NECK, CHIKAGE_POISON_SMOKE, CHIKAGE_TIP_TOEING,
+                    CHIKAGE_MUDDLE
                 )
             }
         }
 
         fun returnSpecialCardNameByMegami(megami_name: MegamiEnum): List<CardName> {
             return when (megami_name){
+                MegamiEnum.NONE -> listOf()
                 MegamiEnum.YURINA -> listOf(
                     YURINA_WOLYUNGNACK, YURINA_POBARAM, YURINA_JJOCKBAE, YURINA_JURUCK
                 )
@@ -230,11 +258,17 @@ enum class CardName {
                     HAGANE_GRAND_SKY_HOLE_CRASH, HAGANE_GRAND_BELL_MEGALOBEL, HAGANE_GRAND_GRAVITATION_ATTRACT,
                     HAGANE_GRAND_MOUNTAIN_RESPECT
                 )
+
+                MegamiEnum.CHIKAGE -> listOf(
+                    CHIKAGE_DEADLY_POISON, CHIKAGE_HAN_KI_POISON,
+                    CHIKAGE_REINCARNATION_POISON, CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIFE
+                )
             }
         }
 
         fun returnAdditionalCardNameByMegami(megami_name: MegamiEnum): List<CardName> {
             return when (megami_name){
+                MegamiEnum.NONE -> listOf()
                 MegamiEnum.YURINA -> listOf()
                 MegamiEnum.SAINE -> listOf()
                 MegamiEnum.HIMIKA -> listOf()
@@ -243,8 +277,15 @@ enum class CardName {
                 MegamiEnum.YUKIHI -> listOf()
                 MegamiEnum.SHINRA -> listOf()
                 MegamiEnum.HAGANE -> listOf()
+                MegamiEnum.CHIKAGE -> listOf()
             }
         }
 
+        fun returnPoisonCardName(): List<CardName> {
+            return listOf(
+                POISON_PARALYTIC, POISON_HALLUCINOGENIC, POISON_RELAXATION,
+                POISON_DEADLY_1, POISON_DEADLY_2
+            )
+        }
     }
 }

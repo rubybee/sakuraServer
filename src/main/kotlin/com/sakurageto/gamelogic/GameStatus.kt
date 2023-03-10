@@ -1256,7 +1256,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     }
                     else{
                         while(true){
-                            val receive = receiveAuraDamageSelect(getSocket(player), selectable)
+                            val receive = receiveAuraDamageSelect(getSocket(player), selectable, damage.first)
                             if (nowPlayer.auraDamagePossible(receive, damage.first, selectable)){
                                 auraDamageProcess(player, receive!!)
                                 break
@@ -1275,7 +1275,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                         }
                         else{
                             while(true){
-                                val receive = receiveAuraDamageSelect(getSocket(player), selectable)
+                                val receive = receiveAuraDamageSelect(getSocket(player), selectable, damage.first)
                                 if (nowPlayer.auraDamagePossible(receive, damage.first, selectable)){
                                     auraDamageProcess(player, receive!!)
                                     break
@@ -1356,6 +1356,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         thisTurnDistance = distanceToken
         nowPlayer.megamiCard?.endPhaseEffect(player, this)
         nowPlayer.megamiCard2?.endPhaseEffect(player, this)
+        player1.canNotGoForward = false; player2.canNotGoForward = false
         player1.rangeBuff.clearBuff(); player2.rangeBuff.clearBuff(); player1.attackBuff.clearBuff(); player2.attackBuff.clearBuff()
     }
 
@@ -1451,7 +1452,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     suspend fun canDoBasicOperation(player: PlayerEnum, command: CommandEnum): Boolean{
         val now_player = getPlayer(player)
         return when(command){
-            CommandEnum.ACTION_GO_FORWARD -> !(now_player.aura + now_player.freezeToken == now_player.maxAura || distanceToken == 0 || thisTurnDistance <= getAdjustSwellDistance(player))
+            CommandEnum.ACTION_GO_FORWARD ->
+                !(now_player.aura + now_player.freezeToken == now_player.maxAura || distanceToken == 0 || thisTurnDistance <= getAdjustSwellDistance(player))
+                        && !(getPlayer(player).canNotGoForward)
             CommandEnum.ACTION_GO_BACKWARD -> !(now_player.aura == 0 || distanceToken == 10)
             CommandEnum.ACTION_WIND_AROUND -> !(dust == 0 || now_player.aura == now_player.maxAura)
             CommandEnum.ACTION_INCUBATE -> now_player.aura != 0
@@ -1560,20 +1563,20 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    suspend fun coverCard(player: PlayerEnum, select_player: PlayerEnum){
+    suspend fun coverCard(player: PlayerEnum, select_player: PlayerEnum, reason: Int){
         val nowSocket = getSocket(select_player)
 
         if(checkCoverAbleHand(player)){
             val list = mutableListOf<Int>()
             for (card in getPlayer(player).hand.values) list.add(card.card_number)
-            val cardNumber = receiveCoverCardSelect(nowSocket, list)
+            val cardNumber = receiveCoverCardSelect(nowSocket, list, reason)
             if(cardNumberHashmap[cardNumber] == null || !returnCardDataByName(cardNumberHashmap[cardNumber]!!).canCover){
-                coverCard(player, select_player)
+                coverCard(player, select_player, reason)
                 return
             }
             val card = popCardFrom(player, cardNumber, LocationEnum.HAND, false)
             if(card == null) {
-                coverCard(player, select_player)
+                coverCard(player, select_player, reason)
                 return
             }
             else{
@@ -1589,7 +1592,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     fun checkCoverAbleHand(player: PlayerEnum): Boolean{
         val nowPlayer = getPlayer(player)
 
-        for(card in nowPlayer.cover_card){
+        for(card in nowPlayer.hand.values){
             if(card.card_data.canCover) return true
         }
         return false
@@ -1600,8 +1603,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         while (true){
             if(nowPlayer.hand.size <= nowPlayer.max_hand) return
-
-            coverCard(player, player)
+            coverCard(player, player, -1)
         }
     }
 
@@ -1639,7 +1641,17 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             val set = mutableSetOf<Int>()
             val list = receiveSelectCard(getSocket(select_player), cardList, reason, card_number) ?: continue
             set.addAll(list)
-            if(set.size == listSize) return cardList
+            if(set.size == listSize) return list
+        }
+    }
+
+    suspend fun selectCardFrom(player: PlayerEnum, cardList: MutableList<Int>, reason: CommandEnum, card_number: Int,
+        listSize: Int): MutableList<Int>{
+        while (true){
+            val set = mutableSetOf<Int>()
+            val list = receiveSelectCard(getSocket(player), cardList, reason, card_number) ?: continue
+            set.addAll(list)
+            if(set.size == listSize) return list
         }
     }
 
@@ -1706,6 +1718,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 val result = nowPlayer.sealZone[card_number]?: return null
                 sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_SEAL_YOUR)
                 nowPlayer.sealZone.remove(card_number)
+                return result
+            }
+            LocationEnum.POISON_BAG -> {
+                val result = nowPlayer.poisonBag[cardNumberHashmap[card_number]]?: return null
+                sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_SEAL_YOUR)
+                nowPlayer.poisonBag.remove(cardNumberHashmap[card_number])
                 return result
             }
             else -> TODO()

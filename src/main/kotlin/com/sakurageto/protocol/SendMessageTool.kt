@@ -239,8 +239,8 @@ suspend fun sendGameEnd(winner: Connection, loser: Connection){
     loser.session.send(Json.encodeToString(data_loser))
 }
 
-suspend fun sendCoverCardSelect(player: Connection, list: MutableList<Int>){
-    val preData = SakuraCardCommand(COVER_CARD_SELECT, -1)
+suspend fun sendCoverCardSelect(player: Connection, list: MutableList<Int>, reason: Int){
+    val preData = SakuraCardCommand(COVER_CARD_SELECT, reason)
     val data = SakuraSendData(COVER_CARD_SELECT, list)
     player.session.send(Json.encodeToString(preData))
     player.session.send(Json.encodeToString(data))
@@ -251,8 +251,8 @@ suspend fun sendCardEffectSelect(player: Connection, card_number: Int){
     player.session.send(Json.encodeToString(data))
 }
 
-suspend fun sendAuraDamageSelect(player: Connection){
-    val data = SakuraCardCommand(SELECT_AURA_DAMAGE_PLACE, -1)
+suspend fun sendAuraDamageSelect(player: Connection, auraDamage: Int){
+    val data = SakuraCardCommand(SELECT_AURA_DAMAGE_PLACE, auraDamage)
     player.session.send(Json.encodeToString(data))
 }
 
@@ -566,8 +566,8 @@ suspend fun receiveActionRequestMain(player: Connection): Pair<CommandEnum, Int>
     return receiveActionRequestMain(player)
 }
 
-suspend fun receiveCoverCardSelect(player: Connection, list: MutableList<Int>): Int{
-    sendCoverCardSelect(player, list)
+suspend fun receiveCoverCardSelect(player: Connection, list: MutableList<Int>, reason: Int): Int{
+    sendCoverCardSelect(player, list, reason)
     return receiveCoverCardSelectMain(player, list)
 }
 
@@ -621,8 +621,8 @@ suspend fun receiveCardEffectSelectMain(player: Connection, card_number: Int): C
 }
 
 //receive data like( [LOCATION_ENUM.AURA, 3, CARD_NUMBER, 2, CARD_NUMBER, 2] )
-suspend fun receiveAuraDamageSelect(player: Connection, place_list: MutableList<Int>): MutableList<Int>?{
-    sendAuraDamageSelect(player)
+suspend fun receiveAuraDamageSelect(player: Connection, place_list: MutableList<Int>, auraDamage: Int): MutableList<Int>?{
+    sendAuraDamageSelect(player, auraDamage)
     sendAuraDamagePlaceInformation(player, place_list)
     return receiveAuraDamageSelectMain(player, place_list)
 }

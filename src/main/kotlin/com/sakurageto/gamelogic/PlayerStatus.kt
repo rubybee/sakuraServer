@@ -18,6 +18,7 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var umbrella: Umbrella? = null
     var stratagem: Stratagem? = null
 
+    var canNotGoForward: Boolean = false
     fun auraDamagePossible(data: MutableList<Int>?, damage: Int, possibleList: MutableList<Int>): Boolean{
         var totalAura = 0
         if(data == null || data.size % 2 == 1) return false
@@ -174,6 +175,7 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var unselected_specialcard: MutableList<CardName> = mutableListOf()
 
     var additional_hand: HashMap<CardName, Card> = HashMap()
+    var poisonBag: HashMap<CardName, Card> = HashMap()
 
     var pre_attack_card: MadeAttack? = null
 

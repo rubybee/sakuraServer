@@ -3,6 +3,7 @@ package com.sakurageto.card
 import com.sakurageto.gamelogic.*
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
+import com.sakurageto.protocol.receiveSelectCard
 import kotlin.math.abs
 
 object CardSet {
@@ -112,6 +113,22 @@ object CardSet {
         cardNameHashmapFirst[CardName.HAGANE_GRAND_GRAVITATION_ATTRACT] = 809
         cardNameHashmapFirst[CardName.HAGANE_GRAND_MOUNTAIN_RESPECT] = 810
 
+        cardNameHashmapFirst[CardName.CHIKAGE_THROW_KUNAI] = 900
+        cardNameHashmapFirst[CardName.CHIKAGE_POISON_NEEDLE] = 901
+        cardNameHashmapFirst[CardName.CHIKAGE_TO_ZU_CHU] = 902
+        cardNameHashmapFirst[CardName.CHIKAGE_CUTTING_NECK] = 903
+        cardNameHashmapFirst[CardName.CHIKAGE_POISON_SMOKE] = 904
+        cardNameHashmapFirst[CardName.CHIKAGE_TIP_TOEING] = 905
+        cardNameHashmapFirst[CardName.CHIKAGE_MUDDLE] = 906
+        cardNameHashmapFirst[CardName.CHIKAGE_DEADLY_POISON] = 907
+        cardNameHashmapFirst[CardName.CHIKAGE_HAN_KI_POISON] = 908
+        cardNameHashmapFirst[CardName.CHIKAGE_REINCARNATION_POISON] = 909
+        cardNameHashmapFirst[CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIFE] = 910
+        cardNameHashmapFirst[CardName.POISON_PARALYTIC] = 995
+        cardNameHashmapFirst[CardName.POISON_HALLUCINOGENIC] = 996
+        cardNameHashmapFirst[CardName.POISON_RELAXATION] = 997
+        cardNameHashmapFirst[CardName.POISON_DEADLY_1] = 998
+        cardNameHashmapFirst[CardName.POISON_DEADLY_2] = 999
 
         //for second turn player 10000~19999
         cardNameHashmapSecond[CardName.YURINA_CHAM] = 10100
@@ -212,8 +229,24 @@ object CardSet {
         cardNameHashmapSecond[CardName.HAGANE_GRAND_GRAVITATION_ATTRACT] = 10809
         cardNameHashmapSecond[CardName.HAGANE_GRAND_MOUNTAIN_RESPECT] = 10810
 
+        cardNameHashmapSecond[CardName.CHIKAGE_THROW_KUNAI] = 10900
+        cardNameHashmapSecond[CardName.CHIKAGE_POISON_NEEDLE] = 10901
+        cardNameHashmapSecond[CardName.CHIKAGE_TO_ZU_CHU] = 10902
+        cardNameHashmapSecond[CardName.CHIKAGE_CUTTING_NECK] = 10903
+        cardNameHashmapSecond[CardName.CHIKAGE_POISON_SMOKE] = 10904
+        cardNameHashmapSecond[CardName.CHIKAGE_TIP_TOEING] = 10905
+        cardNameHashmapSecond[CardName.CHIKAGE_MUDDLE] = 10906
+        cardNameHashmapSecond[CardName.CHIKAGE_DEADLY_POISON] = 10907
+        cardNameHashmapSecond[CardName.CHIKAGE_HAN_KI_POISON] = 10908
+        cardNameHashmapSecond[CardName.CHIKAGE_REINCARNATION_POISON] = 10909
+        cardNameHashmapSecond[CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIFE] = 10910
+        cardNameHashmapSecond[CardName.POISON_PARALYTIC] = 10995
+        cardNameHashmapSecond[CardName.POISON_HALLUCINOGENIC] = 10996
+        cardNameHashmapSecond[CardName.POISON_RELAXATION] = 10997
+        cardNameHashmapSecond[CardName.POISON_DEADLY_1] = 10998
+        cardNameHashmapSecond[CardName.POISON_DEADLY_2] = 10999
 
-
+        //for number -> card name
         cardNumberHashmap[100] = CardName.YURINA_CHAM
         cardNumberHashmap[101] = CardName.YURINA_ILSUM
         cardNumberHashmap[102] = CardName.YURINA_JARUCHIGI
@@ -311,6 +344,23 @@ object CardSet {
         cardNumberHashmap[809] = CardName.HAGANE_GRAND_GRAVITATION_ATTRACT
         cardNumberHashmap[810] = CardName.HAGANE_GRAND_MOUNTAIN_RESPECT
 
+        cardNumberHashmap[900] = CardName.CHIKAGE_THROW_KUNAI
+        cardNumberHashmap[901] = CardName.CHIKAGE_POISON_NEEDLE
+        cardNumberHashmap[902] = CardName.CHIKAGE_TO_ZU_CHU
+        cardNumberHashmap[903] = CardName.CHIKAGE_CUTTING_NECK
+        cardNumberHashmap[904] = CardName.CHIKAGE_POISON_SMOKE
+        cardNumberHashmap[905] = CardName.CHIKAGE_TIP_TOEING
+        cardNumberHashmap[906] = CardName.CHIKAGE_MUDDLE
+        cardNumberHashmap[907] = CardName.CHIKAGE_DEADLY_POISON
+        cardNumberHashmap[908] = CardName.CHIKAGE_HAN_KI_POISON
+        cardNumberHashmap[909] = CardName.CHIKAGE_REINCARNATION_POISON
+        cardNumberHashmap[910] = CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIFE
+        cardNumberHashmap[995] = CardName.POISON_PARALYTIC
+        cardNumberHashmap[996] = CardName.POISON_HALLUCINOGENIC
+        cardNumberHashmap[997] = CardName.POISON_RELAXATION
+        cardNumberHashmap[998] = CardName.POISON_DEADLY_1
+        cardNumberHashmap[999] = CardName.POISON_DEADLY_2
+
         cardNumberHashmap[10100] = CardName.YURINA_CHAM
         cardNumberHashmap[10101] = CardName.YURINA_ILSUM
         cardNumberHashmap[10102] = CardName.YURINA_JARUCHIGI
@@ -407,6 +457,23 @@ object CardSet {
         cardNumberHashmap[10808] = CardName.HAGANE_GRAND_BELL_MEGALOBEL
         cardNumberHashmap[10809] = CardName.HAGANE_GRAND_GRAVITATION_ATTRACT
         cardNumberHashmap[10810] = CardName.HAGANE_GRAND_MOUNTAIN_RESPECT
+
+        cardNumberHashmap[10900] = CardName.CHIKAGE_THROW_KUNAI
+        cardNumberHashmap[10901] = CardName.CHIKAGE_POISON_NEEDLE
+        cardNumberHashmap[10902] = CardName.CHIKAGE_TO_ZU_CHU
+        cardNumberHashmap[10903] = CardName.CHIKAGE_CUTTING_NECK
+        cardNumberHashmap[10904] = CardName.CHIKAGE_POISON_SMOKE
+        cardNumberHashmap[10905] = CardName.CHIKAGE_TIP_TOEING
+        cardNumberHashmap[10906] = CardName.CHIKAGE_MUDDLE
+        cardNumberHashmap[10907] = CardName.CHIKAGE_DEADLY_POISON
+        cardNumberHashmap[10908] = CardName.CHIKAGE_HAN_KI_POISON
+        cardNumberHashmap[10909] = CardName.CHIKAGE_REINCARNATION_POISON
+        cardNumberHashmap[10910] = CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIFE
+        cardNumberHashmap[10995] = CardName.POISON_PARALYTIC
+        cardNumberHashmap[10996] = CardName.POISON_HALLUCINOGENIC
+        cardNumberHashmap[10997] = CardName.POISON_RELAXATION
+        cardNumberHashmap[10998] = CardName.POISON_DEADLY_1
+        cardNumberHashmap[10999] = CardName.POISON_DEADLY_2
     }
 
     private suspend fun selectDustToDistance(nowCommand: CommandEnum, game_status: GameStatus): Boolean{
@@ -762,7 +829,7 @@ object CardSet {
             null
         })
         scarletimagine.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CARD_TO_COVER) {_, player, game_status, _->
-            game_status.coverCard(player, player)
+            game_status.coverCard(player, player, cardNameHashmapFirst[CardName.HIMIKA_SCARLETIMAGINE]!!)
             null
         })
         burmilionfield.setSpecial(2)
@@ -966,7 +1033,7 @@ object CardSet {
         })
         shadowcaltrop.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) {card_number, player, game_status, _ ->
             if (game_status.logger.checkThisCardUseInCover(player, card_number)){
-                game_status.coverCard(player.opposite(), player)
+                game_status.coverCard(player.opposite(), player, cardNameHashmapFirst[CardName.OBORO_SHADOWCALTROP]!!)
             }
             null
         })
@@ -1387,7 +1454,7 @@ object CardSet {
                         game_status.drawCard(player.opposite(), 3)
                         while (true){
                             val list = game_status.selectCardFrom(player.opposite(), player.opposite(), listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, card_number, 2)
-                            {card -> card.card_data.canCover}?: break
+                            {_ -> true}?: break
                             for (cardNumber in list){
                                 game_status.popCardFrom(player.opposite(), cardNumber, LocationEnum.HAND, true)?.let {
                                     game_status.insertCardTo(player.opposite(), it, LocationEnum.DISCARD, true)
@@ -1758,6 +1825,70 @@ object CardSet {
         })
     }
 
+    private val throwKunai = CardData(CardClass.NORMAL, CardName.CHIKAGE_THROW_KUNAI, MegamiEnum.CHIKAGE, CardType.ATTACK, SubType.NONE)
+    private val poisonNeedle = CardData(CardClass.NORMAL, CardName.CHIKAGE_POISON_NEEDLE, MegamiEnum.CHIKAGE, CardType.ATTACK, SubType.NONE)
+    private val toZuChu = CardData(CardClass.NORMAL, CardName.CHIKAGE_TO_ZU_CHU, MegamiEnum.CHIKAGE, CardType.ATTACK, SubType.REACTION)
+    private val cuttingNeck = CardData(CardClass.NORMAL, CardName.CHIKAGE_CUTTING_NECK, MegamiEnum.CHIKAGE, CardType.ATTACK, SubType.FULL_POWER)
+    private val poisonSmoke = CardData(CardClass.NORMAL, CardName.CHIKAGE_POISON_SMOKE, MegamiEnum.CHIKAGE, CardType.BEHAVIOR, SubType.NONE)
+
+    private fun makePoisonList(player: PlayerEnum, game_status: GameStatus, ): MutableList<Int>{
+        val cardList = mutableListOf<Int>()
+        game_status.getPlayer(player).poisonBag[CardName.POISON_PARALYTIC]?.let {
+            cardList.add(it.card_number)
+        }
+        game_status.getPlayer(player).poisonBag[CardName.POISON_HALLUCINOGENIC]?.let {
+            cardList.add(it.card_number)
+        }
+        game_status.getPlayer(player).poisonBag[CardName.POISON_RELAXATION]?.let {
+            cardList.add(it.card_number)
+        }
+        return cardList
+    }
+
+    private fun chikageCardInit(){
+        throwKunai.setAttack(DistanceType.CONTINUOUS, Pair(4, 5), null, 2, 2)
+        poisonNeedle.setAttack(DistanceType.CONTINUOUS, Pair(4, 4), null, 1, 1)
+        poisonNeedle.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.INSERT_POISON) {card_number, player, game_status, _ ->
+            val cardList = makePoisonList(player, game_status)
+            if(cardList.size != 0){
+                val get = game_status.selectCardFrom(player, cardList, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, card_number, 1)[0]
+                game_status.popCardFrom(player, get, LocationEnum.POISON_BAG, false)?.let {
+                    game_status.insertCardTo(player.opposite(), it, LocationEnum.YOUR_DECK_TOP, false)
+                }
+            }
+            null
+        })
+        toZuChu.setAttack(DistanceType.CONTINUOUS, Pair(1, 3), null, 1, 999)
+        toZuChu.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
+            game_status.auraToDistance(player, 1)
+            game_status.dustToDistance(1)
+            game_status.getPlayer(player.opposite()).canNotGoForward = true
+            null
+        })
+        cuttingNeck.setAttack(DistanceType.CONTINUOUS, Pair(0, 3), null, 2, 3)
+        cuttingNeck.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.INSERT_POISON) {card_number, player, game_status, _ ->
+            if(game_status.getPlayer(player.opposite()).hand.size >= 2){
+                val list = game_status.selectCardFrom(player.opposite(), player.opposite(),
+                    listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, card_number, 1
+                ) { _ -> true }
+                game_status.popCardFrom(player.opposite(), list!![0], LocationEnum.HAND, true)?.let {
+                    game_status.insertCardTo(player.opposite(), it, LocationEnum.DISCARD, true)
+                }
+            }
+            null
+        })
+        poisonSmoke.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.INSERT_POISON) {card_number, player, game_status, _->
+            val cardList = makePoisonList(player, game_status)
+            if(cardList.size != 0){
+                val get = game_status.selectCardFrom(player, cardList, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, card_number, 1)[0]
+                game_status.popCardFrom(player, get, LocationEnum.POISON_BAG, true)?.let {
+                    game_status.insertCardTo(player.opposite(), it, LocationEnum.HAND, true)
+                }
+            }
+            null
+        })
+    }
+
     fun init(){
         hashMapInit()
 
@@ -1769,6 +1900,7 @@ object CardSet {
         yukihiCardInit()
         shinraCardInit()
         haganeCardInit()
+        chikageCardInit()
     }
 
     fun returnCardDataByName(card_name: CardName): CardData {
@@ -1864,11 +1996,29 @@ object CardSet {
             CardName.HAGANE_GRAND_BELL_MEGALOBEL -> return grandBellMegalobel
             CardName.HAGANE_GRAND_GRAVITATION_ATTRACT -> return grandGravitationAttract
             CardName.HAGANE_GRAND_MOUNTAIN_RESPECT -> return grandMountainRespect
+            CardName.CHIKAGE_THROW_KUNAI -> return throwKunai
+            CardName.CHIKAGE_POISON_NEEDLE -> return poisonNeedle
+            CardName.CHIKAGE_TO_ZU_CHU -> return toZuChu
+            CardName.CHIKAGE_CUTTING_NECK -> return cuttingNeck
+            CardName.CHIKAGE_POISON_SMOKE -> return poisonSmoke
+            CardName.CHIKAGE_TIP_TOEING -> TODO()
+            CardName.CHIKAGE_MUDDLE -> TODO()
+            CardName.CHIKAGE_DEADLY_POISON -> TODO()
+            CardName.CHIKAGE_HAN_KI_POISON -> TODO()
+            CardName.CHIKAGE_REINCARNATION_POISON -> TODO()
+            CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIFE -> TODO()
+            CardName.POISON_PARALYTIC -> TODO()
+            CardName.POISON_HALLUCINOGENIC -> TODO()
+            CardName.POISON_RELAXATION -> TODO()
+            CardName.POISON_DEADLY_1 -> TODO()
+            CardName.POISON_DEADLY_2 -> TODO()
+            CardName.POISON_DEADLY -> TODO()
         }
     }
 
     fun isPoison(card_number: Int): Boolean{
         return when(card_number){
+            995, 996, 997, 998, 999, 10995, 10996, 10997, 10998, 10999 -> true
             else -> false
         }
     }

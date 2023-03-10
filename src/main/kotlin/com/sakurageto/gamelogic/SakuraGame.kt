@@ -1,10 +1,7 @@
 package com.sakurageto.gamelogic
 
 import com.sakurageto.Connection
-import com.sakurageto.card.Card
-import com.sakurageto.card.CardName
-import com.sakurageto.card.PlayerEnum
-import com.sakurageto.card.SpecialCardEnum
+import com.sakurageto.card.*
 import com.sakurageto.protocol.*
 import io.ktor.websocket.*
 import kotlinx.serialization.encodeToString
@@ -146,6 +143,22 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
             else{
                 game_status.player2.megamiCard2 = Card.cardMakerByName(first_turn == PlayerEnum.PLAYER2, CardName.SHINRA_SHINRA, PlayerEnum.PLAYER2)
                 game_status.player2.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
+            }
+        }
+
+        if(game_status.player1.megami_1 == MegamiEnum.CHIKAGE || game_status.player1.megami_2 == MegamiEnum.CHIKAGE){
+            for(card_name in CardName.returnPoisonCardName()){
+                val turnCheck = first_turn == PlayerEnum.PLAYER1
+                var card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER1)
+                game_status.player1.poisonBag[card.card_data.card_name] = card
+            }
+        }
+
+        if(game_status.player2.megami_1 == MegamiEnum.CHIKAGE || game_status.player2.megami_2 == MegamiEnum.CHIKAGE){
+            for(card_name in CardName.returnPoisonCardName()){
+                val turnCheck = first_turn == PlayerEnum.PLAYER2
+                var card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER2)
+                game_status.player2.poisonBag[card.card_data.card_name] = card
             }
         }
         //additional board setting here
@@ -401,8 +414,8 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
             checkMegami()
             selectBan()
         }
-        checkFinalMegami()
         selectFirst()
+        checkFinalMegami()
         selectCard()
         game_status.drawCard(PlayerEnum.PLAYER1, 3)
         game_status.drawCard(PlayerEnum.PLAYER2, 3)

@@ -18,6 +18,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     val logger = Logger()
 
+    var endCurrentPhase: Boolean = false
+
     var startTurnDistance = 10
 
     suspend fun getAdjustSwellDistance(player: PlayerEnum): Int{
@@ -31,10 +33,15 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return nowSwellDistance
     }
 
-    fun getAdjustDistance(player: PlayerEnum): Int{
+    suspend fun getAdjustDistance(player: PlayerEnum): Int{
         var distance = thisTurnDistance
 
-        //TODO("SOMETHING WILL BE ADDED HERE")
+        for(card in player1.enchantment_card.values){
+            distance += card.effectAllMaintainCard(PlayerEnum.PLAYER1, this, TextEffectTag.CHANGE_DISTANCE)
+        }
+        for(card in player2.enchantment_card.values){
+            distance += card.effectAllMaintainCard(PlayerEnum.PLAYER2, this, TextEffectTag.CHANGE_DISTANCE)
+        }
 
         return distance
     }
@@ -719,7 +726,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    fun applyAllCostBuff(player: PlayerEnum, cost: Int, card: Card): Int{
+    suspend fun applyAllCostBuff(player: PlayerEnum, cost: Int, card: Card): Int{
         val now_player = getPlayer(player)
         var now_cost = cost
 
@@ -751,7 +758,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    private fun applyTempAttackBuff(player: PlayerEnum, madeAttack: MadeAttack, nowTempBuffQueue: AttackBuffQueue){
+    suspend private fun applyTempAttackBuff(player: PlayerEnum, madeAttack: MadeAttack, nowTempBuffQueue: AttackBuffQueue){
         val nowPlayer = getPlayer(player)
 
         for(i in 0..4){
@@ -769,7 +776,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    private fun applyAllAttackBuff(player: PlayerEnum){
+    suspend private fun applyAllAttackBuff(player: PlayerEnum){
         val nowPlayer = getPlayer(player)
         val nowTempBuffQueue = getPlayerTempAttackBuff(player)
         val nowBuffQueue = getPlayerAttackBuff(player)
@@ -998,6 +1005,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     break
                 }
             }
+        }
+
+        if(endCurrentPhase){
+            endCurrentPhase = false
+            return
         }
 
         applyTempAttackBuff(player, nowAttack, nowTempAttackBuff)
@@ -1356,6 +1368,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         thisTurnDistance = distanceToken
         nowPlayer.megamiCard?.endPhaseEffect(player, this)
         nowPlayer.megamiCard2?.endPhaseEffect(player, this)
+        player1.didBasicOperation = false; player2.didBasicOperation = false
         player1.canNotGoForward = false; player2.canNotGoForward = false
         player1.rangeBuff.clearBuff(); player2.rangeBuff.clearBuff(); player1.attackBuff.clearBuff(); player2.attackBuff.clearBuff()
     }
@@ -1449,21 +1462,33 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
+    suspend fun basicOperationEnchantmentCheck(player: PlayerEnum, command: CommandEnum): Boolean{
+        for(card in getPlayer(player.opposite()).enchantment_card.values){
+            if(card.operationForbidCheck(false, command, this)) return false
+        }
+        return true
+    }
+
     suspend fun canDoBasicOperation(player: PlayerEnum, command: CommandEnum): Boolean{
         val now_player = getPlayer(player)
         return when(command){
             CommandEnum.ACTION_GO_FORWARD ->
                 !(now_player.aura + now_player.freezeToken == now_player.maxAura || distanceToken == 0 || thisTurnDistance <= getAdjustSwellDistance(player))
                         && !(getPlayer(player).canNotGoForward)
-            CommandEnum.ACTION_GO_BACKWARD -> !(now_player.aura == 0 || distanceToken == 10)
+            CommandEnum.ACTION_GO_BACKWARD -> {
+                !(now_player.aura == 0 || distanceToken == 10) && basicOperationEnchantmentCheck(player, CommandEnum.ACTION_GO_BACKWARD)
+            }
             CommandEnum.ACTION_WIND_AROUND -> !(dust == 0 || now_player.aura == now_player.maxAura)
             CommandEnum.ACTION_INCUBATE -> now_player.aura != 0
-            CommandEnum.ACTION_BREAK_AWAY -> !(dust == 0 || thisTurnDistance > getAdjustSwellDistance(player) || distanceToken == 10)
+            CommandEnum.ACTION_BREAK_AWAY -> {
+                !(dust == 0 || thisTurnDistance > getAdjustSwellDistance(player) || distanceToken == 10) && basicOperationEnchantmentCheck(player, CommandEnum.ACTION_GO_BACKWARD)
+            }
             else -> false
         }
     }
 
     suspend fun doBasicOperation(player: PlayerEnum, command: CommandEnum, card: Int){
+        getPlayer(player).didBasicOperation = true
         when(command){
             CommandEnum.ACTION_GO_FORWARD -> doGoForward(player, card)
             CommandEnum.ACTION_GO_BACKWARD -> doGoBackward(player, card)
@@ -1722,7 +1747,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
             LocationEnum.POISON_BAG -> {
                 val result = nowPlayer.poisonBag[cardNumberHashmap[card_number]]?: return null
-                sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_SEAL_YOUR)
+                sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_POISON_BAG_YOUR)
                 nowPlayer.poisonBag.remove(cardNumberHashmap[card_number])
                 return result
             }
@@ -1775,6 +1800,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             LocationEnum.SEAL_ZONE -> {
                 nowPlayer.sealZone[card.card_number] = card
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.SEAL_YOUR)
+            }
+            LocationEnum.POISON_BAG -> {
+                nowPlayer.poisonBag[card.card_data.card_name] = card
+                sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.POISON_BAG_YOUR)
             }
             else -> TODO()
         }

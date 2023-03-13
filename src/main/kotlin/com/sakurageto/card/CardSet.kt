@@ -3,7 +3,6 @@ package com.sakurageto.card
 import com.sakurageto.gamelogic.*
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
-import com.sakurageto.protocol.receiveSelectCard
 import kotlin.math.abs
 
 object CardSet {
@@ -123,7 +122,7 @@ object CardSet {
         cardNameHashmapFirst[CardName.CHIKAGE_DEADLY_POISON] = 907
         cardNameHashmapFirst[CardName.CHIKAGE_HAN_KI_POISON] = 908
         cardNameHashmapFirst[CardName.CHIKAGE_REINCARNATION_POISON] = 909
-        cardNameHashmapFirst[CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIFE] = 910
+        cardNameHashmapFirst[CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE] = 910
         cardNameHashmapFirst[CardName.POISON_PARALYTIC] = 995
         cardNameHashmapFirst[CardName.POISON_HALLUCINOGENIC] = 996
         cardNameHashmapFirst[CardName.POISON_RELAXATION] = 997
@@ -239,7 +238,7 @@ object CardSet {
         cardNameHashmapSecond[CardName.CHIKAGE_DEADLY_POISON] = 10907
         cardNameHashmapSecond[CardName.CHIKAGE_HAN_KI_POISON] = 10908
         cardNameHashmapSecond[CardName.CHIKAGE_REINCARNATION_POISON] = 10909
-        cardNameHashmapSecond[CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIFE] = 10910
+        cardNameHashmapSecond[CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE] = 10910
         cardNameHashmapSecond[CardName.POISON_PARALYTIC] = 10995
         cardNameHashmapSecond[CardName.POISON_HALLUCINOGENIC] = 10996
         cardNameHashmapSecond[CardName.POISON_RELAXATION] = 10997
@@ -354,7 +353,7 @@ object CardSet {
         cardNumberHashmap[907] = CardName.CHIKAGE_DEADLY_POISON
         cardNumberHashmap[908] = CardName.CHIKAGE_HAN_KI_POISON
         cardNumberHashmap[909] = CardName.CHIKAGE_REINCARNATION_POISON
-        cardNumberHashmap[910] = CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIFE
+        cardNumberHashmap[910] = CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE
         cardNumberHashmap[995] = CardName.POISON_PARALYTIC
         cardNumberHashmap[996] = CardName.POISON_HALLUCINOGENIC
         cardNumberHashmap[997] = CardName.POISON_RELAXATION
@@ -468,7 +467,7 @@ object CardSet {
         cardNumberHashmap[10907] = CardName.CHIKAGE_DEADLY_POISON
         cardNumberHashmap[10908] = CardName.CHIKAGE_HAN_KI_POISON
         cardNumberHashmap[10909] = CardName.CHIKAGE_REINCARNATION_POISON
-        cardNumberHashmap[10910] = CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIFE
+        cardNumberHashmap[10910] = CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE
         cardNumberHashmap[10995] = CardName.POISON_PARALYTIC
         cardNumberHashmap[10996] = CardName.POISON_HALLUCINOGENIC
         cardNumberHashmap[10997] = CardName.POISON_RELAXATION
@@ -1629,7 +1628,6 @@ object CardSet {
         })
         centrifugalAttack.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.CARD_TO_COVER) {_, player, game_status, _ ->
             if (player == game_status.turnPlayer) {
-                game_status.setEndTurn(player, true)
                 for(card in game_status.getPlayer(player).hand.values){
                     if(card.card_data.canCover){
                         game_status.popCardFrom(player, card.card_number, LocationEnum.HAND, false)?.let {
@@ -1646,6 +1644,10 @@ object CardSet {
                 }
                 game_status.setConcentration(player, 0)
             }
+            null
+        })
+        centrifugalAttack.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.END_CURRENT_PHASE) {_, _, game_status, _ ->
+            game_status.endCurrentPhase = true
             null
         })
         fourWindedEarthquake.setAttack(DistanceType.CONTINUOUS, Pair(0, 6), null, 1, 999)
@@ -1710,7 +1712,8 @@ object CardSet {
                     game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS, {_, _, _ ->
                     true}, {madeAttack ->
                         madeAttack.run {
-                            auraPlusMinus(2); lifePlusMinus(1)
+                            if(aura_damage <= 3) auraPlusMinus(2);
+                            else lifePlusMinus(1)
                         }
                     }))
                     break
@@ -1830,6 +1833,18 @@ object CardSet {
     private val toZuChu = CardData(CardClass.NORMAL, CardName.CHIKAGE_TO_ZU_CHU, MegamiEnum.CHIKAGE, CardType.ATTACK, SubType.REACTION)
     private val cuttingNeck = CardData(CardClass.NORMAL, CardName.CHIKAGE_CUTTING_NECK, MegamiEnum.CHIKAGE, CardType.ATTACK, SubType.FULL_POWER)
     private val poisonSmoke = CardData(CardClass.NORMAL, CardName.CHIKAGE_POISON_SMOKE, MegamiEnum.CHIKAGE, CardType.BEHAVIOR, SubType.NONE)
+    private val tipToeing = CardData(CardClass.NORMAL, CardName.CHIKAGE_TIP_TOEING, MegamiEnum.CHIKAGE, CardType.ENCHANTMENT, SubType.NONE)
+    private val muddle = CardData(CardClass.NORMAL, CardName.CHIKAGE_MUDDLE, MegamiEnum.CHIKAGE, CardType.ENCHANTMENT, SubType.NONE)
+    private val deadlyPoison = CardData(CardClass.SPECIAL, CardName.CHIKAGE_DEADLY_POISON, MegamiEnum.CHIKAGE, CardType.BEHAVIOR, SubType.NONE)
+    private val hankiPoison = CardData(CardClass.SPECIAL, CardName.CHIKAGE_HAN_KI_POISON, MegamiEnum.CHIKAGE, CardType.ENCHANTMENT, SubType.REACTION)
+    private val reincarnationPoison = CardData(CardClass.SPECIAL, CardName.CHIKAGE_REINCARNATION_POISON, MegamiEnum.CHIKAGE, CardType.ATTACK, SubType.NONE)
+    private val chikageWayOfLive = CardData(CardClass.SPECIAL, CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE, MegamiEnum.CHIKAGE, CardType.ENCHANTMENT, SubType.FULL_POWER)
+
+    private val poisonParalytic = CardData(CardClass.NORMAL, CardName.POISON_PARALYTIC, MegamiEnum.NONE, CardType.BEHAVIOR, SubType.NONE)
+    private val poisonHallucinogenic = CardData(CardClass.NORMAL, CardName.POISON_HALLUCINOGENIC, MegamiEnum.NONE, CardType.BEHAVIOR, SubType.NONE)
+    private val poisonRelaxation = CardData(CardClass.NORMAL, CardName.POISON_RELAXATION, MegamiEnum.NONE, CardType.ENCHANTMENT, SubType.NONE)
+    private val poisonDeadly1 = CardData(CardClass.NORMAL, CardName.POISON_DEADLY_1, MegamiEnum.NONE, CardType.BEHAVIOR, SubType.NONE)
+    private val poisonDeadly2 = CardData(CardClass.NORMAL, CardName.POISON_DEADLY_2, MegamiEnum.NONE, CardType.BEHAVIOR, SubType.NONE)
 
     private fun makePoisonList(player: PlayerEnum, game_status: GameStatus, ): MutableList<Int>{
         val cardList = mutableListOf<Int>()
@@ -1887,6 +1902,100 @@ object CardSet {
             }
             null
         })
+        tipToeing.setEnchantment(4)
+        tipToeing.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CHASM, null))
+        tipToeing.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CHANGE_DISTANCE){_, _, _, _->
+            -2
+        })
+        muddle.setEnchantment(2)
+        muddle.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.FORBID_GO_BACKWARD_OTHER, null))
+        muddle.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.FORBID_BREAK_AWAY, null))
+        deadlyPoison.setSpecial(3)
+        deadlyPoison.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.INSERT_POISON) {_, player, game_status, _ ->
+            val getCard = game_status.popCardFrom(player, game_status.getCardNumber(player, CardName.POISON_DEADLY_1), LocationEnum.POISON_BAG, false)?:
+            game_status.popCardFrom(player, game_status.getCardNumber(player, CardName.POISON_DEADLY_2), LocationEnum.POISON_BAG, false)
+            if(getCard != null){
+                game_status.insertCardTo(player.opposite(), getCard, LocationEnum.YOUR_DECK_TOP, false)
+            }
+            null
+        })
+        hankiPoison.setSpecial(2)
+        hankiPoison.setEnchantment(5)
+        hankiPoison.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.REACT_ATTACK_REDUCE) {_, _, _, reactedAttack ->
+            reactedAttack?.let {
+                if(it.aura_damage == 999 || it.life_damage == 999) it.makeNotValid()
+            }
+            null
+        })
+        hankiPoison.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT){card_number, player, game_status, _ ->
+            game_status.addThisTurnAttackBuff(player.opposite(), Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE,
+                { _, _, attack -> attack.life_damage == 999 || attack.aura_damage == 999 }, { madeAttack ->
+                madeAttack.makeNotValid()
+            }))
+            null
+        })
+        reincarnationPoison.setSpecial(1)
+        reincarnationPoison.setAttack(DistanceType.CONTINUOUS, Pair(3, 7), null, 1, 2)
+        reincarnationPoison.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.RETURN){_, player, game_status, _ ->
+            if(game_status.getPlayerHandSize(player.opposite()) >= 2) 1
+            else 0
+        })
+        poisonParalytic.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USING_CONDITION) {_, player, game_status, _ ->
+            if(game_status.getPlayer(player).didBasicOperation) 0
+            else 1
+        })
+        poisonParalytic.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.END_CURRENT_PHASE) {_, _, game_status, _ ->
+            game_status.endCurrentPhase = true
+            null
+        })
+        poisonParalytic.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CARD_DISCARD_PLACE_CHANGE) {card_number, player, game_status, _ ->
+            game_status.movePlayingCard(player, LocationEnum.POISON_BAG, card_number)
+            null
+        })
+        poisonHallucinogenic.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
+            game_status.flareToDust(player, 2)
+            null
+        })
+        poisonHallucinogenic.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CARD_DISCARD_PLACE_CHANGE) {card_number, player, game_status, _ ->
+            game_status.movePlayingCard(player, LocationEnum.POISON_BAG, card_number)
+            null
+        })
+        poisonRelaxation.setEnchantment(3)
+        poisonRelaxation.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CAN_NOT_USE_ATTACK){_, _, _, _ ->
+            null
+        })
+        poisonRelaxation.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.CARD_DISCARD_PLACE_CHANGE) {card_number, player, game_status, _ ->
+            game_status.popCardFrom(player, card_number, LocationEnum.ENCHANTMENT_ZONE, true)?.let {
+                game_status.insertCardTo(it.player, it, LocationEnum.POISON_BAG, true)
+            }
+
+            null
+        })
+        poisonDeadly1.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
+            game_status.auraToDust(player, 3)
+            null
+        })
+        poisonDeadly1.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CARD_DISCARD_PLACE_CHANGE) {card_number, player, game_status, _ ->
+            game_status.popCardFrom(player, card_number, LocationEnum.PLAYING_ZONE, true)?.let {
+                game_status.insertCardTo(it.player.opposite(), it, LocationEnum.DISCARD, true)
+            }
+            null
+        })
+        poisonDeadly2.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
+            game_status.auraToDust(player, 3)
+            null
+        })
+        poisonDeadly2.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CARD_DISCARD_PLACE_CHANGE) {card_number, player, game_status, _ ->
+            game_status.popCardFrom(player, card_number, LocationEnum.PLAYING_ZONE, true)?.let {
+                game_status.insertCardTo(it.player.opposite(), it, LocationEnum.DISCARD, true)
+            }
+            null
+        })
+        poisonDeadly1.canCover = false
+        poisonDeadly2.canCover = false
+        poisonRelaxation.canCover = false
+        poisonHallucinogenic.canCover = false
+        poisonParalytic.canCover = false
     }
 
     fun init(){
@@ -2001,18 +2110,17 @@ object CardSet {
             CardName.CHIKAGE_TO_ZU_CHU -> return toZuChu
             CardName.CHIKAGE_CUTTING_NECK -> return cuttingNeck
             CardName.CHIKAGE_POISON_SMOKE -> return poisonSmoke
-            CardName.CHIKAGE_TIP_TOEING -> TODO()
-            CardName.CHIKAGE_MUDDLE -> TODO()
-            CardName.CHIKAGE_DEADLY_POISON -> TODO()
-            CardName.CHIKAGE_HAN_KI_POISON -> TODO()
-            CardName.CHIKAGE_REINCARNATION_POISON -> TODO()
-            CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIFE -> TODO()
-            CardName.POISON_PARALYTIC -> TODO()
-            CardName.POISON_HALLUCINOGENIC -> TODO()
-            CardName.POISON_RELAXATION -> TODO()
-            CardName.POISON_DEADLY_1 -> TODO()
-            CardName.POISON_DEADLY_2 -> TODO()
-            CardName.POISON_DEADLY -> TODO()
+            CardName.CHIKAGE_TIP_TOEING -> return tipToeing
+            CardName.CHIKAGE_MUDDLE -> return muddle
+            CardName.CHIKAGE_DEADLY_POISON -> return deadlyPoison
+            CardName.CHIKAGE_HAN_KI_POISON -> return hankiPoison
+            CardName.CHIKAGE_REINCARNATION_POISON -> return reincarnationPoison
+            CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE -> return chikageWayOfLive
+            CardName.POISON_PARALYTIC -> return poisonParalytic
+            CardName.POISON_HALLUCINOGENIC -> return poisonHallucinogenic
+            CardName.POISON_RELAXATION -> return poisonRelaxation
+            CardName.POISON_DEADLY_1 -> return poisonDeadly1
+            CardName.POISON_DEADLY_2 -> return poisonDeadly2
         }
     }
 

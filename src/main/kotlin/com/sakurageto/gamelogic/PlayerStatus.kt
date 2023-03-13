@@ -19,6 +19,8 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var stratagem: Stratagem? = null
 
     var canNotGoForward: Boolean = false
+    var didBasicOperation: Boolean = false
+
     fun auraDamagePossible(data: MutableList<Int>?, damage: Int, possibleList: MutableList<Int>): Boolean{
         var totalAura = 0
         if(data == null || data.size % 2 == 1) return false

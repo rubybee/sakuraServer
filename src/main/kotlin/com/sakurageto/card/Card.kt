@@ -5,6 +5,8 @@ import com.sakurageto.card.CardSet.cardNameHashmapFirst
 import com.sakurageto.card.CardSet.returnCardDataByName
 import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.Umbrella
+import com.sakurageto.protocol.CommandEnum
+import com.sakurageto.protocol.SakuraCardCommand
 import com.sakurageto.protocol.receiveNapInformation
 import kotlin.collections.ArrayDeque
 
@@ -290,6 +292,13 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
 
         when(card_data.card_type){
             CardType.ATTACK -> {
+                for(card in gameStatus.getPlayer(player).enchantment_card.values){
+                    for(text in card.card_data.effect!!){
+                        if(enchantmentUsable(text)){
+                            if(text.tag == TextEffectTag.CAN_NOT_USE_ATTACK) return -2
+                        }
+                    }
+                }
                 if(gameStatus.addPreAttackZone(player, this.makeAttack(player, gameStatus, react_attack).addTextAndReturn(gameStatus.getUmbrella(this.player), this.card_data))){
                     return cost
                 }
@@ -537,16 +546,39 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         }
     }
 
-    suspend fun effectAllMaintainCard(player: PlayerEnum, game_status: GameStatus, effectTag: TextEffectTag){
+    suspend fun effectAllMaintainCard(player: PlayerEnum, game_status: GameStatus, effectTag: TextEffectTag): Int{
+        var now = 0
         card_data.effect?.let {
             for(text in it){
                 if(usedEffectUsable(text)){
-                    if(text.tag == effectTag) text.effect!!(this.card_number, player, game_status, null)
+                    if(text.tag == effectTag) text.effect!!(this.card_number, player, game_status, null)?.let { result ->
+                        now += result
+                    }
                 }
                 else if(enchantmentUsable(text)){
-                    if(text.tag == effectTag) text.effect!!(this.card_number, player, game_status, null)
+                    if(text.tag == effectTag) text.effect!!(this.card_number, player, game_status, null)?.let {result ->
+                        now += result
+                    }
                 }
             }
         }
+        return now
     }
+
+    suspend fun operationForbidCheck(forbidYour: Boolean, command: CommandEnum, game_status: GameStatus): Boolean{
+        val findTag = when(command){
+            CommandEnum.ACTION_GO_BACKWARD -> if(forbidYour) TODO() else TextEffectTag.FORBID_GO_BACKWARD_OTHER
+            CommandEnum.ACTION_BREAK_AWAY -> if(forbidYour) TODO() else TextEffectTag.FORBID_BREAK_AWAY
+            else -> TODO()
+        }
+        card_data.effect?.let {
+            for(text in it){
+                if(enchantmentUsable(text)){
+                    if(text.tag == findTag) return true
+                }
+            }
+        }
+        return false
+    }
+
 }

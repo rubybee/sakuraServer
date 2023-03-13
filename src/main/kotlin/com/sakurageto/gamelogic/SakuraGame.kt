@@ -362,6 +362,10 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
         else{
             game_status.setPlayerFullAction(this.turn_player, false)
             while (true){
+                if(game_status.endCurrentPhase){
+                    game_status.endCurrentPhase = false
+                    return
+                }
                 if(game_status.getEndTurn(this.turn_player)){
                     return
                 }

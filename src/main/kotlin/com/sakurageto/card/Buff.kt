@@ -5,12 +5,12 @@ import com.sakurageto.gamelogic.GameStatus
 
 //condition은 어떠한 공격에 어떠한것을 적용한다에서만 사용한다(다음 오라 3데미지 이하인 공격에 적용 등)
 //양면 대미지와 대응불가의 경우 CHANGE_EACH_IMMEDIATE에 기입하였다
-class CostBuff(val cardNumber: Int, var counter: Int, val tag: BufTag, val condition: (PlayerEnum, GameStatus, Card) -> Boolean, val effect: (Int) -> Int
+class CostBuff(val cardNumber: Int, var counter: Int, val tag: BufTag, val condition: suspend (PlayerEnum, GameStatus, Card) -> Boolean, val effect: suspend (Int) -> Int
 )
 
 
 class Buff(
- val cardNumber: Int, var counter: Int, val tag: BufTag, val condition: (PlayerEnum, GameStatus, MadeAttack) -> Boolean, val effect: (MadeAttack) -> Unit
+ val cardNumber: Int, var counter: Int, val tag: BufTag, val condition: suspend (PlayerEnum, GameStatus, MadeAttack) -> Boolean, val effect: suspend (MadeAttack) -> Unit
 )
 
 class AttackBuffQueue() {
@@ -43,7 +43,7 @@ class AttackBuffQueue() {
         }
     }
 
-    fun applyBuff(index: Int, player: PlayerEnum, game_status: GameStatus, madeAttack: MadeAttack, tempQueue: ArrayDeque<Buff> ){
+    suspend fun applyBuff(index: Int, player: PlayerEnum, game_status: GameStatus, madeAttack: MadeAttack, tempQueue: ArrayDeque<Buff> ){
         for(i in 0 until attackBuff[index].size){
             val now = attackBuff[index].first()
             attackBuff[index].removeFirst()

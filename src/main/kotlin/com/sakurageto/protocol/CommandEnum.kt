@@ -239,6 +239,10 @@ enum class CommandEnum {
             SEAL_OTHER -> return SEAL_YOUR
             POP_SEAL_YOUR -> return POP_SEAL_OTHER
             POP_SEAL_OTHER -> return POP_SEAL_YOUR
+            POP_POISON_BAG_YOUR -> return POP_POISON_BAG_OTHER
+            POP_POISON_BAG_OTHER -> return POP_POISON_BAG_YOUR
+            POISON_BAG_YOUR -> return POISON_BAG_OTHER
+            POISON_BAG_OTHER -> return POISON_BAG_YOUR
             else -> return TODO()
         }
     }

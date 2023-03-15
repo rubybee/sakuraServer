@@ -35,37 +35,11 @@ suspend fun sendRequestEnchantmentCard(player: Connection, card_list_your: Mutab
     player.session.send(Json.encodeToString(dataOtherPre))
     player.session.send(Json.encodeToString(dataOther))
 }
-
-suspend fun sendDestructionNotNormal(mine: Connection, other: Connection, card_number: Int){
-    val data_your = SakuraCardCommand(DESTRUCTION_NOT_NORMAL_ENCHANTMENT_YOUR, card_number)
-    val data_other = SakuraCardCommand(DESTRUCTION_NOT_NORMAL_ENCHANTMENT_OTHER, card_number)
-    mine.session.send(Json.encodeToString(data_your))
-    other.session.send(Json.encodeToString(data_other))
-}
 suspend fun sendDestructionEnchant(mine: Connection, other: Connection, card_number: Int){
     val data_your = SakuraCardCommand(DESTRUCTION_ENCHANTMENT_YOUR, card_number)
     val data_other = SakuraCardCommand(DESTRUCTION_ENCHANTMENT_OTHER, card_number)
     mine.session.send(Json.encodeToString(data_your))
     other.session.send(Json.encodeToString(data_other))
-}
-
-suspend fun sendEnchantmentZone(mine: Connection, other: Connection, card_number: Int){
-    val data_your = SakuraCardCommand(ENCHANTMENT_CARD_YOUR, card_number)
-    val data_other = SakuraCardCommand(ENCHANTMENT_CARD_OTHER, card_number)
-    mine.session.send(Json.encodeToString(data_your))
-    other.session.send(Json.encodeToString(data_other))
-}
-
-suspend fun sendCoverZone(mine: Connection, other: Connection, card_number: Int, public: Boolean){
-    val data_your = SakuraCardCommand(COVER_CARD_YOUR, card_number)
-    val data_other = if(public) SakuraCardCommand(COVER_CARD_OTHER, card_number)
-        else SakuraCardCommand(COVER_CARD_OTHER, -1)
-    mine.session.send(Json.encodeToString(data_your))
-    other.session.send(Json.encodeToString(data_other))
-}
-
-suspend fun sendPopPlayingZone(mine: Connection, other: Connection, card_number: Int){
-    sendPopCardZone(mine, other, card_number, true, POP_PLAYING_YOUR)
 }
 
 suspend fun sendPopCardZone(mine: Connection, other: Connection, card_number: Int, public: Boolean, command: CommandEnum){
@@ -80,14 +54,6 @@ suspend fun sendAddCardZone(mine: Connection, other: Connection, card_number: In
     val dataOther = if(public) SakuraCardCommand(command.Opposite(), card_number) else SakuraCardCommand(command.Opposite(), if(CardSet.isPoison(card_number)) 1 else 0)
     mine.session.send(Json.encodeToString(dataYour))
     other.session.send(Json.encodeToString(dataOther))
-}
-
-suspend fun sendAddDiscardZone(mine: Connection, other: Connection, card_number: Int){
-    sendAddCardZone(mine, other, card_number, public = true, DISCARD_CARD_YOUR)
-}
-
-suspend fun sendAddUsedZone(mine: Connection, other: Connection, card_number: Int){
-    sendAddCardZone(mine, other, card_number, public = true, USED_CARD_YOUR)
 }
 
 suspend fun makeAttackComplete(mine: Connection, other: Connection, card_number: Int){
@@ -227,7 +193,7 @@ suspend fun sendActionRequest(mine: Connection){
 
 suspend fun sendDoBasicAction(mine: Connection, other: Connection, command: CommandEnum, card: Int){
     val data_your = SakuraCardCommand(command, card)
-    val data_other = SakuraCardCommand(command.Opposite(), card)
+    val data_other = SakuraCardCommand(command.Opposite(), if(card == -1) -1 else 0)
     mine.session.send(Json.encodeToString(data_your))
     other.session.send(Json.encodeToString(data_other))
 }

@@ -582,10 +582,18 @@ object CardSet {
             null
         })
         jjockbae.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
-            game_status.addImmediateLifeListener(player, ImmediateBackListener(
-                card_number
-            ) { before, after, _ ->
-                before > 3 && after <= 3
+            game_status.addImmediateLifeListener(player, Listener(player, card_number) {gameStatus, cardNumber, beforeLife,
+                afterLife, _, _ ->
+                if(beforeLife > 3 && afterLife < 3){
+                    gameStatus.popCardFrom(player, cardNumber, LocationEnum.USED_CARD, true)?.let {
+                        it.special_card_state = SpecialCardEnum.UNUSED
+                        gameStatus.insertCardTo(player, it, LocationEnum.SPECIAL_CARD, true)
+                    }
+                    true
+                }
+                else{
+                    false
+                }
             })
             null
         })
@@ -1251,9 +1259,11 @@ object CardSet {
         flutteringSnowflake.setAttackFold(DistanceType.CONTINUOUS, Pair(3, 6), null, 3, 1)
         flutteringSnowflake.setAttackUnfold(DistanceType.CONTINUOUS, Pair(0, 2), null, 0, 0)
         flutteringSnowflake.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
-            game_status.addImmediateUmbrellaListener(player, ImmediateBackListener(
-                card_number
-            ) { _, _, _ ->
+            game_status.addImmediateUmbrellaListener(player, Listener(player, card_number){gameStatus, cardNumber, _, _, _, _ ->
+                gameStatus.popCardFrom(player, cardNumber, LocationEnum.USED_CARD, true)?.let {
+                    it.special_card_state = SpecialCardEnum.UNUSED
+                    gameStatus.insertCardTo(player, it, LocationEnum.SPECIAL_CARD, true)
+                }
                 true
             })
             null
@@ -1369,8 +1379,14 @@ object CardSet {
         kiben.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.RUN_STRATAGEM){card_number, player, game_status, _ ->
             when(game_status.getStratagem(player)){
                 Stratagem.SHIN_SAN -> {
+                    var index = 0
                     for(i in 1..3){
-                        val card: Card = game_status.popCardFrom(player.opposite(), -1, LocationEnum.YOUR_DECK_TOP, false)?: break
+                        val card: Card = game_status.getPlayer(player.opposite()).normalCardDeck[index]
+                        if(card.card_data.canCover) game_status.popCardFrom(player.opposite(), card.card_number, LocationEnum.DECK, false)?: break
+                        else {
+                            index += 1
+                            continue
+                        }
                         game_status.insertCardTo(player.opposite(), card, LocationEnum.COVER_CARD, false)
                     }
                     setStratagemByUser(game_status, player, SHINRA_SHINRA_CARD_NUMBER)
@@ -1712,7 +1728,7 @@ object CardSet {
                     game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS, {_, _, _ ->
                     true}, {madeAttack ->
                         madeAttack.run {
-                            if(aura_damage <= 3) auraPlusMinus(2);
+                            if(aura_damage <= 3) auraPlusMinus(2)
                             else lifePlusMinus(1)
                         }
                     }))
@@ -1757,8 +1773,8 @@ object CardSet {
             }, {madeAttack ->
                 madeAttack.run {
                     val temp = abs(game_status.getAdjustDistance(player) - game_status.startTurnDistance)
-                    tempForGrandSkyHole = temp;
-                    aura_damage = temp;
+                    tempForGrandSkyHole = temp
+                    aura_damage = temp
                     life_damage = if(temp % 2 == 0) temp / 2 else temp / 2 + 1
                 }
             }))
@@ -1860,6 +1876,9 @@ object CardSet {
         return cardList
     }
 
+    private fun cardUsedCheck(card: Card, player: PlayerEnum): Boolean = card.player == player && card.card_data.card_class == CardClass.SPECIAL &&
+            card.special_card_state != SpecialCardEnum.PLAYED && card.card_data.card_name != CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE
+
     private fun chikageCardInit(){
         throwKunai.setAttack(DistanceType.CONTINUOUS, Pair(4, 5), null, 2, 2)
         poisonNeedle.setAttack(DistanceType.CONTINUOUS, Pair(4, 4), null, 1, 1)
@@ -1939,6 +1958,46 @@ object CardSet {
         reincarnationPoison.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.RETURN){_, player, game_status, _ ->
             if(game_status.getPlayerHandSize(player.opposite()) >= 2) 1
             else 0
+        })
+        chikageWayOfLive.setSpecial(5)
+        chikageWayOfLive.setEnchantment(4)
+        chikageWayOfLive.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.ADD_LISTENER) {card_number, player, game_status, _ ->
+            game_status.addImmediateLifeListener(player, Listener(player, card_number) {gameStatus, cardNumber, _,
+                                                                                         _, _, damage ->
+                if(damage){
+                    gameStatus.popCardFrom(player, cardNumber, LocationEnum.ENCHANTMENT_ZONE, true)?.let {
+                        gameStatus.cardToDust(player, it.nap, it)
+                        gameStatus.insertCardTo(it.player, it, LocationEnum.SPECIAL_CARD, true)
+                    }
+                    true
+                }
+                else{
+                    false
+                }
+            })
+            null
+        })
+        chikageWayOfLive.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.GAME_END) {card_number, player, game_status, _ ->
+            game_status.popCardFrom(player, card_number, LocationEnum.ENCHANTMENT_ZONE, true)?.let ret@{
+                for(card in game_status.getPlayer(PlayerEnum.PLAYER1).enchantment_card.values){
+                    if(cardUsedCheck(card, player)){
+                        return@ret
+                    }
+                }
+                for(card in game_status.getPlayer(PlayerEnum.PLAYER2).enchantment_card.values){
+                    if(cardUsedCheck(card, player)){
+                        return@ret
+                    }
+                }
+                for(card in game_status.getPlayer(player).special_card_deck.values){
+                    if(cardUsedCheck(card, player)){
+                        return@ret
+                    }
+                }
+                game_status.gameEnd(player)
+            }
+
+            null
         })
         poisonParalytic.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USING_CONDITION) {_, player, game_status, _ ->
             if(game_status.getPlayer(player).didBasicOperation) 0

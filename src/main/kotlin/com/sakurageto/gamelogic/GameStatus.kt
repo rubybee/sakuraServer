@@ -54,11 +54,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     var thisTurnDistance = 10
     var dust = 0
 
-    var player1LifeListener: ArrayDeque<ImmediateBackListener> = ArrayDeque()
-    var player2LifeListener: ArrayDeque<ImmediateBackListener> = ArrayDeque()
+    var player1Listener: ArrayDeque<Listener> = ArrayDeque()
+    var player2Listener: ArrayDeque<Listener> = ArrayDeque()
 
-    val player1UmbrellaListener: ArrayDeque<ImmediateBackListener> = ArrayDeque()
-    val player2UmbrellaListener: ArrayDeque<ImmediateBackListener> = ArrayDeque()
+    val player1UmbrellaListener: ArrayDeque<Listener> = ArrayDeque()
+    val player2UmbrellaListener: ArrayDeque<Listener> = ArrayDeque()
 
     private var player1TempAttackBuff = AttackBuffQueue()
     private var player2TempAttackBuff = AttackBuffQueue()
@@ -199,14 +199,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return receiveCardEffectSelect(getSocket(player), card_number)
     }
 
-    fun addImmediateLifeListener(player: PlayerEnum, listener: ImmediateBackListener){
+    fun addImmediateLifeListener(player: PlayerEnum, listener: Listener){
         when(player){
-            PlayerEnum.PLAYER1 -> player1LifeListener.addLast(listener)
-            PlayerEnum.PLAYER2 -> player2LifeListener.addLast(listener)
+            PlayerEnum.PLAYER1 -> player1Listener.addLast(listener)
+            PlayerEnum.PLAYER2 -> player2Listener.addLast(listener)
         }
     }
 
-    fun addImmediateUmbrellaListener(player: PlayerEnum, listener: ImmediateBackListener){
+    fun addImmediateUmbrellaListener(player: PlayerEnum, listener: Listener){
         when(player){
             PlayerEnum.PLAYER1 -> player1UmbrellaListener.addLast(listener)
             PlayerEnum.PLAYER2 -> player2UmbrellaListener.addLast(listener)
@@ -376,7 +376,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
             else -> {
                 TODO("유저에게 리스트 전송, 그 중 숫자 받고 moveTokenUsingInt() call")
-                false
+                //false
             }
         }
     }
@@ -613,35 +613,29 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     }
 
-    suspend fun lifeListenerProcess(player: PlayerEnum, before: Int, reconstruct: Boolean){
-        val now_player = getPlayer(player)
+    suspend fun lifeListenerProcess(player: PlayerEnum, before: Int, reconstruct: Boolean, damage: Boolean){
+        val nowPlayer = getPlayer(player)
         when(player){
             PlayerEnum.PLAYER1 -> {
-                if(!player1LifeListener.isEmpty()){
-                    for(i in 0..player1LifeListener.size){
-                        if(player1LifeListener.isEmpty()) break
-                        val now = player1LifeListener.first()
-                        player1LifeListener.removeFirst()
-                        if(now.IsItBack(before, now_player.life, reconstruct)){
-                            returnSpecialCard(player, now.card_number)
-                        }
-                        else{
-                            player1LifeListener.addLast(now)
+                if(!player1Listener.isEmpty()){
+                    for(i in 0..player1Listener.size){
+                        if(player1Listener.isEmpty()) break
+                        val now = player1Listener.first()
+                        player1Listener.removeFirst()
+                        if(!(now.doAction(this, before, nowPlayer.life, reconstruct, damage))){
+                            player1Listener.addLast(now)
                         }
                     }
                 }
             }
             PlayerEnum.PLAYER2 -> {
-                if(!player2LifeListener.isEmpty()){
-                    for(i in 0..player2LifeListener.size){
-                        if(player2LifeListener.isEmpty()) break
-                        val now = player2LifeListener.first()
-                        player2LifeListener.removeFirst()
-                        if(now.IsItBack(before, now_player.life, reconstruct)){
-                            returnSpecialCard(player, now.card_number)
-                        }
-                        else{
-                            player2LifeListener.addLast(now)
+                if(!player2Listener.isEmpty()){
+                    for(i in 0..player2Listener.size){
+                        if(player2Listener.isEmpty()) break
+                        val now = player2Listener.first()
+                        player2Listener.removeFirst()
+                        if(!(now.doAction(this, before, nowPlayer.life, reconstruct, damage))){
+                            player2Listener.addLast(now)
                         }
                     }
                 }
@@ -662,8 +656,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             return true
         }
 
-        lifeListenerProcess(player, before, false)
-        chasmProcess(player)
+        lifeListenerProcess(player, before, reconstruct = false, damage = false)
 
         sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.YOUR_LIFE, LocationEnum.DUST, number, -1)
@@ -671,8 +664,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     //return endgame
-    suspend fun lifeToSelfFlare(player: PlayerEnum, number: Int, reconstruct: Boolean): Boolean{
-        if(number == 0) return false
+    suspend fun lifeToSelfFlare(player: PlayerEnum, number: Int, reconstruct: Boolean, damage: Boolean){
+        if(number == 0) {
+            gameEnd(player.opposite())
+        }
 
         val nowPlayer = getPlayer(player)
 
@@ -683,15 +678,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             nowPlayer.flare += number
         }
         else{
-            return true
+            gameEnd(player.opposite())
         }
 
-        lifeListenerProcess(player, before, reconstruct)
+        lifeListenerProcess(player, before, reconstruct, damage)
 
         sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.YOUR_LIFE, LocationEnum.YOUR_FLARE, number, -1)
-
-        return false
     }
 
     suspend fun addAllCardTextBuff(player: PlayerEnum){
@@ -963,8 +956,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             return
         }
 
-        var nowTempAttackBuff = getPlayerTempAttackBuff(player)
-        var nowTempRangeBuff = getPlayerTempRangeBuff(player)
+        val nowTempAttackBuff = getPlayerTempAttackBuff(player)
+        val nowTempRangeBuff = getPlayerTempRangeBuff(player)
 
         when(player){
             PlayerEnum.PLAYER1 -> {
@@ -1054,7 +1047,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     card.addReturnListener(card.player, this)
                     card.special_card_state = SpecialCardEnum.PLAYED
                     insertCardTo(card.player, card, LocationEnum.USED_CARD, true)
-                    print(getPlayer(card.player).usedSpecialCard)
                 }
                 CardClass.NORMAL -> {
                     insertCardTo(card.player, card, LocationEnum.DISCARD, true)
@@ -1305,9 +1297,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
             else{
                 logger.insert(Log(player, LogText.GET_LIFE_DAMAGE, damage.second, damage.second))
-                if(lifeToSelfFlare(player, damage.second, reconstruct)) {
-                    gameEnd(player.opposite())
-                }
+                lifeToSelfFlare(player, damage.second, reconstruct, true)
                 if(!reconstruct) chasmProcess(player)
             }
         }
@@ -1729,13 +1719,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
             LocationEnum.ENCHANTMENT_ZONE -> {
                 val result = nowPlayer.enchantment_card[card_number]?: return null
-                sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_ENCHANTMENT_YOUR)
+                sendPopCardZone(nowSocket, otherSocket, result.card_number, public, CommandEnum.POP_ENCHANTMENT_YOUR)
                 nowPlayer.enchantment_card.remove(card_number)
                 return result
             }
             LocationEnum.YOUR_DECK_TOP -> {
                 if(nowPlayer.normalCardDeck.isEmpty()) return null
                 val result = nowPlayer.normalCardDeck.first()
+                sendPopCardZone(nowSocket, otherSocket, result.card_number, public, CommandEnum.POP_DECK_YOUR)
                 nowPlayer.normalCardDeck.removeFirst()
                 return result
             }
@@ -1850,7 +1841,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    fun getUmbrellaListener(player: PlayerEnum): ArrayDeque<ImmediateBackListener>{
+    fun getUmbrellaListener(player: PlayerEnum): ArrayDeque<Listener>{
         return when(player){
             PlayerEnum.PLAYER1 -> player1UmbrellaListener
             PlayerEnum.PLAYER2 -> player2UmbrellaListener
@@ -1868,11 +1859,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     if(umbrellaListener.isEmpty()) break
                     val now = umbrellaListener.first()
                     umbrellaListener.removeFirst()
-                    if(now.IsItBack(-1, -1, false)){
-                        returnSpecialCard(player, now.card_number)
-                    }
-                    else{
-                        player1LifeListener.addLast(now)
+                    if(!(now.doAction(this, -1, -1, false, false))){
+                        player1Listener.addLast(now)
                     }
                 }
             }

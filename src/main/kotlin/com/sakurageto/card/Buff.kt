@@ -19,21 +19,24 @@ class AttackBuffQueue() {
         ArrayDeque(),
         ArrayDeque(),
         ArrayDeque(),
+        ArrayDeque(),
         ArrayDeque()
     )
 
     fun addAttackBuff(buf: Buff) {
         when (buf.tag) {
-            INSERT -> attackBuff[0].add(buf)
-            CHANGE_EACH -> attackBuff[1].add(buf)
-            MULTIPLE -> attackBuff[2].add(buf)
-            DIVIDE -> attackBuff[3].add(buf)
-            PLUS_MINUS -> attackBuff[4].add(buf)
-            INSERT_IMMEDIATE -> attackBuff[0].add(buf)
-            CHANGE_EACH_IMMEDIATE -> attackBuff[1].add(buf)
-            MULTIPLE_IMMEDIATE -> attackBuff[2].add(buf)
-            DIVIDE_IMMEDIATE -> attackBuff[3].add(buf)
-            PLUS_MINUS_IMMEDIATE -> attackBuff[4].add(buf)
+            CARD_CHANGE -> attackBuff[0].add(buf)
+            INSERT -> attackBuff[1].add(buf)
+            CHANGE_EACH -> attackBuff[2].add(buf)
+            MULTIPLE -> attackBuff[3].add(buf)
+            DIVIDE -> attackBuff[4].add(buf)
+            PLUS_MINUS -> attackBuff[5].add(buf)
+            CARD_CHANGE_IMMEDIATE -> attackBuff[0].add(buf)
+            INSERT_IMMEDIATE -> attackBuff[1].add(buf)
+            CHANGE_EACH_IMMEDIATE -> attackBuff[2].add(buf)
+            MULTIPLE_IMMEDIATE -> attackBuff[3].add(buf)
+            DIVIDE_IMMEDIATE -> attackBuff[4].add(buf)
+            PLUS_MINUS_IMMEDIATE -> attackBuff[5].add(buf)
         }
     }
 
@@ -68,21 +71,24 @@ class RangeBuffQueue() {
         ArrayDeque(),
         ArrayDeque(),
         ArrayDeque(),
+        ArrayDeque(),
         ArrayDeque()
     )
 
     fun addRangeBuff(buff: RangeBuff) {
         when (buff.tag) {
-            RangeBufTag.CHANGE -> rangeBuff[0].add(buff)
-            RangeBufTag.ADD -> rangeBuff[1].add(buff)
-            RangeBufTag.DELETE -> rangeBuff[2].add(buff)
-            RangeBufTag.PLUS -> rangeBuff[3].add(buff)
-            RangeBufTag.MINUS -> rangeBuff[4].add(buff)
-            RangeBufTag.CHANGE_IMMEDIATE -> rangeBuff[0].add(buff)
-            RangeBufTag.ADD_IMMEDIATE -> rangeBuff[1].add(buff)
-            RangeBufTag.DELETE_IMMEDIATE -> rangeBuff[2].add(buff)
-            RangeBufTag.PLUS_IMMEDIATE -> rangeBuff[3].add(buff)
-            RangeBufTag.MINUS_IMMEDIATE -> rangeBuff[4].add(buff)
+            RangeBufTag.CARD_CHANGE -> rangeBuff[0].add(buff)
+            RangeBufTag.CHANGE -> rangeBuff[1].add(buff)
+            RangeBufTag.ADD -> rangeBuff[2].add(buff)
+            RangeBufTag.DELETE -> rangeBuff[3].add(buff)
+            RangeBufTag.PLUS -> rangeBuff[4].add(buff)
+            RangeBufTag.MINUS -> rangeBuff[5].add(buff)
+            RangeBufTag.CARD_CHANGE_IMMEDIATE -> rangeBuff[0].add(buff)
+            RangeBufTag.CHANGE_IMMEDIATE -> rangeBuff[1].add(buff)
+            RangeBufTag.ADD_IMMEDIATE -> rangeBuff[2].add(buff)
+            RangeBufTag.DELETE_IMMEDIATE -> rangeBuff[3].add(buff)
+            RangeBufTag.PLUS_IMMEDIATE -> rangeBuff[4].add(buff)
+            RangeBufTag.MINUS_IMMEDIATE -> rangeBuff[5].add(buff)
         }
     }
 
@@ -172,11 +178,13 @@ fun cleanCostTempBuff(array: Array<ArrayDeque<CostBuff>>){
 }
 
 enum class BufTag {
+    CARD_CHANGE,
     INSERT,
     CHANGE_EACH,
     MULTIPLE,
     DIVIDE,
     PLUS_MINUS,
+    CARD_CHANGE_IMMEDIATE,
     INSERT_IMMEDIATE,
     CHANGE_EACH_IMMEDIATE,
     MULTIPLE_IMMEDIATE,
@@ -185,11 +193,13 @@ enum class BufTag {
 }
 
 enum class RangeBufTag {
+    CARD_CHANGE,
     CHANGE,
     ADD,
     DELETE,
     PLUS,
     MINUS,
+    CARD_CHANGE_IMMEDIATE,
     CHANGE_IMMEDIATE,
     ADD_IMMEDIATE,
     DELETE_IMMEDIATE,

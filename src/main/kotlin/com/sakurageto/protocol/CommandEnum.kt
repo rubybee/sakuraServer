@@ -152,11 +152,15 @@ enum class CommandEnum {
     SHOW_COVER_OTHER,
 
     SELECT_CARD_EFFECT,
+    SELECT_NOT,
     SELECT_ONE,
     SELECT_TWO,
-    SELECT_NOT,
     SELECT_THREE,
     SELECT_FOUR,
+    SELECT_FIVE,
+    SELECT_SIX,
+    SELECT_SEVEN,
+    SELECT_EIGHT,
 
     //from mooembuck
     SELECT_AURA_DAMAGE_PLACE,

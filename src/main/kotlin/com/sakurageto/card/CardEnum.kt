@@ -171,8 +171,24 @@ enum class CardName {
     POISON_HALLUCINOGENIC,
     POISON_RELAXATION,
     POISON_DEADLY_1,
-    POISON_DEADLY_2;
+    POISON_DEADLY_2,
 
+    KURURU_ELEKITTEL,
+    KURURU_ACCELERATOR,
+    KURURU_KURURUOONG,
+    KURURU_TORNADO,
+    KURURU_REGAINER,
+    KURURU_MODULE,
+    KURURU_REFLECTOR,
+
+    KURURU_DRAIN_DEVIL,
+    KURURU_BIG_GOLEM,
+    KURURU_INDUSTRIA,
+    KURURU_KANSHOUSOUCHI_KURURUSIK,
+
+    KURURU_DUPLICATED_GEAR_1,
+    KURURU_DUPLICATED_GEAR_2,
+    KURURU_DUPLICATED_GEAR_3;
 
     companion object {
         fun returnNormalCardNameByMegami(megami_name: MegamiEnum):List<CardName>{
@@ -219,6 +235,11 @@ enum class CardName {
                     CHIKAGE_CUTTING_NECK, CHIKAGE_POISON_SMOKE, CHIKAGE_TIP_TOEING,
                     CHIKAGE_MUDDLE
                 )
+                MegamiEnum.KURURU -> listOf(
+                    KURURU_ELEKITTEL, KURURU_ACCELERATOR, KURURU_KURURUOONG,
+                    KURURU_TORNADO, KURURU_REGAINER, KURURU_MODULE,
+                    KURURU_REFLECTOR
+                )
             }
         }
 
@@ -262,6 +283,10 @@ enum class CardName {
                     CHIKAGE_DEADLY_POISON, CHIKAGE_HAN_KI_POISON,
                     CHIKAGE_REINCARNATION_POISON, CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE
                 )
+                MegamiEnum.KURURU -> listOf(
+                    KURURU_DRAIN_DEVIL, KURURU_BIG_GOLEM, KURURU_INDUSTRIA,
+                    KURURU_KANSHOUSOUCHI_KURURUSIK
+                )
             }
         }
 
@@ -277,6 +302,9 @@ enum class CardName {
                 MegamiEnum.SHINRA -> listOf()
                 MegamiEnum.HAGANE -> listOf()
                 MegamiEnum.CHIKAGE -> listOf()
+                MegamiEnum.KURURU -> listOf(
+                    KURURU_DUPLICATED_GEAR_1, KURURU_DUPLICATED_GEAR_2, KURURU_DUPLICATED_GEAR_3
+                )
             }
         }
 

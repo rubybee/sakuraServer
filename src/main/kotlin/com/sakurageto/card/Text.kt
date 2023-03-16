@@ -64,5 +64,7 @@ enum class TextEffectTag {
     END_CURRENT_PHASE,
     CAN_NOT_USE_ATTACK,
     ADD_LISTENER,
+    DAMAGE,
+    CAN_USE_COVER,
     RUN_STRATAGEM;
 }

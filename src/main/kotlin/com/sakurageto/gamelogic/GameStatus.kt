@@ -862,7 +862,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val nowPlayer = getPlayer(player)
 
         when(effect.tag){
-            BufTag.INSERT, BufTag.CHANGE_EACH, BufTag.MULTIPLE, BufTag.DIVIDE, BufTag.PLUS_MINUS -> {
+            BufTag.CARD_CHANGE, BufTag.INSERT, BufTag.CHANGE_EACH, BufTag.MULTIPLE, BufTag.DIVIDE, BufTag.PLUS_MINUS -> {
                 nowPlayer.attackBuff.addAttackBuff(effect)
             }
             else -> getPlayerTempAttackBuff(player).addAttackBuff(effect)
@@ -874,7 +874,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val nowTempRangeBuff = getPlayerTempRangeBuff(player)
 
         when(effect.tag){
-            RangeBufTag.CHANGE, RangeBufTag.ADD, RangeBufTag.DELETE, RangeBufTag.PLUS, RangeBufTag.MINUS-> {
+            RangeBufTag.CARD_CHANGE, RangeBufTag.CHANGE, RangeBufTag.ADD, RangeBufTag.DELETE, RangeBufTag.PLUS, RangeBufTag.MINUS-> {
                 nowPlayer.rangeBuff.addRangeBuff(effect)
             }
             else -> nowTempRangeBuff.addRangeBuff(effect)
@@ -917,8 +917,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun useCardFrom(player: PlayerEnum, card: Card, location: LocationEnum, react: Boolean, react_attack: MadeAttack?,
-                            reactAttackBuffQueue: AttackBuffQueue?, reactRangeBuffQueue: RangeBuffQueue?): Boolean{
-        val cost = card.canUse(player, this, react_attack)
+                            reactAttackBuffQueue: AttackBuffQueue?, reactRangeBuffQueue: RangeBuffQueue?, isCost: Boolean): Boolean{
+        val cost = card.canUse(player, this, react_attack, isCost)
         if(cost != -2){
             if(location == LocationEnum.COVER_CARD && react) logger.insert(Log(player, LogText.USE_CARD_IN_COVER_AND_REACT, card.card_number, card.card_number))
             else if(location == LocationEnum.COVER_CARD) logger.insert(Log(player, LogText.USE_CARD_IN_COVER, card.card_number, card.card_number))
@@ -984,14 +984,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 if(react.first == CommandEnum.REACT_USE_CARD_HAND){
                     val card = otherPlayer.getCardFromHand(react.second)?: continue
                     if(reactCheck(player.opposite(), card, nowAttack)){
-                        if(useCardFrom(player.opposite(), card, LocationEnum.HAND, true, nowAttack, nowTempAttackBuff, nowTempRangeBuff)) break
+                        if(useCardFrom(player.opposite(), card, LocationEnum.HAND, true, nowAttack, nowTempAttackBuff, nowTempRangeBuff, true)) break
                     }
 
                 }
                 else if(react.first == CommandEnum.REACT_USE_CARD_SPECIAL){
                     val card = otherPlayer.getCardFromSpecial(react.second)?: continue
                     if(reactCheck(player.opposite(), card, nowAttack)){
-                        if(useCardFrom(player.opposite(), card, LocationEnum.SPECIAL_CARD, true, nowAttack, nowTempAttackBuff, nowTempRangeBuff)) break
+                        if(useCardFrom(player.opposite(), card, LocationEnum.SPECIAL_CARD, true, nowAttack, nowTempAttackBuff, nowTempRangeBuff, true)) break
                     }
                 }
                 else{
@@ -1374,7 +1374,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             val receive = receiveSelectCard(nowSocket, list, CommandEnum.SELECT_CARD_REASON_INSTALLATION, -1)?: continue
             if (receive.size == 1){
                 val card = nowPlayer.getCardFromCover(receive[0])?: continue
-                if (useCardFrom(player, card, LocationEnum.COVER_CARD, false, null, null, null)) {
+                if (useCardFrom(player, card, LocationEnum.COVER_CARD, false, null, null, null, true)) {
                     break
                 }
             }
@@ -1422,11 +1422,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
         if(commandEnum == CommandEnum.ACTION_USE_CARD_HAND){
             val card = getCardFrom(player, card_number, LocationEnum.HAND)?: return false
-            if(useCardFrom(player, card, LocationEnum.HAND, false, null, null, null)) return true
+            if(useCardFrom(player, card, LocationEnum.HAND, false, null, null, null, true)) return true
         }
         else if(commandEnum == CommandEnum.ACTION_USE_CARD_SPECIAL){
             val card = getCardFrom(player, card_number, LocationEnum.SPECIAL_CARD)?: return false
-            if(useCardFrom(player, card, LocationEnum.SPECIAL_CARD, false, null, null, null)) return true
+            if(useCardFrom(player, card, LocationEnum.SPECIAL_CARD, false, null, null, null, true)) return true
         }
         else{
             return false

@@ -14,6 +14,9 @@ class MadeAttack(
     var distance_uncont: Array<Boolean>?,
     var megami: MegamiEnum
 ) {
+    var kururuChangeRangeUpper = false
+    var kururuChangeRangeUnder = false
+
     var isItValid= true
     var isItDamage = true
 

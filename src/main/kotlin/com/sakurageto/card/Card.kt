@@ -6,7 +6,6 @@ import com.sakurageto.card.CardSet.returnCardDataByName
 import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.Umbrella
 import com.sakurageto.protocol.CommandEnum
-import com.sakurageto.protocol.SakuraCardCommand
 import com.sakurageto.protocol.receiveNapInformation
 import kotlin.collections.ArrayDeque
 
@@ -268,7 +267,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
     }
 
     //-2: can't use                    -1: can use                 >= 0: cost
-    suspend fun canUse(player: PlayerEnum, gameStatus: GameStatus, react_attack: MadeAttack?): Int{
+    suspend fun canUse(player: PlayerEnum, gameStatus: GameStatus, react_attack: MadeAttack?, isCost: Boolean): Int{
         if(card_data.sub_type == SubType.FULL_POWER && !gameStatus.getPlayerFullAction(player)) return -2
 
         if(!textUseCheck(player, gameStatus, react_attack)){
@@ -278,12 +277,17 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         val cost: Int
 
         if(card_data.card_class == CardClass.SPECIAL){
-            this.thisCardCostBuff(player, gameStatus)
-            gameStatus.addAllCardCostBuff()
-            cost = gameStatus.applyAllCostBuff(player, this.getBaseCost(player, gameStatus), this)
-            if(cost > gameStatus.getPlayerFlare(player)){
-                gameStatus.cleanCostBuff()
-                return -2
+            if(isCost){
+                this.thisCardCostBuff(player, gameStatus)
+                gameStatus.addAllCardCostBuff()
+                cost = gameStatus.applyAllCostBuff(player, this.getBaseCost(player, gameStatus), this)
+                if(cost > gameStatus.getPlayerFlare(player)){
+                    gameStatus.cleanCostBuff()
+                    return -2
+                }
+            }
+            else{
+                cost = 0
             }
         }
         else{
@@ -356,7 +360,9 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
     }
 
     suspend fun enchantmentUseNormal(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?) {
-        val now_need_nap = returnNap(player, game_status, react_attack)
+        var now_need_nap = returnNap(player, game_status, react_attack) + game_status.getPlayer(player).napBuff
+        if(now_need_nap < 0) now_need_nap = 0
+        game_status.getPlayer(player).napBuff = 0
         if (now_need_nap > game_status.getPlayerAura(player) + game_status.dust) {
             game_status.dustToCard(player, game_status.dust, this)
             game_status.auraToCard(player, game_status.getPlayerAura(player), this)
@@ -565,7 +571,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         return now
     }
 
-    suspend fun operationForbidCheck(forbidYour: Boolean, command: CommandEnum, game_status: GameStatus): Boolean{
+    fun operationForbidCheck(forbidYour: Boolean, command: CommandEnum, game_status: GameStatus): Boolean{
         val findTag = when(command){
             CommandEnum.ACTION_GO_BACKWARD -> if(forbidYour) TODO() else TextEffectTag.FORBID_GO_BACKWARD_OTHER
             CommandEnum.ACTION_BREAK_AWAY -> if(forbidYour) TODO() else TextEffectTag.FORBID_BREAK_AWAY

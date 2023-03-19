@@ -267,6 +267,11 @@ suspend fun sendGetStratagem(mine: Connection, other: Connection, stratagem: Str
     other.session.send(Json.encodeToString(dataOther))
 }
 
+suspend fun sendRequestBasicOperation(mine: Connection, card_number: Int){
+    val data = SakuraCardCommand(REQUEST_BASIC_OPERATION, card_number)
+    mine.session.send(Json.encodeToString(data))
+}
+
 //receive function
 suspend fun waitUntil(player: Connection, wait_command: CommandEnum): SakuraSendData {
     val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
@@ -649,4 +654,27 @@ suspend fun receiveSelectCardMain(player: Connection, card_list: MutableList<Int
         }
     }
     return receiveSelectCardMain(player, card_list, reason, card_number)
+}
+
+suspend fun receiveBasicOperation(player: Connection, card_number: Int): CommandEnum{
+    sendRequestBasicOperation(player, card_number)
+    return receiveBasicOperationMain(player)
+}
+
+suspend fun receiveBasicOperationMain(player: Connection): CommandEnum{
+    val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
+
+    for(frame in player.session.incoming){
+        if (frame is Frame.Text) {
+            val text = frame.readText()
+            try {
+                val data = json.decodeFromString<SakuraCardCommand>(text)
+                return data.command
+            }catch (e: Exception){
+                continue
+            }
+
+        }
+    }
+    return receiveBasicOperationMain(player)
 }

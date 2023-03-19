@@ -213,6 +213,23 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
+    private val player1ReconstructListener: ArrayDeque<Listener> = ArrayDeque()
+    private val player2ReconstructListener: ArrayDeque<Listener> = ArrayDeque()
+
+    fun addImmediateReconstructListener(player: PlayerEnum, listener: Listener){
+        when(player){
+            PlayerEnum.PLAYER1 -> player1ReconstructListener.addLast(listener)
+            PlayerEnum.PLAYER2 -> player2ReconstructListener.addLast(listener)
+        }
+    }
+
+    fun getImmediateReconstructListener(player: PlayerEnum): ArrayDeque<Listener>{
+        return when(player){
+            PlayerEnum.PLAYER1 -> player1ReconstructListener
+            PlayerEnum.PLAYER2 -> player2ReconstructListener
+        }
+    }
+
     suspend fun moveTokenUsingInt(player: PlayerEnum, place: Int, number: Int, card: Card){
         if(place == 9) cardToDistance(player, number, card)
         else{
@@ -236,6 +253,19 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return false
     }
 
+    suspend fun auraToAura(playerGive: PlayerEnum, playerGet: PlayerEnum, number: Int){
+        if(number == 0) return
+        var value = number
+
+        if(getPlayerAura(playerGive) < value) value = getPlayerAura(playerGive)
+        if(getPlayerAura(playerGet) + value > getPlayer(playerGet).maxAura) value = getPlayer(playerGet).maxAura - getPlayerAura(playerGet)
+
+        getPlayer(playerGive).aura -= value
+        getPlayer(playerGet).aura += value
+
+        sendMoveToken(getSocket(playerGive), getSocket(playerGet), TokenEnum.SAKURA_TOKEN,
+            LocationEnum.YOUR_AURA, LocationEnum.OTHER_AURA, value, -1)
+    }
 
     suspend fun auraToDistance(player: PlayerEnum, number: Int){
         if(number == 0) return
@@ -618,7 +648,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         when(player){
             PlayerEnum.PLAYER1 -> {
                 if(!player1Listener.isEmpty()){
-                    for(i in 0..player1Listener.size){
+                    for(i in 1..player1Listener.size){
                         if(player1Listener.isEmpty()) break
                         val now = player1Listener.first()
                         player1Listener.removeFirst()
@@ -630,7 +660,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
             PlayerEnum.PLAYER2 -> {
                 if(!player2Listener.isEmpty()){
-                    for(i in 0..player2Listener.size){
+                    for(i in 1..player2Listener.size){
                         if(player2Listener.isEmpty()) break
                         val now = player2Listener.first()
                         player2Listener.removeFirst()
@@ -917,8 +947,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun useCardFrom(player: PlayerEnum, card: Card, location: LocationEnum, react: Boolean, react_attack: MadeAttack?,
-                            reactAttackBuffQueue: AttackBuffQueue?, reactRangeBuffQueue: RangeBuffQueue?, isCost: Boolean): Boolean{
-        val cost = card.canUse(player, this, react_attack, isCost)
+                            reactAttackBuffQueue: AttackBuffQueue?, reactRangeBuffQueue: RangeBuffQueue?, isCost: Boolean, isConsume: Boolean): Boolean{
+        val cost = card.canUse(player, this, react_attack, isCost, isConsume)
         if(cost != -2){
             if(location == LocationEnum.COVER_CARD && react) logger.insert(Log(player, LogText.USE_CARD_IN_COVER_AND_REACT, card.card_number, card.card_number))
             else if(location == LocationEnum.COVER_CARD) logger.insert(Log(player, LogText.USE_CARD_IN_COVER, card.card_number, card.card_number))
@@ -984,14 +1014,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 if(react.first == CommandEnum.REACT_USE_CARD_HAND){
                     val card = otherPlayer.getCardFromHand(react.second)?: continue
                     if(reactCheck(player.opposite(), card, nowAttack)){
-                        if(useCardFrom(player.opposite(), card, LocationEnum.HAND, true, nowAttack, nowTempAttackBuff, nowTempRangeBuff, true)) break
+                        if(useCardFrom(player.opposite(), card, LocationEnum.HAND, true, nowAttack, nowTempAttackBuff, nowTempRangeBuff, true, true)) break
                     }
 
                 }
                 else if(react.first == CommandEnum.REACT_USE_CARD_SPECIAL){
                     val card = otherPlayer.getCardFromSpecial(react.second)?: continue
                     if(reactCheck(player.opposite(), card, nowAttack)){
-                        if(useCardFrom(player.opposite(), card, LocationEnum.SPECIAL_CARD, true, nowAttack, nowTempAttackBuff, nowTempRangeBuff, true)) break
+                        if(useCardFrom(player.opposite(), card, LocationEnum.SPECIAL_CARD, true, nowAttack, nowTempAttackBuff, nowTempRangeBuff, true, true)) break
                     }
                 }
                 else{
@@ -1057,6 +1087,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun afterCardUsed(card_number: Int, player: PlayerEnum){
         movePlayingCard(player, null, card_number)
+        if(CardSet.isFullPower(card_number)){
+            for(card in getPlayer(player).usedSpecialCard.values){
+                card.effectAllMaintainCard(player, this, TextEffectTag.WHEN_FULL_POWER_USED_YOUR)
+            }
+        }
     }
 
     suspend fun afterDestruction(player: PlayerEnum, card_number: Int, location: LocationEnum){
@@ -1349,15 +1384,19 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun endPhaseEffectProcess(player: PlayerEnum){
         val nowPlayer = getPlayer(player)
+        //TODO("CHANGE THIS MECHANISM FUTURE, MAKE USER ABLE TO CHOOSE ORDER OF THIS PROCESS")
+
         val returnList = nowPlayer.usedCardReturn(this)
-        if(returnList.isNotEmpty()){
-           for(cardNumber in returnList) {
-               returnSpecialCard(player, cardNumber)
-           }
+        for(cardNumber in returnList) {
+            returnSpecialCard(player, cardNumber)
         }
-        thisTurnDistance = distanceToken
+        for(card in nowPlayer.usedSpecialCard.values){
+            card.endPhaseEffect(player, this)
+        }
         nowPlayer.megamiCard?.endPhaseEffect(player, this)
         nowPlayer.megamiCard2?.endPhaseEffect(player, this)
+        //TODO("CHANGE THIS MECHANISM FUTURE, MAKE USER ABLE TO CHOOSE ORDER OF THIS PROCESS")
+        thisTurnDistance = distanceToken
         player1.didBasicOperation = false; player2.didBasicOperation = false
         player1.canNotGoForward = false; player2.canNotGoForward = false
         player1.rangeBuff.clearBuff(); player2.rangeBuff.clearBuff(); player1.attackBuff.clearBuff(); player2.attackBuff.clearBuff()
@@ -1374,7 +1413,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             val receive = receiveSelectCard(nowSocket, list, CommandEnum.SELECT_CARD_REASON_INSTALLATION, -1)?: continue
             if (receive.size == 1){
                 val card = nowPlayer.getCardFromCover(receive[0])?: continue
-                if (useCardFrom(player, card, LocationEnum.COVER_CARD, false, null, null, null, true)) {
+                if (useCardFrom(player, card, LocationEnum.COVER_CARD, false, null, null, null, true, true)) {
                     break
                 }
             }
@@ -1409,27 +1448,44 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         installationProcess(player)
 
-        sendDeckReconstruct(nowSocket, otherSocket) // 독 카드 몇장인지 보내줘야 될 듯?
+        sendDeckReconstruct(nowSocket, otherSocket)
         if(damage){
             processDamage(player, CommandEnum.CHOOSE_LIFE, Pair(999, 1), true)
         }
         Card.cardReconstructInsert(nowPlayer.discard, nowPlayer.cover_card, nowPlayer.normalCardDeck)
+        val reconstructListener = getImmediateReconstructListener(player)
+        if(!reconstructListener.isEmpty()){
+            for(i in 1..reconstructListener.size){
+                if(reconstructListener.isEmpty()) break
+                val now = reconstructListener.first()
+                reconstructListener.removeFirst()
+                if(!(now.doAction(this, -1, -1, false, false))){
+                    reconstructListener.addLast(now)
+                }
+            }
+        }
     }
 
     suspend fun cardUseNormal(player: PlayerEnum, commandEnum: CommandEnum, card_number: Int): Boolean{
         if(card_number == -1){
             return false
         }
-        if(commandEnum == CommandEnum.ACTION_USE_CARD_HAND){
-            val card = getCardFrom(player, card_number, LocationEnum.HAND)?: return false
-            if(useCardFrom(player, card, LocationEnum.HAND, false, null, null, null, true)) return true
-        }
-        else if(commandEnum == CommandEnum.ACTION_USE_CARD_SPECIAL){
-            val card = getCardFrom(player, card_number, LocationEnum.SPECIAL_CARD)?: return false
-            if(useCardFrom(player, card, LocationEnum.SPECIAL_CARD, false, null, null, null, true)) return true
-        }
-        else{
-            return false
+        when(commandEnum){
+            CommandEnum.ACTION_USE_CARD_HAND -> {
+                val card = getCardFrom(player, card_number, LocationEnum.HAND)?: return false
+                if(useCardFrom(player, card, LocationEnum.HAND, false, null, null, null, true, true)) return true
+            }
+            CommandEnum.ACTION_USE_CARD_SPECIAL -> {
+                val card = getCardFrom(player, card_number, LocationEnum.SPECIAL_CARD)?: return false
+                if(useCardFrom(player, card, LocationEnum.SPECIAL_CARD, false, null, null, null, true, true)) return true
+            }
+            CommandEnum.ACTION_USE_CARD_COVER -> {
+                val card = getCardFrom(player, card_number, LocationEnum.COVER_CARD)?: return false
+                if(card.canUseAtCover()){
+                    if(useCardFrom(player, card, LocationEnum.COVER_CARD, false, null, null, null, true, true)) return true
+                }
+            }
+            else -> return false
         }
         return false
     }
@@ -1452,11 +1508,15 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    suspend fun basicOperationEnchantmentCheck(player: PlayerEnum, command: CommandEnum): Boolean{
+    private fun basicOperationEnchantmentCheck(player: PlayerEnum, command: CommandEnum): Boolean{
         for(card in getPlayer(player.opposite()).enchantment_card.values){
             if(card.operationForbidCheck(false, command, this)) return false
         }
         return true
+    }
+
+    suspend fun requestBasicOperation(player: PlayerEnum, card_number: Int): CommandEnum{
+        return receiveBasicOperation(getSocket(player), card_number)
     }
 
     suspend fun canDoBasicOperation(player: PlayerEnum, command: CommandEnum): Boolean{
@@ -1711,9 +1771,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 return result
             }
             LocationEnum.PLAYING_ZONE -> {
-                for(card in nowPlayer.using_card) if (card.card_number == card_number) {
+                for(card in nowPlayer.usingCard) if (card.card_number == card_number) {
                     sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_PLAYING_YOUR)
-                    nowPlayer.using_card.remove(card)
+                    nowPlayer.usingCard.remove(card)
                     return card
                 }
             }
@@ -1747,6 +1807,21 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return null
     }
 
+    suspend fun popCardFrom(player: PlayerEnum, card_name: CardName, location: LocationEnum, public: Boolean): Card?{
+        val nowPlayer = getPlayer(player)
+        val nowSocket = getSocket(player)
+        val otherSocket = getSocket(player.opposite())
+        when(location){
+            LocationEnum.ADDITIONAL_CARD -> {
+                val result = nowPlayer.additional_hand[card_name]?: return null
+                sendPopCardZone(nowSocket, otherSocket, result.card_number, public, CommandEnum.POP_ADDITIONAL_YOUR)
+                nowPlayer.additional_hand.remove(card_name)
+                return result
+            }
+            else -> TODO()
+        }
+    }
+
     suspend fun insertCardTo(player: PlayerEnum, card: Card, location: LocationEnum, public: Boolean){
         val nowPlayer = getPlayer(player)
         val nowSocket = getSocket(player)
@@ -1765,7 +1840,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.DISCARD_CARD_YOUR)
             }
             LocationEnum.PLAYING_ZONE -> {
-                nowPlayer.using_card.addFirst(card)
+                nowPlayer.usingCard.addFirst(card)
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.PLAYING_CARD_YOUR)
             }
             LocationEnum.USED_CARD -> {
@@ -1796,6 +1871,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 nowPlayer.poisonBag[card.card_data.card_name] = card
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.POISON_BAG_YOUR)
             }
+            LocationEnum.OUT_OF_GAME -> {
+                nowPlayer.outOfGame[card.card_number] = card
+                sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.OUT_OF_GAME)
+            }
             else -> TODO()
         }
     }
@@ -1821,14 +1900,19 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             LocationEnum.DISCARD -> getPlayer(player).getCardFromDiscard(card_number)
             LocationEnum.SPECIAL_CARD -> getPlayer(player).getCardFromSpecial(card_number)
             LocationEnum.YOUR_DECK_TOP -> getPlayer(player).getCardFromDeckTop(card_number)
+            LocationEnum.PLAYING_ZONE -> getPlayer(player).getCardFromPlaying(card_number)
             else -> TODO()
         }
     }
 
     suspend fun returnSpecialCard(player: PlayerEnum, card_number: Int): Boolean{
         val card = popCardFrom(player, card_number, LocationEnum.USED_CARD, true)?: return false
-        card.special_card_state = SpecialCardEnum.UNUSED
         insertCardTo(player, card, LocationEnum.SPECIAL_CARD, true)
+        card.effectAllMaintainCard(player, this, TextEffectTag.WHEN_THIS_CARD_RETURN)
+        card.special_card_state = SpecialCardEnum.UNUSED
+        for(nowCard in getPlayer(player).usedSpecialCard.values){
+            nowCard.effectAllMaintainCard(player, this, TextEffectTag.WHEN_SPECIAL_RETURN)
+        }
         return true
     }
 
@@ -1855,12 +1939,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             sendChangeUmbrella(getSocket(player), getSocket(player.opposite()))
             val umbrellaListener = getUmbrellaListener(player)
             if(!umbrellaListener.isEmpty()){
-                for(i in 0..umbrellaListener.size){
+                for(i in 1..umbrellaListener.size){
                     if(umbrellaListener.isEmpty()) break
                     val now = umbrellaListener.first()
                     umbrellaListener.removeFirst()
                     if(!(now.doAction(this, -1, -1, false, false))){
-                        player1Listener.addLast(now)
+                        umbrellaListener.addLast(now)
                     }
                 }
             }
@@ -1894,6 +1978,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 sendSetStratagem(player2_socket, player1_socket, stratagem)
             }
         }
+    }
+
+    fun getCardOwner(card_number: Int): PlayerEnum{
+        return if(card_number < 10000) first_turn
+        else first_turn.opposite()
     }
 
     //megami special function

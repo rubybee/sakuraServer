@@ -53,7 +53,13 @@ class PlayerStatus(val player_enum: PlayerEnum) {
 
     var freezeToken = 0
 
-    var using_card = ArrayDeque<Card>()
+    var usingCard = ArrayDeque<Card>()
+    fun getCardFromPlaying(card_number: Int): Card?{
+        for(card in usingCard){
+            if(card.card_number == card_number) return card
+        }
+        return null
+    }
 
     var hand = HashMap<Int, Card>()
 
@@ -67,6 +73,7 @@ class PlayerStatus(val player_enum: PlayerEnum) {
 
     var sealZone = HashMap<Int, Card>()
     var sealInformation = HashMap<Int, Int>()
+    var outOfGame = HashMap<Int, Card>()
 
     fun checkAuraDamage(damage: Int): MutableList<Int>?{
         val selectable = mutableListOf<Int>()

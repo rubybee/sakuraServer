@@ -5,6 +5,7 @@ import com.sakurageto.gamelogic.MegamiEnum
 import com.sakurageto.gamelogic.Umbrella
 
 class MadeAttack(
+    var card_name: CardName,
     var card_number: Int,
     var card_class: CardClass,
     var distance_type: DistanceType,
@@ -36,10 +37,10 @@ class MadeAttack(
         bothSideDamage = true
     }
 
-    constructor(card_number: Int, card_class: CardClass, distance_type: DistanceType, aura_damage: Int, life_damage: Int,
+    constructor(card_name: CardName, card_number: Int, card_class: CardClass, distance_type: DistanceType, aura_damage: Int, life_damage: Int,
                 distance_cont: Pair<Int, Int>?, distance_uncont: Array<Boolean>?, megami: MegamiEnum,
                 cannot_react_normal: Boolean, cannot_react_special: Boolean, cannot_react: Boolean):
-            this(card_number, card_class, distance_type, aura_damage, life_damage, distance_cont, distance_uncont, megami){
+            this(card_name, card_number, card_class, distance_type, aura_damage, life_damage, distance_cont, distance_uncont, megami){
                 this.cannot_react_normal = cannot_react_normal
                 this.cannot_react_special = cannot_react_special
                 this.cannot_react = cannot_react

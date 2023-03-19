@@ -63,4 +63,11 @@ class Logger {
         return false
     }
 
+    fun checkThisTurnAttackNumber(player: PlayerEnum): Int{
+        var number = 0
+        for(log in logQueue){
+            if(log.player == player && log.text == LogText.ATTACK) number += 1
+        }
+        return number
+    }
 }

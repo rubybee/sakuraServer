@@ -59,6 +59,8 @@ enum class CommandEnum {
     POP_ENCHANTMENT_OTHER,
     POP_SEAL_YOUR,
     POP_SEAL_OTHER,
+    POP_ADDITIONAL_YOUR,
+    POP_ADDITIONAL_OTHER,
 
     POISON_BAG_YOUR,
     POISON_BAG_OTHER,
@@ -82,6 +84,7 @@ enum class CommandEnum {
     PLAYING_CARD_OTHER,
     ENCHANTMENT_CARD_OTHER,
     HAND_OTHER,
+    OUT_OF_GAME,
 
     MAKE_ATTACK_COMPLETE_YOUR,
     MAKE_ATTACK_COMPLETE_OTHER,
@@ -125,6 +128,7 @@ enum class CommandEnum {
     ACTION_REQUEST,
     ACTION_USE_CARD_HAND,
     ACTION_USE_CARD_SPECIAL,
+    ACTION_USE_CARD_COVER,
     ACTION_END_TURN,
     ACTION_GO_FORWARD,
     ACTION_GO_BACKWARD,
@@ -173,7 +177,9 @@ enum class CommandEnum {
     STRATAGEM_SET_YOUR,
     STRATAGEM_SET_OTHER,
     STRATAGEM_GET_YOUR,
-    STRATAGEM_GET_OTHER;
+    STRATAGEM_GET_OTHER,
+
+    REQUEST_BASIC_OPERATION;
 
     fun Opposite(): CommandEnum{
         when(this){
@@ -247,6 +253,8 @@ enum class CommandEnum {
             POP_POISON_BAG_OTHER -> return POP_POISON_BAG_YOUR
             POISON_BAG_YOUR -> return POISON_BAG_OTHER
             POISON_BAG_OTHER -> return POISON_BAG_YOUR
+            POP_ADDITIONAL_YOUR -> return POP_ADDITIONAL_OTHER
+            POP_ADDITIONAL_OTHER -> return POP_ADDITIONAL_YOUR
             else -> return TODO()
         }
     }
@@ -286,7 +294,9 @@ enum class LocationEnum(var real_number: Int){
     USED_CARD(20),
     ENCHANTMENT_ZONE(21),
     SEAL_ZONE(22),
-    POISON_BAG(23);
+    POISON_BAG(23),
+    ADDITIONAL_CARD(24),
+    OUT_OF_GAME(25);
 
     fun Opposite(): LocationEnum{
         return when(this){

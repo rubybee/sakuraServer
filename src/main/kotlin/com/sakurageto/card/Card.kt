@@ -9,7 +9,7 @@ import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.receiveNapInformation
 import kotlin.collections.ArrayDeque
 
-class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum, var special_card_state: SpecialCardEnum?) {
+class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum, var special_card_state: SpecialCardEnum?) {
     var vertical: Boolean
     var flipped: Boolean
     var nap: Int? = null
@@ -216,6 +216,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
             when(game_status.getUmbrella(this.player)){
                 Umbrella.FOLD -> {
                     return MadeAttack(
+                        card_name =  this.card_data.card_name,
                         card_number = this.card_number,
                         card_class = this.card_data.card_class,
                         distance_type = this.card_data.distanceTypeFold!!,
@@ -228,6 +229,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
                 }
                 Umbrella.UNFOLD -> {
                     return MadeAttack(
+                        card_name =  this.card_data.card_name,
                         card_number = this.card_number,
                         card_class = this.card_data.card_class,
                         distance_type = this.card_data.distanceTypeUnfold!!,
@@ -240,6 +242,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
                 }
                 null -> {
                     return MadeAttack(
+                        card_name =  this.card_data.card_name,
                         card_number = this.card_number,
                         card_class = this.card_data.card_class,
                         distance_type = DistanceType.DISCONTINUOUS,
@@ -254,6 +257,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         }
         else{
             return MadeAttack(
+                card_name =  this.card_data.card_name,
                 card_number = this.card_number,
                 card_class = this.card_data.card_class,
                 distance_type = this.card_data.distance_type!!,
@@ -267,7 +271,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
     }
 
     //-2: can't use                    -1: can use                 >= 0: cost
-    suspend fun canUse(player: PlayerEnum, gameStatus: GameStatus, react_attack: MadeAttack?, isCost: Boolean): Int{
+    suspend fun canUse(player: PlayerEnum, gameStatus: GameStatus, react_attack: MadeAttack?, isCost: Boolean, isConsume: Boolean): Int{
         if(card_data.sub_type == SubType.FULL_POWER && !gameStatus.getPlayerFullAction(player)) return -2
 
         if(!textUseCheck(player, gameStatus, react_attack)){
@@ -277,7 +281,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         val cost: Int
 
         if(card_data.card_class == CardClass.SPECIAL){
-            if(isCost){
+            if(isCost && isConsume){
                 this.thisCardCostBuff(player, gameStatus)
                 gameStatus.addAllCardCostBuff()
                 cost = gameStatus.applyAllCostBuff(player, this.getBaseCost(player, gameStatus), this)
@@ -357,27 +361,36 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
                 }
             }
         }
+
+        for(card in game_status.getPlayer(player).enchantment_card.values){
+            effectAllMaintainCard(player, game_status, TextEffectTag.WHEN_USE_BEHAVIOR_END)
+        }
+
     }
 
     suspend fun enchantmentUseNormal(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?) {
         var now_need_nap = returnNap(player, game_status, react_attack) + game_status.getPlayer(player).napBuff
         if(now_need_nap < 0) now_need_nap = 0
         game_status.getPlayer(player).napBuff = 0
-        if (now_need_nap > game_status.getPlayerAura(player) + game_status.dust) {
-            game_status.dustToCard(player, game_status.dust, this)
-            game_status.auraToCard(player, game_status.getPlayerAura(player), this)
-        } else {
-            while (true) {
-                val receive_data =
-                    receiveNapInformation(game_status.getSocket(player), now_need_nap, this.card_number)
-                val aura = receive_data.first
-                val dust = receive_data.second
-                if (aura < 0 || dust < 0 || aura + dust != now_need_nap || game_status.getPlayerAura(player) < aura || game_status.dust < dust) {
-                    continue
+        when {
+            now_need_nap == 0 -> {}
+            now_need_nap > game_status.getPlayerAura(player) + game_status.dust -> {
+                game_status.dustToCard(player, game_status.dust, this)
+                game_status.auraToCard(player, game_status.getPlayerAura(player), this)
+            }
+            else -> {
+                while (true) {
+                    val receive_data =
+                        receiveNapInformation(game_status.getSocket(player), now_need_nap, this.card_number)
+                    val aura = receive_data.first
+                    val dust = receive_data.second
+                    if (aura < 0 || dust < 0 || aura + dust != now_need_nap || game_status.getPlayerAura(player) < aura || game_status.dust < dust) {
+                        continue
+                    }
+                    game_status.auraToCard(player, aura, this)
+                    game_status.dustToCard(player, dust, this)
+                    break
                 }
-                game_status.auraToCard(player, aura, this)
-                game_status.dustToCard(player, dust, this)
-                break
             }
         }
 
@@ -534,7 +547,7 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
         this.card_data.effect?.let {
             for(text in it){
                 if (usedEffectUsable(text)) {
-                    if(text.tag == TextEffectTag.END_TURN_EFFECT){
+                    if(text.tag == TextEffectTag.WHEN_END_PHASE_YOUR){
                         text.effect!!(this.card_number, player, game_status, null)
                     }
                 }
@@ -582,6 +595,15 @@ class Card(val card_number: Int, val card_data: CardData, val player: PlayerEnum
                 if(enchantmentUsable(text)){
                     if(text.tag == findTag) return true
                 }
+            }
+        }
+        return false
+    }
+
+    fun canUseAtCover(): Boolean{
+        card_data.effect?.let {
+            for(text in it){
+                if(text.tag == TextEffectTag.CAN_USE_COVER) return true
             }
         }
         return false

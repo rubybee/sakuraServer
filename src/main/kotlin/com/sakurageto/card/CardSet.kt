@@ -282,6 +282,8 @@ object CardSet {
         //11014 is must empty
 
         //for number -> card name
+        cardNumberHashmap[0] = CardName.CARD_UNNAME
+        cardNumberHashmap[1] = CardName.POISON_ANYTHING
         cardNumberHashmap[100] = CardName.YURINA_CHAM
         cardNumberHashmap[101] = CardName.YURINA_ILSUM
         cardNumberHashmap[102] = CardName.YURINA_JARUCHIGI
@@ -2229,7 +2231,7 @@ object CardSet {
             }
         }
         else if(command == CommandEnum.SELECT_THREE){
-            val list = game_status.selectCardFrom(player.opposite(), player, listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, card_number, 1
+            val list = game_status.selectCardFrom(player.opposite(), player.opposite(), listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, card_number + 13, 1
             ) { _ -> true }?: return
             game_status.popCardFrom(player.opposite(), list[0], LocationEnum.HAND, true)?.let {
                 game_status.insertCardTo(player.opposite(), it, LocationEnum.DISCARD, true)
@@ -2335,7 +2337,8 @@ object CardSet {
                 while(true){
                     val list = game_status.selectCardFrom(player, player, listOf(LocationEnum.COVER_CARD, LocationEnum.USED_CARD, LocationEnum.DISCARD),
                         CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, card_number)
-                    { card -> card.card_data.sub_type != SubType.FULL_POWER && card.special_card_state != SpecialCardEnum.UNUSED }?: break
+                    { card -> card.card_data.sub_type != SubType.FULL_POWER && card.special_card_state != SpecialCardEnum.UNUSED &&
+                            card.card_data.megami != MegamiEnum.KURURU}?: break
                     if(list.size > 1) continue
                     if(list.size == 1){
                         var card = game_status.getCardFrom(player, list[0], LocationEnum.DISCARD)
@@ -2455,17 +2458,19 @@ object CardSet {
         })
         module.setEnchantment(3)
         module.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_USE_BEHAVIOR_END){ card_number, player, game_status, _ ->
-            while(true){
-                when(val command = game_status.requestBasicOperation(player, card_number)){
-                    CommandEnum.ACTION_GO_FORWARD, CommandEnum.ACTION_GO_BACKWARD, CommandEnum.ACTION_WIND_AROUND,
+            if(!(game_status.getEndTurn(player))){
+                while(true){
+                    when(val command = game_status.requestBasicOperation(player, card_number)){
+                        CommandEnum.ACTION_GO_FORWARD, CommandEnum.ACTION_GO_BACKWARD, CommandEnum.ACTION_WIND_AROUND,
                         CommandEnum.ACTION_INCUBATE, CommandEnum.ACTION_BREAK_AWAY -> {
                             if(game_status.canDoBasicOperation(player, command)){
                                 game_status.doBasicOperation(player, command, card_number)
                             }
                             break
                         }
-                    CommandEnum.SELECT_NOT -> break
-                    else -> {}
+                        CommandEnum.SELECT_NOT -> break
+                        else -> {}
+                    }
                 }
             }
             null
@@ -2502,6 +2507,7 @@ object CardSet {
                             game_status.getCardFrom(player, card_number, LocationEnum.USED_CARD)?.let {
                                 game_status.useCardFrom(player, it, LocationEnum.USED_CARD, false, null, null, null, true, false)
                             }
+                            break
                         }
                         CommandEnum.SELECT_NOT -> {
                             break
@@ -2523,6 +2529,7 @@ object CardSet {
                         CommandEnum.SELECT_ONE -> {
                             game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false)
                             game_status.deckReconstruct(player, false)
+                            break
                         }
                         CommandEnum.SELECT_NOT -> {
                             break
@@ -2697,6 +2704,7 @@ object CardSet {
     fun returnCardDataByName(card_name: CardName): CardData {
         when (card_name){
             CardName.CARD_UNNAME -> return unused
+            CardName.POISON_ANYTHING -> return unused
             CardName.YURINA_CHAM -> return cham
             CardName.YURINA_ILSUM -> return ilsom
             CardName.YURINA_JARUCHIGI -> return jaru_chigi
@@ -2822,7 +2830,7 @@ object CardSet {
 
     fun isPoison(card_number: Int): Boolean{
         return when(card_number){
-            995, 996, 997, 998, 999, 10995, 10996, 10997, 10998, 10999 -> true
+            1, 995, 996, 997, 998, 999, 10995, 10996, 10997, 10998, 10999 -> true
             else -> false
         }
     }

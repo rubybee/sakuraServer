@@ -14,6 +14,9 @@ class Buff(
 )
 
 class AttackBuffQueue() {
+    companion object {
+        val buffQueueNumber = 6
+    }
     private var attackBuff: Array<ArrayDeque<Buff>> = arrayOf(
         ArrayDeque(),
         ArrayDeque(),
@@ -66,6 +69,10 @@ class RangeBuff(
 )
 
 class RangeBuffQueue() {
+    companion object {
+        val buffQueueNumber = 6
+    }
+
     private var rangeBuff: Array<ArrayDeque<RangeBuff>> = arrayOf(
         ArrayDeque(),
         ArrayDeque(),
@@ -109,9 +116,9 @@ class RangeBuffQueue() {
     }
 
     fun cleanUsedBuff(){
-        for(index in 0..4){
+        for(index in 1..buffQueueNumber){
             for(i in 1..rangeBuff[index].size){
-                var now = rangeBuff[index].first()
+                val now = rangeBuff[index].first()
                 rangeBuff[index].removeFirst()
                 if(now.counter < 0){
                     now.counter *= -1
@@ -126,11 +133,11 @@ class RangeBuffQueue() {
     }
 
     fun applyBuff(index: Int, player: PlayerEnum, game_status: GameStatus, madeAttack: MadeAttack, tempQueue: ArrayDeque<RangeBuff> ){
-        for(i in 0 until rangeBuff[index].size){
+        for(i in 1..  rangeBuff[index].size){
             val now = rangeBuff[index].first()
             rangeBuff[index].removeFirst()
             if(now.condition(player, game_status, madeAttack)){
-                now.counter *= 1
+                now.counter *= -1
                 tempQueue.add(now)
             }
             if(now.counter != 0){

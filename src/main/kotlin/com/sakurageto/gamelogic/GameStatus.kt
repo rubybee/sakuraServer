@@ -770,25 +770,21 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     private fun applyTempRangeBuff(player: PlayerEnum, madeAttack: MadeAttack, nowTempRangeBuffQueue: RangeBuffQueue){
-        val nowPlayer = getPlayer(player)
-
-        for(i in 0..4){
+        for(i in 1..RangeBuffQueue.buffQueueNumber){
             val tempQueue: ArrayDeque<RangeBuff> = ArrayDeque()
             nowTempRangeBuffQueue.applyBuff(i, player, this, madeAttack, tempQueue)
             for(buff in tempQueue){
-                buff.effect(nowPlayer.pre_attack_card!!)
+                buff.effect(madeAttack)
             }
         }
     }
 
     suspend private fun applyTempAttackBuff(player: PlayerEnum, madeAttack: MadeAttack, nowTempBuffQueue: AttackBuffQueue){
-        val nowPlayer = getPlayer(player)
-
-        for(i in 0..4){
+        for(i in 1..AttackBuffQueue.buffQueueNumber){
             val tempQueue: ArrayDeque<Buff> = ArrayDeque()
             nowTempBuffQueue.applyBuff(i, player, this, madeAttack, tempQueue)
             for(buff in tempQueue){
-                buff.effect(nowPlayer.pre_attack_card!!)
+                buff.effect(madeAttack)
             }
         }
 
@@ -804,7 +800,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val nowTempBuffQueue = getPlayerTempAttackBuff(player)
         val nowBuffQueue = getPlayerAttackBuff(player)
 
-        for(i in 0..4){
+        for(i in 1..AttackBuffQueue.buffQueueNumber){
             val tempQueue: ArrayDeque<Buff> = ArrayDeque()
             nowTempBuffQueue.applyBuff(i, player, this, nowPlayer.pre_attack_card!!, tempQueue)
             nowBuffQueue.applyBuff(i, player, this, nowPlayer.pre_attack_card!!, tempQueue)
@@ -827,7 +823,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val nowTempBuffQueue = getPlayerTempRangeBuff(player)
         val nowBuffQueue = getPlayerRangeBuff(player)
 
-        for(i in 0..4){
+        for(i in 1..RangeBuffQueue.buffQueueNumber){
             val tempQueue: ArrayDeque<RangeBuff> = ArrayDeque()
             nowTempBuffQueue.applyBuff(i, player, this, nowPlayer.pre_attack_card!!, tempQueue)
             nowBuffQueue.applyBuff(i, player, this, nowPlayer.pre_attack_card!!, tempQueue)
@@ -871,7 +867,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         return if(attackCheck(player)){
             getPlayerTempRangeBuff(player.opposite()).clearBuff()
+            getPlayerTempAttackBuff(player.opposite()).clearBuff()
             nowPlayer.rangeBuff.cleanUsedBuff()
+            getPlayerTempRangeBuff(player).cleanUsedBuff()
             applyAllAttackBuff(player)
             true
         } else{
@@ -1873,7 +1871,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
             LocationEnum.OUT_OF_GAME -> {
                 nowPlayer.outOfGame[card.card_number] = card
-                sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.OUT_OF_GAME)
+                sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.OUT_OF_GAME_YOUR)
             }
             else -> TODO()
         }

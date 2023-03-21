@@ -46,6 +46,7 @@ enum class DistanceType {
 }
 
 enum class CardName {
+    POISON_ANYTHING,
     CARD_UNNAME,
 
     YURINA_CHAM,

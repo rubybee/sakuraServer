@@ -174,7 +174,11 @@ enum class CommandEnum {
     STRATAGEM_GET_YOUR,
     STRATAGEM_GET_OTHER,
 
-    REQUEST_BASIC_OPERATION;
+    REQUEST_BASIC_OPERATION,
+    GET_DAMAGE_AURA_YOUR,
+    GET_DAMAGE_LIFE_YOUR,
+    GET_DAMAGE_AURA_OTHER,
+    GET_DAMAGE_LIFE_OTHER;
 
     fun Opposite(): CommandEnum{
         when(this){
@@ -250,6 +254,10 @@ enum class CommandEnum {
             POISON_BAG_OTHER -> return POISON_BAG_YOUR
             POP_ADDITIONAL_YOUR -> return POP_ADDITIONAL_OTHER
             POP_ADDITIONAL_OTHER -> return POP_ADDITIONAL_YOUR
+            GET_DAMAGE_AURA_YOUR -> return GET_DAMAGE_AURA_OTHER
+            GET_DAMAGE_LIFE_YOUR -> return GET_DAMAGE_LIFE_OTHER
+            GET_DAMAGE_AURA_OTHER -> return GET_DAMAGE_AURA_YOUR
+            GET_DAMAGE_LIFE_OTHER -> return GET_DAMAGE_LIFE_YOUR
             else -> return TODO()
         }
     }

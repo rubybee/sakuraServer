@@ -75,6 +75,21 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var sealInformation = HashMap<Int, Int>()
     var outOfGame = HashMap<Int, Card>()
 
+    fun getFullAuraDamage(): MutableList<Int>{
+        val selectable = mutableListOf<Int>()
+        if(this.aura > 0){
+            selectable.add(LocationEnum.YOUR_AURA.real_number)
+            selectable.add(this.aura)
+        }
+        for(card in enchantment_card.values){
+            if(card.checkAuraReplaceable()){
+                selectable.add(card.card_number)
+                selectable.add(card.nap!!)
+            }
+        }
+        return selectable
+    }
+
     fun checkAuraDamage(damage: Int): MutableList<Int>?{
         val selectable = mutableListOf<Int>()
         var totalAura = this.aura
@@ -194,6 +209,7 @@ class PlayerStatus(val player_enum: PlayerEnum) {
         pre_attack_card = madeAttack
     }
 
+    var otherBuff: OtherBuffQueue = OtherBuffQueue()
     var attackBuff: AttackBuffQueue = AttackBuffQueue()
     var rangeBuff: RangeBuffQueue = RangeBuffQueue()
 

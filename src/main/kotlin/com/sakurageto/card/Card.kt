@@ -58,6 +58,12 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             dest.addAll(src1)
             dest.addAll(src2)
             dest.shuffle()
+            for(card in dest){
+                if(CardSet.isPoison(card.card_number)){
+                    dest.remove(card)
+                    dest.addFirst(card)
+                }
+            }
             src1.clear()
             src2.clear()
         }
@@ -140,21 +146,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }?: false
     }
 
-    fun canReactable(attack: MadeAttack): Boolean{
-        if(attack.cannot_react_special){
-            if(card_data.card_class == CardClass.SPECIAL){
-                return false
-            }
-        }
-        else if(attack.cannot_react){
-            return false
-        }
-        else if(attack.cannot_react_normal){
-            if(card_data.card_class == CardClass.NORMAL){
-                return false
-            }
-        }
-        return true
+    suspend fun canReactable(attack: MadeAttack, game_status: GameStatus, player: PlayerEnum, continuousBuffQueue: OtherBuffQueue, ): Boolean{
+        return attack.canReactByThisCard(this, game_status, player, continuousBuffQueue)
     }
 
     suspend fun returnNap(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?): Int{
@@ -204,7 +197,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         return true
     }
 
-    suspend fun makeAttack(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?): MadeAttack{
+    suspend fun makeAttack(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?): MadeAttack?{
         card_data.effect?.let {
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT && text.tag == TextEffectTag.NEXT_ATTACK_ENCHANTMENT){
@@ -224,7 +217,11 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         aura_damage = this.card_data.auraDamageFold!!,
                         distance_cont = this.card_data.distanceContFold,
                         distance_uncont = this.card_data.distanceUncontFold,
-                        megami = this.card_data.megami
+                        megami = this.card_data.megami,
+                        cannotReactNormal = this.card_data.cannotReactNormal,
+                        cannotReactSpecial = this.card_data.cannotReactSpecial,
+                        cannotReact = this.card_data.cannotReact,
+                        chogek = this.card_data.chogek
                     )
                 }
                 Umbrella.UNFOLD -> {
@@ -237,21 +234,15 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         aura_damage = this.card_data.auraDamageUnfold!!,
                         distance_cont = this.card_data.distanceContUnfold,
                         distance_uncont = this.card_data.distanceUncontUnfold,
-                        megami = this.card_data.megami
+                        megami = this.card_data.megami,
+                        cannotReactNormal = this.card_data.cannotReactNormal,
+                        cannotReactSpecial = this.card_data.cannotReactSpecial,
+                        cannotReact = this.card_data.cannotReact,
+                        chogek = this.card_data.chogek
                     )
                 }
                 null -> {
-                    return MadeAttack(
-                        card_name =  this.card_data.card_name,
-                        card_number = this.card_number,
-                        card_class = this.card_data.card_class,
-                        distance_type = DistanceType.DISCONTINUOUS,
-                        life_damage = 0,
-                        aura_damage = 0,
-                        distance_cont = null,
-                        distance_uncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false),
-                        megami = this.card_data.megami
-                    )
+                    return null
                 }
             }
         }
@@ -265,7 +256,11 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 aura_damage = this.card_data.aura_damage!!,
                 distance_cont = this.card_data.distance_cont,
                 distance_uncont = this.card_data.distance_uncont,
-                megami = this.card_data.megami
+                megami = this.card_data.megami,
+                cannotReactNormal = this.card_data.cannotReactNormal,
+                cannotReactSpecial = this.card_data.cannotReactSpecial,
+                cannotReact = this.card_data.cannotReact,
+                chogek = this.card_data.chogek
             )
         }
     }
@@ -307,7 +302,22 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         }
                     }
                 }
-                if(gameStatus.addPreAttackZone(player, this.makeAttack(player, gameStatus, react_attack).addTextAndReturn(gameStatus.getUmbrella(this.player), this.card_data))){
+                if(gameStatus.addPreAttackZone(player, this.makeAttack(player, gameStatus, react_attack)?.addTextAndReturn(gameStatus.getUmbrella(this.player), this.card_data)?:
+                    MadeAttack(
+                        card_name =  this.card_data.card_name,
+                        card_number = this.card_number,
+                        card_class = this.card_data.card_class,
+                        distance_type = DistanceType.DISCONTINUOUS,
+                        life_damage = 0,
+                        aura_damage = 0,
+                        distance_cont = null,
+                        distance_uncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false),
+                        megami = this.card_data.megami,
+                        cannotReactNormal = false,
+                        cannotReactSpecial = false,
+                        cannotReact = false,
+                        chogek = false
+                    ))){
                     return cost
                 }
                 if(card_data.card_class == CardClass.SPECIAL){
@@ -322,9 +332,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         return cost
     }
 
-    suspend fun attackUseNormal(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?,
-                                reactAttackBuffQueue: AttackBuffQueue?, reactRangeBuffQueue: RangeBuffQueue?){
-        game_status.afterMakeAttack(this.card_number, player, react_attack, reactAttackBuffQueue, reactRangeBuffQueue)
+    suspend fun attackUseNormal(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?){
+        game_status.afterMakeAttack(this.card_number, player, react_attack)
     }
 
     suspend fun behaviorUseNormal(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?){
@@ -403,8 +412,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
     }
 
-    suspend fun use(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?,
-                    reactAttackBuffQueue: AttackBuffQueue?, reactRangeBuffQueue: RangeBuffQueue?){
+    suspend fun use(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?){
         this.card_data.effect?.let {
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
@@ -425,7 +433,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
 
         when(this.card_data.card_type){
             CardType.ATTACK -> {
-                attackUseNormal(player, game_status, react_attack, reactAttackBuffQueue, reactRangeBuffQueue)
+                attackUseNormal(player, game_status, react_attack)
             }
             CardType.BEHAVIOR -> {
                 behaviorUseNormal(player, game_status, react_attack)

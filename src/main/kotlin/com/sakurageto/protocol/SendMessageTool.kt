@@ -272,6 +272,13 @@ suspend fun sendRequestBasicOperation(mine: Connection, card_number: Int){
     mine.session.send(Json.encodeToString(data))
 }
 
+suspend fun sendSimpleCommand(mine: Connection, other: Connection, command: CommandEnum){
+    val dataYour = SakuraCardCommand(command, -1)
+    val dataOther = SakuraCardCommand(command.Opposite(), -1)
+    mine.session.send(Json.encodeToString(dataYour))
+    other.session.send(Json.encodeToString(dataOther))
+}
+
 //receive function
 suspend fun waitUntil(player: Connection, wait_command: CommandEnum): SakuraSendData {
     val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}

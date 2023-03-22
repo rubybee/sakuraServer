@@ -91,8 +91,14 @@ class CardData(
     var canCover = true
     var canDiscard = true
 
+    var cannotReactNormal: Boolean = false
+    var cannotReactSpecial: Boolean = false
+    var cannotReact: Boolean = false
+    var chogek: Boolean = false
+
     fun setAttack(distance_type: DistanceType, distance_cont: Pair<Int, Int>?, distance_uncont: MutableList<Int>?,
-                  aura_damage: Int, life_damage: Int){
+                  aura_damage: Int, life_damage: Int, cannotReactNormal: Boolean, cannotReactSpecial: Boolean,
+                  cannotReact: Boolean, chogek: Boolean){
         this.distance_type = distance_type
         if(distance_type == DistanceType.CONTINUOUS){
             this.distance_cont = Pair(distance_cont!!.first, distance_cont.second)
@@ -105,6 +111,10 @@ class CardData(
         }
         this.life_damage = life_damage
         this.aura_damage = aura_damage
+        this.cannotReactNormal = cannotReactNormal
+        this.cannotReactSpecial = cannotReactSpecial
+        this.cannotReact = cannotReact
+        this.chogek = chogek
     }
 
     fun setEnchantment(charge: Int){

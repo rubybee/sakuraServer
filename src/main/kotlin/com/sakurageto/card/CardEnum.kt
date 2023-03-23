@@ -1,6 +1,8 @@
 package com.sakurageto.card
 
 import com.sakurageto.gamelogic.MegamiEnum
+import com.sakurageto.gamelogic.MegamiEnum.*
+import java.util.EnumMap
 
 enum class PlayerEnum {
     PLAYER1,
@@ -189,122 +191,435 @@ enum class CardName {
 
     KURURU_DUPLICATED_GEAR_1,
     KURURU_DUPLICATED_GEAR_2,
-    KURURU_DUPLICATED_GEAR_3;
+    KURURU_DUPLICATED_GEAR_3,
+
+    THALLYA_BURNING_STEAM,
+    THALLYA_WAVING_EDGE,
+    THALLYA_SHIELD_CHARGE,
+    THALLYA_STEAM_CANNON,
+    THALLYA_STUNT,
+    THALLYA_ROARING,
+    THALLYA_TURBO_SWITCH,
+
+    THALLYA_ALPHA_EDGE,
+    THALLYA_OMEGA_BURST,
+    THALLYA_THALLYA_MASTERPIECE,
+    THALLYA_JULIA_BLACKBOX,
+
+    FORM_YAKSHA,
+    FORM_NAGA,
+    FORM_GARUDA;
+
+    fun toCardNumber(firstTurn: Boolean): Int{
+        return if(firstTurn){
+            cardNameHashmapFirst[this]
+        } else{
+            cardNameHashmapSecond[this]
+        }?: -1
+    }
 
     companion object {
+        private val cardNameHashmapFirst = EnumMap<CardName, Int>(CardName::class.java).apply {
+            //for first turn player 0~9999
+            put(YURINA_CHAM, 100)
+            put(YURINA_ILSUM, 101)
+            put(YURINA_JARUCHIGI, 102)
+            put(YURINA_GUHAB, 103)
+            put(YURINA_GIBACK, 104)
+            put(YURINA_APDO, 105)
+            put(YURINA_GIYENBANJO, 106)
+            put(YURINA_WOLYUNGNACK, 107)
+            put(YURINA_POBARAM, 108)
+            put(YURINA_JJOCKBAE, 109)
+            put(YURINA_JURUCK, 110)
+            put(SAINE_DOUBLEBEGI, 200)
+            put(SAINE_HURUBEGI, 201)
+            put(SAINE_MOOGECHOO, 202)
+            put(SAINE_GANPA, 203)
+            put(SAINE_GWONYUCK, 204)
+            put(SAINE_CHOONGEMJUNG, 205)
+            put(SAINE_MOOEMBUCK, 206)
+            put(SAINE_YULDONGHOGEK, 207)
+            put(SAINE_HANGMUNGGONGJIN, 208)
+            put(SAINE_EMMOOSHOEBING, 209)
+            put(SAINE_JONGGEK, 210)
+            put(HIMIKA_SHOOT, 300)
+            put(HIMIKA_RAPIDFIRE, 301)
+            put(HIMIKA_MAGNUMCANON, 302)
+            put(HIMIKA_FULLBURST, 303)
+            put(HIMIKA_BACKSTEP, 304)
+            put(HIMIKA_BACKDRAFT, 305)
+            put(HIMIKA_SMOKE, 306)
+            put(HIMIKA_REDBULLET, 307)
+            put(HIMIKA_CRIMSONZERO, 308)
+            put(HIMIKA_SCARLETIMAGINE, 309)
+            put(HIMIKA_BURMILIONFIELD, 310)
+            put(TOKOYO_BITSUNERIGI, 400)
+            put(TOKOYO_WOOAHHANTAGUCK, 401)
+            put(TOKOYO_RUNNINGRABIT, 402)
+            put(TOKOYO_POETDANCE, 403)
+            put(TOKOYO_FLIPFAN, 404)
+            put(TOKOYO_WINDSTAGE, 405)
+            put(TOKOYO_SUNSTAGE, 406)
+            put(TOKOYO_KUON, 407)
+            put(TOKOYO_THOUSANDBIRD, 408)
+            put(TOKOYO_ENDLESSWIND, 409)
+            put(TOKOYO_TOKOYOMOON, 410)
+            put(OBORO_WIRE, 500)
+            put(OBORO_SHADOWCALTROP, 501)
+            put(OBORO_ZANGEKIRANBU, 502)
+            put(OBORO_NINJAWALK, 503)
+            put(OBORO_INDUCE, 504)
+            put(OBORO_CLONE, 505)
+            put(OBORO_BIOACTIVITY, 506)
+            put(OBORO_KUMASUKE, 507)
+            put(OBORO_TOBIKAGE, 508)
+            put(OBORO_ULOO, 509)
+            put(OBORO_MIKAZRA, 510)
+            put(YUKIHI_YUKIHI, 100000)
+            put(YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE, 600)
+            put(YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS, 601)
+            put(YUKIHI_PUSH_OUT_SLASH_PULL, 602)
+            put(YUKIHI_SWING_SLASH_STAB, 603)
+            put(YUKIHI_TURN_UMBRELLA, 604)
+            put(YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN, 605)
+            put(YUKIHI_MAKE_CONNECTION, 606)
+            put(YUKIHI_FLUTTERING_SNOWFLAKE, 607)
+            put(YUKIHI_SWAYING_LAMPLIGHT, 608)
+            put(YUKIHI_CLINGY_MIND, 609)
+            put(YUKIHI_SWIRLING_GESTURE, 610)
+            put(SHINRA_SHINRA, CardSet.SHINRA_SHINRA_CARD_NUMBER)
+            put(SHINRA_IBLON, 700)
+            put(SHINRA_BANLON, 701)
+            put(SHINRA_KIBEN, 702)
+            put(SHINRA_INYONG, 703)
+            put(SHINRA_SEONDONG, 704)
+            put(SHINRA_JANGDAM, 705)
+            put(SHINRA_NONPA, 706)
+            put(SHINRA_WANJEON_NONPA, 707)
+            put(SHINRA_DASIG_IHAE, 708)
+            put(SHINRA_CHEONJI_BANBAG, 709)
+            put(SHINRA_SAMRA_BAN_SHO, 710)
+            put(HAGANE_CENTRIFUGAL_ATTACK, 800)
+            put(HAGANE_FOUR_WINDED_EARTHQUAKE, 801)
+            put(HAGANE_GROUND_BREAKING, 802)
+            put(HAGANE_HYPER_RECOIL, 803)
+            put(HAGANE_WON_MU_RUYN, 804)
+            put(HAGANE_RING_A_BELL, 805)
+            put(HAGANE_GRAVITATION_FIELD, 806)
+            put(HAGANE_GRAND_SKY_HOLE_CRASH, 807)
+            put(HAGANE_GRAND_BELL_MEGALOBEL, 808)
+            put(HAGANE_GRAND_GRAVITATION_ATTRACT, 809)
+            put(HAGANE_GRAND_MOUNTAIN_RESPECT, 810)
+            put(CHIKAGE_THROW_KUNAI, 900)
+            put(CHIKAGE_POISON_NEEDLE, 901)
+            put(CHIKAGE_TO_ZU_CHU, 902)
+            put(CHIKAGE_CUTTING_NECK, 903)
+            put(CHIKAGE_POISON_SMOKE, 904)
+            put(CHIKAGE_TIP_TOEING, 905)
+            put(CHIKAGE_MUDDLE, 906)
+            put(CHIKAGE_DEADLY_POISON, 907)
+            put(CHIKAGE_HAN_KI_POISON, 908)
+            put(CHIKAGE_REINCARNATION_POISON, 909)
+            put(CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE, 910)
+            put(POISON_PARALYTIC, 995)
+            put(POISON_HALLUCINOGENIC, 996)
+            put(POISON_RELAXATION, 997)
+            put(POISON_DEADLY_1, 998)
+            put(POISON_DEADLY_2, 999)
+            put(KURURU_ELEKITTEL, 1000)
+            put(KURURU_ACCELERATOR, 1001)
+            put(KURURU_KURURUOONG, 1002)
+            put(KURURU_TORNADO, 1003)
+            put(KURURU_REGAINER, 1004)
+            put(KURURU_MODULE, 1005)
+            put(KURURU_REFLECTOR, 1006)
+            put(KURURU_DRAIN_DEVIL, 1007)
+            put(KURURU_BIG_GOLEM, 1008)
+            put(KURURU_INDUSTRIA, 1009)
+            put(KURURU_DUPLICATED_GEAR_1, 1010)
+            put(KURURU_DUPLICATED_GEAR_2, 1011)
+            put(KURURU_DUPLICATED_GEAR_3, 1012)
+            put(KURURU_KANSHOUSOUCHI_KURURUSIK, 1013)
+            put(THALLYA_BURNING_STEAM, 1100)
+            put(THALLYA_WAVING_EDGE, 1101)
+            put(THALLYA_SHIELD_CHARGE, 1102)
+            put(THALLYA_STEAM_CANNON, 1103)
+            put(THALLYA_STUNT, 1104)
+            put(THALLYA_ROARING, 1105)
+            put(THALLYA_TURBO_SWITCH, 1106)
+            put(THALLYA_ALPHA_EDGE, 1107)
+            put(THALLYA_OMEGA_BURST, 1108)
+            put(THALLYA_THALLYA_MASTERPIECE, 1109)
+            put(THALLYA_JULIA_BLACKBOX, 1110)
+            put(FORM_YAKSHA, 1110)
+            put(FORM_NAGA, 1111)
+            put(FORM_GARUDA, 1112)
+        }
+        private val cardNameHashmapSecond = EnumMap<CardName, Int>(CardName::class.java).apply {
+            //for second turn player 10000~19999
+            put(YURINA_CHAM, 10100)
+            put(YURINA_ILSUM, 10101)
+            put(YURINA_JARUCHIGI, 10102)
+            put(YURINA_GUHAB, 10103)
+            put(YURINA_GIBACK, 10104)
+            put(YURINA_APDO, 10105)
+            put(YURINA_GIYENBANJO, 10106)
+            put(YURINA_WOLYUNGNACK, 10107)
+            put(YURINA_POBARAM, 10108)
+            put(YURINA_JJOCKBAE, 10109)
+            put(YURINA_JURUCK, 10110)
+            put(SAINE_DOUBLEBEGI, 10200)
+            put(SAINE_HURUBEGI, 10201)
+            put(SAINE_MOOGECHOO, 10202)
+            put(SAINE_GANPA, 10203)
+            put(SAINE_GWONYUCK, 10204)
+            put(SAINE_CHOONGEMJUNG, 10205)
+            put(SAINE_MOOEMBUCK, 10206)
+            put(SAINE_YULDONGHOGEK, 10207)
+            put(SAINE_HANGMUNGGONGJIN, 10208)
+            put(SAINE_EMMOOSHOEBING, 10209)
+            put(SAINE_JONGGEK, 10210)
+            put(HIMIKA_SHOOT, 10300)
+            put(HIMIKA_RAPIDFIRE, 10301)
+            put(HIMIKA_MAGNUMCANON, 10302)
+            put(HIMIKA_FULLBURST, 10303)
+            put(HIMIKA_BACKSTEP, 10304)
+            put(HIMIKA_BACKDRAFT, 10305)
+            put(HIMIKA_SMOKE, 10306)
+            put(HIMIKA_REDBULLET, 10307)
+            put(HIMIKA_CRIMSONZERO, 10308)
+            put(HIMIKA_SCARLETIMAGINE, 10309)
+            put(HIMIKA_BURMILIONFIELD, 10310)
+            put(TOKOYO_BITSUNERIGI, 10400)
+            put(TOKOYO_WOOAHHANTAGUCK, 10401)
+            put(TOKOYO_RUNNINGRABIT, 10402)
+            put(TOKOYO_POETDANCE, 10403)
+            put(TOKOYO_FLIPFAN, 10404)
+            put(TOKOYO_WINDSTAGE, 10405)
+            put(TOKOYO_SUNSTAGE, 10406)
+            put(TOKOYO_KUON, 10407)
+            put(TOKOYO_THOUSANDBIRD, 10408)
+            put(TOKOYO_ENDLESSWIND, 10409)
+            put(TOKOYO_TOKOYOMOON, 10410)
+            put(OBORO_WIRE, 10500)
+            put(OBORO_SHADOWCALTROP, 10501)
+            put(OBORO_ZANGEKIRANBU, 10502)
+            put(OBORO_NINJAWALK, 10503)
+            put(OBORO_INDUCE, 10504)
+            put(OBORO_CLONE, 10505)
+            put(OBORO_BIOACTIVITY, 10506)
+            put(OBORO_KUMASUKE, 10507)
+            put(OBORO_TOBIKAGE, 10508)
+            put(OBORO_ULOO, 10509)
+            put(OBORO_MIKAZRA, 10510)
+            put(YUKIHI_YUKIHI, 200000)
+            put(YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE, 10600)
+            put(YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS, 10601)
+            put(YUKIHI_PUSH_OUT_SLASH_PULL, 10602)
+            put(YUKIHI_SWING_SLASH_STAB, 10603)
+            put(YUKIHI_TURN_UMBRELLA, 10604)
+            put(YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN, 10605)
+            put(YUKIHI_MAKE_CONNECTION, 10606)
+            put(YUKIHI_FLUTTERING_SNOWFLAKE, 10607)
+            put(YUKIHI_SWAYING_LAMPLIGHT, 10608)
+            put(YUKIHI_CLINGY_MIND, 10609)
+            put(YUKIHI_SWIRLING_GESTURE, 10610)
+            put(SHINRA_SHINRA, CardSet.SHINRA_SHINRA_CARD_NUMBER)
+            put(SHINRA_IBLON, 10700)
+            put(SHINRA_BANLON, 10701)
+            put(SHINRA_KIBEN, 10702)
+            put(SHINRA_INYONG, 10703)
+            put(SHINRA_SEONDONG, 10704)
+            put(SHINRA_JANGDAM, 10705)
+            put(SHINRA_NONPA, 10706)
+            put(SHINRA_WANJEON_NONPA, 10707)
+            put(SHINRA_DASIG_IHAE, 10708)
+            put(SHINRA_CHEONJI_BANBAG, 10709)
+            put(SHINRA_SAMRA_BAN_SHO, 10710)
+            put(HAGANE_CENTRIFUGAL_ATTACK, 10800)
+            put(HAGANE_FOUR_WINDED_EARTHQUAKE, 10801)
+            put(HAGANE_GROUND_BREAKING, 10802)
+            put(HAGANE_HYPER_RECOIL, 10803)
+            put(HAGANE_WON_MU_RUYN, 10804)
+            put(HAGANE_RING_A_BELL, 10805)
+            put(HAGANE_GRAVITATION_FIELD, 10806)
+            put(HAGANE_GRAND_SKY_HOLE_CRASH, 10807)
+            put(HAGANE_GRAND_BELL_MEGALOBEL, 10808)
+            put(HAGANE_GRAND_GRAVITATION_ATTRACT, 10809)
+            put(HAGANE_GRAND_MOUNTAIN_RESPECT, 10810)
+            put(CHIKAGE_THROW_KUNAI, 10900)
+            put(CHIKAGE_POISON_NEEDLE, 10901)
+            put(CHIKAGE_TO_ZU_CHU, 10902)
+            put(CHIKAGE_CUTTING_NECK, 10903)
+            put(CHIKAGE_POISON_SMOKE, 10904)
+            put(CHIKAGE_TIP_TOEING, 10905)
+            put(CHIKAGE_MUDDLE, 10906)
+            put(CHIKAGE_DEADLY_POISON, 10907)
+            put(CHIKAGE_HAN_KI_POISON, 10908)
+            put(CHIKAGE_REINCARNATION_POISON, 10909)
+            put(CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE, 10910)
+            put(POISON_PARALYTIC, 10995)
+            put(POISON_HALLUCINOGENIC, 10996)
+            put(POISON_RELAXATION, 10997)
+            put(POISON_DEADLY_1, 10998)
+            put(POISON_DEADLY_2, 10999)
+            put(KURURU_ELEKITTEL, 11000)
+            put(KURURU_ACCELERATOR, 11001)
+            put(KURURU_KURURUOONG, 11002)
+            put(KURURU_TORNADO, 11003)
+            put(KURURU_REGAINER, 11004)
+            put(KURURU_MODULE, 11005)
+            put(KURURU_REFLECTOR, 11006)
+            put(KURURU_DRAIN_DEVIL, 11007)
+            put(KURURU_BIG_GOLEM, 11008)
+            put(KURURU_INDUSTRIA, 11009)
+            put(KURURU_DUPLICATED_GEAR_1, 11010)
+            put(KURURU_DUPLICATED_GEAR_2, 11011)
+            put(KURURU_DUPLICATED_GEAR_3, 11012)
+            put(KURURU_KANSHOUSOUCHI_KURURUSIK, 11013)
+            put(THALLYA_BURNING_STEAM, 11100)
+            put(THALLYA_WAVING_EDGE, 11101)
+            put(THALLYA_SHIELD_CHARGE, 11102)
+            put(THALLYA_STEAM_CANNON, 11103)
+            put(THALLYA_STUNT, 11104)
+            put(THALLYA_ROARING, 11105)
+            put(THALLYA_TURBO_SWITCH, 11106)
+            put(THALLYA_ALPHA_EDGE, 11107)
+            put(THALLYA_OMEGA_BURST, 11108)
+            put(THALLYA_THALLYA_MASTERPIECE, 11109)
+            put(THALLYA_JULIA_BLACKBOX, 11110)
+            put(FORM_YAKSHA, 11110)
+            put(FORM_NAGA, 11111)
+            put(FORM_GARUDA, 11112)
+        }
+
         fun returnNormalCardNameByMegami(megami_name: MegamiEnum):List<CardName>{
             return when (megami_name){
-                MegamiEnum.NONE -> listOf()
-                MegamiEnum.YURINA -> listOf(
+                NONE -> listOf()
+                YURINA -> listOf(
                     YURINA_CHAM, YURINA_ILSUM, YURINA_JARUCHIGI, YURINA_GUHAB, YURINA_GIBACK,
                     YURINA_APDO, YURINA_GIYENBANJO
                 )
-                MegamiEnum.SAINE -> listOf(
+                SAINE -> listOf(
                     SAINE_HURUBEGI, SAINE_DOUBLEBEGI, SAINE_MOOGECHOO, SAINE_GANPA, SAINE_GWONYUCK,
                     SAINE_CHOONGEMJUNG, SAINE_MOOEMBUCK
                 )
-                MegamiEnum.HIMIKA -> listOf(
+                HIMIKA -> listOf(
                     HIMIKA_SHOOT, HIMIKA_RAPIDFIRE, HIMIKA_MAGNUMCANON, HIMIKA_FULLBURST,
                     HIMIKA_BACKSTEP, HIMIKA_BACKDRAFT, HIMIKA_SMOKE
                 )
-                MegamiEnum.TOKOYO -> listOf(
+                TOKOYO -> listOf(
                     TOKOYO_BITSUNERIGI, TOKOYO_WOOAHHANTAGUCK, TOKOYO_RUNNINGRABIT, TOKOYO_POETDANCE,
                     TOKOYO_FLIPFAN, TOKOYO_WINDSTAGE, TOKOYO_SUNSTAGE
                 )
-                MegamiEnum.OBORO -> listOf(
+                OBORO -> listOf(
                     OBORO_WIRE, OBORO_SHADOWCALTROP, OBORO_ZANGEKIRANBU, OBORO_NINJAWALK,
                     OBORO_INDUCE, OBORO_CLONE, OBORO_BIOACTIVITY
                 )
-                MegamiEnum.YUKIHI -> listOf(
+                YUKIHI -> listOf(
                     YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE, YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS,
                     YUKIHI_PUSH_OUT_SLASH_PULL, YUKIHI_SWING_SLASH_STAB, YUKIHI_TURN_UMBRELLA,
                     YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN, YUKIHI_MAKE_CONNECTION
                 )
-                MegamiEnum.SHINRA -> listOf(
+                SHINRA -> listOf(
                     SHINRA_IBLON, SHINRA_BANLON,
                     SHINRA_KIBEN, SHINRA_INYONG, SHINRA_SEONDONG,
                     SHINRA_JANGDAM, SHINRA_NONPA
                 )
-                MegamiEnum.HAGANE -> listOf(
+                HAGANE -> listOf(
                     HAGANE_CENTRIFUGAL_ATTACK, HAGANE_FOUR_WINDED_EARTHQUAKE,
                     HAGANE_GROUND_BREAKING, HAGANE_HYPER_RECOIL,
                     HAGANE_WON_MU_RUYN, HAGANE_RING_A_BELL,
                     HAGANE_GRAVITATION_FIELD
                 )
-                MegamiEnum.CHIKAGE -> listOf(
+                CHIKAGE -> listOf(
                     CHIKAGE_THROW_KUNAI, CHIKAGE_POISON_NEEDLE, CHIKAGE_TO_ZU_CHU,
                     CHIKAGE_CUTTING_NECK, CHIKAGE_POISON_SMOKE, CHIKAGE_TIP_TOEING,
                     CHIKAGE_MUDDLE
                 )
-                MegamiEnum.KURURU -> listOf(
+                KURURU -> listOf(
                     KURURU_ELEKITTEL, KURURU_ACCELERATOR, KURURU_KURURUOONG,
                     KURURU_TORNADO, KURURU_REGAINER, KURURU_MODULE,
                     KURURU_REFLECTOR
+                )
+                THALLYA -> listOf(
+                    THALLYA_BURNING_STEAM, THALLYA_WAVING_EDGE, THALLYA_SHIELD_CHARGE,
+                    THALLYA_STEAM_CANNON, THALLYA_STUNT, THALLYA_ROARING,
+                    THALLYA_TURBO_SWITCH
                 )
             }
         }
 
         fun returnSpecialCardNameByMegami(megami_name: MegamiEnum): List<CardName> {
             return when (megami_name){
-                MegamiEnum.NONE -> listOf()
-                MegamiEnum.YURINA -> listOf(
+                NONE -> listOf()
+                YURINA -> listOf(
                     YURINA_WOLYUNGNACK, YURINA_POBARAM, YURINA_JJOCKBAE, YURINA_JURUCK
                 )
 
-                MegamiEnum.SAINE -> listOf(
+                SAINE -> listOf(
                     SAINE_YULDONGHOGEK, SAINE_HANGMUNGGONGJIN, SAINE_EMMOOSHOEBING, SAINE_JONGGEK
                 )
 
-                MegamiEnum.HIMIKA -> listOf(
+                HIMIKA -> listOf(
                     HIMIKA_REDBULLET, HIMIKA_CRIMSONZERO, HIMIKA_SCARLETIMAGINE, HIMIKA_BURMILIONFIELD
                 )
 
-                MegamiEnum.TOKOYO -> listOf(
+                TOKOYO -> listOf(
                     TOKOYO_KUON, TOKOYO_THOUSANDBIRD, TOKOYO_ENDLESSWIND, TOKOYO_TOKOYOMOON
                 )
 
-                MegamiEnum.OBORO -> listOf(
+                OBORO -> listOf(
                     OBORO_KUMASUKE, OBORO_TOBIKAGE, OBORO_ULOO, OBORO_MIKAZRA
                 )
 
-                MegamiEnum.YUKIHI -> listOf(
+                YUKIHI -> listOf(
                     YUKIHI_FLUTTERING_SNOWFLAKE, YUKIHI_SWAYING_LAMPLIGHT, YUKIHI_CLINGY_MIND, YUKIHI_SWIRLING_GESTURE
                 )
 
-                MegamiEnum.SHINRA -> listOf(
+                SHINRA -> listOf(
                     SHINRA_WANJEON_NONPA, SHINRA_DASIG_IHAE, SHINRA_CHEONJI_BANBAG, SHINRA_SAMRA_BAN_SHO
                 )
 
-                MegamiEnum.HAGANE -> listOf(
+                HAGANE -> listOf(
                     HAGANE_GRAND_SKY_HOLE_CRASH, HAGANE_GRAND_BELL_MEGALOBEL, HAGANE_GRAND_GRAVITATION_ATTRACT,
                     HAGANE_GRAND_MOUNTAIN_RESPECT
                 )
 
-                MegamiEnum.CHIKAGE -> listOf(
+                CHIKAGE -> listOf(
                     CHIKAGE_DEADLY_POISON, CHIKAGE_HAN_KI_POISON,
                     CHIKAGE_REINCARNATION_POISON, CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE
                 )
-                MegamiEnum.KURURU -> listOf(
+                KURURU -> listOf(
                     KURURU_DRAIN_DEVIL, KURURU_BIG_GOLEM, KURURU_INDUSTRIA,
                     KURURU_KANSHOUSOUCHI_KURURUSIK
+                )
+
+                THALLYA -> listOf(
+                    THALLYA_ALPHA_EDGE, THALLYA_OMEGA_BURST, THALLYA_THALLYA_MASTERPIECE,
+                    THALLYA_JULIA_BLACKBOX,
                 )
             }
         }
 
         fun returnAdditionalCardNameByMegami(megami_name: MegamiEnum): List<CardName> {
             return when (megami_name){
-                MegamiEnum.NONE -> listOf()
-                MegamiEnum.YURINA -> listOf()
-                MegamiEnum.SAINE -> listOf()
-                MegamiEnum.HIMIKA -> listOf()
-                MegamiEnum.TOKOYO -> listOf()
-                MegamiEnum.OBORO -> listOf()
-                MegamiEnum.YUKIHI -> listOf()
-                MegamiEnum.SHINRA -> listOf()
-                MegamiEnum.HAGANE -> listOf()
-                MegamiEnum.CHIKAGE -> listOf()
-                MegamiEnum.KURURU -> listOf(
+                NONE -> listOf()
+                YURINA -> listOf()
+                SAINE -> listOf()
+                HIMIKA -> listOf()
+                TOKOYO -> listOf()
+                OBORO -> listOf()
+                YUKIHI -> listOf()
+                SHINRA -> listOf()
+                HAGANE -> listOf()
+                CHIKAGE -> listOf()
+                KURURU -> listOf(
                     KURURU_DUPLICATED_GEAR_1, KURURU_DUPLICATED_GEAR_2, KURURU_DUPLICATED_GEAR_3
+                )
+                THALLYA -> listOf(
+                    FORM_YAKSHA, FORM_NAGA, FORM_GARUDA
                 )
             }
         }

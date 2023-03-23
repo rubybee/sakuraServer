@@ -7,7 +7,7 @@ import com.sakurageto.card.PlayerEnum
 //number1, number2 used to express location and card number
 class Log(val player: PlayerEnum, val text: LogText, val number1: Int, val number2: Int) {
     fun cardCheck(card_name: CardName): Boolean{
-        return CardSet.cardNameHashmapFirst[card_name] == number1 || CardSet.cardNameHashmapSecond[card_name] == number1
+        return card_name.toCardNumber(true) == number1 || card_name.toCardNumber(false) == number1
     }
 
 }

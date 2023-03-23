@@ -1,7 +1,5 @@
 package com.sakurageto.gamelogic
 
-import com.sakurageto.card.CardName
-import com.sakurageto.card.CardSet
 import com.sakurageto.card.PlayerEnum
 
 class Logger {

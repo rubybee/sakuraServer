@@ -3,283 +3,21 @@ package com.sakurageto.card
 import com.sakurageto.gamelogic.*
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
+import java.util.EnumMap
 import kotlin.collections.HashMap
 import kotlin.math.abs
 
 data class Kikou(var attack: Int = 0, var behavior: Int = 0, var enchantment: Int = 0, var reaction: Int = 0, var fullPower: Int = 0)
 
 object CardSet {
-    val cardNameHashmapFirst = HashMap<CardName, Int>()
-    val cardNameHashmapSecond = HashMap<CardName, Int>()
-    val cardNumberHashmap = HashMap<Int, CardName>()
+    private val cardNumberHashmap = HashMap<Int, CardName>()
+    private val cardDataHashmap = EnumMap<CardName, CardData>(CardName::class.java)
 
-    private const val SHINRA_SHINRA_CARD_NUMBER = 100001
+    const val SHINRA_SHINRA_CARD_NUMBER = 100001
+    fun Int.toCardName(): CardName = cardNumberHashmap[this]?: CardName.CARD_UNNAME
+    fun CardName.toCardData(): CardData = cardDataHashmap[this]?: unused
 
     private fun hashMapInit(){
-        //for first turn player 0~9999
-        cardNameHashmapFirst[CardName.YURINA_CHAM] = 100
-        cardNameHashmapFirst[CardName.YURINA_ILSUM] = 101
-        cardNameHashmapFirst[CardName.YURINA_JARUCHIGI] = 102
-        cardNameHashmapFirst[CardName.YURINA_GUHAB] = 103
-        cardNameHashmapFirst[CardName.YURINA_GIBACK] = 104
-        cardNameHashmapFirst[CardName.YURINA_APDO] = 105
-        cardNameHashmapFirst[CardName.YURINA_GIYENBANJO] = 106
-        cardNameHashmapFirst[CardName.YURINA_WOLYUNGNACK] = 107
-        cardNameHashmapFirst[CardName.YURINA_POBARAM] = 108
-        cardNameHashmapFirst[CardName.YURINA_JJOCKBAE] = 109
-        cardNameHashmapFirst[CardName.YURINA_JURUCK] = 110
-
-        cardNameHashmapFirst[CardName.SAINE_DOUBLEBEGI] = 200
-        cardNameHashmapFirst[CardName.SAINE_HURUBEGI] = 201
-        cardNameHashmapFirst[CardName.SAINE_MOOGECHOO] = 202
-        cardNameHashmapFirst[CardName.SAINE_GANPA] = 203
-        cardNameHashmapFirst[CardName.SAINE_GWONYUCK] = 204
-        cardNameHashmapFirst[CardName.SAINE_CHOONGEMJUNG] = 205
-        cardNameHashmapFirst[CardName.SAINE_MOOEMBUCK] = 206
-        cardNameHashmapFirst[CardName.SAINE_YULDONGHOGEK] = 207
-        cardNameHashmapFirst[CardName.SAINE_HANGMUNGGONGJIN] = 208
-        cardNameHashmapFirst[CardName.SAINE_EMMOOSHOEBING] = 209
-        cardNameHashmapFirst[CardName.SAINE_JONGGEK] = 210
-
-        cardNameHashmapFirst[CardName.HIMIKA_SHOOT] = 300
-        cardNameHashmapFirst[CardName.HIMIKA_RAPIDFIRE] = 301
-        cardNameHashmapFirst[CardName.HIMIKA_MAGNUMCANON] = 302
-        cardNameHashmapFirst[CardName.HIMIKA_FULLBURST] = 303
-        cardNameHashmapFirst[CardName.HIMIKA_BACKSTEP] = 304
-        cardNameHashmapFirst[CardName.HIMIKA_BACKDRAFT] = 305
-        cardNameHashmapFirst[CardName.HIMIKA_SMOKE] = 306
-        cardNameHashmapFirst[CardName.HIMIKA_REDBULLET] = 307
-        cardNameHashmapFirst[CardName.HIMIKA_CRIMSONZERO] = 308
-        cardNameHashmapFirst[CardName.HIMIKA_SCARLETIMAGINE] = 309
-        cardNameHashmapFirst[CardName.HIMIKA_BURMILIONFIELD] = 310
-
-        cardNameHashmapFirst[CardName.TOKOYO_BITSUNERIGI] = 400
-        cardNameHashmapFirst[CardName.TOKOYO_WOOAHHANTAGUCK] = 401
-        cardNameHashmapFirst[CardName.TOKOYO_RUNNINGRABIT] = 402
-        cardNameHashmapFirst[CardName.TOKOYO_POETDANCE] = 403
-        cardNameHashmapFirst[CardName.TOKOYO_FLIPFAN] = 404
-        cardNameHashmapFirst[CardName.TOKOYO_WINDSTAGE] = 405
-        cardNameHashmapFirst[CardName.TOKOYO_SUNSTAGE] = 406
-        cardNameHashmapFirst[CardName.TOKOYO_KUON] = 407
-        cardNameHashmapFirst[CardName.TOKOYO_THOUSANDBIRD] = 408
-        cardNameHashmapFirst[CardName.TOKOYO_ENDLESSWIND] = 409
-        cardNameHashmapFirst[CardName.TOKOYO_TOKOYOMOON] = 410
-
-        cardNameHashmapFirst[CardName.OBORO_WIRE] = 500
-        cardNameHashmapFirst[CardName.OBORO_SHADOWCALTROP] = 501
-        cardNameHashmapFirst[CardName.OBORO_ZANGEKIRANBU] = 502
-        cardNameHashmapFirst[CardName.OBORO_NINJAWALK] = 503
-        cardNameHashmapFirst[CardName.OBORO_INDUCE] = 504
-        cardNameHashmapFirst[CardName.OBORO_CLONE] = 505
-        cardNameHashmapFirst[CardName.OBORO_BIOACTIVITY] = 506
-        cardNameHashmapFirst[CardName.OBORO_KUMASUKE] = 507
-        cardNameHashmapFirst[CardName.OBORO_TOBIKAGE] = 508
-        cardNameHashmapFirst[CardName.OBORO_ULOO] = 509
-        cardNameHashmapFirst[CardName.OBORO_MIKAZRA] = 510
-
-        cardNameHashmapFirst[CardName.YUKIHI_YUKIHI] = 100000
-        cardNameHashmapFirst[CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE] = 600
-        cardNameHashmapFirst[CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS] = 601
-        cardNameHashmapFirst[CardName.YUKIHI_PUSH_OUT_SLASH_PULL] = 602
-        cardNameHashmapFirst[CardName.YUKIHI_SWING_SLASH_STAB] = 603
-        cardNameHashmapFirst[CardName.YUKIHI_TURN_UMBRELLA] = 604
-        cardNameHashmapFirst[CardName.YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN] = 605
-        cardNameHashmapFirst[CardName.YUKIHI_MAKE_CONNECTION] = 606
-        cardNameHashmapFirst[CardName.YUKIHI_FLUTTERING_SNOWFLAKE] = 607
-        cardNameHashmapFirst[CardName.YUKIHI_SWAYING_LAMPLIGHT] = 608
-        cardNameHashmapFirst[CardName.YUKIHI_CLINGY_MIND] = 609
-        cardNameHashmapFirst[CardName.YUKIHI_SWIRLING_GESTURE] = 610
-
-        cardNameHashmapFirst[CardName.SHINRA_SHINRA] = SHINRA_SHINRA_CARD_NUMBER
-        cardNameHashmapFirst[CardName.SHINRA_IBLON] = 700
-        cardNameHashmapFirst[CardName.SHINRA_BANLON] = 701
-        cardNameHashmapFirst[CardName.SHINRA_KIBEN] = 702
-        cardNameHashmapFirst[CardName.SHINRA_INYONG] = 703
-        cardNameHashmapFirst[CardName.SHINRA_SEONDONG] = 704
-        cardNameHashmapFirst[CardName.SHINRA_JANGDAM] = 705
-        cardNameHashmapFirst[CardName.SHINRA_NONPA] = 706
-        cardNameHashmapFirst[CardName.SHINRA_WANJEON_NONPA] = 707
-        cardNameHashmapFirst[CardName.SHINRA_DASIG_IHAE] = 708
-        cardNameHashmapFirst[CardName.SHINRA_CHEONJI_BANBAG] = 709
-        cardNameHashmapFirst[CardName.SHINRA_SAMRA_BAN_SHO] = 710
-
-        cardNameHashmapFirst[CardName.HAGANE_CENTRIFUGAL_ATTACK] = 800
-        cardNameHashmapFirst[CardName.HAGANE_FOUR_WINDED_EARTHQUAKE] = 801
-        cardNameHashmapFirst[CardName.HAGANE_GROUND_BREAKING] = 802
-        cardNameHashmapFirst[CardName.HAGANE_HYPER_RECOIL] = 803
-        cardNameHashmapFirst[CardName.HAGANE_WON_MU_RUYN] = 804
-        cardNameHashmapFirst[CardName.HAGANE_RING_A_BELL] = 805
-        cardNameHashmapFirst[CardName.HAGANE_GRAVITATION_FIELD] = 806
-        cardNameHashmapFirst[CardName.HAGANE_GRAND_SKY_HOLE_CRASH] = 807
-        cardNameHashmapFirst[CardName.HAGANE_GRAND_BELL_MEGALOBEL] = 808
-        cardNameHashmapFirst[CardName.HAGANE_GRAND_GRAVITATION_ATTRACT] = 809
-        cardNameHashmapFirst[CardName.HAGANE_GRAND_MOUNTAIN_RESPECT] = 810
-
-        cardNameHashmapFirst[CardName.CHIKAGE_THROW_KUNAI] = 900
-        cardNameHashmapFirst[CardName.CHIKAGE_POISON_NEEDLE] = 901
-        cardNameHashmapFirst[CardName.CHIKAGE_TO_ZU_CHU] = 902
-        cardNameHashmapFirst[CardName.CHIKAGE_CUTTING_NECK] = 903
-        cardNameHashmapFirst[CardName.CHIKAGE_POISON_SMOKE] = 904
-        cardNameHashmapFirst[CardName.CHIKAGE_TIP_TOEING] = 905
-        cardNameHashmapFirst[CardName.CHIKAGE_MUDDLE] = 906
-        cardNameHashmapFirst[CardName.CHIKAGE_DEADLY_POISON] = 907
-        cardNameHashmapFirst[CardName.CHIKAGE_HAN_KI_POISON] = 908
-        cardNameHashmapFirst[CardName.CHIKAGE_REINCARNATION_POISON] = 909
-        cardNameHashmapFirst[CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE] = 910
-        cardNameHashmapFirst[CardName.POISON_PARALYTIC] = 995
-        cardNameHashmapFirst[CardName.POISON_HALLUCINOGENIC] = 996
-        cardNameHashmapFirst[CardName.POISON_RELAXATION] = 997
-        cardNameHashmapFirst[CardName.POISON_DEADLY_1] = 998
-        cardNameHashmapFirst[CardName.POISON_DEADLY_2] = 999
-
-        cardNameHashmapFirst[CardName.KURURU_ELEKITTEL] = 1000
-        cardNameHashmapFirst[CardName.KURURU_ACCELERATOR] = 1001
-        cardNameHashmapFirst[CardName.KURURU_KURURUOONG] = 1002
-        cardNameHashmapFirst[CardName.KURURU_TORNADO] = 1003
-        cardNameHashmapFirst[CardName.KURURU_REGAINER] = 1004
-        cardNameHashmapFirst[CardName.KURURU_MODULE] = 1005
-        cardNameHashmapFirst[CardName.KURURU_REFLECTOR] = 1006
-        cardNameHashmapFirst[CardName.KURURU_DRAIN_DEVIL] = 1007
-        cardNameHashmapFirst[CardName.KURURU_BIG_GOLEM] = 1008
-        cardNameHashmapFirst[CardName.KURURU_INDUSTRIA] = 1009
-        cardNameHashmapFirst[CardName.KURURU_DUPLICATED_GEAR_1] = 1010
-        cardNameHashmapFirst[CardName.KURURU_DUPLICATED_GEAR_2] = 1011
-        cardNameHashmapFirst[CardName.KURURU_DUPLICATED_GEAR_3] = 1012
-        cardNameHashmapFirst[CardName.KURURU_KANSHOUSOUCHI_KURURUSIK] = 1013
-        //1014 is must empty
-
-        //for second turn player 10000~19999
-        cardNameHashmapSecond[CardName.YURINA_CHAM] = 10100
-        cardNameHashmapSecond[CardName.YURINA_ILSUM] = 10101
-        cardNameHashmapSecond[CardName.YURINA_JARUCHIGI] = 10102
-        cardNameHashmapSecond[CardName.YURINA_GUHAB] = 10103
-        cardNameHashmapSecond[CardName.YURINA_GIBACK] = 10104
-        cardNameHashmapSecond[CardName.YURINA_APDO] = 10105
-        cardNameHashmapSecond[CardName.YURINA_GIYENBANJO] = 10106
-        cardNameHashmapSecond[CardName.YURINA_WOLYUNGNACK] = 10107
-        cardNameHashmapSecond[CardName.YURINA_POBARAM] = 10108
-        cardNameHashmapSecond[CardName.YURINA_JJOCKBAE] = 10109
-        cardNameHashmapSecond[CardName.YURINA_JURUCK] = 10110
-
-        cardNameHashmapSecond[CardName.SAINE_DOUBLEBEGI] = 10200
-        cardNameHashmapSecond[CardName.SAINE_HURUBEGI] = 10201
-        cardNameHashmapSecond[CardName.SAINE_MOOGECHOO] = 10202
-        cardNameHashmapSecond[CardName.SAINE_GANPA] = 10203
-        cardNameHashmapSecond[CardName.SAINE_GWONYUCK] = 10204
-        cardNameHashmapSecond[CardName.SAINE_CHOONGEMJUNG] = 10205
-        cardNameHashmapSecond[CardName.SAINE_MOOEMBUCK] = 10206
-        cardNameHashmapSecond[CardName.SAINE_YULDONGHOGEK] = 10207
-        cardNameHashmapSecond[CardName.SAINE_HANGMUNGGONGJIN] = 10208
-        cardNameHashmapSecond[CardName.SAINE_EMMOOSHOEBING] = 10209
-        cardNameHashmapSecond[CardName.SAINE_JONGGEK] = 10210
-
-        cardNameHashmapSecond[CardName.HIMIKA_SHOOT] = 10300
-        cardNameHashmapSecond[CardName.HIMIKA_RAPIDFIRE] = 10301
-        cardNameHashmapSecond[CardName.HIMIKA_MAGNUMCANON] = 10302
-        cardNameHashmapSecond[CardName.HIMIKA_FULLBURST] = 10303
-        cardNameHashmapSecond[CardName.HIMIKA_BACKSTEP] = 10304
-        cardNameHashmapSecond[CardName.HIMIKA_BACKDRAFT] = 10305
-        cardNameHashmapSecond[CardName.HIMIKA_SMOKE] = 10306
-        cardNameHashmapSecond[CardName.HIMIKA_REDBULLET] = 10307
-        cardNameHashmapSecond[CardName.HIMIKA_CRIMSONZERO] = 10308
-        cardNameHashmapSecond[CardName.HIMIKA_SCARLETIMAGINE] = 10309
-        cardNameHashmapSecond[CardName.HIMIKA_BURMILIONFIELD] = 10310
-
-        cardNameHashmapSecond[CardName.TOKOYO_BITSUNERIGI] = 10400
-        cardNameHashmapSecond[CardName.TOKOYO_WOOAHHANTAGUCK] = 10401
-        cardNameHashmapSecond[CardName.TOKOYO_RUNNINGRABIT] = 10402
-        cardNameHashmapSecond[CardName.TOKOYO_POETDANCE] = 10403
-        cardNameHashmapSecond[CardName.TOKOYO_FLIPFAN] = 10404
-        cardNameHashmapSecond[CardName.TOKOYO_WINDSTAGE] = 10405
-        cardNameHashmapSecond[CardName.TOKOYO_SUNSTAGE] = 10406
-        cardNameHashmapSecond[CardName.TOKOYO_KUON] = 10407
-        cardNameHashmapSecond[CardName.TOKOYO_THOUSANDBIRD] = 10408
-        cardNameHashmapSecond[CardName.TOKOYO_ENDLESSWIND] = 10409
-        cardNameHashmapSecond[CardName.TOKOYO_TOKOYOMOON] = 10410
-
-        cardNameHashmapSecond[CardName.OBORO_WIRE] = 10500
-        cardNameHashmapSecond[CardName.OBORO_SHADOWCALTROP] = 10501
-        cardNameHashmapSecond[CardName.OBORO_ZANGEKIRANBU] = 10502
-        cardNameHashmapSecond[CardName.OBORO_NINJAWALK] = 10503
-        cardNameHashmapSecond[CardName.OBORO_INDUCE] = 10504
-        cardNameHashmapSecond[CardName.OBORO_CLONE] = 10505
-        cardNameHashmapSecond[CardName.OBORO_BIOACTIVITY] = 10506
-        cardNameHashmapSecond[CardName.OBORO_KUMASUKE] = 10507
-        cardNameHashmapSecond[CardName.OBORO_TOBIKAGE] = 10508
-        cardNameHashmapSecond[CardName.OBORO_ULOO] = 10509
-        cardNameHashmapSecond[CardName.OBORO_MIKAZRA] = 10510
-
-        cardNameHashmapSecond[CardName.YUKIHI_YUKIHI] = 200000
-        cardNameHashmapSecond[CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE] = 10600
-        cardNameHashmapSecond[CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS] = 10601
-        cardNameHashmapSecond[CardName.YUKIHI_PUSH_OUT_SLASH_PULL] = 10602
-        cardNameHashmapSecond[CardName.YUKIHI_SWING_SLASH_STAB] = 10603
-        cardNameHashmapSecond[CardName.YUKIHI_TURN_UMBRELLA] = 10604
-        cardNameHashmapSecond[CardName.YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN] = 10605
-        cardNameHashmapSecond[CardName.YUKIHI_MAKE_CONNECTION] = 10606
-        cardNameHashmapSecond[CardName.YUKIHI_FLUTTERING_SNOWFLAKE] = 10607
-        cardNameHashmapSecond[CardName.YUKIHI_SWAYING_LAMPLIGHT] = 10608
-        cardNameHashmapSecond[CardName.YUKIHI_CLINGY_MIND] = 10609
-        cardNameHashmapSecond[CardName.YUKIHI_SWIRLING_GESTURE] = 10610
-
-        cardNameHashmapSecond[CardName.SHINRA_SHINRA] = SHINRA_SHINRA_CARD_NUMBER
-        cardNameHashmapSecond[CardName.SHINRA_IBLON] = 10700
-        cardNameHashmapSecond[CardName.SHINRA_BANLON] = 10701
-        cardNameHashmapSecond[CardName.SHINRA_KIBEN] = 10702
-        cardNameHashmapSecond[CardName.SHINRA_INYONG] = 10703
-        cardNameHashmapSecond[CardName.SHINRA_SEONDONG] = 10704
-        cardNameHashmapSecond[CardName.SHINRA_JANGDAM] = 10705
-        cardNameHashmapSecond[CardName.SHINRA_NONPA] = 10706
-        cardNameHashmapSecond[CardName.SHINRA_WANJEON_NONPA] = 10707
-        cardNameHashmapSecond[CardName.SHINRA_DASIG_IHAE] = 10708
-        cardNameHashmapSecond[CardName.SHINRA_CHEONJI_BANBAG] = 10709
-        cardNameHashmapSecond[CardName.SHINRA_SAMRA_BAN_SHO] = 10710
-
-        cardNameHashmapSecond[CardName.HAGANE_CENTRIFUGAL_ATTACK] = 10800
-        cardNameHashmapSecond[CardName.HAGANE_FOUR_WINDED_EARTHQUAKE] = 10801
-        cardNameHashmapSecond[CardName.HAGANE_GROUND_BREAKING] = 10802
-        cardNameHashmapSecond[CardName.HAGANE_HYPER_RECOIL] = 10803
-        cardNameHashmapSecond[CardName.HAGANE_WON_MU_RUYN] = 10804
-        cardNameHashmapSecond[CardName.HAGANE_RING_A_BELL] = 10805
-        cardNameHashmapSecond[CardName.HAGANE_GRAVITATION_FIELD] = 10806
-        cardNameHashmapSecond[CardName.HAGANE_GRAND_SKY_HOLE_CRASH] = 10807
-        cardNameHashmapSecond[CardName.HAGANE_GRAND_BELL_MEGALOBEL] = 10808
-        cardNameHashmapSecond[CardName.HAGANE_GRAND_GRAVITATION_ATTRACT] = 10809
-        cardNameHashmapSecond[CardName.HAGANE_GRAND_MOUNTAIN_RESPECT] = 10810
-
-        cardNameHashmapSecond[CardName.CHIKAGE_THROW_KUNAI] = 10900
-        cardNameHashmapSecond[CardName.CHIKAGE_POISON_NEEDLE] = 10901
-        cardNameHashmapSecond[CardName.CHIKAGE_TO_ZU_CHU] = 10902
-        cardNameHashmapSecond[CardName.CHIKAGE_CUTTING_NECK] = 10903
-        cardNameHashmapSecond[CardName.CHIKAGE_POISON_SMOKE] = 10904
-        cardNameHashmapSecond[CardName.CHIKAGE_TIP_TOEING] = 10905
-        cardNameHashmapSecond[CardName.CHIKAGE_MUDDLE] = 10906
-        cardNameHashmapSecond[CardName.CHIKAGE_DEADLY_POISON] = 10907
-        cardNameHashmapSecond[CardName.CHIKAGE_HAN_KI_POISON] = 10908
-        cardNameHashmapSecond[CardName.CHIKAGE_REINCARNATION_POISON] = 10909
-        cardNameHashmapSecond[CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE] = 10910
-        cardNameHashmapSecond[CardName.POISON_PARALYTIC] = 10995
-        cardNameHashmapSecond[CardName.POISON_HALLUCINOGENIC] = 10996
-        cardNameHashmapSecond[CardName.POISON_RELAXATION] = 10997
-        cardNameHashmapSecond[CardName.POISON_DEADLY_1] = 10998
-        cardNameHashmapSecond[CardName.POISON_DEADLY_2] = 10999
-
-        cardNameHashmapSecond[CardName.KURURU_ELEKITTEL] = 11000
-        cardNameHashmapSecond[CardName.KURURU_ACCELERATOR] = 11001
-        cardNameHashmapSecond[CardName.KURURU_KURURUOONG] = 11002
-        cardNameHashmapSecond[CardName.KURURU_TORNADO] = 11003
-        cardNameHashmapSecond[CardName.KURURU_REGAINER] = 11004
-        cardNameHashmapSecond[CardName.KURURU_MODULE] = 11005
-        cardNameHashmapSecond[CardName.KURURU_REFLECTOR] = 11006
-        cardNameHashmapSecond[CardName.KURURU_DRAIN_DEVIL] = 11007
-        cardNameHashmapSecond[CardName.KURURU_BIG_GOLEM] = 11008
-        cardNameHashmapSecond[CardName.KURURU_INDUSTRIA] = 11009
-        cardNameHashmapSecond[CardName.KURURU_DUPLICATED_GEAR_1] = 11010
-        cardNameHashmapSecond[CardName.KURURU_DUPLICATED_GEAR_2] = 11011
-        cardNameHashmapSecond[CardName.KURURU_DUPLICATED_GEAR_3] = 11012
-        cardNameHashmapSecond[CardName.KURURU_KANSHOUSOUCHI_KURURUSIK] = 11013
-        //11014 is must empty
-
         //for number -> card name
         cardNumberHashmap[0] = CardName.CARD_UNNAME
         cardNumberHashmap[1] = CardName.POISON_ANYTHING
@@ -412,6 +150,21 @@ object CardSet {
         cardNumberHashmap[1012] = CardName.KURURU_DUPLICATED_GEAR_3
         cardNumberHashmap[1013] = CardName.KURURU_KANSHOUSOUCHI_KURURUSIK
 
+        cardNumberHashmap[1100] = CardName.THALLYA_BURNING_STEAM
+        cardNumberHashmap[1101] = CardName.THALLYA_WAVING_EDGE
+        cardNumberHashmap[1102] = CardName.THALLYA_SHIELD_CHARGE
+        cardNumberHashmap[1103] = CardName.THALLYA_STEAM_CANNON
+        cardNumberHashmap[1104] = CardName.THALLYA_STUNT
+        cardNumberHashmap[1105] = CardName.THALLYA_ROARING
+        cardNumberHashmap[1106] = CardName.THALLYA_TURBO_SWITCH
+        cardNumberHashmap[1107] = CardName.THALLYA_ALPHA_EDGE
+        cardNumberHashmap[1108] = CardName.THALLYA_OMEGA_BURST
+        cardNumberHashmap[1109] = CardName.THALLYA_THALLYA_MASTERPIECE
+        cardNumberHashmap[1110] = CardName.THALLYA_JULIA_BLACKBOX
+        cardNumberHashmap[1110] = CardName.FORM_YAKSHA
+        cardNumberHashmap[1111] = CardName.FORM_NAGA
+        cardNumberHashmap[1112] = CardName.FORM_GARUDA
+
         cardNumberHashmap[10100] = CardName.YURINA_CHAM
         cardNumberHashmap[10101] = CardName.YURINA_ILSUM
         cardNumberHashmap[10102] = CardName.YURINA_JARUCHIGI
@@ -448,6 +201,7 @@ object CardSet {
         cardNumberHashmap[10309] = CardName.HIMIKA_SCARLETIMAGINE
         cardNumberHashmap[10310] = CardName.HIMIKA_BURMILIONFIELD
 
+        cardNumberHashmap[10400] = CardName.TOKOYO_BITSUNERIGI
         cardNumberHashmap[10401] = CardName.TOKOYO_WOOAHHANTAGUCK
         cardNumberHashmap[10402] = CardName.TOKOYO_RUNNINGRABIT
         cardNumberHashmap[10403] = CardName.TOKOYO_POETDANCE
@@ -526,20 +280,142 @@ object CardSet {
         cardNumberHashmap[10998] = CardName.POISON_DEADLY_1
         cardNumberHashmap[10999] = CardName.POISON_DEADLY_2
 
-        cardNumberHashmap[11000] = CardName.KURURU_ELEKITTEL
-        cardNumberHashmap[11001] = CardName.KURURU_ACCELERATOR
-        cardNumberHashmap[11002] = CardName.KURURU_KURURUOONG
-        cardNumberHashmap[11003] = CardName.KURURU_TORNADO
-        cardNumberHashmap[11004] = CardName.KURURU_REGAINER
-        cardNumberHashmap[11005] = CardName.KURURU_MODULE
-        cardNumberHashmap[11006] = CardName.KURURU_REFLECTOR
-        cardNumberHashmap[11007] = CardName.KURURU_DRAIN_DEVIL
-        cardNumberHashmap[11008] = CardName.KURURU_BIG_GOLEM
-        cardNumberHashmap[11009] = CardName.KURURU_INDUSTRIA
-        cardNumberHashmap[11010] = CardName.KURURU_DUPLICATED_GEAR_1
-        cardNumberHashmap[11011] = CardName.KURURU_DUPLICATED_GEAR_2
-        cardNumberHashmap[11012] = CardName.KURURU_DUPLICATED_GEAR_3
-        cardNumberHashmap[11013] = CardName.KURURU_KANSHOUSOUCHI_KURURUSIK
+        cardNumberHashmap[11100] = CardName.THALLYA_BURNING_STEAM
+        cardNumberHashmap[11101] = CardName.THALLYA_WAVING_EDGE
+        cardNumberHashmap[11102] = CardName.THALLYA_SHIELD_CHARGE
+        cardNumberHashmap[11103] = CardName.THALLYA_STEAM_CANNON
+        cardNumberHashmap[11104] = CardName.THALLYA_STUNT
+        cardNumberHashmap[11105] = CardName.THALLYA_ROARING
+        cardNumberHashmap[11106] = CardName.THALLYA_TURBO_SWITCH
+        cardNumberHashmap[11107] = CardName.THALLYA_ALPHA_EDGE
+        cardNumberHashmap[11108] = CardName.THALLYA_OMEGA_BURST
+        cardNumberHashmap[11109] = CardName.THALLYA_THALLYA_MASTERPIECE
+        cardNumberHashmap[11110] = CardName.THALLYA_JULIA_BLACKBOX
+        cardNumberHashmap[11110] = CardName.FORM_YAKSHA
+        cardNumberHashmap[11111] = CardName.FORM_NAGA
+        cardNumberHashmap[11112] = CardName.FORM_GARUDA
+
+        cardDataHashmap[CardName.CARD_UNNAME] = unused
+        cardDataHashmap[CardName.POISON_ANYTHING] = unused
+        cardDataHashmap[CardName.YURINA_CHAM] = cham
+        cardDataHashmap[CardName.YURINA_ILSUM] = ilsom
+        cardDataHashmap[CardName.YURINA_JARUCHIGI] = jaru_chigi
+        cardDataHashmap[CardName.YURINA_GUHAB] = guhab
+        cardDataHashmap[CardName.YURINA_GIBACK] = giback
+        cardDataHashmap[CardName.YURINA_APDO] = apdo
+        cardDataHashmap[CardName.YURINA_GIYENBANJO] = giyenbanzo
+        cardDataHashmap[CardName.YURINA_WOLYUNGNACK] = wolyungnack
+        cardDataHashmap[CardName.YURINA_POBARAM] = pobaram
+        cardDataHashmap[CardName.YURINA_JJOCKBAE] = jjockbae
+        cardDataHashmap[CardName.YURINA_JURUCK] = juruck
+        cardDataHashmap[CardName.SAINE_DOUBLEBEGI] = doublebegi
+        cardDataHashmap[CardName.SAINE_HURUBEGI] = hurubegi
+        cardDataHashmap[CardName.SAINE_MOOGECHOO] = moogechoo
+        cardDataHashmap[CardName.SAINE_GANPA] = ganpa
+        cardDataHashmap[CardName.SAINE_GWONYUCK] = gwonyuck
+        cardDataHashmap[CardName.SAINE_CHOONGEMJUNG] = choongemjung
+        cardDataHashmap[CardName.SAINE_MOOEMBUCK] = mooembuck
+        cardDataHashmap[CardName.SAINE_YULDONGHOGEK] = yuldonghogek
+        cardDataHashmap[CardName.SAINE_HANGMUNGGONGJIN] = hangmunggongjin
+        cardDataHashmap[CardName.SAINE_EMMOOSHOEBING] = emmooshoebing
+        cardDataHashmap[CardName.SAINE_JONGGEK] = jonggek
+        cardDataHashmap[CardName.HIMIKA_SHOOT] = shoot
+        cardDataHashmap[CardName.HIMIKA_RAPIDFIRE] = rapidfire
+        cardDataHashmap[CardName.HIMIKA_MAGNUMCANON] = magnumcanon
+        cardDataHashmap[CardName.HIMIKA_FULLBURST] = fullburst
+        cardDataHashmap[CardName.HIMIKA_BACKSTEP] = backstep
+        cardDataHashmap[CardName.HIMIKA_BACKDRAFT] = backdraft
+        cardDataHashmap[CardName.HIMIKA_SMOKE] = smoke
+        cardDataHashmap[CardName.HIMIKA_REDBULLET] = redbullet
+        cardDataHashmap[CardName.HIMIKA_CRIMSONZERO] = crimsonzero
+        cardDataHashmap[CardName.HIMIKA_SCARLETIMAGINE] = scarletimagine
+        cardDataHashmap[CardName.HIMIKA_BURMILIONFIELD] = burmilionfield
+        cardDataHashmap[CardName.TOKOYO_BITSUNERIGI] = bitsunerigi
+        cardDataHashmap[CardName.TOKOYO_WOOAHHANTAGUCK] = wooahhantaguck
+        cardDataHashmap[CardName.TOKOYO_RUNNINGRABIT] = runningrabit
+        cardDataHashmap[CardName.TOKOYO_POETDANCE] = poetdance
+        cardDataHashmap[CardName.TOKOYO_FLIPFAN] = flipfan
+        cardDataHashmap[CardName.TOKOYO_WINDSTAGE] = windstage
+        cardDataHashmap[CardName.TOKOYO_SUNSTAGE] = sunstage
+        cardDataHashmap[CardName.TOKOYO_KUON] = kuon
+        cardDataHashmap[CardName.TOKOYO_THOUSANDBIRD] = thousandbird
+        cardDataHashmap[CardName.TOKOYO_ENDLESSWIND] = endlesswind
+        cardDataHashmap[CardName.TOKOYO_TOKOYOMOON] = tokoyomoon
+        cardDataHashmap[CardName.OBORO_WIRE] = wire
+        cardDataHashmap[CardName.OBORO_SHADOWCALTROP] = shadowcaltrop
+        cardDataHashmap[CardName.OBORO_ZANGEKIRANBU] = zangekiranbu
+        cardDataHashmap[CardName.OBORO_NINJAWALK] = ninjawalk
+        cardDataHashmap[CardName.OBORO_INDUCE] = induce
+        cardDataHashmap[CardName.OBORO_CLONE] = clone
+        cardDataHashmap[CardName.OBORO_BIOACTIVITY] = bioactivity
+        cardDataHashmap[CardName.OBORO_KUMASUKE] = kumasuke
+        cardDataHashmap[CardName.OBORO_TOBIKAGE] = tobikage
+        cardDataHashmap[CardName.OBORO_ULOO] = uloo
+        cardDataHashmap[CardName.OBORO_MIKAZRA] = mikazra
+        cardDataHashmap[CardName.YUKIHI_YUKIHI] = yukihi
+        cardDataHashmap[CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE] = hiddenNeedle
+        cardDataHashmap[CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS] = hiddenFire
+        cardDataHashmap[CardName.YUKIHI_PUSH_OUT_SLASH_PULL] = pushOut
+        cardDataHashmap[CardName.YUKIHI_SWING_SLASH_STAB] = swing
+        cardDataHashmap[CardName.YUKIHI_TURN_UMBRELLA] = turnUmbrella
+        cardDataHashmap[CardName.YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN] = backwardStep
+        cardDataHashmap[CardName.YUKIHI_MAKE_CONNECTION] = makeConnection
+        cardDataHashmap[CardName.YUKIHI_FLUTTERING_SNOWFLAKE] = flutteringSnowflake
+        cardDataHashmap[CardName.YUKIHI_SWAYING_LAMPLIGHT] = swayingLamplight
+        cardDataHashmap[CardName.YUKIHI_CLINGY_MIND] = clingyMind
+        cardDataHashmap[CardName.YUKIHI_SWIRLING_GESTURE] = swirlingGesture
+        cardDataHashmap[CardName.SHINRA_SHINRA] = shinra
+        cardDataHashmap[CardName.SHINRA_IBLON] = iblon
+        cardDataHashmap[CardName.SHINRA_BANLON] = banlon
+        cardDataHashmap[CardName.SHINRA_KIBEN] = kiben
+        cardDataHashmap[CardName.SHINRA_INYONG] = inyong
+        cardDataHashmap[CardName.SHINRA_SEONDONG] = seondong
+        cardDataHashmap[CardName.SHINRA_JANGDAM] = jangdam
+        cardDataHashmap[CardName.SHINRA_NONPA] = nonpa
+        cardDataHashmap[CardName.SHINRA_WANJEON_NONPA] = wanjeonNonpa
+        cardDataHashmap[CardName.SHINRA_DASIG_IHAE] = dasicIhae
+        cardDataHashmap[CardName.SHINRA_CHEONJI_BANBAG] = cheonjiBanBag
+        cardDataHashmap[CardName.SHINRA_SAMRA_BAN_SHO] = samraBanSho
+        cardDataHashmap[CardName.HAGANE_CENTRIFUGAL_ATTACK] = centrifugalAttack
+        cardDataHashmap[CardName.HAGANE_FOUR_WINDED_EARTHQUAKE] = fourWindedEarthquake
+        cardDataHashmap[CardName.HAGANE_GROUND_BREAKING] = groundBreaking
+        cardDataHashmap[CardName.HAGANE_HYPER_RECOIL] = hyperRecoil
+        cardDataHashmap[CardName.HAGANE_WON_MU_RUYN] = wonMuRuyn
+        cardDataHashmap[CardName.HAGANE_RING_A_BELL] = ringABell
+        cardDataHashmap[CardName.HAGANE_GRAVITATION_FIELD] = gravitationField
+        cardDataHashmap[CardName.HAGANE_GRAND_SKY_HOLE_CRASH] = grandSkyHoleCrash
+        cardDataHashmap[CardName.HAGANE_GRAND_BELL_MEGALOBEL] = grandBellMegalobel
+        cardDataHashmap[CardName.HAGANE_GRAND_GRAVITATION_ATTRACT] = grandGravitationAttract
+        cardDataHashmap[CardName.HAGANE_GRAND_MOUNTAIN_RESPECT] = grandMountainRespect
+        cardDataHashmap[CardName.CHIKAGE_THROW_KUNAI] = throwKunai
+        cardDataHashmap[CardName.CHIKAGE_POISON_NEEDLE] = poisonNeedle
+        cardDataHashmap[CardName.CHIKAGE_TO_ZU_CHU] = toZuChu
+        cardDataHashmap[CardName.CHIKAGE_CUTTING_NECK] = cuttingNeck
+        cardDataHashmap[CardName.CHIKAGE_POISON_SMOKE] = poisonSmoke
+        cardDataHashmap[CardName.CHIKAGE_TIP_TOEING] = tipToeing
+        cardDataHashmap[CardName.CHIKAGE_MUDDLE] = muddle
+        cardDataHashmap[CardName.CHIKAGE_DEADLY_POISON] = deadlyPoison
+        cardDataHashmap[CardName.CHIKAGE_HAN_KI_POISON] = hankiPoison
+        cardDataHashmap[CardName.CHIKAGE_REINCARNATION_POISON] = reincarnationPoison
+        cardDataHashmap[CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE] = chikageWayOfLive
+        cardDataHashmap[CardName.POISON_PARALYTIC] = poisonParalytic
+        cardDataHashmap[CardName.POISON_HALLUCINOGENIC] = poisonHallucinogenic
+        cardDataHashmap[CardName.POISON_RELAXATION] = poisonRelaxation
+        cardDataHashmap[CardName.POISON_DEADLY_1] = poisonDeadly1
+        cardDataHashmap[CardName.POISON_DEADLY_2] = poisonDeadly2
+        cardDataHashmap[CardName.KURURU_ELEKITTEL] = elekittel
+        cardDataHashmap[CardName.KURURU_ACCELERATOR] = accelerator
+        cardDataHashmap[CardName.KURURU_KURURUOONG] = kururuoong
+        cardDataHashmap[CardName.KURURU_TORNADO] = tornado
+        cardDataHashmap[CardName.KURURU_REGAINER] = regainer
+        cardDataHashmap[CardName.KURURU_MODULE] = module
+        cardDataHashmap[CardName.KURURU_REFLECTOR] = reflector
+        cardDataHashmap[CardName.KURURU_DRAIN_DEVIL] = drainDevil
+        cardDataHashmap[CardName.KURURU_BIG_GOLEM] = bigGolem
+        cardDataHashmap[CardName.KURURU_INDUSTRIA] = industria
+        cardDataHashmap[CardName.KURURU_DUPLICATED_GEAR_1] = dupliGear1
+        cardDataHashmap[CardName.KURURU_DUPLICATED_GEAR_2] = dupliGear2
+        cardDataHashmap[CardName.KURURU_DUPLICATED_GEAR_3] = dupliGear3
     }
 
     private suspend fun selectDustToDistance(nowCommand: CommandEnum, game_status: GameStatus): Boolean{
@@ -926,7 +802,7 @@ object CardSet {
             null
         })
         scarletimagine.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CARD_TO_COVER) {_, player, game_status, _->
-            game_status.coverCard(player, player, cardNameHashmapFirst[CardName.HIMIKA_SCARLETIMAGINE]!!)
+            game_status.coverCard(player, player, CardName.HIMIKA_SCARLETIMAGINE.toCardNumber(true))
             null
         })
         burmilionfield.setSpecial(2)
@@ -1130,7 +1006,7 @@ object CardSet {
         })
         shadowcaltrop.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) {card_number, player, game_status, _ ->
             if (game_status.logger.checkThisCardUseInCover(player, card_number)){
-                game_status.coverCard(player.opposite(), player, cardNameHashmapFirst[CardName.OBORO_SHADOWCALTROP]!!)
+                game_status.coverCard(player.opposite(), player, CardName.OBORO_SHADOWCALTROP.toCardNumber(true))
             }
             null
         })
@@ -2643,7 +2519,7 @@ object CardSet {
             if(duplicateCardData != null){
                 for(card in nowPlayer.hand.values + nowPlayer.normalCardDeck + nowPlayer.discard + nowPlayer.cover_card
                         + nowPlayer.sealZone.values + game_status.getPlayer(player.opposite()).sealZone.values){
-                    when(cardNumberHashmap[card.card_number]!!){
+                    when(card.card_number.toCardName()){
                         CardName.KURURU_DUPLICATED_GEAR_1 -> card.card_data = duplicateCardData(duplicateCardData, CardName.KURURU_DUPLICATED_GEAR_1)
                         CardName.KURURU_DUPLICATED_GEAR_2 -> card.card_data = duplicateCardData(duplicateCardData, CardName.KURURU_DUPLICATED_GEAR_2)
                         CardName.KURURU_DUPLICATED_GEAR_3 -> card.card_data = duplicateCardData(duplicateCardData, CardName.KURURU_DUPLICATED_GEAR_3)
@@ -2664,7 +2540,7 @@ object CardSet {
             val nowPlayer = game_status.getPlayer(player)
             for(card in nowPlayer.hand.values + nowPlayer.normalCardDeck + nowPlayer.discard + nowPlayer.cover_card
                     + nowPlayer.sealZone.values + game_status.getPlayer(player.opposite()).sealZone.values){
-                when(cardNumberHashmap[card.card_number]!!){
+                when(card.card_number.toCardName()){
                     CardName.KURURU_DUPLICATED_GEAR_1 -> card.card_data = dupliGear1
                     CardName.KURURU_DUPLICATED_GEAR_2 -> card.card_data = dupliGear2
                     CardName.KURURU_DUPLICATED_GEAR_3 -> card.card_data = dupliGear3
@@ -2727,8 +2603,6 @@ object CardSet {
     }
 
     fun init(){
-        hashMapInit()
-
         yurinaCardInit()
         saineCardInit()
         himikaCardInit()
@@ -2739,133 +2613,8 @@ object CardSet {
         haganeCardInit()
         chikageCardInit()
         kururuCardInit()
-    }
 
-    fun returnCardDataByName(card_name: CardName): CardData {
-        when (card_name){
-            CardName.CARD_UNNAME -> return unused
-            CardName.POISON_ANYTHING -> return unused
-            CardName.YURINA_CHAM -> return cham
-            CardName.YURINA_ILSUM -> return ilsom
-            CardName.YURINA_JARUCHIGI -> return jaru_chigi
-            CardName.YURINA_GUHAB -> return guhab
-            CardName.YURINA_GIBACK -> return giback
-            CardName.YURINA_APDO -> return apdo
-            CardName.YURINA_GIYENBANJO -> return giyenbanzo
-            CardName.YURINA_WOLYUNGNACK -> return wolyungnack
-            CardName.YURINA_POBARAM -> return pobaram
-            CardName.YURINA_JJOCKBAE -> return jjockbae
-            CardName.YURINA_JURUCK -> return juruck
-            CardName.SAINE_DOUBLEBEGI -> return doublebegi
-            CardName.SAINE_HURUBEGI -> return hurubegi
-            CardName.SAINE_MOOGECHOO -> return moogechoo
-            CardName.SAINE_GANPA -> return ganpa
-            CardName.SAINE_GWONYUCK -> return gwonyuck
-            CardName.SAINE_CHOONGEMJUNG -> return choongemjung
-            CardName.SAINE_MOOEMBUCK -> return mooembuck
-            CardName.SAINE_YULDONGHOGEK -> return yuldonghogek
-            CardName.SAINE_HANGMUNGGONGJIN -> return hangmunggongjin
-            CardName.SAINE_EMMOOSHOEBING -> return emmooshoebing
-            CardName.SAINE_JONGGEK -> return jonggek
-            CardName.HIMIKA_SHOOT -> return shoot
-            CardName.HIMIKA_RAPIDFIRE -> return rapidfire
-            CardName.HIMIKA_MAGNUMCANON -> return magnumcanon
-            CardName.HIMIKA_FULLBURST -> return fullburst
-            CardName.HIMIKA_BACKSTEP -> return backstep
-            CardName.HIMIKA_BACKDRAFT -> return backdraft
-            CardName.HIMIKA_SMOKE -> return smoke
-            CardName.HIMIKA_REDBULLET -> return redbullet
-            CardName.HIMIKA_CRIMSONZERO -> return crimsonzero
-            CardName.HIMIKA_SCARLETIMAGINE -> return scarletimagine
-            CardName.HIMIKA_BURMILIONFIELD -> return burmilionfield
-            CardName.TOKOYO_BITSUNERIGI -> return bitsunerigi
-            CardName.TOKOYO_WOOAHHANTAGUCK -> return wooahhantaguck
-            CardName.TOKOYO_RUNNINGRABIT -> return runningrabit
-            CardName.TOKOYO_POETDANCE -> return poetdance
-            CardName.TOKOYO_FLIPFAN -> return flipfan
-            CardName.TOKOYO_WINDSTAGE -> return windstage
-            CardName.TOKOYO_SUNSTAGE -> return sunstage
-            CardName.TOKOYO_KUON -> return kuon
-            CardName.TOKOYO_THOUSANDBIRD -> return thousandbird
-            CardName.TOKOYO_ENDLESSWIND -> return endlesswind
-            CardName.TOKOYO_TOKOYOMOON -> return tokoyomoon
-            CardName.OBORO_WIRE -> return wire
-            CardName.OBORO_SHADOWCALTROP -> return shadowcaltrop
-            CardName.OBORO_ZANGEKIRANBU -> return zangekiranbu
-            CardName.OBORO_NINJAWALK -> return ninjawalk
-            CardName.OBORO_INDUCE -> return induce
-            CardName.OBORO_CLONE -> return clone
-            CardName.OBORO_BIOACTIVITY -> return bioactivity
-            CardName.OBORO_KUMASUKE -> return kumasuke
-            CardName.OBORO_TOBIKAGE -> return tobikage
-            CardName.OBORO_ULOO -> return uloo
-            CardName.OBORO_MIKAZRA -> return mikazra
-            CardName.YUKIHI_YUKIHI -> return yukihi
-            CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE -> return hiddenNeedle
-            CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS -> return hiddenFire
-            CardName.YUKIHI_PUSH_OUT_SLASH_PULL -> return pushOut
-            CardName.YUKIHI_SWING_SLASH_STAB -> return swing
-            CardName.YUKIHI_TURN_UMBRELLA -> return turnUmbrella
-            CardName.YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN -> return backwardStep
-            CardName.YUKIHI_MAKE_CONNECTION -> return makeConnection
-            CardName.YUKIHI_FLUTTERING_SNOWFLAKE -> return flutteringSnowflake
-            CardName.YUKIHI_SWAYING_LAMPLIGHT -> return swayingLamplight
-            CardName.YUKIHI_CLINGY_MIND -> return clingyMind
-            CardName.YUKIHI_SWIRLING_GESTURE -> return swirlingGesture
-            CardName.SHINRA_SHINRA -> return shinra
-            CardName.SHINRA_IBLON -> return iblon
-            CardName.SHINRA_BANLON -> return banlon
-            CardName.SHINRA_KIBEN -> return kiben
-            CardName.SHINRA_INYONG -> return inyong
-            CardName.SHINRA_SEONDONG -> return seondong
-            CardName.SHINRA_JANGDAM -> return jangdam
-            CardName.SHINRA_NONPA -> return nonpa
-            CardName.SHINRA_WANJEON_NONPA -> return wanjeonNonpa
-            CardName.SHINRA_DASIG_IHAE -> return dasicIhae
-            CardName.SHINRA_CHEONJI_BANBAG -> return cheonjiBanBag
-            CardName.SHINRA_SAMRA_BAN_SHO -> return samraBanSho
-            CardName.HAGANE_CENTRIFUGAL_ATTACK -> return centrifugalAttack
-            CardName.HAGANE_FOUR_WINDED_EARTHQUAKE -> return fourWindedEarthquake
-            CardName.HAGANE_GROUND_BREAKING -> return groundBreaking
-            CardName.HAGANE_HYPER_RECOIL -> return hyperRecoil
-            CardName.HAGANE_WON_MU_RUYN -> return wonMuRuyn
-            CardName.HAGANE_RING_A_BELL -> return ringABell
-            CardName.HAGANE_GRAVITATION_FIELD -> return gravitationField
-            CardName.HAGANE_GRAND_SKY_HOLE_CRASH -> return grandSkyHoleCrash
-            CardName.HAGANE_GRAND_BELL_MEGALOBEL -> return grandBellMegalobel
-            CardName.HAGANE_GRAND_GRAVITATION_ATTRACT -> return grandGravitationAttract
-            CardName.HAGANE_GRAND_MOUNTAIN_RESPECT -> return grandMountainRespect
-            CardName.CHIKAGE_THROW_KUNAI -> return throwKunai
-            CardName.CHIKAGE_POISON_NEEDLE -> return poisonNeedle
-            CardName.CHIKAGE_TO_ZU_CHU -> return toZuChu
-            CardName.CHIKAGE_CUTTING_NECK -> return cuttingNeck
-            CardName.CHIKAGE_POISON_SMOKE -> return poisonSmoke
-            CardName.CHIKAGE_TIP_TOEING -> return tipToeing
-            CardName.CHIKAGE_MUDDLE -> return muddle
-            CardName.CHIKAGE_DEADLY_POISON -> return deadlyPoison
-            CardName.CHIKAGE_HAN_KI_POISON -> return hankiPoison
-            CardName.CHIKAGE_REINCARNATION_POISON -> return reincarnationPoison
-            CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE -> return chikageWayOfLive
-            CardName.POISON_PARALYTIC -> return poisonParalytic
-            CardName.POISON_HALLUCINOGENIC -> return poisonHallucinogenic
-            CardName.POISON_RELAXATION -> return poisonRelaxation
-            CardName.POISON_DEADLY_1 -> return poisonDeadly1
-            CardName.POISON_DEADLY_2 -> return poisonDeadly2
-            CardName.KURURU_ELEKITTEL -> return elekittel
-            CardName.KURURU_ACCELERATOR -> return accelerator
-            CardName.KURURU_KURURUOONG -> return kururuoong
-            CardName.KURURU_TORNADO -> return tornado
-            CardName.KURURU_REGAINER -> return regainer
-            CardName.KURURU_MODULE -> return module
-            CardName.KURURU_REFLECTOR -> return reflector
-            CardName.KURURU_DRAIN_DEVIL -> return drainDevil
-            CardName.KURURU_BIG_GOLEM -> return bigGolem
-            CardName.KURURU_INDUSTRIA -> return industria
-            CardName.KURURU_DUPLICATED_GEAR_1 -> return dupliGear1
-            CardName.KURURU_DUPLICATED_GEAR_2 -> return dupliGear2
-            CardName.KURURU_DUPLICATED_GEAR_3 -> return dupliGear3
-            CardName.KURURU_KANSHOUSOUCHI_KURURUSIK -> return kanshousouchiKururusik
-        }
+        hashMapInit()
     }
 
     fun isPoison(card_number: Int): Boolean{
@@ -2874,5 +2623,5 @@ object CardSet {
             else -> false
         }
     }
-    fun isFullPower(card_number: Int): Boolean = returnCardDataByName(cardNumberHashmap[card_number]!!).sub_type == SubType.FULL_POWER
+    fun isFullPower(card_number: Int): Boolean = card_number.toCardName().toCardData().sub_type == SubType.FULL_POWER
 }

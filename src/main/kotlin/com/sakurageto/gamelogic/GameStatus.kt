@@ -2,10 +2,7 @@ package com.sakurageto.gamelogic
 
 import com.sakurageto.Connection
 import com.sakurageto.card.*
-import com.sakurageto.card.CardSet.cardNameHashmapSecond
-import com.sakurageto.card.CardSet.cardNameHashmapFirst
-import com.sakurageto.card.CardSet.cardNumberHashmap
-import com.sakurageto.card.CardSet.returnCardDataByName
+import com.sakurageto.card.CardSet.toCardName
 import com.sakurageto.protocol.*
 import io.ktor.websocket.*
 
@@ -104,8 +101,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     fun getCardNumber(player: PlayerEnum, card_name: CardName): Int{
-        return if (getPlayer(player).first_turn) cardNameHashmapFirst[card_name]?: -1
-        else cardNameHashmapSecond[card_name]?: -1
+        return if (getPlayer(player).first_turn) card_name.toCardNumber(true)
+        else card_name.toCardNumber(true)
     }
 
     fun getPlayerLife(player: PlayerEnum): Int{
@@ -1600,26 +1597,19 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     suspend fun coverCard(player: PlayerEnum, select_player: PlayerEnum, reason: Int){
         val nowSocket = getSocket(select_player)
 
-        if(checkCoverAbleHand(player)){
+        while(true){
             val list = mutableListOf<Int>()
-            for (card in getPlayer(player).hand.values) list.add(card.card_number)
+            for(card in getPlayer(player).hand.values){
+                if(card.card_data.canCover) list.add(card.card_number)
+            }
+            if(list.size == 0) break
             val cardNumber = receiveCoverCardSelect(nowSocket, list, reason)
-            if(cardNumberHashmap[cardNumber] == null || !returnCardDataByName(cardNumberHashmap[cardNumber]!!).canCover){
-                coverCard(player, select_player, reason)
-                return
+            if(getCardFrom(player, cardNumber, LocationEnum.HAND)?.card_data?.canCover == true){
+                val card = popCardFrom(player, cardNumber, LocationEnum.HAND, false)
+                if(card == null) continue
+                else insertCardTo(player, card, LocationEnum.COVER_CARD, false)
             }
-            val card = popCardFrom(player, cardNumber, LocationEnum.HAND, false)
-            if(card == null) {
-                coverCard(player, select_player, reason)
-                return
-            }
-            else{
-                insertCardTo(player, card, LocationEnum.COVER_CARD, false)
-                return
-            }
-        }
-        else{
-            return
+            break
         }
     }
 
@@ -1756,9 +1746,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 return result
             }
             LocationEnum.POISON_BAG -> {
-                val result = nowPlayer.poisonBag[cardNumberHashmap[card_number]]?: return null
+                val result = nowPlayer.poisonBag[card_number.toCardName()]?: return null
                 sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_POISON_BAG_YOUR)
-                nowPlayer.poisonBag.remove(cardNumberHashmap[card_number])
+                nowPlayer.poisonBag.remove(card_number.toCardName())
                 return result
             }
             else -> TODO()

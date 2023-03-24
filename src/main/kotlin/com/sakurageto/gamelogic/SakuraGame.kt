@@ -322,18 +322,12 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
     }
 
     suspend fun startPhaseDefault(){
-        game_status.turnPlayer = this.turn_player
-        game_status.addConcentration(this.turn_player)
-        game_status.enchantmentReduceAll(this.turn_player)
-        if(receiveReconstructRequest(getSocket(this.turn_player))){
-            game_status.deckReconstruct(this.turn_player, true)
-        }
-        game_status.drawCard(this.turn_player, 2)
+        game_status.startPhaseDefault(this.turn_player)
     }
 
     suspend fun startPhase(){
         sendStartPhaseStart(getSocket(this.turn_player), getSocket(this.turn_player.opposite()))
-        game_status.startTurnDistance = game_status.distanceToken
+        game_status.startTurnDistance = game_status.getAdjustDistance(null)
         game_status.startPhaseEffectProcess()
         if(turn_number == 0 || turn_number == 1){
             return

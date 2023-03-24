@@ -232,6 +232,7 @@ enum class CardName {
             put(YURINA_POBARAM, 108)
             put(YURINA_JJOCKBAE, 109)
             put(YURINA_JURUCK, 110)
+
             put(SAINE_DOUBLEBEGI, 200)
             put(SAINE_HURUBEGI, 201)
             put(SAINE_MOOGECHOO, 202)
@@ -243,6 +244,7 @@ enum class CardName {
             put(SAINE_HANGMUNGGONGJIN, 208)
             put(SAINE_EMMOOSHOEBING, 209)
             put(SAINE_JONGGEK, 210)
+
             put(HIMIKA_SHOOT, 300)
             put(HIMIKA_RAPIDFIRE, 301)
             put(HIMIKA_MAGNUMCANON, 302)
@@ -254,6 +256,7 @@ enum class CardName {
             put(HIMIKA_CRIMSONZERO, 308)
             put(HIMIKA_SCARLETIMAGINE, 309)
             put(HIMIKA_BURMILIONFIELD, 310)
+
             put(TOKOYO_BITSUNERIGI, 400)
             put(TOKOYO_WOOAHHANTAGUCK, 401)
             put(TOKOYO_RUNNINGRABIT, 402)
@@ -265,6 +268,7 @@ enum class CardName {
             put(TOKOYO_THOUSANDBIRD, 408)
             put(TOKOYO_ENDLESSWIND, 409)
             put(TOKOYO_TOKOYOMOON, 410)
+
             put(OBORO_WIRE, 500)
             put(OBORO_SHADOWCALTROP, 501)
             put(OBORO_ZANGEKIRANBU, 502)
@@ -276,6 +280,7 @@ enum class CardName {
             put(OBORO_TOBIKAGE, 508)
             put(OBORO_ULOO, 509)
             put(OBORO_MIKAZRA, 510)
+
             put(YUKIHI_YUKIHI, 100000)
             put(YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE, 600)
             put(YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS, 601)
@@ -288,6 +293,7 @@ enum class CardName {
             put(YUKIHI_SWAYING_LAMPLIGHT, 608)
             put(YUKIHI_CLINGY_MIND, 609)
             put(YUKIHI_SWIRLING_GESTURE, 610)
+
             put(SHINRA_SHINRA, CardSet.SHINRA_SHINRA_CARD_NUMBER)
             put(SHINRA_IBLON, 700)
             put(SHINRA_BANLON, 701)
@@ -311,6 +317,7 @@ enum class CardName {
             put(HAGANE_GRAND_BELL_MEGALOBEL, 808)
             put(HAGANE_GRAND_GRAVITATION_ATTRACT, 809)
             put(HAGANE_GRAND_MOUNTAIN_RESPECT, 810)
+
             put(CHIKAGE_THROW_KUNAI, 900)
             put(CHIKAGE_POISON_NEEDLE, 901)
             put(CHIKAGE_TO_ZU_CHU, 902)
@@ -327,6 +334,7 @@ enum class CardName {
             put(POISON_RELAXATION, 997)
             put(POISON_DEADLY_1, 998)
             put(POISON_DEADLY_2, 999)
+
             put(KURURU_ELEKITTEL, 1000)
             put(KURURU_ACCELERATOR, 1001)
             put(KURURU_KURURUOONG, 1002)
@@ -341,6 +349,7 @@ enum class CardName {
             put(KURURU_DUPLICATED_GEAR_2, 1011)
             put(KURURU_DUPLICATED_GEAR_3, 1012)
             put(KURURU_KANSHOUSOUCHI_KURURUSIK, 1013)
+
             put(THALLYA_BURNING_STEAM, 1100)
             put(THALLYA_WAVING_EDGE, 1101)
             put(THALLYA_SHIELD_CHARGE, 1102)
@@ -369,6 +378,7 @@ enum class CardName {
             put(YURINA_POBARAM, 10108)
             put(YURINA_JJOCKBAE, 10109)
             put(YURINA_JURUCK, 10110)
+
             put(SAINE_DOUBLEBEGI, 10200)
             put(SAINE_HURUBEGI, 10201)
             put(SAINE_MOOGECHOO, 10202)
@@ -380,6 +390,7 @@ enum class CardName {
             put(SAINE_HANGMUNGGONGJIN, 10208)
             put(SAINE_EMMOOSHOEBING, 10209)
             put(SAINE_JONGGEK, 10210)
+
             put(HIMIKA_SHOOT, 10300)
             put(HIMIKA_RAPIDFIRE, 10301)
             put(HIMIKA_MAGNUMCANON, 10302)
@@ -391,6 +402,7 @@ enum class CardName {
             put(HIMIKA_CRIMSONZERO, 10308)
             put(HIMIKA_SCARLETIMAGINE, 10309)
             put(HIMIKA_BURMILIONFIELD, 10310)
+
             put(TOKOYO_BITSUNERIGI, 10400)
             put(TOKOYO_WOOAHHANTAGUCK, 10401)
             put(TOKOYO_RUNNINGRABIT, 10402)
@@ -402,6 +414,7 @@ enum class CardName {
             put(TOKOYO_THOUSANDBIRD, 10408)
             put(TOKOYO_ENDLESSWIND, 10409)
             put(TOKOYO_TOKOYOMOON, 10410)
+
             put(OBORO_WIRE, 10500)
             put(OBORO_SHADOWCALTROP, 10501)
             put(OBORO_ZANGEKIRANBU, 10502)
@@ -413,6 +426,7 @@ enum class CardName {
             put(OBORO_TOBIKAGE, 10508)
             put(OBORO_ULOO, 10509)
             put(OBORO_MIKAZRA, 10510)
+
             put(YUKIHI_YUKIHI, 200000)
             put(YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE, 10600)
             put(YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS, 10601)
@@ -425,6 +439,7 @@ enum class CardName {
             put(YUKIHI_SWAYING_LAMPLIGHT, 10608)
             put(YUKIHI_CLINGY_MIND, 10609)
             put(YUKIHI_SWIRLING_GESTURE, 10610)
+
             put(SHINRA_SHINRA, CardSet.SHINRA_SHINRA_CARD_NUMBER)
             put(SHINRA_IBLON, 10700)
             put(SHINRA_BANLON, 10701)
@@ -437,6 +452,7 @@ enum class CardName {
             put(SHINRA_DASIG_IHAE, 10708)
             put(SHINRA_CHEONJI_BANBAG, 10709)
             put(SHINRA_SAMRA_BAN_SHO, 10710)
+
             put(HAGANE_CENTRIFUGAL_ATTACK, 10800)
             put(HAGANE_FOUR_WINDED_EARTHQUAKE, 10801)
             put(HAGANE_GROUND_BREAKING, 10802)
@@ -448,6 +464,7 @@ enum class CardName {
             put(HAGANE_GRAND_BELL_MEGALOBEL, 10808)
             put(HAGANE_GRAND_GRAVITATION_ATTRACT, 10809)
             put(HAGANE_GRAND_MOUNTAIN_RESPECT, 10810)
+
             put(CHIKAGE_THROW_KUNAI, 10900)
             put(CHIKAGE_POISON_NEEDLE, 10901)
             put(CHIKAGE_TO_ZU_CHU, 10902)
@@ -464,6 +481,7 @@ enum class CardName {
             put(POISON_RELAXATION, 10997)
             put(POISON_DEADLY_1, 10998)
             put(POISON_DEADLY_2, 10999)
+
             put(KURURU_ELEKITTEL, 11000)
             put(KURURU_ACCELERATOR, 11001)
             put(KURURU_KURURUOONG, 11002)
@@ -478,6 +496,7 @@ enum class CardName {
             put(KURURU_DUPLICATED_GEAR_2, 11011)
             put(KURURU_DUPLICATED_GEAR_3, 11012)
             put(KURURU_KANSHOUSOUCHI_KURURUSIK, 11013)
+
             put(THALLYA_BURNING_STEAM, 11100)
             put(THALLYA_WAVING_EDGE, 11101)
             put(THALLYA_SHIELD_CHARGE, 11102)

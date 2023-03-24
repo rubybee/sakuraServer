@@ -87,7 +87,7 @@ suspend fun sendMoveToken(mine: Connection, other: Connection, what: TokenEnum, 
     mine.session.send(Json.encodeToString(preData))
     other.session.send(Json.encodeToString(preData))
     val dataYour = SakuraSendData(MOVE_TOKEN, mutableListOf(what.real_number, from.real_number, to.real_number, number, card_number))
-    val dataOther = SakuraSendData(MOVE_TOKEN, mutableListOf(what.real_number, from.Opposite().real_number, to.Opposite().real_number, number, card_number))
+    val dataOther = SakuraSendData(MOVE_TOKEN, mutableListOf(what.opposite().real_number, from.Opposite().real_number, to.Opposite().real_number, number, card_number))
     mine.session.send(Json.encodeToString(dataYour))
     other.session.send(Json.encodeToString(dataOther))
 }

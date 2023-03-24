@@ -184,8 +184,22 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     suspend fun textUseCheck(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?): Boolean{
         card_data.effect?.let {
             for(text in it){
-                if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT && text.tag == TextEffectTag.USING_CONDITION){
+                if(text.tag == TextEffectTag.USING_CONDITION){
                     if(text.effect!!(this.card_number, player, game_status, react_attack)!! == 1){
+                        return true
+                    }
+                    return false
+                }
+            }
+        }
+        return true
+    }
+
+    suspend fun textCostCheck(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?): Boolean {
+        card_data.effect?.let {
+            for (text in it) {
+                if (text.tag == TextEffectTag.COST_CHECK) {
+                    if (text.effect!!(this.card_number, player, game_status, react_attack)!! == 1) {
                         return true
                     }
                     return false
@@ -268,6 +282,10 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         if(card_data.sub_type == SubType.FULL_POWER && !gameStatus.getPlayerFullAction(player)) return -2
 
         if(!textUseCheck(player, gameStatus, react_attack)){
+            return -2
+        }
+
+        if(isCost && !textCostCheck(player, gameStatus, react_attack)){
             return -2
         }
 
@@ -515,16 +533,9 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     }
 
     suspend fun forbidTokenMove(player: PlayerEnum, game_status: GameStatus): Int{
-        this.card_data.effect?.let{
-            for(text in it){
-                if (text.timing_tag == TextEffectTimingTag.IN_DEPLOYMENT && text.tag == TextEffectTag.DAMAGE_AURA_REPLACEABLE_HERE && (nap
-                        ?: -1) > 0
-                ) {
-                    return text.effect!!(this.card_number, player, game_status, null)!!
-                }
-            }
-        }
-        return -1
+        val now = effectAllMaintainCard(player, game_status, TextEffectTag.FORBID_MOVE_TOKEN)
+        return if (now == 0) -1
+        else now
     }
 
     fun isItInstallation(): Boolean{
@@ -547,6 +558,17 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             }
         }
         return false
+    }
+
+    suspend fun effectText(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, tag: TextEffectTag): Int?{
+        this.card_data.effect?.let {
+            for(text in it){
+                if(text.tag == tag){
+                    return text.effect!!(this.card_number, player, game_status, react_attack)
+                }
+            }
+        }
+        return null
     }
 
     suspend fun endPhaseEffect(player: PlayerEnum, game_status: GameStatus) {
@@ -593,7 +615,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     fun operationForbidCheck(forbidYour: Boolean, command: CommandEnum, game_status: GameStatus): Boolean{
         val findTag = when(command){
             CommandEnum.ACTION_GO_BACKWARD -> if(forbidYour) TODO() else TextEffectTag.FORBID_GO_BACKWARD_OTHER
-            CommandEnum.ACTION_BREAK_AWAY -> if(forbidYour) TODO() else TextEffectTag.FORBID_BREAK_AWAY
+            CommandEnum.ACTION_BREAK_AWAY -> if(forbidYour) TODO() else TextEffectTag.FORBID_BREAK_AWAY_OTHER
             else -> TODO()
         }
         card_data.effect?.let {

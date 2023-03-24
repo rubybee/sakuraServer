@@ -474,7 +474,7 @@ object CardSet {
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         guhab.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _ ->
             game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, buff_game_status, _ ->
-                buff_game_status.getDistance() <= 2
+                buff_game_status.getAdjustDistance(player) <= 2
             }, {_, _, madeAttack ->
                 madeAttack.run {
                     auraPlusMinus(1); lifePlusMinus(1)
@@ -522,8 +522,11 @@ object CardSet {
         pobaram.setAttack(DistanceType.CONTINUOUS, Pair(0, 10), null, 2, 999,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         pobaram.setSpecial(3)
-        pobaram.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.REACT_ATTACK_REDUCE){_, _, _, reactedAttack ->
-            reactedAttack?.auraPlusMinus(-2)
+        pobaram.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.REACT_ATTACK_REDUCE){card_number, _, _, reactedAttack ->
+            reactedAttack?.addAttackBuff(Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true },
+                {_, _, attack ->
+                    attack.auraPlusMinus(-2)
+                }))
             null
         })
         pobaram.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.TERMINATION){_, _, _, _->
@@ -613,8 +616,11 @@ object CardSet {
             1
         })
         choongemjung.setEnchantment(1)
-        choongemjung.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.REACT_ATTACK_REDUCE) {_, _, _, reactedAttack ->
-            reactedAttack?.auraPlusMinus(-1)
+        choongemjung.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.REACT_ATTACK_REDUCE) {card_number, _, _, reactedAttack ->
+            reactedAttack?.addAttackBuff(Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true },
+                {_, _, attack ->
+                    attack.auraPlusMinus(-1)
+                }))
             null
         })
         choongemjung.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
@@ -674,9 +680,11 @@ object CardSet {
         emmooshoebing.setSpecial(2)
         emmooshoebing.setAttack(DistanceType.CONTINUOUS, Pair(0, 10), null, 1, 1,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
-        emmooshoebing.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.REACT_ATTACK_REDUCE){_, _, _, reactedAttack ->
-            reactedAttack?.auraPlusMinus(-1)
-            reactedAttack?.lifePlusMinus(-1)
+        emmooshoebing.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.REACT_ATTACK_REDUCE){card_number, _, _, reactedAttack ->
+            reactedAttack?.addAttackBuff(Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true },
+                {_, _, attack ->
+                    attack.auraPlusMinus(-1); attack.lifePlusMinus(-1)
+                }))
             null
         })
         //return 1 means it can be return 0 means it can't be return
@@ -788,7 +796,7 @@ object CardSet {
             null
         }))
         crimsonzero.addtext((Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
-            if(game_status.getDistance() == 0){
+            if(game_status.getAdjustDistance(player) == 0){
                 game_status.addThisTurnOtherBuff(player, OtherBuff(card_number, 1, OtherBuffTag.GET, {_, _, _ ->
                     true }, {_, _, attack ->
                     attack.canNotReact()
@@ -855,8 +863,8 @@ object CardSet {
             }
             null
         })
-        runningrabit.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, _, game_status, _->
-            if(game_status.getDistance() <= 3){
+        runningrabit.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _->
+            if(game_status.getAdjustDistance(player)<= 3){
                 game_status.dustToDistance(2)
             }
             null
@@ -1622,7 +1630,7 @@ object CardSet {
             null
         })
         samraBanSho.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.EFFECT_WHEN_DESTRUCTION_OTHER_CARD){_, player, game_status, _ ->
-            game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false)
+            game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false, null, null)
             null
         })
         samraBanSho.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MOVE_SAKURA_TOKEN){_, player, game_status, _ ->
@@ -1947,8 +1955,12 @@ object CardSet {
             -2
         })
         muddle.setEnchantment(2)
-        muddle.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.FORBID_GO_BACKWARD_OTHER, null))
-        muddle.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.FORBID_BREAK_AWAY, null))
+        muddle.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.FORBID_GO_BACKWARD_OTHER){_, _, _, _ ->
+            1
+        })
+        muddle.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.FORBID_BREAK_AWAY_OTHER){ _, _, _, _ ->
+            1
+        })
         deadlyPoison.setSpecial(3)
         deadlyPoison.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.INSERT_POISON) {_, player, game_status, _ ->
             val getCard = game_status.popCardFrom(player, game_status.getCardNumber(player, CardName.POISON_DEADLY_1), LocationEnum.POISON_BAG, false)?:
@@ -2191,7 +2203,8 @@ object CardSet {
         elekittel.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.DAMAGE) {_, player, game_status, _ ->
             val kikou = getKikou(player, game_status)
             if(kikou.behavior >= 3 || kikou.reaction >= 2) {
-                game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false)
+                game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false,
+                    null, null)
             }
             null
         })
@@ -2234,10 +2247,12 @@ object CardSet {
         tornado.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.DAMAGE) {_, player, game_status, _ ->
             val kikou = getKikou(player, game_status)
             if(kikou.attack >= 2) {
-                game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_AURA, Pair(5, 999), false)
+                game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_AURA, Pair(5, 999), false,
+                null, null)
             }
             if(kikou.enchantment >= 2){
-                game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false)
+                game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false,
+                null, null)
             }
             null
         })
@@ -2444,7 +2459,8 @@ object CardSet {
                 while(true){
                     when(game_status.receiveCardEffectSelect(player, card_number)){
                         CommandEnum.SELECT_ONE -> {
-                            game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false)
+                            game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false,
+                            null, null)
                             game_status.deckReconstruct(player, false)
                             break
                         }
@@ -2602,6 +2618,265 @@ object CardSet {
         })
     }
 
+    val attackYakshaText = Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MANEUVER) {_, player, game_status, _ ->
+        maneuver(player, game_status, true)
+        null
+    }
+
+    private val burningSteam = CardData(CardClass.NORMAL, CardName.THALLYA_BURNING_STEAM, MegamiEnum.THALLYA, CardType.ATTACK, SubType.NONE)
+    private val WavingEdge = CardData(CardClass.NORMAL, CardName.THALLYA_WAVING_EDGE, MegamiEnum.THALLYA, CardType.ATTACK, SubType.NONE)
+    private val shieldCharge = CardData(CardClass.NORMAL, CardName.THALLYA_SHIELD_CHARGE, MegamiEnum.THALLYA, CardType.ATTACK, SubType.NONE)
+    private val steamCanon = CardData(CardClass.NORMAL, CardName.THALLYA_STEAM_CANNON, MegamiEnum.THALLYA, CardType.ATTACK, SubType.FULL_POWER)
+    private val stunt = CardData(CardClass.NORMAL, CardName.THALLYA_STUNT, MegamiEnum.THALLYA, CardType.BEHAVIOR, SubType.NONE)
+    private val roaring = CardData(CardClass.NORMAL, CardName.THALLYA_ROARING, MegamiEnum.THALLYA, CardType.BEHAVIOR, SubType.NONE)
+    private val turboSwitch = CardData(CardClass.NORMAL, CardName.THALLYA_TURBO_SWITCH, MegamiEnum.THALLYA, CardType.BEHAVIOR, SubType.REACTION)
+    private val alphaEdge = CardData(CardClass.SPECIAL, CardName.THALLYA_ALPHA_EDGE, MegamiEnum.THALLYA, CardType.ATTACK, SubType.NONE)
+    private val omegaBurst = CardData(CardClass.SPECIAL, CardName.THALLYA_OMEGA_BURST, MegamiEnum.THALLYA, CardType.BEHAVIOR, SubType.REACTION)
+    private val masterPiece = CardData(CardClass.SPECIAL, CardName.THALLYA_THALLYA_MASTERPIECE, MegamiEnum.THALLYA, CardType.BEHAVIOR, SubType.NONE)
+    private val juliaBlackbox = CardData(CardClass.SPECIAL, CardName.THALLYA_JULIA_BLACKBOX, MegamiEnum.THALLYA, CardType.BEHAVIOR, SubType.FULL_POWER)
+    private val formYaksha = CardData(CardClass.SPECIAL, CardName.FORM_YAKSHA, MegamiEnum.THALLYA, CardType.UNDEFINED, SubType.NONE)
+    private val formNaga = CardData(CardClass.SPECIAL, CardName.FORM_NAGA, MegamiEnum.THALLYA, CardType.UNDEFINED, SubType.NONE)
+    private val formGaruda = CardData(CardClass.SPECIAL, CardName.FORM_GARUDA, MegamiEnum.THALLYA, CardType.UNDEFINED, SubType.NONE)
+
+    private suspend fun maneuver(player: PlayerEnum, gameStatus: GameStatus, basicAction: Boolean) {
+        if(gameStatus.getPlayer(player).artificialToken == 0) return
+        var changeToken = false
+        if(gameStatus.distanceToken - gameStatus.player1ArtificialTokenOn - gameStatus.player2ArtificialTokenOn > 0){
+            while (true){
+                val nowCommand = gameStatus.receiveCardEffectSelect(player, CardName.THALLYA_BURNING_STEAM.toCardNumber(true))
+                when(nowCommand){
+                    CommandEnum.SELECT_ONE -> {
+                        gameStatus.addArtificialToken(player, true, 1)
+                        changeToken = true
+                    }
+                    CommandEnum.SELECT_TWO -> {
+                        if(gameStatus.distanceToken + gameStatus.player1ArtificialTokenOut + gameStatus.player2ArtificialTokenOut > 9) break
+                        gameStatus.addArtificialToken(player, false, 1)
+                        changeToken = true
+
+                    }
+                    else -> continue
+                }
+                break
+            }
+        }
+        else{
+            if(gameStatus.distanceToken + gameStatus.player1ArtificialTokenOut + gameStatus.player2ArtificialTokenOut < 10){
+                gameStatus.addArtificialToken(player, false, 1)
+                changeToken = true
+            }
+        }
+        if(changeToken){
+            gameStatus.getManeuverListener(player)?.let {
+                if(!it.isEmpty()){
+                    for(i in 1..it.size){
+                        if(it.isEmpty()) break
+                        val now = it.first()
+                        it.removeFirst()
+                        if(!(now.doAction(gameStatus, -1, -1,
+                                booleanPara1 = false, booleanPara2 = false))){
+                            it.addLast(now)
+                        }
+                    }
+                }
+            }
+            for(card in gameStatus.getPlayer(player).usedSpecialCard.values){
+                card.effectAllMaintainCard(player, gameStatus, TextEffectTag.WHEN_MANEUVER)
+            }
+        }
+    }
+
+    private fun combustCondition(game_status: GameStatus, player: PlayerEnum): Boolean = game_status.getPlayer(player).artificialToken != 0
+
+    private fun makeTransformListOrigin(player: PlayerEnum, game_status: GameStatus): MutableList<Int>{
+        val cardList = mutableListOf<Int>()
+        game_status.getPlayer(player).additional_hand[CardName.FORM_YAKSHA]?.let {
+            cardList.add(it.card_number)
+        }
+        game_status.getPlayer(player).poisonBag[CardName.FORM_NAGA]?.let {
+            cardList.add(it.card_number)
+        }
+        game_status.getPlayer(player).poisonBag[CardName.FORM_GARUDA]?.let {
+            cardList.add(it.card_number)
+        }
+        return cardList
+    }
+
+    private fun thallyaCardInit(){
+        burningSteam.setAttack(DistanceType.CONTINUOUS, Pair(3, 5), null, 2, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        burningSteam.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MANEUVER) {_, player, game_status, _ ->
+            maneuver(player, game_status, false)
+            null
+        })
+        WavingEdge.setAttack(DistanceType.CONTINUOUS, Pair(1, 3), null, 3, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        WavingEdge.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.COST_CHECK){_, player, game_status, _ ->
+            if(combustCondition(game_status, player)) 1
+            else 0
+        })
+        WavingEdge.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.COST){_, player, game_status, _ ->
+            game_status.combust(player, 1)
+            null
+        })
+        WavingEdge.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MANEUVER) {_, player, game_status, _ ->
+            maneuver(player, game_status, false)
+            null
+        })
+        shieldCharge.setAttack(DistanceType.CONTINUOUS, Pair(1, 1), null, 3, 2,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        shieldCharge.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.COST_CHECK){_, player, game_status, _ ->
+            if(combustCondition(game_status, player)) 1
+            else 0
+        })
+        shieldCharge.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.COST){_, player, game_status, _ ->
+            game_status.combust(player, 1)
+            null
+        })
+        shieldCharge.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.AFTER_DAMAGE_PLACE_CHANGE){_, _, _, _ ->
+            LocationEnum.DISTANCE.real_number
+        })
+        steamCanon.setAttack(DistanceType.CONTINUOUS, Pair(2, 8), null, 3, 2,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        steamCanon.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.COST_CHECK){_, player, game_status, _ ->
+            if(combustCondition(game_status, player)) 1
+            else 0
+        })
+        steamCanon.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.COST){_, player, game_status, _ ->
+            game_status.combust(player, 1)
+            null
+        })
+        stunt.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_SHRINK) {_, player, game_status, _ ->
+            game_status.setShrink(player.opposite())
+            null
+        })
+        stunt.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){_, player, game_status, _ ->
+            game_status.auraToFlare(player, player,2)
+            null
+        })
+        roaring.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CHANGE_CONCENTRATION){card_number, player, game_status, _ ->
+            if((game_status.getPlayer(player).artificialToken ?: 0) >= 2){
+                while(true){
+                    when(game_status.receiveCardEffectSelect(player, card_number)){
+                        CommandEnum.SELECT_ONE -> {
+                            game_status.combust(player, 2)
+                            game_status.addConcentration(player)
+                            game_status.decreaseConcentration(player.opposite())
+                            game_status.setShrink(player.opposite())
+                        }
+                        CommandEnum.SELECT_NOT -> {}
+                        else -> continue
+                    }
+                    break
+                }
+            }
+            null
+        })
+        roaring.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CHANGE_CONCENTRATION){card_number, player, game_status, _ ->
+            if(game_status.getPlayer(player).concentration >= 2){
+                while(true){
+                    when(game_status.receiveCardEffectSelect(player, card_number + 1)){
+                        CommandEnum.SELECT_ONE -> {
+                            game_status.decreaseConcentration(player)
+                            game_status.decreaseConcentration(player)
+                            game_status.restoreArtificialToken(player, 3)
+                        }
+                        CommandEnum.SELECT_NOT -> {}
+                        else -> continue
+                    }
+                    break
+                }
+            }
+            null
+        })
+        turboSwitch.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.COST_CHECK){_, player, game_status, _ ->
+            if(combustCondition(game_status, player)) 1
+            else 0
+        })
+        turboSwitch.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.COST){_, player, game_status, _ ->
+            game_status.combust(player, 1)
+            null
+        })
+        turboSwitch.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MANEUVER) {_, player, game_status, _ ->
+            maneuver(player, game_status, false)
+            null
+        })
+        alphaEdge.setSpecial(1)
+        alphaEdge.setAttack(DistanceType.DISCONTINUOUS, null, mutableListOf(1, 3, 5, 7), 1, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        alphaEdge.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
+            game_status.addImmediateManeuverListener(player, Listener(player, card_number) {_, cardNumber, _,
+                                                                                        _, _, _ ->
+                game_status.returnSpecialCard(player, cardNumber)
+                true
+            })
+            null
+        })
+        omegaBurst.setSpecial(4)
+        omegaBurst.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.REACT_ATTACK_INVALID) {card_number, player, game_status, reactedAttack ->
+            val number = game_status.getPlayer(player).artificialTokenBurn
+            game_status.restoreArtificialToken(player, number)
+            reactedAttack?.addOtherBuff( OtherBuff(card_number, 1, OtherBuffTag.GET,
+                { nowPlayer, gameStatus, attack ->
+                    val damage = attack.getDamage(gameStatus, nowPlayer, game_status.getPlayerAttackBuff(player))
+                    (damage.first == 999) || (damage.first <= number)
+                }, { _, _, attack ->
+                    attack.makeNotValid()
+                }))
+            null
+        })
+        masterPiece.setSpecial(1)
+        masterPiece.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_MANEUVER) {card_number, player, game_status, _ ->
+            if(game_status.turnPlayer == player){
+                while(true){
+                    val nowCommand = game_status.receiveCardEffectSelect(player, card_number)
+                    if(selectDustToDistance(nowCommand, game_status)) break
+                }
+            }
+            null
+        })
+        juliaBlackbox.setSpecial(2)
+        juliaBlackbox.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.TRANSFORM) {card_number, player, game_status, _ ->
+            if((game_status.getPlayer(player).artificialToken?: 0) == 0){
+                val cardList = makeTransformListOrigin(player, game_status)
+                if(cardList.size != 0){
+                    val get = game_status.selectCardFrom(player, cardList, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, card_number, 1)[0]
+                    game_status.popCardFrom(player, get, LocationEnum.ADDITIONAL_CARD, false)?.let {
+                        game_status.insertCardTo(player, it, LocationEnum.TRANSFORM, true)
+                        it.special_card_state = SpecialCardEnum.PLAYED
+                        it.effectText(player, game_status, null, TextEffectTag.WHEN_TRANSFORM)
+                    }
+                }
+            }
+            else{
+                game_status.movePlayingCard(player, LocationEnum.SPECIAL_CARD, card_number)
+            }
+            null
+        })
+        formYaksha.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_TRANSFORM) {_, player, game_status, _ ->
+            game_status.setShrink(player.opposite())
+            if(player == PlayerEnum.PLAYER1) game_status.player1NextTurnDraw = 1
+            else game_status.player2NextTurnDraw = 1
+            null
+        })
+        formYaksha.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.FORBID_BASIC_OPERATION) {_, player, game_status, _ ->
+            if((game_status.getPlayer(player).artificialToken?: 0) == 0) 1
+            else 0
+        })
+        formNaga.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_TRANSFORM) {_, player, game_status, _ ->
+            val otherFlare = game_status.getPlayer(player.opposite()).flare
+            if(otherFlare >= 3){
+                game_status.flareToDust(player.opposite(), otherFlare - 2)
+            }
+            null
+        })
+        formGaruda.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_TRANSFORM) {_, player, game_status, _ ->
+            game_status.drawCard(player, 2)
+            game_status.getPlayer(player).max_hand = 99999
+            null
+        })
+    }
+
     fun init(){
         yurinaCardInit()
         saineCardInit()
@@ -2613,6 +2888,7 @@ object CardSet {
         haganeCardInit()
         chikageCardInit()
         kururuCardInit()
+        thallyaCardInit()
 
         hashMapInit()
     }

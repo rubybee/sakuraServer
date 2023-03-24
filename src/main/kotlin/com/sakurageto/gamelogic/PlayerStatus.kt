@@ -4,7 +4,9 @@ import com.sakurageto.card.*
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import com.sakurageto.protocol.SakuraSendData
-import java.util.NoSuchElementException
+import java.util.*
+import kotlin.collections.ArrayDeque
+import kotlin.collections.HashMap
 
 class PlayerStatus(val player_enum: PlayerEnum) {
     var first_turn = false
@@ -17,6 +19,9 @@ class PlayerStatus(val player_enum: PlayerEnum) {
 
     var umbrella: Umbrella? = null
     var stratagem: Stratagem? = null
+    var artificialToken: Int? = null
+    var artificialTokenBurn: Int = 0
+    var transformZone: EnumMap<CardName, Card> = EnumMap(CardName::class.java)
 
     var canNotGoForward: Boolean = false
     var didBasicOperation: Boolean = false
@@ -200,8 +205,8 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var unselected_card: MutableList<CardName> = mutableListOf()
     var unselected_specialcard: MutableList<CardName> = mutableListOf()
 
-    var additional_hand: HashMap<CardName, Card> = HashMap()
-    var poisonBag: HashMap<CardName, Card> = HashMap()
+    var additional_hand: EnumMap<CardName, Card> = EnumMap(CardName::class.java)
+    var poisonBag: EnumMap<CardName, Card> = EnumMap(CardName::class.java)
 
     var pre_attack_card: MadeAttack? = null
 

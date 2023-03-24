@@ -123,6 +123,17 @@ class MadeAttack(
         }
     }
 
+    suspend fun effectText(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, tag: TextEffectTag): Int?{
+        this.effect?.let {
+            for(text in it){
+                if(text.tag == tag){
+                    return text.effect!!(this.card_number, player, game_status, react_attack)
+                }
+            }
+        }
+        return null
+    }
+
     suspend fun canReactByThisCard(card: Card, game_status: GameStatus, player: PlayerEnum, continuousOtherBuff: OtherBuffQueue): Boolean{
         activeOtherBuff(game_status, player, continuousOtherBuff)
 
@@ -296,6 +307,13 @@ class MadeAttack(
     }
 
     var effect: MutableList<Text>? = null
+
+
+    fun addTextAndReturn(text: Text): MadeAttack{
+        if(effect == null) effect = mutableListOf()
+        effect!!.add(text)
+        return this
+    }
 
     fun addTextAndReturn(umbrella: Umbrella?, card_data: CardData): MadeAttack{
         when(umbrella){

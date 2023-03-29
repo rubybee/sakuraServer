@@ -65,8 +65,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             if(nowPlayer.artificialTokenBurn < value) value = it
             nowPlayer.artificialToken = it + value
             nowPlayer.artificialTokenBurn -= value
-            sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN_BURN,
-                LocationEnum.MACHINE_BURN, LocationEnum.MACHINE, value, -1)
+            sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN,
+                LocationEnum.MACHINE_BURN_YOUR, LocationEnum.MACHINE_YOUR, value, -1)
         }
 
     }
@@ -78,13 +78,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             nowPlayer.artificialToken = it - number
             nowPlayer.artificialTokenBurn += number
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN,
-                LocationEnum.MACHINE, LocationEnum.MACHINE_BURN, number, -1)
+                LocationEnum.MACHINE_YOUR, LocationEnum.MACHINE_BURN_YOUR, number, -1)
         }
 
     }
 
     //before call this function must check player have enough artificial token
-    suspend fun addArtificialToken(player: PlayerEnum, on: Boolean, number: Int){
+    suspend fun addArtificialTokenAtDistance(player: PlayerEnum, on: Boolean, number: Int){
         when(player){
             PlayerEnum.PLAYER1 -> {
                 if(player1.artificialToken == null) return
@@ -92,13 +92,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     player1.artificialToken = player1.artificialToken!! - number
                     player1ArtificialTokenOn += number
                     sendMoveToken(player1_socket, player2_socket, TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN_ON_TOKEN,
-                        LocationEnum.MACHINE, LocationEnum.DISTANCE, number, -1)
+                        LocationEnum.MACHINE_YOUR, LocationEnum.DISTANCE, number, -1)
                 }
                 else{
-                    player1.artificialToken = player1.artificialToken!! -number
+                    player1.artificialToken = player1.artificialToken!! - number
                     player1ArtificialTokenOut += number
                     sendMoveToken(player1_socket, player2_socket, TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN_OUT_TOKEN,
-                        LocationEnum.MACHINE, LocationEnum.DISTANCE, number, -1)
+                        LocationEnum.MACHINE_YOUR, LocationEnum.DISTANCE, number, -1)
                 }
             }
             PlayerEnum.PLAYER2 -> {
@@ -107,13 +107,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     player2.artificialToken = player2.artificialToken!! - number
                     player2ArtificialTokenOn += number
                     sendMoveToken(player2_socket, player1_socket, TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN_ON_TOKEN,
-                        LocationEnum.MACHINE, LocationEnum.DISTANCE, number, -1)
+                        LocationEnum.MACHINE_YOUR, LocationEnum.DISTANCE, number, -1)
                 }
                 else{
                     player2.artificialToken = player2.artificialToken!! - number
                     player2ArtificialTokenOut += number
                     sendMoveToken(player2_socket, player1_socket, TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN_OUT_TOKEN,
-                        LocationEnum.MACHINE, LocationEnum.DISTANCE, number, -1)
+                        LocationEnum.MACHINE_YOUR, LocationEnum.DISTANCE, number, -1)
                 }
             }
         }
@@ -1028,6 +1028,44 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return false
     }
 
+    suspend fun gaugeIncrease(player: PlayerEnum, thunder: Boolean){
+        val nowPlayer = getPlayer(player)
+        if(thunder){
+            nowPlayer.thunderGauge?.let {
+                nowPlayer.thunderGauge = it + 1
+                sendSimpleCommand(getSocket(player), getSocket(player.opposite()), CommandEnum.SET_THUNDER_GAUGE_YOUR, it + 1)
+            }
+        }
+        else{
+            nowPlayer.windGauge?.let {
+                nowPlayer.windGauge = it + 1
+                sendSimpleCommand(getSocket(player), getSocket(player.opposite()), CommandEnum.SET_WIND_GAUGE_YOUR, it + 1)
+            }
+        }
+    }
+
+    suspend fun gaugeIncreaseRequest(player: PlayerEnum, card: Card){
+        val nowPlayer = getPlayer(player)
+        if(nowPlayer.thunderGauge != null && card.card_data.megami != MegamiEnum.RAIRA && card.card_data.megami != MegamiEnum.NONE){
+            while(true){
+                when(receiveCardEffectSelect(player, CardName.RAIRA_BEAST_NAIL.toCardNumber(true))){
+                    CommandEnum.SELECT_ONE -> {
+                        gaugeIncrease(player, true)
+                    }
+                    CommandEnum.SELECT_TWO -> {
+                        gaugeIncrease(player, false)
+                    }
+                    CommandEnum.SELECT_NOT -> {
+                    }
+                    else -> {
+                        continue
+                    }
+                }
+                break
+            }
+        }
+    }
+
     suspend fun useCardFrom(player: PlayerEnum, card: Card, location: LocationEnum, react: Boolean, react_attack: MadeAttack?,
                             isCost: Boolean, isConsume: Boolean): Boolean{
         val cost = card.canUse(player, this, react_attack, isCost, isConsume)
@@ -1040,6 +1078,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             if(cost == -1){
                 popCardFrom(player, card.card_number, location, true)
                 insertCardTo(player, card, LocationEnum.PLAYING_ZONE, true)
+                gaugeIncreaseRequest(player, card)
                 sendUseCardMeesage(getSocket(player), getSocket(player.opposite()), react, card.card_number)
                 card.use(player, this, react_attack)
                 return true
@@ -1050,6 +1089,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 cleanAfterUseCost()
                 popCardFrom(player, card.card_number, LocationEnum.SPECIAL_CARD, true)
                 insertCardTo(player, card, LocationEnum.PLAYING_ZONE, true)
+                gaugeIncreaseRequest(player, card)
                 sendUseCardMeesage(getSocket(player), getSocket(player.opposite()), react, card.card_number)
                 card.use(player, this, react_attack)
                 return true
@@ -1499,29 +1539,35 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     private suspend fun removeArtificialToken(){
-        if(player1ArtificialTokenOn != 0) {
-            sendMoveToken(player1_socket, player2_socket, TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN_ON_TOKEN, LocationEnum.DISTANCE,
-                LocationEnum.MACHINE_BURN, player1ArtificialTokenOn, -1)
-            player1.artificialTokenBurn = player1.artificialTokenBurn!! + player1ArtificialTokenOn
-            player1ArtificialTokenOn = 0
-        }
-        if(player1ArtificialTokenOut != 0) {
-            sendMoveToken(player1_socket, player2_socket, TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN_OUT_TOKEN, LocationEnum.DISTANCE,
-                LocationEnum.MACHINE_BURN, player1ArtificialTokenOut, -1)
-            player1.artificialTokenBurn = player1.artificialTokenBurn!! + player1ArtificialTokenOut
-            player1ArtificialTokenOut = 0
-        }
-        if(player2ArtificialTokenOn != 0) {
-            sendMoveToken(player2_socket, player1_socket, TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN_ON_TOKEN, LocationEnum.DISTANCE,
-                LocationEnum.MACHINE_BURN, player2ArtificialTokenOn, -1)
-            player2.artificialTokenBurn = player2.artificialTokenBurn!! + player2ArtificialTokenOn
-            player2ArtificialTokenOn = 0
-        }
-        if(player2ArtificialTokenOut != 0) {
-            sendMoveToken(player2_socket, player1_socket, TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN_OUT_TOKEN, LocationEnum.DISTANCE,
-                LocationEnum.MACHINE_BURN, player2ArtificialTokenOut, -1)
-            player2.artificialTokenBurn = player2.artificialTokenBurn!! + player2ArtificialTokenOut
-            player2ArtificialTokenOut = 0
+        when(turnPlayer){
+            PlayerEnum.PLAYER1 -> {
+                if(player1ArtificialTokenOn != 0) {
+                    sendMoveToken(player1_socket, player2_socket, TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN_ON_TOKEN, LocationEnum.DISTANCE,
+                        LocationEnum.MACHINE_BURN_YOUR, player1ArtificialTokenOn, -1)
+                    player1.artificialTokenBurn += player1ArtificialTokenOn
+                    player1ArtificialTokenOn = 0
+                }
+                if(player1ArtificialTokenOut != 0) {
+                    sendMoveToken(player1_socket, player2_socket, TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN_OUT_TOKEN, LocationEnum.DISTANCE,
+                        LocationEnum.MACHINE_BURN_YOUR, player1ArtificialTokenOut, -1)
+                    player1.artificialTokenBurn += player1ArtificialTokenOut
+                    player1ArtificialTokenOut = 0
+                }
+            }
+            PlayerEnum.PLAYER2 -> {
+                if(player2ArtificialTokenOn != 0) {
+                    sendMoveToken(player2_socket, player1_socket, TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN_ON_TOKEN, LocationEnum.DISTANCE,
+                        LocationEnum.MACHINE_BURN_YOUR, player2ArtificialTokenOn, -1)
+                    player2.artificialTokenBurn += player2ArtificialTokenOn
+                    player2ArtificialTokenOn = 0
+                }
+                if(player2ArtificialTokenOut != 0) {
+                    sendMoveToken(player2_socket, player1_socket, TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN_OUT_TOKEN, LocationEnum.DISTANCE,
+                        LocationEnum.MACHINE_BURN_YOUR, player2ArtificialTokenOut, -1)
+                    player2.artificialTokenBurn += player2ArtificialTokenOut
+                    player2ArtificialTokenOut = 0
+                }
+            }
         }
     }
 

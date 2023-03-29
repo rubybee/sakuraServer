@@ -22,6 +22,8 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var artificialToken: Int? = null
     var artificialTokenBurn: Int = 0
     var transformZone: EnumMap<CardName, Card> = EnumMap(CardName::class.java)
+    var windGauge: Int? = null
+    var thunderGauge: Int? = null
 
     var canNotGoForward: Boolean = false
     var didBasicOperation: Boolean = false

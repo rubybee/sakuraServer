@@ -21,7 +21,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
     private var first_turn = PlayerEnum.PLAYER1
     private var turn_player = PlayerEnum.PLAYER1
 
-    inline fun getSocket(player: PlayerEnum): Connection{
+    private inline fun getSocket(player: PlayerEnum): Connection{
         return if(player ==  PlayerEnum.PLAYER1) player1 else player2
     }
 
@@ -149,7 +149,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
         if(game_status.player1.megami_1 == MegamiEnum.CHIKAGE || game_status.player1.megami_2 == MegamiEnum.CHIKAGE){
             for(card_name in CardName.returnPoisonCardName()){
                 val turnCheck = first_turn == PlayerEnum.PLAYER1
-                var card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER1)
+                val card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER1)
                 game_status.player1.poisonBag[card.card_data.card_name] = card
             }
         }
@@ -157,9 +157,19 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
         if(game_status.player2.megami_1 == MegamiEnum.CHIKAGE || game_status.player2.megami_2 == MegamiEnum.CHIKAGE){
             for(card_name in CardName.returnPoisonCardName()){
                 val turnCheck = first_turn == PlayerEnum.PLAYER2
-                var card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER2)
+                val card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER2)
                 game_status.player2.poisonBag[card.card_data.card_name] = card
             }
+        }
+
+        if(game_status.player1.megami_1 == MegamiEnum.THALLYA || game_status.player1.megami_2 == MegamiEnum.THALLYA){
+            game_status.player1.artificialToken = 5
+            game_status.player1ManeuverListener = ArrayDeque()
+        }
+
+        if(game_status.player2.megami_1 == MegamiEnum.THALLYA || game_status.player2.megami_2 == MegamiEnum.THALLYA){
+            game_status.player2.artificialToken = 5
+            game_status.player2ManeuverListener = ArrayDeque()
         }
         //additional board setting here
     }
@@ -204,10 +214,10 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
         val player1_data = waitCardSetUntil(player1, CommandEnum.SELECT_CARD)
         val player2_data = waitCardSetUntil(player2, CommandEnum.SELECT_CARD)
 
-        var card_data_player1: MutableList<CardName> = mutableListOf()
-        var specialcard_data_player1: MutableList<CardName> = mutableListOf()
-        var card_data_player2 : MutableList<CardName> = mutableListOf()
-        var specialcard_data_player2 : MutableList<CardName> = mutableListOf()
+        val card_data_player1: MutableList<CardName> = mutableListOf()
+        val specialcard_data_player1: MutableList<CardName> = mutableListOf()
+        val card_data_player2 : MutableList<CardName> = mutableListOf()
+        val specialcard_data_player2 : MutableList<CardName> = mutableListOf()
 
         if(checkCardSet(game_status.player1.unselected_card, player1_data.normal_card, 7))
             card_data_player1.addAll(player1_data.normal_card!!)
@@ -258,17 +268,17 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
         additional_card_player2.addAll(CardName.returnAdditionalCardNameByMegami(game_status.player2.megami_2))
 
         if(!additional_card_player1.isEmpty()){
-            val turn_check = first_turn == PlayerEnum.PLAYER1
+            val turnCheck = first_turn == PlayerEnum.PLAYER1
             for(card_name in additional_card_player1){
-                var card = Card.cardMakerByName(turn_check, card_name, PlayerEnum.PLAYER1)
+                val card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER1)
                 game_status.player1.additional_hand[card.card_data.card_name] = card
             }
         }
 
         if(!additional_card_player2.isEmpty()){
-            val turn_check = first_turn == PlayerEnum.PLAYER2
+            val turnCheck = first_turn == PlayerEnum.PLAYER2
             for(card_name in additional_card_player2){
-                var card = Card.cardMakerByName(turn_check, card_name, PlayerEnum.PLAYER2)
+                val card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER2)
                 game_status.player2.additional_hand[card.card_data.card_name] = card
             }
         }
@@ -280,7 +290,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
         game_status.player2.deleteSpeicalUsedCard(specialcard_data_player2)
     }
 
-    suspend fun selectFirst(){
+     fun selectFirst(){
         val random = Random.nextInt(2)
         if(random == 0){
             first_turn = PlayerEnum.PLAYER1
@@ -341,7 +351,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
         if(receiveFullPowerRequest(getSocket(this.turn_player))){
             game_status.setPlayerFullAction(this.turn_player, true)
             while (true){
-                var data = receiveFullPowerActionRequest(getSocket(this.turn_player))
+                val data = receiveFullPowerActionRequest(getSocket(this.turn_player))
                 if(data.first == CommandEnum.ACTION_END_TURN){
                     return
                 }

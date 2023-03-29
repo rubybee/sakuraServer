@@ -208,7 +208,22 @@ enum class CardName {
 
     FORM_YAKSHA,
     FORM_NAGA,
-    FORM_GARUDA;
+    FORM_GARUDA,
+
+    RAIRA_BEAST_NAIL,
+    RAIRA_STORM_SURGE_ATTACK,
+    RAIRA_REINCARNATION_NAIL,
+    RAIRA_WIND_RUN,
+    RAIRA_WISDOM_OF_STORM_SURGE,
+    RAIRA_HOWLING,
+    RAIRA_WIND_KICK,
+    RAIRA_THUNDER_WIND_PUNCH,
+    RAIRA_SUMMON_THUNDER,
+    RAIRA_WIND_CONSEQUENCE_BALL,
+    RAIRA_CIRCULAR_CIRCUIT,
+    RAIRA_WIND_ATTACK,
+    RAIRA_WIND_ZEN_KAI,
+    RAIRA_WIND_CELESTIAL_SPHERE;
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -361,9 +376,24 @@ enum class CardName {
             put(THALLYA_OMEGA_BURST, 1108)
             put(THALLYA_THALLYA_MASTERPIECE, 1109)
             put(THALLYA_JULIA_BLACKBOX, 1110)
-            put(FORM_YAKSHA, 1110)
-            put(FORM_NAGA, 1111)
-            put(FORM_GARUDA, 1112)
+            put(FORM_YAKSHA, 1111)
+            put(FORM_NAGA, 1112)
+            put(FORM_GARUDA, 1113)
+
+            put(RAIRA_BEAST_NAIL, 1200)
+            put(RAIRA_STORM_SURGE_ATTACK, 1201)
+            put(RAIRA_REINCARNATION_NAIL, 1202)
+            put(RAIRA_WIND_RUN, 1203)
+            put(RAIRA_WISDOM_OF_STORM_SURGE, 1204)
+            put(RAIRA_HOWLING, 1205)
+            put(RAIRA_WIND_KICK, 1206)
+            put(RAIRA_THUNDER_WIND_PUNCH, 1207)
+            put(RAIRA_SUMMON_THUNDER, 1208)
+            put(RAIRA_WIND_CONSEQUENCE_BALL, 1209)
+            put(RAIRA_CIRCULAR_CIRCUIT, 1210)
+            put(RAIRA_WIND_ATTACK, 1211)
+            put(RAIRA_WIND_ZEN_KAI, 1212)
+            put(RAIRA_WIND_CELESTIAL_SPHERE, 1213)
         }
         private val cardNameHashmapSecond = EnumMap<CardName, Int>(CardName::class.java).apply {
             //for second turn player 10000~19999
@@ -508,9 +538,24 @@ enum class CardName {
             put(THALLYA_OMEGA_BURST, 11108)
             put(THALLYA_THALLYA_MASTERPIECE, 11109)
             put(THALLYA_JULIA_BLACKBOX, 11110)
-            put(FORM_YAKSHA, 11110)
-            put(FORM_NAGA, 11111)
-            put(FORM_GARUDA, 11112)
+            put(FORM_YAKSHA, 11111)
+            put(FORM_NAGA, 11112)
+            put(FORM_GARUDA, 11113)
+
+            put(RAIRA_BEAST_NAIL, 11200)
+            put(RAIRA_STORM_SURGE_ATTACK, 11201)
+            put(RAIRA_REINCARNATION_NAIL, 11202)
+            put(RAIRA_WIND_RUN, 11203)
+            put(RAIRA_WISDOM_OF_STORM_SURGE, 11204)
+            put(RAIRA_HOWLING, 11205)
+            put(RAIRA_WIND_KICK, 11206)
+            put(RAIRA_THUNDER_WIND_PUNCH, 11207)
+            put(RAIRA_SUMMON_THUNDER, 11208)
+            put(RAIRA_WIND_CONSEQUENCE_BALL, 11209)
+            put(RAIRA_CIRCULAR_CIRCUIT, 11210)
+            put(RAIRA_WIND_ATTACK, 11211)
+            put(RAIRA_WIND_ZEN_KAI, 11212)
+            put(RAIRA_WIND_CELESTIAL_SPHERE, 11213)
         }
 
         fun returnNormalCardNameByMegami(megami_name: MegamiEnum):List<CardName>{
@@ -567,6 +612,11 @@ enum class CardName {
                     THALLYA_STEAM_CANNON, THALLYA_STUNT, THALLYA_ROARING,
                     THALLYA_TURBO_SWITCH
                 )
+                RAIRA -> listOf(
+                    RAIRA_BEAST_NAIL, RAIRA_STORM_SURGE_ATTACK, RAIRA_REINCARNATION_NAIL,
+                    RAIRA_WIND_RUN, RAIRA_WISDOM_OF_STORM_SURGE, RAIRA_HOWLING,
+                    RAIRA_WIND_KICK
+                )
             }
         }
 
@@ -576,36 +626,28 @@ enum class CardName {
                 YURINA -> listOf(
                     YURINA_WOLYUNGNACK, YURINA_POBARAM, YURINA_JJOCKBAE, YURINA_JURUCK
                 )
-
                 SAINE -> listOf(
                     SAINE_YULDONGHOGEK, SAINE_HANGMUNGGONGJIN, SAINE_EMMOOSHOEBING, SAINE_JONGGEK
                 )
-
                 HIMIKA -> listOf(
                     HIMIKA_REDBULLET, HIMIKA_CRIMSONZERO, HIMIKA_SCARLETIMAGINE, HIMIKA_BURMILIONFIELD
                 )
-
                 TOKOYO -> listOf(
                     TOKOYO_KUON, TOKOYO_THOUSANDBIRD, TOKOYO_ENDLESSWIND, TOKOYO_TOKOYOMOON
                 )
-
                 OBORO -> listOf(
                     OBORO_KUMASUKE, OBORO_TOBIKAGE, OBORO_ULOO, OBORO_MIKAZRA
                 )
-
                 YUKIHI -> listOf(
                     YUKIHI_FLUTTERING_SNOWFLAKE, YUKIHI_SWAYING_LAMPLIGHT, YUKIHI_CLINGY_MIND, YUKIHI_SWIRLING_GESTURE
                 )
-
                 SHINRA -> listOf(
                     SHINRA_WANJEON_NONPA, SHINRA_DASIG_IHAE, SHINRA_CHEONJI_BANBAG, SHINRA_SAMRA_BAN_SHO
                 )
-
                 HAGANE -> listOf(
                     HAGANE_GRAND_SKY_HOLE_CRASH, HAGANE_GRAND_BELL_MEGALOBEL, HAGANE_GRAND_GRAVITATION_ATTRACT,
                     HAGANE_GRAND_MOUNTAIN_RESPECT
                 )
-
                 CHIKAGE -> listOf(
                     CHIKAGE_DEADLY_POISON, CHIKAGE_HAN_KI_POISON,
                     CHIKAGE_REINCARNATION_POISON, CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE
@@ -614,10 +656,13 @@ enum class CardName {
                     KURURU_DRAIN_DEVIL, KURURU_BIG_GOLEM, KURURU_INDUSTRIA,
                     KURURU_KANSHOUSOUCHI_KURURUSIK
                 )
-
                 THALLYA -> listOf(
                     THALLYA_ALPHA_EDGE, THALLYA_OMEGA_BURST, THALLYA_THALLYA_MASTERPIECE,
                     THALLYA_JULIA_BLACKBOX,
+                )
+                RAIRA -> listOf(
+                    RAIRA_THUNDER_WIND_PUNCH, RAIRA_SUMMON_THUNDER, RAIRA_WIND_CONSEQUENCE_BALL,
+                    RAIRA_CIRCULAR_CIRCUIT
                 )
             }
         }
@@ -639,6 +684,9 @@ enum class CardName {
                 )
                 THALLYA -> listOf(
                     FORM_YAKSHA, FORM_NAGA, FORM_GARUDA
+                )
+                RAIRA -> listOf(
+                    RAIRA_WIND_ATTACK, RAIRA_WIND_ZEN_KAI, RAIRA_WIND_CELESTIAL_SPHERE
                 )
             }
         }

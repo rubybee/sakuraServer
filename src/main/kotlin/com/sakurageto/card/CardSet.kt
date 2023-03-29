@@ -161,9 +161,24 @@ object CardSet {
         cardNumberHashmap[1108] = CardName.THALLYA_OMEGA_BURST
         cardNumberHashmap[1109] = CardName.THALLYA_THALLYA_MASTERPIECE
         cardNumberHashmap[1110] = CardName.THALLYA_JULIA_BLACKBOX
-        cardNumberHashmap[1110] = CardName.FORM_YAKSHA
-        cardNumberHashmap[1111] = CardName.FORM_NAGA
-        cardNumberHashmap[1112] = CardName.FORM_GARUDA
+        cardNumberHashmap[1111] = CardName.FORM_YAKSHA
+        cardNumberHashmap[1112] = CardName.FORM_NAGA
+        cardNumberHashmap[1113] = CardName.FORM_GARUDA
+
+        cardNumberHashmap[1200] = CardName.RAIRA_BEAST_NAIL
+        cardNumberHashmap[1201] = CardName.RAIRA_STORM_SURGE_ATTACK
+        cardNumberHashmap[1202] = CardName.RAIRA_REINCARNATION_NAIL
+        cardNumberHashmap[1203] = CardName.RAIRA_WIND_RUN
+        cardNumberHashmap[1204] = CardName.RAIRA_WISDOM_OF_STORM_SURGE
+        cardNumberHashmap[1205] = CardName.RAIRA_HOWLING
+        cardNumberHashmap[1206] = CardName.RAIRA_WIND_KICK
+        cardNumberHashmap[1207] = CardName.RAIRA_THUNDER_WIND_PUNCH
+        cardNumberHashmap[1208] = CardName.RAIRA_SUMMON_THUNDER
+        cardNumberHashmap[1209] = CardName.RAIRA_WIND_CONSEQUENCE_BALL
+        cardNumberHashmap[1210] = CardName.RAIRA_CIRCULAR_CIRCUIT
+        cardNumberHashmap[1211] = CardName.RAIRA_WIND_ATTACK
+        cardNumberHashmap[1212] = CardName.RAIRA_WIND_ZEN_KAI
+        cardNumberHashmap[1213] = CardName.RAIRA_WIND_CELESTIAL_SPHERE
 
         cardNumberHashmap[10100] = CardName.YURINA_CHAM
         cardNumberHashmap[10101] = CardName.YURINA_ILSUM
@@ -291,9 +306,39 @@ object CardSet {
         cardNumberHashmap[11108] = CardName.THALLYA_OMEGA_BURST
         cardNumberHashmap[11109] = CardName.THALLYA_THALLYA_MASTERPIECE
         cardNumberHashmap[11110] = CardName.THALLYA_JULIA_BLACKBOX
-        cardNumberHashmap[11110] = CardName.FORM_YAKSHA
-        cardNumberHashmap[11111] = CardName.FORM_NAGA
-        cardNumberHashmap[11112] = CardName.FORM_GARUDA
+        cardNumberHashmap[11111] = CardName.FORM_YAKSHA
+        cardNumberHashmap[11112] = CardName.FORM_NAGA
+        cardNumberHashmap[11113] = CardName.FORM_GARUDA
+
+        cardNumberHashmap[1200] = CardName.RAIRA_BEAST_NAIL
+        cardNumberHashmap[1201] = CardName.RAIRA_STORM_SURGE_ATTACK
+        cardNumberHashmap[1202] = CardName.RAIRA_REINCARNATION_NAIL
+        cardNumberHashmap[1203] = CardName.RAIRA_WIND_RUN
+        cardNumberHashmap[1204] = CardName.RAIRA_WISDOM_OF_STORM_SURGE
+        cardNumberHashmap[1205] = CardName.RAIRA_HOWLING
+        cardNumberHashmap[1206] = CardName.RAIRA_WIND_KICK
+        cardNumberHashmap[1207] = CardName.RAIRA_THUNDER_WIND_PUNCH
+        cardNumberHashmap[1208] = CardName.RAIRA_SUMMON_THUNDER
+        cardNumberHashmap[1209] = CardName.RAIRA_WIND_CONSEQUENCE_BALL
+        cardNumberHashmap[1210] = CardName.RAIRA_CIRCULAR_CIRCUIT
+        cardNumberHashmap[1211] = CardName.RAIRA_WIND_ATTACK
+        cardNumberHashmap[1212] = CardName.RAIRA_WIND_ZEN_KAI
+        cardNumberHashmap[1213] = CardName.RAIRA_WIND_CELESTIAL_SPHERE
+
+        cardNumberHashmap[11200] = CardName.RAIRA_BEAST_NAIL
+        cardNumberHashmap[11201] = CardName.RAIRA_STORM_SURGE_ATTACK
+        cardNumberHashmap[11202] = CardName.RAIRA_REINCARNATION_NAIL
+        cardNumberHashmap[11203] = CardName.RAIRA_WIND_RUN
+        cardNumberHashmap[11204] = CardName.RAIRA_WISDOM_OF_STORM_SURGE
+        cardNumberHashmap[11205] = CardName.RAIRA_HOWLING
+        cardNumberHashmap[11206] = CardName.RAIRA_WIND_KICK
+        cardNumberHashmap[11207] = CardName.RAIRA_THUNDER_WIND_PUNCH
+        cardNumberHashmap[11208] = CardName.RAIRA_SUMMON_THUNDER
+        cardNumberHashmap[11209] = CardName.RAIRA_WIND_CONSEQUENCE_BALL
+        cardNumberHashmap[11210] = CardName.RAIRA_CIRCULAR_CIRCUIT
+        cardNumberHashmap[11211] = CardName.RAIRA_WIND_ATTACK
+        cardNumberHashmap[11212] = CardName.RAIRA_WIND_ZEN_KAI
+        cardNumberHashmap[11213] = CardName.RAIRA_WIND_CELESTIAL_SPHERE
 
         cardDataHashmap[CardName.CARD_UNNAME] = unused
         cardDataHashmap[CardName.POISON_ANYTHING] = unused
@@ -308,6 +353,7 @@ object CardSet {
         cardDataHashmap[CardName.YURINA_POBARAM] = pobaram
         cardDataHashmap[CardName.YURINA_JJOCKBAE] = jjockbae
         cardDataHashmap[CardName.YURINA_JURUCK] = juruck
+
         cardDataHashmap[CardName.SAINE_DOUBLEBEGI] = doublebegi
         cardDataHashmap[CardName.SAINE_HURUBEGI] = hurubegi
         cardDataHashmap[CardName.SAINE_MOOGECHOO] = moogechoo
@@ -319,6 +365,7 @@ object CardSet {
         cardDataHashmap[CardName.SAINE_HANGMUNGGONGJIN] = hangmunggongjin
         cardDataHashmap[CardName.SAINE_EMMOOSHOEBING] = emmooshoebing
         cardDataHashmap[CardName.SAINE_JONGGEK] = jonggek
+
         cardDataHashmap[CardName.HIMIKA_SHOOT] = shoot
         cardDataHashmap[CardName.HIMIKA_RAPIDFIRE] = rapidfire
         cardDataHashmap[CardName.HIMIKA_MAGNUMCANON] = magnumcanon
@@ -330,6 +377,7 @@ object CardSet {
         cardDataHashmap[CardName.HIMIKA_CRIMSONZERO] = crimsonzero
         cardDataHashmap[CardName.HIMIKA_SCARLETIMAGINE] = scarletimagine
         cardDataHashmap[CardName.HIMIKA_BURMILIONFIELD] = burmilionfield
+
         cardDataHashmap[CardName.TOKOYO_BITSUNERIGI] = bitsunerigi
         cardDataHashmap[CardName.TOKOYO_WOOAHHANTAGUCK] = wooahhantaguck
         cardDataHashmap[CardName.TOKOYO_RUNNINGRABIT] = runningrabit
@@ -341,6 +389,7 @@ object CardSet {
         cardDataHashmap[CardName.TOKOYO_THOUSANDBIRD] = thousandbird
         cardDataHashmap[CardName.TOKOYO_ENDLESSWIND] = endlesswind
         cardDataHashmap[CardName.TOKOYO_TOKOYOMOON] = tokoyomoon
+
         cardDataHashmap[CardName.OBORO_WIRE] = wire
         cardDataHashmap[CardName.OBORO_SHADOWCALTROP] = shadowcaltrop
         cardDataHashmap[CardName.OBORO_ZANGEKIRANBU] = zangekiranbu
@@ -352,6 +401,7 @@ object CardSet {
         cardDataHashmap[CardName.OBORO_TOBIKAGE] = tobikage
         cardDataHashmap[CardName.OBORO_ULOO] = uloo
         cardDataHashmap[CardName.OBORO_MIKAZRA] = mikazra
+
         cardDataHashmap[CardName.YUKIHI_YUKIHI] = yukihi
         cardDataHashmap[CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE] = hiddenNeedle
         cardDataHashmap[CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS] = hiddenFire
@@ -364,6 +414,7 @@ object CardSet {
         cardDataHashmap[CardName.YUKIHI_SWAYING_LAMPLIGHT] = swayingLamplight
         cardDataHashmap[CardName.YUKIHI_CLINGY_MIND] = clingyMind
         cardDataHashmap[CardName.YUKIHI_SWIRLING_GESTURE] = swirlingGesture
+
         cardDataHashmap[CardName.SHINRA_SHINRA] = shinra
         cardDataHashmap[CardName.SHINRA_IBLON] = iblon
         cardDataHashmap[CardName.SHINRA_BANLON] = banlon
@@ -376,6 +427,7 @@ object CardSet {
         cardDataHashmap[CardName.SHINRA_DASIG_IHAE] = dasicIhae
         cardDataHashmap[CardName.SHINRA_CHEONJI_BANBAG] = cheonjiBanBag
         cardDataHashmap[CardName.SHINRA_SAMRA_BAN_SHO] = samraBanSho
+
         cardDataHashmap[CardName.HAGANE_CENTRIFUGAL_ATTACK] = centrifugalAttack
         cardDataHashmap[CardName.HAGANE_FOUR_WINDED_EARTHQUAKE] = fourWindedEarthquake
         cardDataHashmap[CardName.HAGANE_GROUND_BREAKING] = groundBreaking
@@ -387,6 +439,7 @@ object CardSet {
         cardDataHashmap[CardName.HAGANE_GRAND_BELL_MEGALOBEL] = grandBellMegalobel
         cardDataHashmap[CardName.HAGANE_GRAND_GRAVITATION_ATTRACT] = grandGravitationAttract
         cardDataHashmap[CardName.HAGANE_GRAND_MOUNTAIN_RESPECT] = grandMountainRespect
+
         cardDataHashmap[CardName.CHIKAGE_THROW_KUNAI] = throwKunai
         cardDataHashmap[CardName.CHIKAGE_POISON_NEEDLE] = poisonNeedle
         cardDataHashmap[CardName.CHIKAGE_TO_ZU_CHU] = toZuChu
@@ -398,11 +451,13 @@ object CardSet {
         cardDataHashmap[CardName.CHIKAGE_HAN_KI_POISON] = hankiPoison
         cardDataHashmap[CardName.CHIKAGE_REINCARNATION_POISON] = reincarnationPoison
         cardDataHashmap[CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE] = chikageWayOfLive
+
         cardDataHashmap[CardName.POISON_PARALYTIC] = poisonParalytic
         cardDataHashmap[CardName.POISON_HALLUCINOGENIC] = poisonHallucinogenic
         cardDataHashmap[CardName.POISON_RELAXATION] = poisonRelaxation
         cardDataHashmap[CardName.POISON_DEADLY_1] = poisonDeadly1
         cardDataHashmap[CardName.POISON_DEADLY_2] = poisonDeadly2
+
         cardDataHashmap[CardName.KURURU_ELEKITTEL] = elekittel
         cardDataHashmap[CardName.KURURU_ACCELERATOR] = accelerator
         cardDataHashmap[CardName.KURURU_KURURUOONG] = kururuoong
@@ -416,6 +471,24 @@ object CardSet {
         cardDataHashmap[CardName.KURURU_DUPLICATED_GEAR_1] = dupliGear1
         cardDataHashmap[CardName.KURURU_DUPLICATED_GEAR_2] = dupliGear2
         cardDataHashmap[CardName.KURURU_DUPLICATED_GEAR_3] = dupliGear3
+
+        cardDataHashmap[CardName.THALLYA_BURNING_STEAM] = burningSteam
+        cardDataHashmap[CardName.THALLYA_WAVING_EDGE] = wavingEdge
+        cardDataHashmap[CardName.THALLYA_SHIELD_CHARGE] = shieldCharge
+        cardDataHashmap[CardName.THALLYA_STEAM_CANNON] = steamCanon
+        cardDataHashmap[CardName.THALLYA_STUNT] = stunt
+        cardDataHashmap[CardName.THALLYA_ROARING] = roaring
+        cardDataHashmap[CardName.THALLYA_TURBO_SWITCH] = turboSwitch
+        cardDataHashmap[CardName.THALLYA_ALPHA_EDGE] = alphaEdge
+        cardDataHashmap[CardName.THALLYA_OMEGA_BURST] = omegaBurst
+        cardDataHashmap[CardName.THALLYA_THALLYA_MASTERPIECE] = masterPiece
+        cardDataHashmap[CardName.FORM_GARUDA] = formGaruda
+        cardDataHashmap[CardName.FORM_NAGA] = formNaga
+        cardDataHashmap[CardName.FORM_GARUDA] = formGaruda
+
+
+
+
     }
 
     private suspend fun selectDustToDistance(nowCommand: CommandEnum, game_status: GameStatus): Boolean{
@@ -1273,7 +1346,7 @@ object CardSet {
                                     madeAttack.run { addRange(Pair(1, 3)); addRange(Pair(5, 7))}
                                 }
                                 CardName.YUKIHI_FLUTTERING_SNOWFLAKE -> {
-                                    madeAttack.run { addRange(Pair(1, 3)); addRange(Pair(4, 7))}
+                                    madeAttack.run { addRange(Pair(1, 2)); addRange(Pair(4, 6))}
                                 }
                                 CardName.YUKIHI_SWAYING_LAMPLIGHT -> {
                                     madeAttack.run { addRange(Pair(1, 3)); addRange(Pair(5, 7))}
@@ -1296,7 +1369,7 @@ object CardSet {
                                     madeAttack.run { addRange(Pair(0, 1)); addRange(Pair(3, 5))}
                                 }
                                 CardName.YUKIHI_FLUTTERING_SNOWFLAKE -> {
-                                    madeAttack.run { addRange(Pair(0, 1)); addRange(Pair(2, 5))}
+                                    madeAttack.run { addRange(Pair(0, 0)); addRange(Pair(2, 4))}
                                 }
                                 CardName.YUKIHI_SWAYING_LAMPLIGHT -> {
                                     madeAttack.run { addRange(Pair(0, 0)); addRange(Pair(3, 5))}
@@ -2392,7 +2465,8 @@ object CardSet {
                 while(true){
                     when(val command = game_status.requestBasicOperation(player, card_number)){
                         CommandEnum.ACTION_GO_FORWARD, CommandEnum.ACTION_GO_BACKWARD, CommandEnum.ACTION_WIND_AROUND,
-                        CommandEnum.ACTION_INCUBATE, CommandEnum.ACTION_BREAK_AWAY -> {
+                        CommandEnum.ACTION_INCUBATE, CommandEnum.ACTION_BREAK_AWAY, CommandEnum.ACTION_NAGA, CommandEnum.ACTION_YAKSHA,
+                        CommandEnum.ACTION_GARUDA -> {
                             if(game_status.canDoBasicOperation(player, command)){
                                 game_status.doBasicOperation(player, command, card_number)
                             }
@@ -2479,7 +2553,8 @@ object CardSet {
             while(true){
                 when(val command = game_status.requestBasicOperation(player, card_number)){
                     CommandEnum.ACTION_GO_FORWARD, CommandEnum.ACTION_GO_BACKWARD, CommandEnum.ACTION_WIND_AROUND,
-                    CommandEnum.ACTION_INCUBATE, CommandEnum.ACTION_BREAK_AWAY -> {
+                    CommandEnum.ACTION_INCUBATE, CommandEnum.ACTION_BREAK_AWAY, CommandEnum.ACTION_NAGA,
+                    CommandEnum.ACTION_YAKSHA, CommandEnum.ACTION_GARUDA  -> {
                         if(game_status.canDoBasicOperation(player, command)){
                             game_status.doBasicOperation(player, command, card_number)
                         }
@@ -2624,7 +2699,7 @@ object CardSet {
     }
 
     private val burningSteam = CardData(CardClass.NORMAL, CardName.THALLYA_BURNING_STEAM, MegamiEnum.THALLYA, CardType.ATTACK, SubType.NONE)
-    private val WavingEdge = CardData(CardClass.NORMAL, CardName.THALLYA_WAVING_EDGE, MegamiEnum.THALLYA, CardType.ATTACK, SubType.NONE)
+    private val wavingEdge = CardData(CardClass.NORMAL, CardName.THALLYA_WAVING_EDGE, MegamiEnum.THALLYA, CardType.ATTACK, SubType.NONE)
     private val shieldCharge = CardData(CardClass.NORMAL, CardName.THALLYA_SHIELD_CHARGE, MegamiEnum.THALLYA, CardType.ATTACK, SubType.NONE)
     private val steamCanon = CardData(CardClass.NORMAL, CardName.THALLYA_STEAM_CANNON, MegamiEnum.THALLYA, CardType.ATTACK, SubType.FULL_POWER)
     private val stunt = CardData(CardClass.NORMAL, CardName.THALLYA_STUNT, MegamiEnum.THALLYA, CardType.BEHAVIOR, SubType.NONE)
@@ -2646,12 +2721,12 @@ object CardSet {
                 val nowCommand = gameStatus.receiveCardEffectSelect(player, CardName.THALLYA_BURNING_STEAM.toCardNumber(true))
                 when(nowCommand){
                     CommandEnum.SELECT_ONE -> {
-                        gameStatus.addArtificialToken(player, true, 1)
+                        gameStatus.addArtificialTokenAtDistance(player, true, 1)
                         changeToken = true
                     }
                     CommandEnum.SELECT_TWO -> {
                         if(gameStatus.distanceToken + gameStatus.player1ArtificialTokenOut + gameStatus.player2ArtificialTokenOut > 9) break
-                        gameStatus.addArtificialToken(player, false, 1)
+                        gameStatus.addArtificialTokenAtDistance(player, false, 1)
                         changeToken = true
 
                     }
@@ -2662,7 +2737,7 @@ object CardSet {
         }
         else{
             if(gameStatus.distanceToken + gameStatus.player1ArtificialTokenOut + gameStatus.player2ArtificialTokenOut < 10){
-                gameStatus.addArtificialToken(player, false, 1)
+                gameStatus.addArtificialTokenAtDistance(player, false, 1)
                 changeToken = true
             }
         }
@@ -2680,8 +2755,10 @@ object CardSet {
                     }
                 }
             }
-            for(card in gameStatus.getPlayer(player).usedSpecialCard.values){
-                card.effectAllMaintainCard(player, gameStatus, TextEffectTag.WHEN_MANEUVER)
+            if(basicAction){
+                for(card in gameStatus.getPlayer(player).usedSpecialCard.values){
+                    card.effectAllMaintainCard(player, gameStatus, TextEffectTag.WHEN_MANEUVER)
+                }
             }
         }
     }
@@ -2709,17 +2786,17 @@ object CardSet {
             maneuver(player, game_status, false)
             null
         })
-        WavingEdge.setAttack(DistanceType.CONTINUOUS, Pair(1, 3), null, 3, 1,
+        wavingEdge.setAttack(DistanceType.CONTINUOUS, Pair(1, 3), null, 3, 1,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
-        WavingEdge.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.COST_CHECK){_, player, game_status, _ ->
+        wavingEdge.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.COST_CHECK){ _, player, game_status, _ ->
             if(combustCondition(game_status, player)) 1
             else 0
         })
-        WavingEdge.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.COST){_, player, game_status, _ ->
+        wavingEdge.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.COST){ _, player, game_status, _ ->
             game_status.combust(player, 1)
             null
         })
-        WavingEdge.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MANEUVER) {_, player, game_status, _ ->
+        wavingEdge.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MANEUVER) { _, player, game_status, _ ->
             maneuver(player, game_status, false)
             null
         })
@@ -2877,6 +2954,12 @@ object CardSet {
         })
     }
 
+
+
+    private fun rairaCardInit(){
+
+    }
+
     fun init(){
         yurinaCardInit()
         saineCardInit()
@@ -2889,6 +2972,7 @@ object CardSet {
         chikageCardInit()
         kururuCardInit()
         thallyaCardInit()
+        rairaCardInit()
 
         hashMapInit()
     }

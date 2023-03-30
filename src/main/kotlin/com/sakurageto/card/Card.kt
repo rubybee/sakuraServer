@@ -289,13 +289,14 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             return -2
         }
 
-        val cost: Int
+        var cost: Int
 
         if(card_data.card_class == CardClass.SPECIAL){
             if(isCost && isConsume){
                 this.thisCardCostBuff(player, gameStatus)
                 gameStatus.addAllCardCostBuff()
                 cost = gameStatus.applyAllCostBuff(player, this.getBaseCost(player, gameStatus), this)
+                if(cost < 0) cost = 0
                 if(cost > gameStatus.getPlayerFlare(player)){
                     gameStatus.cleanCostBuff()
                     return -2

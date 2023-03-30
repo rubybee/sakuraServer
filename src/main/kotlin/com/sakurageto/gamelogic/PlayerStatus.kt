@@ -1,6 +1,7 @@
 package com.sakurageto.gamelogic
 
 import com.sakurageto.card.*
+import com.sakurageto.card.CardSet.toCardName
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import com.sakurageto.protocol.SakuraSendData
@@ -208,6 +209,12 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var unselected_specialcard: MutableList<CardName> = mutableListOf()
 
     var additional_hand: EnumMap<CardName, Card> = EnumMap(CardName::class.java)
+    fun getCardFromAdditonal(card_name: CardName): Card?{
+        return additional_hand[card_name]
+    }
+    fun getCardFromAdditional(card_number: Int): Card?{
+        return additional_hand[card_number.toCardName()]
+    }
     var poisonBag: EnumMap<CardName, Card> = EnumMap(CardName::class.java)
 
     var pre_attack_card: MadeAttack? = null

@@ -1028,22 +1028,60 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return false
     }
 
+    suspend fun setGauge(player: PlayerEnum, thunder: Boolean, number: Int){
+        val nowPlayer = getPlayer(player)
+        if(thunder){
+            nowPlayer.thunderGauge?.let {
+                nowPlayer.thunderGauge = number
+                sendSimpleCommand(getSocket(player), getSocket(player.opposite()), CommandEnum.SET_THUNDER_GAUGE_YOUR, number)
+            }
+        }
+        else{
+            nowPlayer.windGauge?.let {
+                nowPlayer.windGauge = number
+                sendSimpleCommand(getSocket(player), getSocket(player.opposite()), CommandEnum.SET_WIND_GAUGE_YOUR, number)
+            }
+        }
+    }
+
     suspend fun gaugeIncrease(player: PlayerEnum, thunder: Boolean){
         val nowPlayer = getPlayer(player)
         if(thunder){
             nowPlayer.thunderGauge?.let {
                 nowPlayer.thunderGauge = it + 1
-                sendSimpleCommand(getSocket(player), getSocket(player.opposite()), CommandEnum.SET_THUNDER_GAUGE_YOUR, it + 1)
+                sendSimpleCommand(getSocket(player), getSocket(player.opposite()), CommandEnum.INCREASE_THUNDER_GAUGE_YOUR, -1)
             }
         }
         else{
             nowPlayer.windGauge?.let {
                 nowPlayer.windGauge = it + 1
-                sendSimpleCommand(getSocket(player), getSocket(player.opposite()), CommandEnum.SET_WIND_GAUGE_YOUR, it + 1)
+                sendSimpleCommand(getSocket(player), getSocket(player.opposite()), CommandEnum.INCREASE_WIND_GAUGE_YOUR, -1)
             }
         }
     }
 
+    //call this function when use some card that have effect to change wind, thunder gauge, cannot select not increase
+    suspend fun gaugeIncreaseRequest(player: PlayerEnum, card: Int){
+        val nowPlayer = getPlayer(player)
+        if(nowPlayer.thunderGauge != null){
+            while(true){
+                when(receiveCardEffectSelect(player, card)){
+                    CommandEnum.SELECT_ONE -> {
+                        gaugeIncrease(player, true)
+                    }
+                    CommandEnum.SELECT_TWO -> {
+                        gaugeIncrease(player, false)
+                    }
+                    else -> {
+                        continue
+                    }
+                }
+                break
+            }
+        }
+    }
+
+    //call this function when after use any card
     suspend fun gaugeIncreaseRequest(player: PlayerEnum, card: Card){
         val nowPlayer = getPlayer(player)
         if(nowPlayer.thunderGauge != null && card.card_data.megami != MegamiEnum.RAIRA && card.card_data.megami != MegamiEnum.NONE){
@@ -1175,13 +1213,23 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 nowAttack.afterAttackProcess(player, this, react_attack)
             }
         }
+        for(card in getPlayer(player.opposite()).usedSpecialCard.values){
+            card.effectAllMaintainCard(player.opposite(), this, TextEffectTag.AFTER_OTHER_ATTACK_COMPLETE)
+        }
     }
 
     suspend fun movePlayingCard(player: PlayerEnum, place: LocationEnum?, card_number: Int){
         val card = popCardFrom(player, card_number, LocationEnum.PLAYING_ZONE, true)?: return
 
         if(place != null){
-            if(card.card_data.card_class == CardClass.SPECIAL && place == LocationEnum.SPECIAL_CARD) card.special_card_state = SpecialCardEnum.UNUSED
+            if(card.card_data.card_class == CardClass.SPECIAL){
+                if(place == LocationEnum.SPECIAL_CARD){
+                    card.special_card_state = SpecialCardEnum.UNUSED
+                }
+                else{
+                    card.special_card_state = SpecialCardEnum.PLAYED
+                }
+            }
             insertCardTo(card.player, card, place, true)
         }
         else if(card.card_data.card_type == CardType.ENCHANTMENT){
@@ -2147,6 +2195,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             LocationEnum.SPECIAL_CARD -> getPlayer(player).getCardFromSpecial(card_number)
             LocationEnum.YOUR_DECK_TOP -> getPlayer(player).getCardFromDeckTop(card_number)
             LocationEnum.PLAYING_ZONE -> getPlayer(player).getCardFromPlaying(card_number)
+            LocationEnum.ADDITIONAL_CARD -> getPlayer(player).getCardFromAdditional(card_number)
+            else -> TODO()
+        }
+    }
+
+    fun getCardFrom(player: PlayerEnum, card_name: CardName, location: LocationEnum): Card?{
+        return when(location){
+            LocationEnum.ADDITIONAL_CARD -> getPlayer(player).getCardFromAdditonal(card_name)
             else -> TODO()
         }
     }
@@ -2229,6 +2285,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     fun getCardOwner(card_number: Int): PlayerEnum{
         return if(card_number < 10000) first_turn
         else first_turn.opposite()
+    }
+
+    suspend fun moveAdditionalCard(player: PlayerEnum, card_name: CardName, location: LocationEnum): Boolean{
+        val nowPlayer = getPlayer(player)
+        popCardFrom(player, card_name, LocationEnum.ADDITIONAL_CARD, true)?.let {
+            insertCardTo(player, it, location, true)
+        }?: return false
+        return true
     }
 
     //megami special function

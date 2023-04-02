@@ -487,9 +487,20 @@ object CardSet {
         cardDataHashmap[CardName.FORM_NAGA] = formNaga
         cardDataHashmap[CardName.FORM_GARUDA] = formGaruda
 
-
-
-
+        cardDataHashmap[CardName.RAIRA_BEAST_NAIL] = beastNail
+        cardDataHashmap[CardName.RAIRA_STORM_SURGE_ATTACK] = stormSurgeAttack
+        cardDataHashmap[CardName.RAIRA_REINCARNATION_NAIL] = reincarnationNail
+        cardDataHashmap[CardName.RAIRA_WIND_RUN] = windRun
+        cardDataHashmap[CardName.RAIRA_WISDOM_OF_STORM_SURGE] = wisdomOfStormSurge
+        cardDataHashmap[CardName.RAIRA_HOWLING] = howling
+        cardDataHashmap[CardName.RAIRA_WIND_KICK] = windKick
+        cardDataHashmap[CardName.RAIRA_THUNDER_WIND_PUNCH] = thunderWindPunch
+        cardDataHashmap[CardName.RAIRA_SUMMON_THUNDER] = summonThunder
+        cardDataHashmap[CardName.RAIRA_WIND_CONSEQUENCE_BALL] = windConsequenceBall
+        cardDataHashmap[CardName.RAIRA_WIND_ATTACK] = windAttack
+        cardDataHashmap[CardName.RAIRA_WIND_ZEN_KAI] = windZenKai
+        cardDataHashmap[CardName.RAIRA_WIND_CELESTIAL_SPHERE] = windCelestialSphere
+        cardDataHashmap[CardName.RAIRA_CIRCULAR_CIRCUIT] = circularCircuit
     }
 
     private suspend fun selectDustToDistance(nowCommand: CommandEnum, game_status: GameStatus): Boolean{
@@ -2809,7 +2820,10 @@ object CardSet {
             game_status.combust(player, 1)
             null
         })
-        shieldCharge.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.AFTER_DAMAGE_PLACE_CHANGE){_, _, _, _ ->
+        shieldCharge.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.AFTER_AURA_DAMAGE_PLACE_CHANGE){ _, _, _, _ ->
+            LocationEnum.DISTANCE.real_number
+        })
+        shieldCharge.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.AFTER_LIFE_DAMAGE_PLACE_CHANGE){ _, _, _, _ ->
             LocationEnum.DISTANCE.real_number
         })
         steamCanon.setAttack(DistanceType.CONTINUOUS, Pair(2, 8), null, 3, 2,
@@ -3041,7 +3055,7 @@ object CardSet {
                 when(game_status.receiveCardEffectSelect(player, card_number)){
                     CommandEnum.SELECT_ONE -> {
                         game_status.gaugeIncrease(player, true)
-                        game_status.gaugeIncrease(player, true)
+                        game_status.gaugeIncrease(player, false)
                     }
                     CommandEnum.SELECT_TWO -> {
                         for(card in game_status.getPlayer(player).hand.keys){

@@ -171,6 +171,16 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
             game_status.player2.artificialToken = 5
             game_status.player2ManeuverListener = ArrayDeque()
         }
+
+        if(game_status.player1.megami_1 == MegamiEnum.RAIRA || game_status.player1.megami_2 == MegamiEnum.RAIRA){
+            game_status.getPlayer(PlayerEnum.PLAYER1).windGauge = 0
+            game_status.getPlayer(PlayerEnum.PLAYER1).thunderGauge = 0
+        }
+
+        if(game_status.player2.megami_1 == MegamiEnum.RAIRA || game_status.player2.megami_2 == MegamiEnum.RAIRA){
+            game_status.getPlayer(PlayerEnum.PLAYER2).windGauge = 0
+            game_status.getPlayer(PlayerEnum.PLAYER2).thunderGauge = 0
+        }
         //additional board setting here
     }
 

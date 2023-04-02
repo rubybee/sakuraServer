@@ -1198,16 +1198,18 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(nowAttack.isItValid){
             if(nowAttack.inevitable || nowAttack.rangeCheck(getAdjustDistance(player), this, player, getPlayerRangeBuff(player))){
                 if(nowAttack.isItDamage){
-                    val damage = nowAttack.getDamage(this, player, getPlayerAttackBuff(player))
-                    val chosen = damageSelect(player.opposite(), damage)
-                    val auraReplace = nowAttack.effectText(player, this, react_attack, TextEffectTag.AFTER_DAMAGE_PLACE_CHANGE)
-                    val lifeReplace = auraReplace?: nowAttack.effectText(player, this, react_attack, TextEffectTag.AFTER_LIFE_DAMAGE_PLACE_CHANGE)
-                    if(nowAttack.bothSideDamage){
-                        processDamage(player.opposite(), CommandEnum.CHOOSE_AURA, Pair(damage.first, 999), false, auraReplace, lifeReplace)
-                        processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, damage.second), false, auraReplace, lifeReplace)
-                    }
-                    else{
-                        processDamage(player.opposite(), chosen, Pair(damage.first, damage.second), false, auraReplace, lifeReplace)
+                    if(nowAttack.beforeProcessDamageCheck(player, this, react_attack)){
+                        val damage = nowAttack.getDamage(this, player, getPlayerAttackBuff(player))
+                        val chosen = damageSelect(player.opposite(), damage)
+                        val auraReplace = nowAttack.effectText(player, this, react_attack, TextEffectTag.AFTER_AURA_DAMAGE_PLACE_CHANGE)
+                        val lifeReplace = nowAttack.effectText(player, this, react_attack, TextEffectTag.AFTER_LIFE_DAMAGE_PLACE_CHANGE)
+                        if(nowAttack.bothSideDamage){
+                            processDamage(player.opposite(), CommandEnum.CHOOSE_AURA, Pair(damage.first, 999), false, auraReplace, lifeReplace)
+                            processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, damage.second), false, auraReplace, lifeReplace)
+                        }
+                        else{
+                            processDamage(player.opposite(), chosen, Pair(damage.first, damage.second), false, auraReplace, lifeReplace)
+                        }
                     }
                 }
                 nowAttack.afterAttackProcess(player, this, react_attack)

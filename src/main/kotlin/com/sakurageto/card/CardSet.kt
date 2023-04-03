@@ -2765,7 +2765,7 @@ object CardSet {
                     }
                 }
             }
-            if(basicAction){
+            if(!basicAction){
                 for(card in gameStatus.getPlayer(player).usedSpecialCard.values){
                     card.effectAllMaintainCard(player, gameStatus, TextEffectTag.WHEN_MANEUVER)
                 }
@@ -2919,8 +2919,20 @@ object CardSet {
         masterPiece.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_MANEUVER) {card_number, player, game_status, _ ->
             if(game_status.turnPlayer == player){
                 while(true){
-                    val nowCommand = game_status.receiveCardEffectSelect(player, card_number)
-                    if(selectDustToDistance(nowCommand, game_status)) break
+                    when(game_status.receiveCardEffectSelect(player, card_number)){
+                        CommandEnum.SELECT_ONE -> {
+                            game_status.dustToDistance(1)
+                        }
+                        CommandEnum.SELECT_TWO -> {
+                            game_status.distanceToDust(1)
+                        }
+                        CommandEnum.SELECT_NOT -> {
+                        }
+                        else -> {
+                            continue
+                        }
+                    }
+                    break
                 }
             }
             null

@@ -67,7 +67,7 @@ class MadeAttack(
                 buff.effect(player, game_status, this)
             }
         }
-        if(!editedChogek && editedAuraDamage >= 5) editedAuraDamage = 5
+        if(!editedChogek && editedAuraDamage >= 5 && editedAuraDamage != 999) editedAuraDamage = 5
         return Pair(editedAuraDamage, editedLifeDamage)
     }
 

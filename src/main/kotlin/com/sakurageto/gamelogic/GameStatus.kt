@@ -1624,8 +1624,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     var player1NextTurnDraw = 2
     var player2NextTurnDraw = 2
 
-    suspend fun startPhaseDefault(turnPlayer: PlayerEnum){
+    suspend fun startPhaseDefaultFirst(turnPlayer: PlayerEnum){
         this.turnPlayer = turnPlayer
+        startTurnDistance = getAdjustDistance(null)
+    }
+
+    suspend fun startPhaseDefaultSecond(turnPlayer: PlayerEnum){
         addConcentration(turnPlayer)
         enchantmentReduceAll(turnPlayer)
         if(receiveReconstructRequest(getSocket(turnPlayer))){

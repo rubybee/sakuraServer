@@ -5,7 +5,9 @@ import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.Umbrella
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.receiveNapInformation
+import java.util.*
 import kotlin.collections.ArrayDeque
+import kotlin.collections.HashMap
 
 class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum, var special_card_state: SpecialCardEnum?) {
     var vertical: Boolean
@@ -35,7 +37,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
 
         fun cardInitInsert(start_turn: Boolean, dest: ArrayDeque<Card>, src: MutableList<CardName>, player: PlayerEnum){
-            src.shuffle()
+            src.shuffle(Random(System.currentTimeMillis()))
             for(card_name in src){
                 dest.add(cardMakerByName(start_turn, card_name, player))
             }
@@ -55,7 +57,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         fun cardReconstructInsert(src1: ArrayDeque<Card>, src2: ArrayDeque<Card>, dest: ArrayDeque<Card>){
             dest.addAll(src1)
             dest.addAll(src2)
-            dest.shuffle()
+            dest.shuffle(Random(System.currentTimeMillis()))
             for(card in dest){
                 if(CardSet.isPoison(card.card_number)){
                     dest.remove(card)

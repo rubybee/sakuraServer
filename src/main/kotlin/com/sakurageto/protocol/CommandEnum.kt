@@ -1,6 +1,7 @@
 package com.sakurageto.protocol
 
 enum class CommandEnum {
+    ACK,
     NULL,
     SELECT_MODE_YOUR,
     SELECT_MODE_OTHER,

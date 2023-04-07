@@ -1,6 +1,7 @@
 package com.sakurageto.gamelogic
 
 import com.sakurageto.Connection
+import com.sakurageto.RoomInformation
 import com.sakurageto.card.*
 import com.sakurageto.protocol.*
 import io.ktor.websocket.*
@@ -13,7 +14,7 @@ enum class GameMode(var realnumber: Int){
     SAM_SEUB_IL_SA(1),
 }
 
-class SakuraGame(val player1: Connection, val player2: Connection) {
+class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Connection) {
     private var game_mode: GameMode //0 = no ban 1 = pick ban
     private var game_status: GameStatus
 
@@ -28,15 +29,23 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
     init {
         game_mode = GameMode.SSANG_JANG_YO_LAN
         game_status = GameStatus(PlayerStatus(PlayerEnum.PLAYER1), PlayerStatus(PlayerEnum.PLAYER2), player1, player2)
+        RoomInformation.roomHashMap[roomNumber]?.game = game_status
     }
 
     private suspend fun selectMode(){
         val json = Json { ignoreUnknownKeys = true; coerceInputValues = true; encodeDefaults = true;}
-        val data = SakuraCardCommand(CommandEnum.SELECT_MODE_YOUR, -1)
-        val dataOther = SakuraCardCommand(CommandEnum.SELECT_MODE_OTHER, -1)
+        val random = Random(System.currentTimeMillis())
+        val firstCode = random.nextInt()
+        val secondCode = random.nextInt()
+        RoomInformation.roomHashMap[roomNumber]?.firstUserCode = firstCode
+        RoomInformation.roomHashMap[roomNumber]?.secondUserCode = secondCode
+        println("firstplayer: connectCode: ${firstCode}")
+        println("secondplayer: connectCode: ${secondCode}")
+        val data = SakuraCardCommand(CommandEnum.SELECT_MODE_OTHER, firstCode)
+        val dataOther = SakuraCardCommand(CommandEnum.SELECT_MODE_YOUR, secondCode)
         player1.session.send(json.encodeToString(data))
         player2.session.send(json.encodeToString(dataOther))
-        val dataGet = waitUntil(player1, CommandEnum.SELECT_MODE_YOUR).data?: mutableListOf(0)
+        val dataGet = waitUntil(player2, CommandEnum.SELECT_MODE_YOUR).data?: mutableListOf(0)
         val mode = if (dataGet.isEmpty()) 0 else dataGet[0]
         if(mode == 0){
             this.game_mode = GameMode.SSANG_JANG_YO_LAN
@@ -301,7 +310,7 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
     }
 
      fun selectFirst(){
-        val random = Random.nextInt(2)
+        val random = Random(System.currentTimeMillis()).nextInt(2)
         if(random == 0){
             first_turn = PlayerEnum.PLAYER1
             game_status.setFirstTurn(PlayerEnum.PLAYER1)
@@ -413,6 +422,9 @@ class SakuraGame(val player1: Connection, val player2: Connection) {
             startPhase()
             mainPhase()
             endPhase()
+            if(game_status.gameEnd) {
+                break
+            }
         }
     }
 

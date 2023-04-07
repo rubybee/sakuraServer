@@ -1,11 +1,12 @@
 package com.sakurageto
 
+import com.sakurageto.card.PlayerEnum
 import io.ktor.server.websocket.*
 import java.util.concurrent.atomic.*
 
-class Connection(val session: DefaultWebSocketServerSession) {
-    companion object {
-        val lastId = AtomicInteger(0)
-    }
-    val name = "user${lastId.getAndIncrement()}"
+class Connection(var session: DefaultWebSocketServerSession) {
+    var gameEnd: Boolean = false
+    var socketPlayer: PlayerEnum = PlayerEnum.PLAYER1
+    var roomNumber: Int = -1
+    var disconnectTime: Long = -1
 }

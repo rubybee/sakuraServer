@@ -1,6 +1,8 @@
 package com.sakurageto.gamelogic
 
 import com.sakurageto.Connection
+import com.sakurageto.Room
+import com.sakurageto.RoomInformation
 import com.sakurageto.card.*
 import com.sakurageto.card.CardSet.toCardName
 import com.sakurageto.protocol.*
@@ -1419,6 +1421,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
+    var gameEnd = false
+
     suspend fun gameEnd(winner: PlayerEnum){
         val winner_socket = getSocket(winner)
         val roser_socket = getSocket(winner.opposite())
@@ -1427,6 +1431,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         player1_socket.session.close()
         player2_socket.session.close()
+        RoomInformation.roomHashMap.remove(getSocket(winner).roomNumber)
+        getSocket(PlayerEnum.PLAYER1).gameEnd = true
+        getSocket(PlayerEnum.PLAYER2).gameEnd = true
+        gameEnd = true
     }
 
     suspend fun auraDamageProcess(player: PlayerEnum, data: MutableList<Int>, replace: Int?){

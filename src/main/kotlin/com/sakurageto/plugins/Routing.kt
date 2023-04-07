@@ -1,11 +1,11 @@
 package com.sakurageto.plugins
 
+import com.sakurageto.Room
 import io.ktor.server.routing.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import com.sakurageto.RoomInformation
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import java.lang.NumberFormatException
 
 fun Application.configureRouting() {
     val roomNumberRange = (2..10000)
@@ -17,22 +17,27 @@ fun Application.configureRouting() {
 
         get("/makeroom") {
             var nowRoomNumber = roomNumberRange.random()
-            while (RoomInformation.room_number_hashmap.containsKey(nowRoomNumber)){
+            while (RoomInformation.roomHashMap.containsKey(nowRoomNumber)){
                 nowRoomNumber  = roomNumberRange.random()
             }
-            RoomInformation.room_number_hashmap[nowRoomNumber] = true
-            RoomInformation.room_wait_hashmap[nowRoomNumber] = true
+            RoomInformation.roomHashMap[nowRoomNumber] = Room(System.currentTimeMillis())
             call.respondText(nowRoomNumber.toString())
         }
 
         get("/enterroom/{roomnumber}"){
-            var roomnumber: Int = call.parameters["roomnumber"]?.toInt() ?: 1
-            if ((RoomInformation.room_number_hashmap[roomnumber] == true)
-                and (RoomInformation.room_wait_hashmap[roomnumber] == true)) {
-                call.respondText("okay enter room")
-                RoomInformation.room_wait_hashmap[roomnumber] = false
-            } else {
-                call.respondText("invalid room number")
+            try {
+                call.parameters["roomnumber"]?.toInt()?.let {
+                    val room = RoomInformation.roomHashMap[it]
+                    if(room?.waitStatus == true){
+                        call.respondText("okay enter room")
+                        room.waitStatus = false
+                    }
+                    else {
+                        call.respondText("invalid room number")
+                    }
+                }
+            }catch (_: NumberFormatException){
+
             }
         }
     }

@@ -1,7 +1,6 @@
 package com.sakurageto.gamelogic
 
 import com.sakurageto.Connection
-import com.sakurageto.Room
 import com.sakurageto.RoomInformation
 import com.sakurageto.card.*
 import com.sakurageto.card.CardSet.toCardName
@@ -789,7 +788,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun lifeToSelfFlare(player: PlayerEnum, number: Int, reconstruct: Boolean, damage: Boolean){
         if(number == 0) {
-            gameEnd(player.opposite())
+            return
         }
 
         val nowPlayer = getPlayer(player)

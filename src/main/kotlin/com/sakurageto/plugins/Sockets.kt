@@ -52,6 +52,9 @@ fun Application.configureSockets() {
                                     socketPlayer = PlayerEnum.PLAYER1; roomNumber = it
                                 }
                                 while(true){
+                                    if(room.firstUserConnection?.gameEnd == true){
+                                        break
+                                    }
                                     delay(1000)
                                 }
                             }
@@ -87,6 +90,9 @@ fun Application.configureSockets() {
                                 room.firstUserConnection?.session = this
                                 room.firstUserConnection?.disconnectTime = -1L
                                 while(true){
+                                    if(room.firstUserConnection?.gameEnd == true){
+                                        break
+                                    }
                                     delay(1000)
                                 }
                             }
@@ -95,6 +101,9 @@ fun Application.configureSockets() {
                                 room.secondUserConnection?.session?.incoming?.cancel()
                                 room.secondUserConnection?.session?.close()
                                 while(room.secondUserConnection?.disconnectTime == -1L){
+                                    if(room.secondUserConnection?.gameEnd == true){
+                                        break
+                                    }
                                     delay(500)
                                 }
                                 room.secondUserConnection?.session = this

@@ -2501,7 +2501,7 @@ object CardSet {
             }
             null
         })
-        reflector.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT){card_number, player, game_status, _ ->
+        reflector.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT_OTHER){card_number, player, game_status, _ ->
             if(game_status.logger.checkThisTurnAttackNumber(player.opposite()) == 1){
                 game_status.addThisTurnOtherBuff(player.opposite(), OtherBuff(card_number, 1, OtherBuffTag.GET,
                     { _, _, _ -> true}, { _, _, attack ->

@@ -96,6 +96,7 @@ object CardSet {
         cardNumberHashmap[610] = CardName.YUKIHI_SWIRLING_GESTURE
 
         cardNumberHashmap[SHINRA_SHINRA_CARD_NUMBER] = CardName.SHINRA_SHINRA
+        cardNumberHashmap[700] = CardName.SHINRA_IBLON
         cardNumberHashmap[701] = CardName.SHINRA_BANLON
         cardNumberHashmap[702] = CardName.SHINRA_KIBEN
         cardNumberHashmap[703] = CardName.SHINRA_INYONG
@@ -882,7 +883,7 @@ object CardSet {
         }))
         crimsonzero.addtext((Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
             if(game_status.getAdjustDistance(player) == 0){
-                game_status.addThisTurnOtherBuff(player, OtherBuff(card_number, 1, OtherBuffTag.GET, {_, _, _ ->
+                game_status.addThisTurnOtherBuff(player, OtherBuff(card_number, 1, OtherBuffTag.GET_IMMEDIATE, {_, _, _ ->
                     true }, {_, _, attack ->
                     attack.canNotReact()
                 }))
@@ -1054,7 +1055,7 @@ object CardSet {
                 else{
                     if (list.size == 1){
                         val card = game_status.popCardFrom(player.opposite(), list[0], LocationEnum.HAND, true)?: continue
-                        game_status.insertCardTo(player, card, LocationEnum.DISCARD, true)
+                        game_status.insertCardTo(player.opposite(), card, LocationEnum.DISCARD, true)
                         break
                     }
                 }
@@ -1475,7 +1476,7 @@ object CardSet {
                 else index = 1
                 val cardTwo = game_status.getCardFrom(player.opposite(), index, LocationEnum.YOUR_DECK_TOP)!!
                 if(cardTwo.card_data.canCover){
-                    game_status.popCardFrom(player.opposite(), cardOne.card_number, LocationEnum.DECK, false)?.let {
+                    game_status.popCardFrom(player.opposite(), cardTwo.card_number, LocationEnum.DECK, false)?.let {
                         game_status.insertCardTo(player.opposite(), it, LocationEnum.COVER_CARD, false)
                     }
                 }
@@ -1507,13 +1508,17 @@ object CardSet {
                 Stratagem.SHIN_SAN -> {
                     var index = 0
                     for(i in 1..3){
-                        val card: Card = game_status.getPlayer(player.opposite()).normalCardDeck[index]
-                        if(card.card_data.canCover) game_status.popCardFrom(player.opposite(), card.card_number, LocationEnum.DECK, false)?: break
-                        else {
-                            index += 1
-                            continue
-                        }
-                        game_status.insertCardTo(player.opposite(), card, LocationEnum.COVER_CARD, false)
+                        game_status.getPlayer(player.opposite()).normalCardDeck.getOrNull(index)?.let let@{
+                            if(it.card_data.canCover) {
+                                val card = game_status.popCardFrom(player.opposite(), it.card_number, LocationEnum.DECK, false)?: return@let
+                                game_status.insertCardTo(player.opposite(), card, LocationEnum.COVER_CARD, false)
+                            }
+                            else {
+                                index += 1
+                                return@let
+                            }
+
+                        }?: break
                     }
                     setStratagemByUser(game_status, player, SHINRA_SHINRA_CARD_NUMBER)
                 }
@@ -1551,7 +1556,7 @@ object CardSet {
                     while(true){
                         val nowCommand = game_status.receiveCardEffectSelect(player, card_number)
                         if(nowCommand == CommandEnum.SELECT_ONE){
-                            game_status.useCardFrom(player, card, LocationEnum.HAND, false, null,
+                            game_status.useCardFrom(player, card, LocationEnum.OTHER_HAND, false, null,
                                 isCost = true, isConsume = true)
                             break
                         }
@@ -2067,7 +2072,7 @@ object CardSet {
             null
         })
         hankiPoison.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT){card_number, player, game_status, _ ->
-            game_status.addThisTurnOtherBuff(player.opposite(), OtherBuff(card_number, 1, OtherBuffTag.GET,
+            game_status.addThisTurnOtherBuff(player.opposite(), OtherBuff(card_number, 1, OtherBuffTag.GET_IMMEDIATE,
                 { nowPlayer, gameStatus, attack ->
                     val damage = attack.getDamage(gameStatus, nowPlayer, game_status.getPlayerAttackBuff(player))
                     damage.first == 999 || damage.second == 999
@@ -2149,7 +2154,7 @@ object CardSet {
         })
         poisonRelaxation.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.CARD_DISCARD_PLACE_CHANGE) {card_number, player, game_status, _ ->
             game_status.popCardFrom(player, card_number, LocationEnum.ENCHANTMENT_ZONE, true)?.let {
-                game_status.insertCardTo(it.player, it, LocationEnum.POISON_BAG, true)
+                game_status.insertCardTo(it.player.opposite(), it, LocationEnum.POISON_BAG, true)
             }
 
             null
@@ -2160,7 +2165,7 @@ object CardSet {
         })
         poisonDeadly1.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CARD_DISCARD_PLACE_CHANGE) {card_number, player, game_status, _ ->
             game_status.popCardFrom(player, card_number, LocationEnum.PLAYING_ZONE, true)?.let {
-                game_status.insertCardTo(it.player.opposite(), it, LocationEnum.DISCARD, true)
+                game_status.insertCardTo(it.player, it, LocationEnum.DISCARD, true)
             }
             null
         })
@@ -2170,7 +2175,7 @@ object CardSet {
         })
         poisonDeadly2.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CARD_DISCARD_PLACE_CHANGE) {card_number, player, game_status, _ ->
             game_status.popCardFrom(player, card_number, LocationEnum.PLAYING_ZONE, true)?.let {
-                game_status.insertCardTo(it.player.opposite(), it, LocationEnum.DISCARD, true)
+                game_status.insertCardTo(it.player, it, LocationEnum.DISCARD, true)
             }
             null
         })
@@ -2503,7 +2508,7 @@ object CardSet {
         })
         reflector.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT_OTHER){card_number, player, game_status, _ ->
             if(game_status.logger.checkThisTurnAttackNumber(player.opposite()) == 1){
-                game_status.addThisTurnOtherBuff(player.opposite(), OtherBuff(card_number, 1, OtherBuffTag.GET,
+                game_status.addThisTurnOtherBuff(player.opposite(), OtherBuff(card_number, 1, OtherBuffTag.GET_IMMEDIATE,
                     { _, _, _ -> true}, { _, _, attack ->
                         attack.makeNotValid()
                     })
@@ -2516,14 +2521,14 @@ object CardSet {
             game_status.auraToAura(player.opposite(), player, 1)
             null
         })
-        drainDevil.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_SPECIAL_RETURN) {card_number, player, game_status, _ ->
+        drainDevil.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_SPECIAL_RETURN_YOUR) { card_number, player, game_status, _ ->
             if(!game_status.getPlayer(player).end_turn){
                 while(true){
                     when(game_status.receiveCardEffectSelect(player, card_number)){
                         CommandEnum.SELECT_ONE -> {
                             game_status.getCardFrom(player, card_number, LocationEnum.USED_CARD)?.let {
                                 game_status.useCardFrom(player, it, LocationEnum.USED_CARD, false, null,
-                                    isCost = true, isConsume = false)
+                                    isCost = false, isConsume = false)
                             }
                             break
                         }

@@ -321,6 +321,7 @@ enum class CardName {
             put(SHINRA_DASIG_IHAE, 708)
             put(SHINRA_CHEONJI_BANBAG, 709)
             put(SHINRA_SAMRA_BAN_SHO, 710)
+
             put(HAGANE_CENTRIFUGAL_ATTACK, 800)
             put(HAGANE_FOUR_WINDED_EARTHQUAKE, 801)
             put(HAGANE_GROUND_BREAKING, 802)

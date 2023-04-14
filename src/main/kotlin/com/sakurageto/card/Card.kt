@@ -281,8 +281,6 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
 
     //-2: can't use                    -1: can use                 >= 0: cost
     suspend fun canUse(player: PlayerEnum, gameStatus: GameStatus, react_attack: MadeAttack?, isCost: Boolean, isConsume: Boolean): Int{
-        if(card_data.sub_type == SubType.FULL_POWER && !gameStatus.getPlayerFullAction(player)) return -2
-
         if(!textUseCheck(player, gameStatus, react_attack)){
             return -2
         }
@@ -315,9 +313,11 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         when(card_data.card_type){
             CardType.ATTACK -> {
                 for(card in gameStatus.getPlayer(player).enchantment_card.values){
-                    for(text in card.card_data.effect!!){
-                        if(enchantmentUsable(text)){
-                            if(text.tag == TextEffectTag.CAN_NOT_USE_ATTACK) return -2
+                    card.card_data.effect?.let {
+                        for(text in it){
+                            if(enchantmentUsable(text)){
+                                if(text.tag == TextEffectTag.CAN_NOT_USE_ATTACK) return -2
+                            }
                         }
                     }
                 }

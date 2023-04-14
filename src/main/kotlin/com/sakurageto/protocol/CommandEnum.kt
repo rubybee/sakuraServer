@@ -353,6 +353,7 @@ enum class LocationEnum(var real_number: Int){
     DISCARD(11),
     DECK(12),
     HAND(13),
+    OTHER_HAND(29),
     YOUR_DECK_TOP(14),
     OTHER_DECK_TOP(15),
     YOUR_DECK_BELOW(16),

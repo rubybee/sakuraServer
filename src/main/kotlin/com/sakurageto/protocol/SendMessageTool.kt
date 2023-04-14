@@ -313,6 +313,11 @@ suspend fun sendRequestBasicOperation(mine: Connection, card_number: Int){
     send(mine, Json.encodeToString(data))
 }
 
+suspend fun sendSimpleCommand(mine: Connection, command: CommandEnum){
+    val dataYour = SakuraCardCommand(command, -1)
+    send(mine, Json.encodeToString(dataYour))
+}
+
 suspend fun sendSimpleCommand(mine: Connection, other: Connection, command: CommandEnum){
     val dataYour = SakuraCardCommand(command, -1)
     val dataOther = SakuraCardCommand(command.Opposite(), -1)

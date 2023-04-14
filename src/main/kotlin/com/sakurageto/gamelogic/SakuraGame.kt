@@ -157,16 +157,16 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
 
         if(game_status.player1.megami_1 == MegamiEnum.CHIKAGE || game_status.player1.megami_2 == MegamiEnum.CHIKAGE){
             for(card_name in CardName.returnPoisonCardName()){
-                val turnCheck = first_turn == PlayerEnum.PLAYER1
-                val card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER1)
+                val turnCheck = first_turn == PlayerEnum.PLAYER2
+                val card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER2)
                 game_status.player1.poisonBag[card.card_data.card_name] = card
             }
         }
 
         if(game_status.player2.megami_1 == MegamiEnum.CHIKAGE || game_status.player2.megami_2 == MegamiEnum.CHIKAGE){
             for(card_name in CardName.returnPoisonCardName()){
-                val turnCheck = first_turn == PlayerEnum.PLAYER2
-                val card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER2)
+                val turnCheck = first_turn == PlayerEnum.PLAYER1
+                val card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER1)
                 game_status.player2.poisonBag[card.card_data.card_name] = card
             }
         }

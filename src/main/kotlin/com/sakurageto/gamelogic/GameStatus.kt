@@ -1195,13 +1195,15 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             return
         }
 
-        nowAttack.activeOtherBuff(this, player, getPlayerOtherBuff(player))
+        nowAttack.activeOtherBuff(this, player, nowPlayer.otherBuff)
+        println("$player do attack: ${nowAttack.card_name}, valid: ${nowAttack.isItValid}, damage: ${nowAttack.isItDamage}")
         if(nowAttack.isItValid){
-            if(nowAttack.inevitable || nowAttack.rangeCheck(getAdjustDistance(player), this, player, getPlayerRangeBuff(player))){
+            if(nowAttack.inevitable || nowAttack.rangeCheck(getAdjustDistance(player), this, player, nowPlayer.rangeBuff)){
                 if(nowAttack.isItDamage){
                     if(nowAttack.beforeProcessDamageCheck(player, this, react_attack)){
-                        val damage = nowAttack.getDamage(this, player, getPlayerAttackBuff(player))
+                        val damage = nowAttack.getDamage(this, player, nowPlayer.attackBuff)
                         val chosen = damageSelect(player.opposite(), damage)
+                        println("damage: (${damage.first}, ${damage.second})")
                         val auraReplace = nowAttack.effectText(player, this, react_attack, TextEffectTag.AFTER_AURA_DAMAGE_PLACE_CHANGE)
                         val lifeReplace = nowAttack.effectText(player, this, react_attack, TextEffectTag.AFTER_LIFE_DAMAGE_PLACE_CHANGE)
                         if(nowAttack.bothSideDamage){
@@ -1405,6 +1407,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
         }
 
+        sendSimpleCommand(getSocket(player), CommandEnum.SELECT_ENCHANTMENT_END)
+
         if(player1_card.isNotEmpty()){
             for(card_number in player1_card.keys){
                 val card = player1.enchantment_card[card_number]
@@ -1418,6 +1422,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 enchantmentDestruction(PlayerEnum.PLAYER2, card!!)
             }
         }
+
+
     }
 
     var gameEnd = false
@@ -1748,19 +1754,23 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(card_number == -1){
             return false
         }
+
         when(commandEnum){
             CommandEnum.ACTION_USE_CARD_HAND -> {
                 val card = getCardFrom(player, card_number, LocationEnum.HAND)?: return false
+                if(card.card_data.sub_type == SubType.FULL_POWER && !getPlayerFullAction(player)) return false
                 if(useCardFrom(player, card, LocationEnum.HAND, false, null,
                         isCost = true, isConsume = true)) return true
             }
             CommandEnum.ACTION_USE_CARD_SPECIAL -> {
                 val card = getCardFrom(player, card_number, LocationEnum.SPECIAL_CARD)?: return false
+                if(card.card_data.sub_type == SubType.FULL_POWER && !getPlayerFullAction(player)) return false
                 if(useCardFrom(player, card, LocationEnum.SPECIAL_CARD, false, null,
                         isCost = true, isConsume = true)) return true
             }
             CommandEnum.ACTION_USE_CARD_COVER -> {
                 val card = getCardFrom(player, card_number, LocationEnum.COVER_CARD)?: return false
+                if(card.card_data.sub_type == SubType.FULL_POWER && !getPlayerFullAction(player)) return false
                 if(card.canUseAtCover()){
                     if(useCardFrom(player, card, LocationEnum.COVER_CARD, false, null,
                             isCost = true, isConsume = true)) return true
@@ -1949,7 +1959,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             distanceToken += 1
             thisTurnDistance += 1
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
-                LocationEnum.YOUR_AURA, LocationEnum.YOUR_FLARE, 1, -1)
+                LocationEnum.DUST, LocationEnum.DISTANCE, 1, -1)
         }
     }
 
@@ -1980,7 +1990,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 nowPlayer.max_hand = 2
                 return
             }
-            coverCard(player, player, -1)
+            coverCard(player, player, 0)
         }
 
     }
@@ -2061,6 +2071,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     return result
                 }
             }
+            LocationEnum.OTHER_HAND -> {
+                if(card_number in getPlayer(player.opposite()).hand){
+                    sendPopCardZone(otherSocket, nowSocket, card_number, public, CommandEnum.POP_HAND_YOUR)
+                    val result = getPlayer(player.opposite()).hand[card_number]
+                    nowPlayer.hand.remove(card_number)
+                    return result
+                }
+            }
             LocationEnum.SPECIAL_CARD -> {
                 val result = nowPlayer.special_card_deck[card_number]?: return null
                 sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_SPECIAL_YOUR)
@@ -2129,50 +2147,56 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val nowPlayer = getPlayer(player)
         val nowSocket = getSocket(player)
         val otherSocket = getSocket(player.opposite())
+        val cardOwner = getPlayer(card.player)
+        val cardOwnerSocket = getSocket(card.player)
+        val cardOwnerOppositeSocket = getSocket(card.player.opposite())
         when(location){
             LocationEnum.YOUR_DECK_BELOW -> {
-                nowPlayer.normalCardDeck.addLast(card)
-                sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.DECK_BELOW_YOUR)
+                cardOwner.normalCardDeck.addLast(card)
+                sendAddCardZone(cardOwnerSocket, cardOwnerOppositeSocket, card.card_number, public, CommandEnum.DECK_BELOW_YOUR)
             }
             LocationEnum.YOUR_DECK_TOP -> {
-                nowPlayer.normalCardDeck.addFirst(card)
-                sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.DECK_TOP_YOUR)
+                cardOwner.normalCardDeck.addFirst(card)
+                sendAddCardZone(cardOwnerSocket, cardOwnerOppositeSocket, card.card_number, public, CommandEnum.DECK_TOP_YOUR)
             }
             LocationEnum.DISCARD -> {
-                nowPlayer.discard.addFirst(card)
-                sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.DISCARD_CARD_YOUR)
+                cardOwner.discard.addFirst(card)
+                sendAddCardZone(cardOwnerSocket, cardOwnerOppositeSocket, card.card_number, public, CommandEnum.DISCARD_CARD_YOUR)
             }
             LocationEnum.PLAYING_ZONE -> {
                 nowPlayer.usingCard.addFirst(card)
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.PLAYING_CARD_YOUR)
             }
             LocationEnum.USED_CARD -> {
-                nowPlayer.usedSpecialCard[card.card_number] = card
-                sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.USED_CARD_YOUR)
+                cardOwner.usedSpecialCard[card.card_number] = card
+                sendAddCardZone(cardOwnerSocket, cardOwnerOppositeSocket, card.card_number, public, CommandEnum.USED_CARD_YOUR)
             }
             LocationEnum.COVER_CARD -> {
-                nowPlayer.cover_card.addFirst(card)
-                sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.COVER_CARD_YOUR)
+                cardOwner.cover_card.addFirst(card)
+                sendAddCardZone(cardOwnerSocket, cardOwnerOppositeSocket, card.card_number, public, CommandEnum.COVER_CARD_YOUR)
             }
             LocationEnum.ENCHANTMENT_ZONE -> {
                 nowPlayer.enchantment_card[card.card_number] = card
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.ENCHANTMENT_CARD_YOUR)
             }
             LocationEnum.SPECIAL_CARD -> {
-                nowPlayer.special_card_deck[card.card_number] = card
-                sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.SPECIAL_YOUR)
+                cardOwner.special_card_deck[card.card_number] = card
+                sendAddCardZone(cardOwnerSocket, cardOwnerOppositeSocket, card.card_number, public, CommandEnum.SPECIAL_YOUR)
             }
             LocationEnum.HAND -> {
-                nowPlayer.hand[card.card_number] = card
-                sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.HAND_YOUR)
+                cardOwner.hand[card.card_number] = card
+                sendAddCardZone(cardOwnerSocket, cardOwnerOppositeSocket, card.card_number, public, CommandEnum.HAND_YOUR)
             }
             LocationEnum.SEAL_ZONE -> {
                 nowPlayer.sealZone[card.card_number] = card
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.SEAL_YOUR)
             }
             LocationEnum.POISON_BAG -> {
-                nowPlayer.poisonBag[card.card_data.card_name] = card
-                sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.POISON_BAG_YOUR)
+                val poisonOwner = getPlayer(card.player.opposite())
+                val poisonOwnerSocket = getSocket(card.player.opposite())
+                val poisonOwnerOppositeSocket = getSocket(card.player)
+                poisonOwner.poisonBag[card.card_data.card_name] = card
+                sendAddCardZone(poisonOwnerSocket, poisonOwnerOppositeSocket, card.card_number, public, CommandEnum.POISON_BAG_YOUR)
             }
             LocationEnum.OUT_OF_GAME -> {
                 nowPlayer.outOfGame[card.card_number] = card
@@ -2209,6 +2233,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             LocationEnum.YOUR_DECK_TOP -> getPlayer(player).getCardFromDeckTop(card_number)
             LocationEnum.PLAYING_ZONE -> getPlayer(player).getCardFromPlaying(card_number)
             LocationEnum.ADDITIONAL_CARD -> getPlayer(player).getCardFromAdditional(card_number)
+            LocationEnum.USED_CARD -> getPlayer(player).getCardFromUsed(card_number)
             else -> TODO()
         }
     }
@@ -2226,7 +2251,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         card.effectAllMaintainCard(player, this, TextEffectTag.WHEN_THIS_CARD_RETURN)
         card.special_card_state = SpecialCardEnum.UNUSED
         for(nowCard in getPlayer(player).usedSpecialCard.values){
-            nowCard.effectAllMaintainCard(player, this, TextEffectTag.WHEN_SPECIAL_RETURN)
+            nowCard.effectAllMaintainCard(player, this, TextEffectTag.WHEN_SPECIAL_RETURN_YOUR)
         }
         return true
     }

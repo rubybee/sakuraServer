@@ -121,6 +121,10 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var normalCardDeck = ArrayDeque<Card>()
     var usedSpecialCard = HashMap<Int, Card>()
 
+    fun getCardFromUsed(index: Int): Card?{
+        return usedSpecialCard[index]
+    }
+
     fun getCardFromDeckTop(index: Int): Card?{
         if(normalCardDeck.size > index) return normalCardDeck[index]
         return null

@@ -323,6 +323,13 @@ class MadeAttack(
                     for(text in it){
                         this.effect!!.add(text)
                     }
+                }?: run{
+                    card_data.effect?.let {
+                        this.effect = mutableListOf()
+                        for(text in it){
+                            this.effect!!.add(text)
+                        }
+                    }
                 }
             }
             Umbrella.UNFOLD -> {
@@ -330,6 +337,13 @@ class MadeAttack(
                     this.effect = mutableListOf()
                     for(text in it){
                         this.effect!!.add(text)
+                    }
+                }?: run{
+                    card_data.effect?.let {
+                        this.effect = mutableListOf()
+                        for(text in it){
+                            this.effect!!.add(text)
+                        }
                     }
                 }
             }

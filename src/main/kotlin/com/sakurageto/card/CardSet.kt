@@ -2063,7 +2063,7 @@ object CardSet {
         hankiPoison.setSpecial(2)
         hankiPoison.setEnchantment(5)
         hankiPoison.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.REACT_ATTACK_REDUCE) {card_number, _, _, reactedAttack ->
-            reactedAttack?.addOtherBuff(OtherBuff(card_number, 1, OtherBuffTag.GET, { player, game_status, attack ->
+            reactedAttack?.addOtherBuff(OtherBuff(card_number, 1, OtherBuffTag.GET_IMMEDIATE, { player, game_status, attack ->
                 val damage = attack.getDamage(game_status, player,  game_status.getPlayerAttackBuff(player))
                 damage.first == 999 || damage.second == 999
             }, { _, _, attack ->
@@ -2071,7 +2071,7 @@ object CardSet {
             }))
             null
         })
-        hankiPoison.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT){card_number, player, game_status, _ ->
+        hankiPoison.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT_OTHER){card_number, player, game_status, _ ->
             game_status.addThisTurnOtherBuff(player.opposite(), OtherBuff(card_number, 1, OtherBuffTag.GET_IMMEDIATE,
                 { nowPlayer, gameStatus, attack ->
                     val damage = attack.getDamage(gameStatus, nowPlayer, game_status.getPlayerAttackBuff(player))
@@ -2217,12 +2217,9 @@ object CardSet {
 
     private fun getKikou(player: PlayerEnum, game_status: GameStatus): Kikou{
         val result = Kikou()
-        val player1 = game_status.getPlayer(PlayerEnum.PLAYER1)
-        val player2 = game_status.getPlayer(PlayerEnum.PLAYER2)
-        for (nowPlayer in listOf(player1, player2)) {
-            for (card in nowPlayer.enchantment_card.values + nowPlayer.usingCard + nowPlayer.discard) {
-                if (card.player == player) calcKikou(card.card_data, result)
-            }
+        val nowPlayer = game_status.getPlayer(player)
+        for (card in nowPlayer.enchantment_card.values + nowPlayer.usedSpecialCard.values + nowPlayer.discard) {
+            calcKikou(card.card_data, result)
         }
         return result
     }
@@ -2292,7 +2289,7 @@ object CardSet {
     private fun kururuCardInit(){
         elekittel.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.DAMAGE) {_, player, game_status, _ ->
             val kikou = getKikou(player, game_status)
-            if(kikou.behavior >= 3 || kikou.reaction >= 2) {
+            if(kikou.behavior >= 3 && kikou.reaction >= 2) {
                 game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false,
                     null, null)
             }
@@ -2300,7 +2297,7 @@ object CardSet {
         })
         accelerator.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) {card_number, player, game_status, _ ->
             val kikou = getKikou(player, game_status)
-            if(kikou.enchantment >= 1 || kikou.behavior >= 2) {
+            if(kikou.enchantment >= 1 && kikou.behavior >= 2) {
                 while(true){
                     val list = game_status.selectCardFrom(player, player, listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, card_number
                     ) { card -> card.card_data.sub_type == SubType.FULL_POWER }?: break
@@ -2499,7 +2496,7 @@ object CardSet {
         reflector.setEnchantment(0)
         reflector.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
             val kikou = getKikou(player, game_status)
-            if(kikou.attack >= 1 || kikou.reaction >= 1) {
+            if(kikou.attack >= 1 && kikou.reaction >= 1) {
                 game_status.getCardFrom(player, card_number, LocationEnum.PLAYING_ZONE)?.let {
                     game_status.dustToCard(player, 4, it)
                 }

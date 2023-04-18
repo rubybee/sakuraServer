@@ -29,6 +29,7 @@ suspend fun waitReconnect(player: Connection){
 
 suspend fun send(player: Connection, data: String){
     try {
+//        println("send message to ${player.socketPlayer}: $data")
         player.session.send(data)
         val frame = player.session.incoming.receive()
         if (frame is Frame.Text) {

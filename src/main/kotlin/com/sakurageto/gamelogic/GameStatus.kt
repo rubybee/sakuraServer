@@ -153,24 +153,24 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     fun getPlayerTempRangeBuff(player: PlayerEnum): RangeBuffQueue{
-        return if(player == PlayerEnum.PLAYER1) player1.rangeBuff else player2.rangeBuff
-    }
-
-    fun getPlayerRangeBuff(player: PlayerEnum): RangeBuffQueue{
         return if(player == PlayerEnum.PLAYER1) player1TempRangeBuff else player2TempRangeBuff
     }
 
+    fun getPlayerRangeBuff(player: PlayerEnum): RangeBuffQueue{
+        return if(player == PlayerEnum.PLAYER1) player1.rangeBuff else player2.rangeBuff
+    }
+
     fun getPlayerTempOtherBuff(player: PlayerEnum): OtherBuffQueue{
-        return if(player == PlayerEnum.PLAYER1) player1.otherBuff else player2.otherBuff
+        return if(player == PlayerEnum.PLAYER1) player1TempOtherBuff else player2TempOtherBuff
     }
 
     fun getPlayerOtherBuff(player: PlayerEnum): OtherBuffQueue{
-        return if(player == PlayerEnum.PLAYER1) player1TempOtherBuff else player2TempOtherBuff
+        return if(player == PlayerEnum.PLAYER1) player1.otherBuff else player2.otherBuff
     }
 
     fun getCardNumber(player: PlayerEnum, card_name: CardName): Int{
         return if (getPlayer(player).first_turn) card_name.toCardNumber(true)
-        else card_name.toCardNumber(true)
+        else card_name.toCardNumber(false)
     }
 
     fun getPlayerLife(player: PlayerEnum): Int{
@@ -837,17 +837,17 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     suspend fun addAllCardTextBuff(player: PlayerEnum){
         val mine = getPlayer(player)
         val other = getPlayer(player)
-        for(card in mine.enchantment_card){
-            card.value.effectAllMaintainCard(player, this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT)
+        for(card in mine.enchantment_card.values){
+            card.effectAllMaintainCard(player, this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT)
         }
-        for(card in mine.usedSpecialCard){
-            card.value.effectAllMaintainCard(player, this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT)
+        for(card in mine.usedSpecialCard.values){
+            card.effectAllMaintainCard(player, this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT)
         }
-        for(card in other.enchantment_card){
-            card.value.effectAllMaintainCard(player.opposite(), this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT_OTHER)
+        for(card in other.enchantment_card.values){
+            card.effectAllMaintainCard(player.opposite(), this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT_OTHER)
         }
-        for(card in other.usedSpecialCard){
-            card.value.effectAllMaintainCard(player.opposite(), this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT_OTHER)
+        for(card in other.usedSpecialCard.values){
+            card.effectAllMaintainCard(player.opposite(), this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT_OTHER)
         }
     }
 
@@ -1110,10 +1110,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val cost = card.canUse(player, this, react_attack, isCost, isConsume)
         if(cost != -2){
             if(isCost) card.effectText(player, this, react_attack, TextEffectTag.COST)
+
             if(location == LocationEnum.COVER_CARD && react) logger.insert(Log(player, LogText.USE_CARD_IN_COVER_AND_REACT, card.card_number, card.card_number))
             else if(location == LocationEnum.COVER_CARD) logger.insert(Log(player, LogText.USE_CARD_IN_COVER, card.card_number, card.card_number))
             else if(react) logger.insert(Log(player, LogText.USE_CARD_REACT, card.card_number, card.card_number))
             else logger.insert(Log(player, LogText.USE_CARD, card.card_number, card.card_number))
+
             if(cost == -1){
                 popCardFrom(player, card.card_number, location, true)
                 insertCardTo(player, card, LocationEnum.PLAYING_ZONE, true)
@@ -1126,7 +1128,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 card.special_card_state = SpecialCardEnum.PLAYING
                 flareToDust(player, cost)
                 cleanAfterUseCost()
-                popCardFrom(player, card.card_number, LocationEnum.SPECIAL_CARD, true)
+                popCardFrom(player, card.card_number, location, true)
                 insertCardTo(player, card, LocationEnum.PLAYING_ZONE, true)
                 gaugeIncreaseRequest(player, card)
                 sendUseCardMeesage(getSocket(player), getSocket(player.opposite()), react, card.card_number)
@@ -2075,7 +2077,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 if(card_number in getPlayer(player.opposite()).hand){
                     sendPopCardZone(otherSocket, nowSocket, card_number, public, CommandEnum.POP_HAND_YOUR)
                     val result = getPlayer(player.opposite()).hand[card_number]
-                    nowPlayer.hand.remove(card_number)
+                    getPlayer(player.opposite()).hand.remove(card_number)
                     return result
                 }
             }

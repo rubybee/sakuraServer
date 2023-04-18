@@ -146,7 +146,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }?: false
     }
 
-    suspend fun canReactable(attack: MadeAttack, game_status: GameStatus, player: PlayerEnum, continuousBuffQueue: OtherBuffQueue, ): Boolean{
+    suspend fun canReactable(attack: MadeAttack, game_status: GameStatus, player: PlayerEnum, continuousBuffQueue: OtherBuffQueue): Boolean{
         return attack.canReactByThisCard(this, game_status, player, continuousBuffQueue)
     }
 

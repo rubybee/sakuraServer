@@ -836,7 +836,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun addAllCardTextBuff(player: PlayerEnum){
         val mine = getPlayer(player)
-        val other = getPlayer(player)
+        val other = getPlayer(player.opposite())
         for(card in mine.enchantment_card.values){
             card.effectAllMaintainCard(player, this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT)
         }

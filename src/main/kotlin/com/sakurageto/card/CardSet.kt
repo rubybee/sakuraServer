@@ -18,6 +18,30 @@ object CardSet {
     fun Int.toCardName(): CardName = cardNumberHashmap[this]?: CardName.CARD_UNNAME
     fun CardName.toCardData(): CardData = cardDataHashmap[this]?: unused
 
+    private fun hashMapTest(){
+        val cardNameList = CardName.values()
+        for(cardName in cardNameList){
+            if(cardName == CardName.CARD_UNNAME || cardName == CardName.POISON_ANYTHING) continue
+            if(cardName.toCardData() == unused){
+                println("cardDataHashmap don't have card name: $cardName")
+            }
+            val firstNumber = cardName.toCardNumber(true)
+            if(firstNumber == -1){
+                println("cardNameHashmapFirst don't have card name: $cardName")
+                if(firstNumber.toCardName() == CardName.CARD_UNNAME){
+                    println("cardNumberHashMap don't have card number: $firstNumber")
+                }
+            }
+            val secondNumber = cardName.toCardNumber(false)
+            if(secondNumber == -1){
+                println("cardNameHashmapSecond don't have card name: $cardName")
+                if(secondNumber.toCardName() == CardName.CARD_UNNAME){
+                    println("cardNumberHashMap don't have card number: $secondNumber")
+                }
+            }
+        }
+    }
+
     private fun hashMapInit(){
         //for number -> card name
         cardNumberHashmap[0] = CardName.CARD_UNNAME
@@ -182,6 +206,7 @@ object CardSet {
         cardNumberHashmap[1212] = CardName.RAIRA_WIND_ZEN_KAI
         cardNumberHashmap[1213] = CardName.RAIRA_WIND_CELESTIAL_SPHERE
 
+
         cardNumberHashmap[10100] = CardName.YURINA_CHAM
         cardNumberHashmap[10101] = CardName.YURINA_ILSUM
         cardNumberHashmap[10102] = CardName.YURINA_JARUCHIGI
@@ -297,6 +322,21 @@ object CardSet {
         cardNumberHashmap[10998] = CardName.POISON_DEADLY_1
         cardNumberHashmap[10999] = CardName.POISON_DEADLY_2
 
+        cardNumberHashmap[11000] = CardName.KURURU_ELEKITTEL
+        cardNumberHashmap[11001] = CardName.KURURU_ACCELERATOR
+        cardNumberHashmap[11002] = CardName.KURURU_KURURUOONG
+        cardNumberHashmap[11003] = CardName.KURURU_TORNADO
+        cardNumberHashmap[11004] = CardName.KURURU_REGAINER
+        cardNumberHashmap[11005] = CardName.KURURU_MODULE
+        cardNumberHashmap[11006] = CardName.KURURU_REFLECTOR
+        cardNumberHashmap[11007] = CardName.KURURU_DRAIN_DEVIL
+        cardNumberHashmap[11008] = CardName.KURURU_BIG_GOLEM
+        cardNumberHashmap[11009] = CardName.KURURU_INDUSTRIA
+        cardNumberHashmap[11010] = CardName.KURURU_DUPLICATED_GEAR_1
+        cardNumberHashmap[11011] = CardName.KURURU_DUPLICATED_GEAR_2
+        cardNumberHashmap[11012] = CardName.KURURU_DUPLICATED_GEAR_3
+        cardNumberHashmap[11013] = CardName.KURURU_KANSHOUSOUCHI_KURURUSIK
+
         cardNumberHashmap[11100] = CardName.THALLYA_BURNING_STEAM
         cardNumberHashmap[11101] = CardName.THALLYA_WAVING_EDGE
         cardNumberHashmap[11102] = CardName.THALLYA_SHIELD_CHARGE
@@ -311,21 +351,6 @@ object CardSet {
         cardNumberHashmap[11111] = CardName.FORM_YAKSHA
         cardNumberHashmap[11112] = CardName.FORM_NAGA
         cardNumberHashmap[11113] = CardName.FORM_GARUDA
-
-        cardNumberHashmap[1200] = CardName.RAIRA_BEAST_NAIL
-        cardNumberHashmap[1201] = CardName.RAIRA_STORM_SURGE_ATTACK
-        cardNumberHashmap[1202] = CardName.RAIRA_REINCARNATION_NAIL
-        cardNumberHashmap[1203] = CardName.RAIRA_WIND_RUN
-        cardNumberHashmap[1204] = CardName.RAIRA_WISDOM_OF_STORM_SURGE
-        cardNumberHashmap[1205] = CardName.RAIRA_HOWLING
-        cardNumberHashmap[1206] = CardName.RAIRA_WIND_KICK
-        cardNumberHashmap[1207] = CardName.RAIRA_THUNDER_WIND_PUNCH
-        cardNumberHashmap[1208] = CardName.RAIRA_SUMMON_THUNDER
-        cardNumberHashmap[1209] = CardName.RAIRA_WIND_CONSEQUENCE_BALL
-        cardNumberHashmap[1210] = CardName.RAIRA_CIRCULAR_CIRCUIT
-        cardNumberHashmap[1211] = CardName.RAIRA_WIND_ATTACK
-        cardNumberHashmap[1212] = CardName.RAIRA_WIND_ZEN_KAI
-        cardNumberHashmap[1213] = CardName.RAIRA_WIND_CELESTIAL_SPHERE
 
         cardNumberHashmap[11200] = CardName.RAIRA_BEAST_NAIL
         cardNumberHashmap[11201] = CardName.RAIRA_STORM_SURGE_ATTACK
@@ -342,8 +367,10 @@ object CardSet {
         cardNumberHashmap[11212] = CardName.RAIRA_WIND_ZEN_KAI
         cardNumberHashmap[11213] = CardName.RAIRA_WIND_CELESTIAL_SPHERE
 
+
         cardDataHashmap[CardName.CARD_UNNAME] = unused
         cardDataHashmap[CardName.POISON_ANYTHING] = unused
+
         cardDataHashmap[CardName.YURINA_CHAM] = cham
         cardDataHashmap[CardName.YURINA_ILSUM] = ilsom
         cardDataHashmap[CardName.YURINA_JARUCHIGI] = jaru_chigi
@@ -470,6 +497,7 @@ object CardSet {
         cardDataHashmap[CardName.KURURU_DRAIN_DEVIL] = drainDevil
         cardDataHashmap[CardName.KURURU_BIG_GOLEM] = bigGolem
         cardDataHashmap[CardName.KURURU_INDUSTRIA] = industria
+        cardDataHashmap[CardName.KURURU_KANSHOUSOUCHI_KURURUSIK] = kanshousouchiKururusik
         cardDataHashmap[CardName.KURURU_DUPLICATED_GEAR_1] = dupliGear1
         cardDataHashmap[CardName.KURURU_DUPLICATED_GEAR_2] = dupliGear2
         cardDataHashmap[CardName.KURURU_DUPLICATED_GEAR_3] = dupliGear3
@@ -484,9 +512,10 @@ object CardSet {
         cardDataHashmap[CardName.THALLYA_ALPHA_EDGE] = alphaEdge
         cardDataHashmap[CardName.THALLYA_OMEGA_BURST] = omegaBurst
         cardDataHashmap[CardName.THALLYA_THALLYA_MASTERPIECE] = masterPiece
+        cardDataHashmap[CardName.THALLYA_JULIA_BLACKBOX] = juliaBlackbox
         cardDataHashmap[CardName.FORM_GARUDA] = formGaruda
         cardDataHashmap[CardName.FORM_NAGA] = formNaga
-        cardDataHashmap[CardName.FORM_GARUDA] = formGaruda
+        cardDataHashmap[CardName.FORM_YAKSHA] = formYaksha
 
         cardDataHashmap[CardName.RAIRA_BEAST_NAIL] = beastNail
         cardDataHashmap[CardName.RAIRA_STORM_SURGE_ATTACK] = stormSurgeAttack
@@ -1149,6 +1178,7 @@ object CardSet {
                 {card -> card.card_data.sub_type != SubType.FULL_POWER}
                 if(selected == null){
                     game_status.showSome(player, CommandEnum.SHOW_COVER_YOUR, -1)
+                    break
                 }
                 else{
                     if(selected.size == 1){
@@ -1172,11 +1202,10 @@ object CardSet {
         bioactivity.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.RETURN_OTHER_CARD) {card_number, player, game_status, _ ->
             while(true) {
                 val selected = game_status.selectCardFrom(player, player, listOf(LocationEnum.USED_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
-                    card_number) { true }
-                if (selected != null) {
-                    if (selected.size == 1 && game_status.returnSpecialCard(player, selected[0])) {
-                        break
-                    }
+                    card_number) { true }?: break
+                if(selected.size == 1){
+                    game_status.returnSpecialCard(player, selected[0])
+                    break
                 }
             }
             null
@@ -1196,21 +1225,19 @@ object CardSet {
             null
         })
         tobikage.setSpecial(4)
-        tobikage.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) {card_number, player, game_status, react_attack ->
+        tobikage.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) ret@{card_number, player, game_status, react_attack ->
             while(true){
                 val selected = game_status.selectCardFrom(player, player, listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, card_number)
-                {card -> card.card_data.sub_type != SubType.FULL_POWER}
-                if(selected == null){
+                {card -> card.card_data.sub_type != SubType.FULL_POWER}?: run {
                     game_status.showSome(player, CommandEnum.SHOW_COVER_YOUR, -1)
+                    return@ret null
                 }
-                else{
-                    if(selected.size == 1){
-                        val selectNumber = selected[0]
-                        val card = game_status.getCardFrom(player, selectNumber, LocationEnum.COVER_CARD)?: continue
-                        game_status.useCardFrom(player, card, LocationEnum.COVER_CARD, true, react_attack,
-                            isCost = true, isConsume = true)
-                        break
-                    }
+                if(selected.size == 1){
+                    val selectNumber = selected[0]
+                    val card = game_status.getCardFrom(player, selectNumber, LocationEnum.COVER_CARD)?: continue
+                    game_status.useCardFrom(player, card, LocationEnum.COVER_CARD, true, react_attack,
+                        isCost = true, isConsume = true)
+                    break
                 }
             }
             null
@@ -1251,7 +1278,6 @@ object CardSet {
                 if(nowCommand == CommandEnum.SELECT_ONE){
                     game_status.changeUmbrella(player)
                     break
-
                 }
                 else if(nowCommand == CommandEnum.SELECT_TWO){
                     //not change
@@ -1531,7 +1557,8 @@ object CardSet {
                                 game_status.popCardFrom(player.opposite(), list[0], LocationEnum.DISCARD, true)?.let {
                                     game_status.useCardFrom(player, it, LocationEnum.DISCARD, false, null,
                                         isCost = true, isConsume = true)
-                                }
+                                }?: continue
+                                break
                             }
                         }
                         else{
@@ -1936,22 +1963,19 @@ object CardSet {
         grandMountainRespect.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) {card_number, player, game_status, _ ->
             while(true){
                 val selected = game_status.selectCardFrom(player, player, listOf(LocationEnum.DISCARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, card_number)
-                {card -> card.card_data.sub_type != SubType.FULL_POWER}
-                if(selected == null) break
-                else{
-                    if(selected.size == 0) break
-                    else if(selected.size <= 2){
-                        val card = game_status.getCardFrom(player, selected[0], LocationEnum.DISCARD)?: continue
-                        game_status.useCardFrom(player, card, LocationEnum.DISCARD, false, null,
+                {card -> card.card_data.sub_type != SubType.FULL_POWER}?: break
+                if(selected.size == 0) break
+                else if(selected.size <= 2){
+                    val card = game_status.getCardFrom(player, selected[0], LocationEnum.DISCARD)?: continue
+                    game_status.useCardFrom(player, card, LocationEnum.DISCARD, false, null,
+                        isCost = true, isConsume = true)
+                    if(game_status.getEndTurn(player)) break
+                    if(selected.size == 2){
+                        val secondCard = game_status.getCardFrom(player, selected[1], LocationEnum.DISCARD)?: break
+                        game_status.useCardFrom(player, secondCard, LocationEnum.DISCARD, false, null,
                             isCost = true, isConsume = true)
-                        if(game_status.getEndTurn(player)) break
-                        if(selected.size == 2){
-                            val secondCard = game_status.getCardFrom(player, selected[1], LocationEnum.DISCARD)?: break
-                            game_status.useCardFrom(player, secondCard, LocationEnum.DISCARD, false, null,
-                                isCost = true, isConsume = true)
-                        }
-                        break
                     }
+                    break
                 }
             }
             null
@@ -2324,7 +2348,7 @@ object CardSet {
                 kururuoong(card_number, player, firstCommand, game_status)
                 while(true){
                     val secondCommand = game_status.receiveCardEffectSelect(player, card_number)
-                    if(firstCommand != secondCommand) continue
+                    if(firstCommand == secondCommand) continue
                     kururuoong(card_number, player, secondCommand, game_status)
                     break
                 }
@@ -2343,7 +2367,7 @@ object CardSet {
             }
             null
         })
-        regainer.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) ret@{card_number, player, game_status, _ ->
+        regainer.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) {card_number, player, game_status, _ ->
             val kikou = getKikou(player, game_status)
             if(kikou.enchantment >= 1 && kikou.reaction >= 1) {
                 while(true){
@@ -2351,26 +2375,27 @@ object CardSet {
                         CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, card_number)
                     { card -> card.card_data.sub_type != SubType.FULL_POWER && card.special_card_state != SpecialCardEnum.UNUSED &&
                             card.card_data.megami != MegamiEnum.KURURU}?: break
-                    if(list.size > 1) continue
-                    if(list.size == 1){
-                        var card = game_status.getCardFrom(player, list[0], LocationEnum.DISCARD)
+                    if(list.size == 0) {
+                        break
+                    }
+                    else if(list.size > 1) {
+                        continue
+                    }
+                    else{
                         var location = LocationEnum.DISCARD
-                        when {
-                            card != null -> {}
-                            game_status.getCardFrom(player, list[0], LocationEnum.USED_CARD) != null -> {
-                                location = LocationEnum.USED_CARD
-                                card = game_status.getCardFrom(player, list[0], LocationEnum.USED_CARD)
-                            }
-                            game_status.getCardFrom(player, list[0], LocationEnum.COVER_CARD) != null -> {
-                                location = LocationEnum.COVER_CARD
-                                card = game_status.getCardFrom(player, list[0], LocationEnum.COVER_CARD)
-                            }
-                            else -> continue
-                        }
+                        val card = game_status.getCardFrom(player, list[0], LocationEnum.DISCARD) ?:
+                        game_status.getCardFrom(player, list[0], LocationEnum.USED_CARD).let {
+                            location = LocationEnum.USED_CARD
+                            it
+                        }?:game_status.getCardFrom(player, list[0], LocationEnum.COVER_CARD).let {
+                            location = LocationEnum.COVER_CARD
+                            it
+                        }?: continue
+
                         while(true){
                             when(game_status.receiveCardEffectSelect(player, card_number)){
                                 CommandEnum.SELECT_ONE -> {
-                                    if(card!!.card_data.card_type == CardType.ATTACK){
+                                    if(card.card_data.card_type == CardType.ATTACK){
                                         game_status.addThisTurnRangeBuff(player, RangeBuff(card_number,1, RangeBufTag.CARD_CHANGE_IMMEDIATE, {_, _, _ -> true},
                                             { _, _, attack -> attack.run {
                                                 kururuChangeRangeUpper = true
@@ -2390,9 +2415,10 @@ object CardSet {
                                             }
                                             }))
                                     }
+                                    break
                                 }
                                 CommandEnum.SELECT_TWO -> {
-                                    if(card!!.card_data.card_type == CardType.ATTACK){
+                                    if(card.card_data.card_type == CardType.ATTACK){
                                         game_status.addThisTurnRangeBuff(player, RangeBuff(card_number,1, RangeBufTag.CARD_CHANGE_IMMEDIATE, {_, _, _ -> true},
                                             { _, _, attack -> attack.run {
                                                 kururuChangeRangeUnder = true
@@ -2412,60 +2438,67 @@ object CardSet {
                                             }
                                             }))
                                     }
+                                    break
                                 }
                                 CommandEnum.SELECT_THREE -> {
-                                    if(card!!.card_data.card_type == CardType.ATTACK){
+                                    if(card.card_data.card_type == CardType.ATTACK){
                                         game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CARD_CHANGE_IMMEDIATE, {_, _, _ -> true},
                                             {_, _, attack ->
                                             attack.auraPlusMinus(1)
                                         }))
                                     }
+                                    break
                                 }
                                 CommandEnum.SELECT_FOUR -> {
-                                    if(card!!.card_data.card_type == CardType.ATTACK){
+                                    if(card.card_data.card_type == CardType.ATTACK){
                                         game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CARD_CHANGE_IMMEDIATE, {_, _, _ -> true},
                                             {_, _, attack ->
                                             attack.auraPlusMinus(-1)
                                         }))
                                     }
+                                    break
                                 }
                                 CommandEnum.SELECT_FIVE -> {
-                                    if(card!!.card_data.card_type == CardType.ATTACK){
+                                    if(card.card_data.card_type == CardType.ATTACK){
                                         game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CARD_CHANGE_IMMEDIATE, {_, _, _ -> true},
                                             {_, _, attack ->
                                                 attack.lifePlusMinus(1)
                                         }))
                                     }
+                                    break
                                 }
                                 CommandEnum.SELECT_SIX -> {
-                                    if(card!!.card_data.card_type == CardType.ATTACK){
+                                    if(card.card_data.card_type == CardType.ATTACK){
                                         game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.CARD_CHANGE_IMMEDIATE, {_, _, _ -> true},
                                             {_, _, attack ->
                                                 attack.lifePlusMinus(-1)
                                         }))
                                     }
+                                    break
                                 }
                                 CommandEnum.SELECT_SEVEN -> {
-                                    if(card!!.card_data.card_type == CardType.ENCHANTMENT){
+                                    if(card.card_data.card_type == CardType.ENCHANTMENT){
                                         game_status.getPlayer(player).napBuff += 1
                                     }
+                                    break
                                 }
                                 CommandEnum.SELECT_EIGHT -> {
-                                    if(card!!.card_data.card_type == CardType.ENCHANTMENT){
+                                    if(card.card_data.card_type == CardType.ENCHANTMENT){
                                         game_status.getPlayer(player).napBuff -= 1
                                     }
+                                    break
                                 }
                                 CommandEnum.SELECT_NOT -> {
-
+                                    break
                                 }
                                 else -> continue
                             }
-                            break
                         }
-                        game_status.useCardFrom(player, card!!, location, false, null,
+
+                        game_status.useCardFrom(player, card, location, false, null,
                             isCost = false, isConsume = true)
+                        break
                     }
-                    break
                 }
             }
             null
@@ -2483,8 +2516,11 @@ object CardSet {
                         CommandEnum.ACTION_GARUDA -> {
                             if(game_status.canDoBasicOperation(player, command)){
                                 game_status.doBasicOperation(player, command, card_number)
+                                break
                             }
-                            break
+                            else{
+                                continue
+                            }
                         }
                         CommandEnum.SELECT_NOT -> break
                         else -> {}
@@ -2525,7 +2561,7 @@ object CardSet {
                         CommandEnum.SELECT_ONE -> {
                             game_status.getCardFrom(player, card_number, LocationEnum.USED_CARD)?.let {
                                 game_status.useCardFrom(player, it, LocationEnum.USED_CARD, false, null,
-                                    isCost = false, isConsume = false)
+                                    isCost = false, isConsume = true)
                             }
                             break
                         }
@@ -2571,8 +2607,11 @@ object CardSet {
                     CommandEnum.ACTION_YAKSHA, CommandEnum.ACTION_GARUDA  -> {
                         if(game_status.canDoBasicOperation(player, command)){
                             game_status.doBasicOperation(player, command, card_number)
+                            break
                         }
-                        break
+                        else{
+                            continue
+                        }
                     }
                     CommandEnum.SELECT_NOT -> break
                     else -> {}
@@ -2596,7 +2635,7 @@ object CardSet {
                         }?: game_status.popCardFrom(player, list[0], LocationEnum.HAND, true)?.let {
                             game_status.insertCardTo(player, it, LocationEnum.SEAL_ZONE, true)
                             game_status.getPlayer(player).sealInformation[it.card_number] = card_number
-                        }
+                        }?: continue
                         break
                     }
                     else if(list.size == 0){
@@ -2644,10 +2683,14 @@ object CardSet {
             })
             null
         })
-        industria.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_THIS_CARD_RETURN){ _, player, game_status, _ ->
+        industria.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_THIS_CARD_RETURN){ card_number, player, game_status, _ ->
             val nowPlayer = game_status.getPlayer(player)
             for(card in nowPlayer.hand.values + nowPlayer.normalCardDeck + nowPlayer.discard + nowPlayer.cover_card
-                    + nowPlayer.sealZone.values + game_status.getPlayer(player.opposite()).sealZone.values){
+                    + nowPlayer.sealZone.values + game_status.getPlayer(PlayerEnum.PLAYER2).sealZone.values.filter {
+                it.player == game_status.getCardOwner(card_number)
+            } + game_status.getPlayer(PlayerEnum.PLAYER1).sealZone.values.filter {
+                it.player == game_status.getCardOwner(card_number)
+            }){
                 when(card.card_number.toCardName()){
                     CardName.KURURU_DUPLICATED_GEAR_1 -> card.card_data = dupliGear1
                     CardName.KURURU_DUPLICATED_GEAR_2 -> card.card_data = dupliGear2
@@ -2678,6 +2721,7 @@ object CardSet {
                             it.special_card_state = SpecialCardEnum.PLAYED
                             game_status.insertCardTo(player.opposite(), it, LocationEnum.USED_CARD, true)
                         }
+                        break
                     }
                     else if(list.size == 0){
                         break
@@ -2696,6 +2740,7 @@ object CardSet {
                     game_status.useCardFrom(player, card, LocationEnum.USED_CARD, false, null,
                         isCost = true, isConsume = false)
                     game_status.movePlayingCard(player, LocationEnum.OUT_OF_GAME, card_number)
+                    break
                 }
                 else if(list.size == 0){
                     break
@@ -3248,6 +3293,7 @@ object CardSet {
         rairaCardInit()
 
         hashMapInit()
+        hashMapTest()
     }
 
     fun isPoison(card_number: Int): Boolean{

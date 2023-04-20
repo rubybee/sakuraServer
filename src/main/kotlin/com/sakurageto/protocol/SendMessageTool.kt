@@ -582,6 +582,7 @@ suspend fun receiveFullPowerActionRequestMain(player: Connection): Pair<CommandE
                     val data = json.decodeFromString<SakuraCardCommand>(text)
                     if (data.command == ACTION_USE_CARD_HAND ||
                         data.command == ACTION_USE_CARD_SPECIAL ||
+                        data.command == ACTION_USE_CARD_COVER ||
                         data.command == ACTION_END_TURN
                     ){
                         return Pair(data.command, data.card)
@@ -692,7 +693,7 @@ suspend fun receiveCardEffectSelectMain(player: Connection, card_number: Int): C
                 try {
                     val data = json.decodeFromString<SakuraCardCommand>(text)
                     when(data.command){
-                        SELECT_ONE, SELECT_TWO, SELECT_THREE, SELECT_FOUR, SELECT_NOT -> return data.command //will be added
+                        SELECT_ONE, SELECT_TWO, SELECT_THREE, SELECT_FOUR, SELECT_FIVE, SELECT_SIX, SELECT_SEVEN, SELECT_EIGHT, SELECT_NOT -> return data.command //will be added
                         else -> continue
                     }
                 }catch (e: Exception){

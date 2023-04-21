@@ -49,7 +49,7 @@ class PlayerStatus(val player_enum: PlayerEnum) {
                         if(data[index + 1] <= this.aura) data[index + 1]
                         else return false
                     } else{
-                        if(data[index + 1] <= enchantment_card[data[index]]!!.nap!!) data[index + 1]
+                        if(data[index + 1] <= enchantmentCard[data[index]]!!.nap!!) data[index + 1]
                         else return false
                     }
                 }
@@ -75,7 +75,11 @@ class PlayerStatus(val player_enum: PlayerEnum) {
         return hand[card_number]
     }
 
-    var enchantment_card: HashMap<Int, Card> = HashMap()
+    var enchantmentCard: HashMap<Int, Card> = HashMap()
+
+    fun getCardFromEnchantment(card_number: Int): Card?{
+        return enchantmentCard[card_number]
+    }
 
     var special_card_deck = HashMap<Int, Card>()
 
@@ -89,7 +93,7 @@ class PlayerStatus(val player_enum: PlayerEnum) {
             selectable.add(LocationEnum.YOUR_AURA.real_number)
             selectable.add(this.aura)
         }
-        for(card in enchantment_card.values){
+        for(card in enchantmentCard.values){
             if(card.checkAuraReplaceable()){
                 selectable.add(card.card_number)
                 selectable.add(card.nap!!)
@@ -104,7 +108,7 @@ class PlayerStatus(val player_enum: PlayerEnum) {
         if(this.aura > 0){
             selectable.add(LocationEnum.YOUR_AURA.real_number)
         }
-        for(card in enchantment_card.values){
+        for(card in enchantmentCard.values){
             if(card.checkAuraReplaceable()){
                 totalAura += card.nap!!
                 selectable.add(card.card_number)
@@ -363,7 +367,7 @@ class PlayerStatus(val player_enum: PlayerEnum) {
             LocationEnum.DISCARD -> for (card in discard) if(condition(card)) list.add(card.card_number)
             LocationEnum.DECK -> for (card in normalCardDeck) if(condition(card)) list.add(card.card_number)
             LocationEnum.HAND -> for (card in hand.values) if(condition(card)) list.add(card.card_number)
-            LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD -> for (card in enchantment_card.values) if(condition(card)) list.add(card.card_number)
+            LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD -> for (card in enchantmentCard.values) if(condition(card)) list.add(card.card_number)
             LocationEnum.COVER_CARD -> for (card in cover_card) if(condition(card)) list.add(card.card_number)
             LocationEnum.USED_CARD -> for (card in usedSpecialCard.values) if(condition(card)) list.add(card.card_number)
             else -> TODO()

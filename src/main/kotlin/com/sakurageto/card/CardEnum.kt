@@ -217,13 +217,28 @@ enum class CardName {
     RAIRA_WISDOM_OF_STORM_SURGE,
     RAIRA_HOWLING,
     RAIRA_WIND_KICK,
+
     RAIRA_THUNDER_WIND_PUNCH,
     RAIRA_SUMMON_THUNDER,
     RAIRA_WIND_CONSEQUENCE_BALL,
     RAIRA_CIRCULAR_CIRCUIT,
     RAIRA_WIND_ATTACK,
     RAIRA_WIND_ZEN_KAI,
-    RAIRA_WIND_CELESTIAL_SPHERE;
+    RAIRA_WIND_CELESTIAL_SPHERE,
+
+    UTSURO_WON_WOL,
+    UTSURO_BLACK_WAVE,
+    UTSURO_HARVEST,
+    UTSURO_PRESSURE,
+    UTSURO_SHADOW_WING,
+    UTSURO_SHADOW_WALL,
+    UTSURO_YUE_HOE_JU,
+
+    UTSURO_HOE_MYEOL,
+    UTSURO_HEO_WI,
+    UTSURO_JONG_MAL,
+    UTSURO_MA_SIG;
+
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -395,6 +410,18 @@ enum class CardName {
             put(RAIRA_WIND_ATTACK, 1211)
             put(RAIRA_WIND_ZEN_KAI, 1212)
             put(RAIRA_WIND_CELESTIAL_SPHERE, 1213)
+
+            put(UTSURO_WON_WOL, 1300)
+            put(UTSURO_BLACK_WAVE, 1301)
+            put(UTSURO_HARVEST, 1302)
+            put(UTSURO_PRESSURE, 1303)
+            put(UTSURO_SHADOW_WING, 1304)
+            put(UTSURO_SHADOW_WALL, 1305)
+            put(UTSURO_YUE_HOE_JU, 1306)
+            put(UTSURO_HOE_MYEOL, 1307)
+            put(UTSURO_HEO_WI, 1308)
+            put(UTSURO_JONG_MAL, 1309)
+            put(UTSURO_MA_SIG, 1310)
         }
         private val cardNameHashmapSecond = EnumMap<CardName, Int>(CardName::class.java).apply {
             //for second turn player 10000~19999
@@ -557,6 +584,18 @@ enum class CardName {
             put(RAIRA_WIND_ATTACK, 11211)
             put(RAIRA_WIND_ZEN_KAI, 11212)
             put(RAIRA_WIND_CELESTIAL_SPHERE, 11213)
+
+            put(UTSURO_WON_WOL, 11300)
+            put(UTSURO_BLACK_WAVE, 11301)
+            put(UTSURO_HARVEST, 11302)
+            put(UTSURO_PRESSURE, 11303)
+            put(UTSURO_SHADOW_WING, 11304)
+            put(UTSURO_SHADOW_WALL, 11305)
+            put(UTSURO_YUE_HOE_JU, 11306)
+            put(UTSURO_HOE_MYEOL, 11307)
+            put(UTSURO_HEO_WI, 11308)
+            put(UTSURO_JONG_MAL, 11309)
+            put(UTSURO_MA_SIG, 11310)
         }
 
         fun returnNormalCardNameByMegami(megami_name: MegamiEnum):List<CardName>{
@@ -618,6 +657,12 @@ enum class CardName {
                     RAIRA_WIND_RUN, RAIRA_WISDOM_OF_STORM_SURGE, RAIRA_HOWLING,
                     RAIRA_WIND_KICK
                 )
+
+                UTSURO -> listOf(
+                    UTSURO_WON_WOL, UTSURO_BLACK_WAVE, UTSURO_HARVEST,
+                    UTSURO_PRESSURE, UTSURO_SHADOW_WING, UTSURO_SHADOW_WALL,
+                    UTSURO_YUE_HOE_JU
+                )
             }
         }
 
@@ -665,6 +710,10 @@ enum class CardName {
                     RAIRA_THUNDER_WIND_PUNCH, RAIRA_SUMMON_THUNDER, RAIRA_WIND_CONSEQUENCE_BALL,
                     RAIRA_CIRCULAR_CIRCUIT
                 )
+                UTSURO -> listOf(
+                    UTSURO_HOE_MYEOL, UTSURO_HEO_WI, UTSURO_JONG_MAL,
+                    UTSURO_MA_SIG
+                )
             }
         }
 
@@ -689,6 +738,7 @@ enum class CardName {
                 RAIRA -> listOf(
                     RAIRA_WIND_ATTACK, RAIRA_WIND_ZEN_KAI, RAIRA_WIND_CELESTIAL_SPHERE
                 )
+                UTSURO -> listOf()
             }
         }
 
@@ -699,4 +749,11 @@ enum class CardName {
             )
         }
     }
+}
+
+enum class DamageSelect {
+    NULL,
+    AURA,
+    LIFE,
+    BOTH
 }

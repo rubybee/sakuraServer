@@ -377,7 +377,7 @@ class MadeAttack(
             DistanceType.CONTINUOUS -> {
                 return_data.add(-2)
                 return_data.add(distance_cont!!.first)
-                return_data.add(distance_cont!!.second)
+                return_data.add(distance_cont.second)
                 return_data.add(-2)
             }
         }
@@ -392,11 +392,18 @@ class MadeAttack(
         return return_data
     }
 
-    suspend fun afterAttackProcess(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?){
+    suspend fun afterAttackProcess(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, damageSelect: DamageSelect){
         this.effect?.let{
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.AFTER_ATTACK){
-                    text.effect!!(this.card_number, player, game_status, react_attack)
+                    if(text.tag == TextEffectTag.WHEN_CHOOSE_AURA_DAMAGE){
+                        if(damageSelect == DamageSelect.AURA){
+                            text.effect!!(this.card_number, player, game_status, react_attack)
+                        }
+                    }
+                    else{
+                        text.effect!!(this.card_number, player, game_status, react_attack)
+                    }
                 }
             }
         }

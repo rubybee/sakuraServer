@@ -312,7 +312,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
 
         when(card_data.card_type){
             CardType.ATTACK -> {
-                for(card in gameStatus.getPlayer(player).enchantment_card.values){
+                for(card in gameStatus.getPlayer(player).enchantmentCard.values){
                     card.card_data.effect?.let {
                         for(text in it){
                             if(enchantmentUsable(text)){
@@ -390,7 +390,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             }
         }
 
-        for(card in game_status.getPlayer(player).enchantment_card.values){
+        for(card in game_status.getPlayer(player).enchantmentCard.values){
             effectAllMaintainCard(player, game_status, TextEffectTag.WHEN_USE_BEHAVIOR_END)
         }
 

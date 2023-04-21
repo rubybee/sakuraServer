@@ -206,6 +206,18 @@ object CardSet {
         cardNumberHashmap[1212] = CardName.RAIRA_WIND_ZEN_KAI
         cardNumberHashmap[1213] = CardName.RAIRA_WIND_CELESTIAL_SPHERE
 
+        cardNumberHashmap[1300] = CardName.UTSURO_WON_WOL
+        cardNumberHashmap[1301] = CardName.UTSURO_BLACK_WAVE
+        cardNumberHashmap[1302] = CardName.UTSURO_HARVEST
+        cardNumberHashmap[1303] = CardName.UTSURO_PRESSURE
+        cardNumberHashmap[1304] = CardName.UTSURO_SHADOW_WING
+        cardNumberHashmap[1305] = CardName.UTSURO_SHADOW_WALL
+        cardNumberHashmap[1306] = CardName.UTSURO_YUE_HOE_JU
+        cardNumberHashmap[1307] = CardName.UTSURO_HOE_MYEOL
+        cardNumberHashmap[1308] = CardName.UTSURO_HEO_WI
+        cardNumberHashmap[1309] = CardName.UTSURO_JONG_MAL
+        cardNumberHashmap[1310] = CardName.UTSURO_MA_SIG
+
 
         cardNumberHashmap[10100] = CardName.YURINA_CHAM
         cardNumberHashmap[10101] = CardName.YURINA_ILSUM
@@ -366,6 +378,18 @@ object CardSet {
         cardNumberHashmap[11211] = CardName.RAIRA_WIND_ATTACK
         cardNumberHashmap[11212] = CardName.RAIRA_WIND_ZEN_KAI
         cardNumberHashmap[11213] = CardName.RAIRA_WIND_CELESTIAL_SPHERE
+
+        cardNumberHashmap[11300] = CardName.UTSURO_WON_WOL
+        cardNumberHashmap[11301] = CardName.UTSURO_BLACK_WAVE
+        cardNumberHashmap[11302] = CardName.UTSURO_HARVEST
+        cardNumberHashmap[11303] = CardName.UTSURO_PRESSURE
+        cardNumberHashmap[11304] = CardName.UTSURO_SHADOW_WING
+        cardNumberHashmap[11305] = CardName.UTSURO_SHADOW_WALL
+        cardNumberHashmap[11306] = CardName.UTSURO_YUE_HOE_JU
+        cardNumberHashmap[11307] = CardName.UTSURO_HOE_MYEOL
+        cardNumberHashmap[11308] = CardName.UTSURO_HEO_WI
+        cardNumberHashmap[11309] = CardName.UTSURO_JONG_MAL
+        cardNumberHashmap[11310] = CardName.UTSURO_MA_SIG
 
 
         cardDataHashmap[CardName.CARD_UNNAME] = unused
@@ -842,12 +866,11 @@ object CardSet {
         rapidfire.setAttack(DistanceType.CONTINUOUS, Pair(6, 8), null, 2, 1,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         rapidfire.addtext((Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
-            if (yeonwhaAttack(player, game_status)) {
-                game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true },
-                    {_, _, attack ->
-                        attack.auraPlusMinus(1); attack.lifePlusMinus(1)
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE,
+                {conditionPlayer, conditionGameStatus, _ -> yeonwhaAttack(conditionPlayer, conditionGameStatus)},
+                {_, _, attack ->
+                    attack.auraPlusMinus(1); attack.lifePlusMinus(1)
                 }))
-            }
             null
         }))
         magnumcanon.setAttack(DistanceType.CONTINUOUS, Pair(5, 8), null, 3, 2,
@@ -1763,7 +1786,7 @@ object CardSet {
     private fun checkAllSpecialCardUsed(player: PlayerEnum, game_status: GameStatus, except: Int): Boolean{
         val nowPlayer = game_status.getPlayer(player)
         if(nowPlayer.special_card_deck.isEmpty()){
-            for (card in game_status.player1.enchantment_card.values){
+            for (card in game_status.player1.enchantmentCard.values){
                 if(card.card_number == except) continue
                 if(card.player == player && card.special_card_state != null) return false
             }
@@ -1771,7 +1794,7 @@ object CardSet {
                 if(card.card_number == except) continue
                 if(card.player == player && card.special_card_state != null) return false
             }
-            for (card in game_status.player2.enchantment_card.values){
+            for (card in game_status.player2.enchantmentCard.values){
                 if(card.card_number == except) continue
                 if(card.player == player && card.special_card_state != null) return false
             }
@@ -2132,12 +2155,12 @@ object CardSet {
         })
         chikageWayOfLive.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.GAME_END) {card_number, player, game_status, _ ->
             game_status.popCardFrom(player, card_number, LocationEnum.ENCHANTMENT_ZONE, true)?.let ret@{
-                for(card in game_status.getPlayer(PlayerEnum.PLAYER1).enchantment_card.values){
+                for(card in game_status.getPlayer(PlayerEnum.PLAYER1).enchantmentCard.values){
                     if(cardUsedCheck(card, player)){
                         return@ret
                     }
                 }
-                for(card in game_status.getPlayer(PlayerEnum.PLAYER2).enchantment_card.values){
+                for(card in game_status.getPlayer(PlayerEnum.PLAYER2).enchantmentCard.values){
                     if(cardUsedCheck(card, player)){
                         return@ret
                     }
@@ -2242,7 +2265,7 @@ object CardSet {
     private fun getKikou(player: PlayerEnum, game_status: GameStatus): Kikou{
         val result = Kikou()
         val nowPlayer = game_status.getPlayer(player)
-        for (card in nowPlayer.enchantment_card.values + nowPlayer.usedSpecialCard.values + nowPlayer.discard) {
+        for (card in nowPlayer.enchantmentCard.values + nowPlayer.usedSpecialCard.values + nowPlayer.discard) {
             calcKikou(card.card_data, result)
         }
         return result
@@ -3278,6 +3301,141 @@ object CardSet {
         })
     }
 
+    private val wonwol = CardData(CardClass.NORMAL, CardName.UTSURO_WON_WOL, MegamiEnum.UTSURO, CardType.ATTACK, SubType.NONE)
+    private val blackWave = CardData(CardClass.NORMAL, CardName.UTSURO_BLACK_WAVE, MegamiEnum.UTSURO, CardType.ATTACK, SubType.NONE)
+    private val harvest = CardData(CardClass.NORMAL, CardName.UTSURO_HARVEST, MegamiEnum.UTSURO, CardType.ATTACK, SubType.NONE)
+
+    private fun hoejin(game_status: GameStatus) = game_status.dust >= 12
+
+    //return is used to check kanae's go dong,
+    private suspend fun moveResourceToDust(player: PlayerEnum, game_status: GameStatus, card_number: Int): CommandEnum{
+        val nowPlayer = game_status.getPlayer(player)
+        if(nowPlayer.aura == 0 && nowPlayer.life == 0 && nowPlayer.flare == 0){
+            return CommandEnum.SELECT_NOT
+        }
+        else{
+            while(true){
+                when(game_status.receiveCardEffectSelect(player, card_number)){
+                    CommandEnum.SELECT_ONE -> {
+                        if(nowPlayer.aura != 0){
+                            game_status.auraToDust(player, 1)
+                            return CommandEnum.SELECT_ONE
+                        }
+                        else{
+                            continue
+                        }
+                    }
+                    CommandEnum.SELECT_TWO -> {
+                        if(nowPlayer.life != 0){
+                            game_status.lifeToDust(player, 1)
+                            return CommandEnum.SELECT_TWO
+                        }
+                        else{
+                            continue
+                        }
+                    }
+                    CommandEnum.SELECT_THREE -> {
+                        if(nowPlayer.flare != 0){
+                            game_status.flareToDust(player, 1)
+                            return CommandEnum.SELECT_THREE
+                        }
+                        else{
+                            continue
+                        }
+                    }
+                    else -> {
+                        continue
+                    }
+                }
+            }
+        }
+    }
+
+    fun utsuroCardInit(){
+        wonwol.setAttack(DistanceType.CONTINUOUS, Pair(5, 7), null, 2, 2,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        wonwol.addtext((Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnRangeBuff(player, RangeBuff(card_number,1, RangeBufTag.PLUS_IMMEDIATE,
+                {_, conditionGameStatus, _ -> hoejin(conditionGameStatus)},
+                { _, _, attack ->
+                    attack.plusMinusRange(1, true)
+                }))
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.INSERT_IMMEDIATE,
+                {_, conditionGameStatus, _ -> hoejin(conditionGameStatus) },
+                {_, _, attack ->
+                    attack.run {
+                        editedAuraDamage = 999
+                    }
+                }))
+            null
+        }))
+        blackWave.setAttack(DistanceType.CONTINUOUS, Pair(4, 7), null, 1, 2,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        blackWave.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.WHEN_CHOOSE_AURA_DAMAGE) { card_number, player, game_status, _ ->
+            while (true){
+                val list = game_status.selectCardFrom(player.opposite(), player, listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, card_number)
+                { true }
+                if(list == null){
+                    break
+                }
+                else{
+                    if (list.size == 1){
+                        val card = game_status.popCardFrom(player.opposite(), list[0], LocationEnum.HAND, true)?: continue
+                        game_status.insertCardTo(player.opposite(), card, LocationEnum.DISCARD, true)
+                        break
+                    }
+                }
+            }
+            null
+        })
+        harvest.setAttack(DistanceType.CONTINUOUS, Pair(4, 4), null, 999, 0,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        harvest.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) { card_number, player, game_status, _ ->
+            var aura = 0
+            var life = 0
+            var flare = 0
+            for(i in 0..1){
+                when(moveResourceToDust(player.opposite(), game_status, card_number)){
+                    CommandEnum.SELECT_ONE -> {
+                        aura += 1
+                    }
+                    CommandEnum.SELECT_TWO -> {
+                        life += 1
+                    }
+                    CommandEnum.SELECT_THREE -> {
+                        flare += 1
+                    }
+                    else -> {
+                        break
+                    }
+                }
+            }
+            null
+        })
+        harvest.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) ret@{ card_number, player, game_status, _ ->
+            while (true){
+                val cardList = game_status.selectCardFrom(player.opposite(), player, listOf(LocationEnum.ENCHANTMENT_ZONE), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, card_number
+                ) { true }?: return@ret null
+                if(cardList.size == 1){
+                    game_status.getCardFrom(player.opposite(), cardList[0], LocationEnum.ENCHANTMENT_ZONE)?.let {
+                        game_status.cardToDust(player.opposite(), 2, it)
+                        if(it.nap == 0){
+                            game_status.enchantmentDestruction(player.opposite(), it)
+                        }
+                    }?: continue
+                    break
+                }
+                else if(cardList.size > 2){
+                    continue
+                }
+                else{
+                    break
+                }
+            }
+            null
+        })
+    }
+
     fun init(){
         yurinaCardInit()
         saineCardInit()
@@ -3291,6 +3449,7 @@ object CardSet {
         kururuCardInit()
         thallyaCardInit()
         rairaCardInit()
+        utsuroCardInit()
 
         hashMapInit()
         hashMapTest()

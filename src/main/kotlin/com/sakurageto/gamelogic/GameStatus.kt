@@ -8,9 +8,6 @@ import com.sakurageto.protocol.*
 import io.ktor.websocket.*
 
 class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private val player1_socket: Connection, private val player2_socket: Connection) {
-    companion object{
-        const val swellDistance = 2
-    }
 
     var turnPlayer = PlayerEnum.PLAYER1
 
@@ -20,8 +17,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     var startTurnDistance = 10
 
+    var thisTurnSwellDistance = 2
+
     suspend fun getAdjustSwellDistance(player: PlayerEnum): Int{
-        var nowSwellDistance = swellDistance
+        var nowSwellDistance = thisTurnSwellDistance
 
         for(card in player1.enchantmentCard.values) nowSwellDistance += card.swellAdjust(player, this)
         for(card in player2.enchantmentCard.values) nowSwellDistance += card.swellAdjust(player, this)
@@ -40,10 +39,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         distance += player2ArtificialTokenOut
 
         for(card in player1.enchantmentCard.values){
-            distance += card.effectAllMaintainCard(PlayerEnum.PLAYER1, this, TextEffectTag.CHANGE_DISTANCE)
+            distance += card.effectAllValidEffect(PlayerEnum.PLAYER1, this, TextEffectTag.CHANGE_DISTANCE)
         }
         for(card in player2.enchantmentCard.values){
-            distance += card.effectAllMaintainCard(PlayerEnum.PLAYER2, this, TextEffectTag.CHANGE_DISTANCE)
+            distance += card.effectAllValidEffect(PlayerEnum.PLAYER2, this, TextEffectTag.CHANGE_DISTANCE)
         }
 
         if(distance < 0) distance = 0
@@ -844,16 +843,16 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val mine = getPlayer(player)
         val other = getPlayer(player.opposite())
         for(card in mine.enchantmentCard.values){
-            card.effectAllMaintainCard(player, this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT)
+            card.effectAllValidEffect(player, this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT)
         }
         for(card in mine.usedSpecialCard.values){
-            card.effectAllMaintainCard(player, this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT)
+            card.effectAllValidEffect(player, this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT)
         }
         for(card in other.enchantmentCard.values){
-            card.effectAllMaintainCard(player.opposite(), this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT_OTHER)
+            card.effectAllValidEffect(player.opposite(), this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT_OTHER)
         }
         for(card in other.usedSpecialCard.values){
-            card.effectAllMaintainCard(player.opposite(), this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT_OTHER)
+            card.effectAllValidEffect(player.opposite(), this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT_OTHER)
         }
     }
 
@@ -1145,6 +1144,16 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return false
     }
 
+    private suspend fun checkWhenGetDamageByAttack(player: PlayerEnum, selectedDamage: DamageSelect, damage: Pair<Int, Int>){
+        if((selectedDamage == DamageSelect.BOTH && (damage.first >= 1 || damage.second >= 1)) ||
+            (selectedDamage == DamageSelect.AURA && damage.first >= 1) ||
+            (selectedDamage == DamageSelect.LIFE && damage.second >= 1)){
+            for(card in getPlayer(player).enchantmentCard.values){
+                card.effectAllValidEffect(player, this, TextEffectTag.WHEN_GET_DAMAGE_BY_ATTACK)
+            }
+        }
+    }
+
     suspend fun afterMakeAttack(card_number: Int, player: PlayerEnum, react_attack: MadeAttack?){
         val nowSocket = getSocket(player)
         val otherSocket = getSocket(player.opposite())
@@ -1198,18 +1207,16 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
         }
 
+        nowAttack.activeOtherBuff(this, player, nowPlayer.otherBuff)
+        val damage = nowAttack.getDamage(this, player, nowPlayer.attackBuff)
+        var selectedDamage: DamageSelect = DamageSelect.NULL
         if(endCurrentPhase){
-            endCurrentPhase = false
             return
         }
-
-        nowAttack.activeOtherBuff(this, player, nowPlayer.otherBuff)
-        var selectedDamage: DamageSelect = DamageSelect.NULL
         if(nowAttack.isItValid){
             if(nowAttack.inevitable || nowAttack.rangeCheck(getAdjustDistance(player), this, player, nowPlayer.rangeBuff)){
                 if(nowAttack.isItDamage){
                     if(nowAttack.beforeProcessDamageCheck(player, this, react_attack)){
-                        val damage = nowAttack.getDamage(this, player, nowPlayer.attackBuff)
                         val chosen = damageSelect(player.opposite(), damage)
                         val auraReplace = nowAttack.effectText(player, this, react_attack, TextEffectTag.AFTER_AURA_DAMAGE_PLACE_CHANGE)
                         val lifeReplace = nowAttack.effectText(player, this, react_attack, TextEffectTag.AFTER_LIFE_DAMAGE_PLACE_CHANGE)
@@ -1226,10 +1233,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     }
                 }
                 nowAttack.afterAttackProcess(player, this, react_attack, selectedDamage)
+                checkWhenGetDamageByAttack(player, selectedDamage, damage)
             }
         }
         for(card in getPlayer(player.opposite()).usedSpecialCard.values){
-            card.effectAllMaintainCard(player.opposite(), this, TextEffectTag.AFTER_OTHER_ATTACK_COMPLETE)
+            card.effectAllValidEffect(player.opposite(), this, TextEffectTag.AFTER_OTHER_ATTACK_COMPLETE)
         }
     }
 
@@ -1271,7 +1279,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         movePlayingCard(player, null, card_number)
         if(CardSet.isFullPower(card_number)){
             for(card in getPlayer(player).usedSpecialCard.values){
-                card.effectAllMaintainCard(player, this, TextEffectTag.WHEN_FULL_POWER_USED_YOUR)
+                card.effectAllValidEffect(player, this, TextEffectTag.WHEN_FULL_POWER_USED_YOUR)
             }
         }
     }
@@ -1297,9 +1305,26 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun enchantmentDestruction(player: PlayerEnum, card: Card){
         sendDestructionEnchant(getSocket(player), getSocket(player.opposite()), card.card_number)
-        card.destructionEnchantmentNormaly(player, this)
-        for(enchantmentCard in getPlayer(player).enchantmentCard.values){
-            enchantmentCard.effectAllMaintainCard(player, this, TextEffectTag.EFFECT_WHEN_DESTRUCTION_OTHER_CARD)
+
+        var checkValid = true
+        for(checkCard in getPlayer(player.opposite()).enchantmentCard.values){
+            if(checkCard.canUseEffectCheck(TextEffectTag.AFTER_DESTRUCTION_EFFECT_INVALID_OTHER)){
+                checkValid = false
+                break
+            }
+        }
+        if(checkValid){
+            card.destructionEnchantmentNormaly(player, this)
+        }
+
+        if(endCurrentPhase){
+            endCurrentPhase = false
+            return
+        }
+        else{
+            for(enchantmentCard in getPlayer(player).enchantmentCard.values){
+                enchantmentCard.effectAllValidEffect(player, this, TextEffectTag.WHEN_ENCHANTMENT_DESTRUCTION_YOUR)
+            }
         }
         afterDestruction(player, card.card_number, LocationEnum.DISCARD)
     }
@@ -1309,7 +1334,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         afterDestruction(player, card.card_number, LocationEnum.COVER_CARD)
     }
 
-    suspend fun enchantmentReduceAll(player: PlayerEnum){
+    private suspend fun enchantmentReduceAll(player: PlayerEnum){
         if(player1.enchantmentCard.isEmpty() && player2.enchantmentCard.isEmpty()){
             return
         }
@@ -1317,8 +1342,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         sendReduceNapStart(player1_socket)
         sendReduceNapStart(player2_socket)
 
-        val player1_card: HashMap<Int, Boolean> = HashMap()
-        val player2_card: HashMap<Int, Boolean> = HashMap()
+        val player1Card: HashMap<Int, Boolean> = HashMap()
+        val player2Card: HashMap<Int, Boolean> = HashMap()
 
 
         for(i in player1.enchantmentCard){
@@ -1327,7 +1352,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 cardToDust(PlayerEnum.PLAYER1, nap, i.value)
             }
             if(i.value.isItDestruction()){
-                player1_card[i.value.card_number] = true
+                player1Card[i.value.card_number] = true
             }
         }
 
@@ -1337,14 +1362,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 cardToDust(PlayerEnum.PLAYER2, nap, i.value)
             }
             if(i.value.isItDestruction()){
-                player2_card[i.value.card_number] = true
+                player2Card[i.value.card_number] = true
             }
         }
 
         sendReduceNapEnd(player1_socket)
         sendReduceNapEnd(player2_socket)
 
-        if(player1_card.isEmpty() && player2_card.isEmpty()){
+        if(player1Card.isEmpty() && player2Card.isEmpty()){
             return
         }
 
@@ -1352,26 +1377,32 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             PlayerEnum.PLAYER1 -> {
                 sendStartSelectEnchantment(player1_socket)
                 while(true){
-                    sendRequestEnchantmentCard(player1_socket, player1_card.keys.toMutableList(), player2_card.keys.toMutableList())
+                    sendRequestEnchantmentCard(player1_socket, player1Card.keys.toMutableList(), player2Card.keys.toMutableList())
                     val receive = receiveEnchantment(player1_socket)
                     when(receive.first){
                         CommandEnum.SELECT_ENCHANTMENT_YOUR -> {
-                            if(player1_card[receive.second] == true){
+                            if(player1Card[receive.second] == true){
                                 val card = player1.enchantmentCard[receive.second]
                                 enchantmentDestruction(PlayerEnum.PLAYER1, card!!)
-                                player1_card.remove(receive.second)
+                                player1Card.remove(receive.second)
+                                if(endCurrentPhase){
+                                    break
+                                }
                             }
-                            if(player1_card.isEmpty() && player2_card.isEmpty()){
+                            if(player1Card.isEmpty() && player2Card.isEmpty()){
                                 break
                             }
                         }
                         CommandEnum.SELECT_ENCHANTMENT_OTHER -> {
-                            if(player2_card[receive.second] == true){
+                            if(player2Card[receive.second] == true){
                                 val card = player2.enchantmentCard[receive.second]
                                 enchantmentDestruction(PlayerEnum.PLAYER2, card!!)
-                                player2_card.remove(receive.second)
+                                player2Card.remove(receive.second)
+                                if(endCurrentPhase){
+                                    break
+                                }
                             }
-                            if(player1_card.isEmpty() && player2_card.isEmpty()){
+                            if(player1Card.isEmpty() && player2Card.isEmpty()){
                                 break
                             }
                         }
@@ -1385,27 +1416,33 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             PlayerEnum.PLAYER2 -> {
                 sendStartSelectEnchantment(player2_socket)
                 while(true){
-                    sendRequestEnchantmentCard(player2_socket, player2_card.keys.toMutableList(), player1_card.keys.toMutableList())
+                    sendRequestEnchantmentCard(player2_socket, player2Card.keys.toMutableList(), player1Card.keys.toMutableList())
                     val receive = receiveEnchantment(player2_socket)
                     when(receive.first){
                         CommandEnum.SELECT_ENCHANTMENT_YOUR -> {
-                            if(player2_card[receive.second] == true){
+                            if(player2Card[receive.second] == true){
                                 val card = player2.enchantmentCard[receive.second]
                                 enchantmentDestruction(PlayerEnum.PLAYER2, card!!)
-                                player2_card.remove(receive.second)
-                                if(player1_card.isEmpty() && player2_card.isEmpty()){
+                                player2Card.remove(receive.second)
+                                if(endCurrentPhase){
                                     break
                                 }
                             }
+                            if(player1Card.isEmpty() && player2Card.isEmpty()){
+                                break
+                            }
                         }
                         CommandEnum.SELECT_ENCHANTMENT_OTHER -> {
-                            if(player1_card[receive.second] == true){
+                            if(player1Card[receive.second] == true){
                                 val card = player1.enchantmentCard[receive.second]
                                 enchantmentDestruction(PlayerEnum.PLAYER1, card!!)
-                                player1_card.remove(receive.second)
-                                if(player1_card.isEmpty() && player2_card.isEmpty()){
+                                player1Card.remove(receive.second)
+                                if(endCurrentPhase){
                                     break
                                 }
+                            }
+                            if(player1Card.isEmpty() && player2Card.isEmpty()){
+                                break
                             }
                         }
                         CommandEnum.SELECT_ENCHANTMENT_END -> {
@@ -1419,30 +1456,43 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         sendSimpleCommand(getSocket(player), CommandEnum.SELECT_ENCHANTMENT_END)
 
-        if(player1_card.isNotEmpty()){
-            for(card_number in player1_card.keys){
-                val card = player1.enchantmentCard[card_number]
-                enchantmentDestruction(PlayerEnum.PLAYER1, card!!)
+        if(endCurrentPhase){
+            if(player1Card.isNotEmpty()){
+                for(card_number in player1Card.keys){
+                    afterDestruction(PlayerEnum.PLAYER1, card_number, LocationEnum.DISCARD)
+                }
+            }
+
+            if(player2Card.isNotEmpty()){
+                for(card_number in player2Card.keys){
+                    afterDestruction(PlayerEnum.PLAYER2, card_number, LocationEnum.DISCARD)
+                }
             }
         }
+        else{
+            if(player1Card.isNotEmpty()){
+                for(card_number in player1Card.keys){
+                    val card = player1.enchantmentCard[card_number]
+                    enchantmentDestruction(PlayerEnum.PLAYER1, card!!)
+                }
+            }
 
-        if(player2_card.isNotEmpty()){
-            for(card_number in player2_card.keys){
-                val card = player2.enchantmentCard[card_number]
-                enchantmentDestruction(PlayerEnum.PLAYER2, card!!)
+            if(player2Card.isNotEmpty()){
+                for(card_number in player2Card.keys){
+                    val card = player2.enchantmentCard[card_number]
+                    enchantmentDestruction(PlayerEnum.PLAYER2, card!!)
+                }
             }
         }
-
-
     }
 
     var gameEnd = false
 
     suspend fun gameEnd(winner: PlayerEnum){
-        val winner_socket = getSocket(winner)
-        val roser_socket = getSocket(winner.opposite())
+        val winnerSocket = getSocket(winner)
+        val loserSocket = getSocket(winner.opposite())
 
-        sendGameEnd(winner_socket, roser_socket)
+        sendGameEnd(winnerSocket, loserSocket)
 
         player1_socket.session.close()
         player2_socket.session.close()
@@ -1655,19 +1705,27 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     suspend fun startPhaseDefaultSecond(turnPlayer: PlayerEnum){
         addConcentration(turnPlayer)
         enchantmentReduceAll(turnPlayer)
-        if(receiveReconstructRequest(getSocket(turnPlayer))){
-            deckReconstruct(turnPlayer, true)
+        if(endCurrentPhase){
+            endCurrentPhase = false
         }
-        when(turnPlayer){
-            PlayerEnum.PLAYER1 -> drawCard(turnPlayer, player1NextTurnDraw)
-            PlayerEnum.PLAYER2 -> drawCard(turnPlayer, player2NextTurnDraw)
+        else{
+            if(receiveReconstructRequest(getSocket(turnPlayer))){
+                deckReconstruct(turnPlayer, true)
+            }
+            when(turnPlayer){
+                PlayerEnum.PLAYER1 -> drawCard(turnPlayer, player1NextTurnDraw)
+                PlayerEnum.PLAYER2 -> drawCard(turnPlayer, player2NextTurnDraw)
+            }
         }
         player1NextTurnDraw = 2
         player2NextTurnDraw = 2
     }
 
-    suspend fun startPhaseEffectProcess(){
+    suspend fun startPhaseEffectProcess(turnPlayer: PlayerEnum){
         removeArtificialToken()
+        for(card in getPlayer(turnPlayer).enchantmentCard.values){
+            card.effectAllValidEffect(turnPlayer, this, TextEffectTag.WHEN_START_PHASE_YOUR)
+        }
     }
 
     fun mainPhaseEffectProcess(){
@@ -1688,7 +1746,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         nowPlayer.megamiCard?.endPhaseEffect(player, this)
         nowPlayer.megamiCard2?.endPhaseEffect(player, this)
         //TODO("CHANGE THIS MECHANISM FUTURE, MAKE USER ABLE TO CHOOSE ORDER OF THIS PROCESS")
-        thisTurnDistance = distanceToken
+        thisTurnSwellDistance = 2; thisTurnDistance = distanceToken
         player1.didBasicOperation = false; player2.didBasicOperation = false
         player1.canNotGoForward = false; player2.canNotGoForward = false
         player1.rangeBuff.clearBuff(); player2.rangeBuff.clearBuff(); player1.attackBuff.clearBuff(); player2.attackBuff.clearBuff()
@@ -1741,6 +1799,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val otherSocket = getSocket(player.opposite())
 
         installationProcess(player)
+
+        if(endCurrentPhase){
+            endCurrentPhase = false
+            return
+        }
 
         sendDeckReconstruct(nowSocket, otherSocket)
         if(damage){
@@ -1811,7 +1874,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     private fun basicOperationEnchantmentCheck(player: PlayerEnum, command: CommandEnum): Boolean{
         for(card in getPlayer(player.opposite()).enchantmentCard.values){
-            if(card.operationForbidCheck(false, command, this)) return false
+            if(card.operationForbidCheck(false, command)) return false
         }
         return true
     }
@@ -1823,7 +1886,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     suspend fun canDoBasicOperation(player: PlayerEnum, command: CommandEnum): Boolean{
         val nowPlayer = getPlayer(player)
         for(card in nowPlayer.transformZone.values){
-            if(card.effectAllMaintainCard(player, this, TextEffectTag.FORBID_BASIC_OPERATION) != 0) return false
+            if(card.effectAllValidEffect(player, this, TextEffectTag.FORBID_BASIC_OPERATION) != 0) return false
         }
         return when(command){
             CommandEnum.ACTION_GO_FORWARD ->
@@ -2259,10 +2322,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     suspend fun returnSpecialCard(player: PlayerEnum, card_number: Int): Boolean{
         val card = popCardFrom(player, card_number, LocationEnum.USED_CARD, true)?: return false
         insertCardTo(player, card, LocationEnum.SPECIAL_CARD, true)
-        card.effectAllMaintainCard(player, this, TextEffectTag.WHEN_THIS_CARD_RETURN)
+        card.effectAllValidEffect(player, this, TextEffectTag.WHEN_THIS_CARD_RETURN)
         card.special_card_state = SpecialCardEnum.UNUSED
         for(nowCard in getPlayer(player).usedSpecialCard.values){
-            nowCard.effectAllMaintainCard(player, this, TextEffectTag.WHEN_SPECIAL_RETURN_YOUR)
+            nowCard.effectAllValidEffect(player, this, TextEffectTag.WHEN_SPECIAL_RETURN_YOUR)
         }
         return true
     }
@@ -2337,7 +2400,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun moveAdditionalCard(player: PlayerEnum, card_name: CardName, location: LocationEnum): Boolean{
-        val nowPlayer = getPlayer(player)
         popCardFrom(player, card_name, LocationEnum.ADDITIONAL_CARD, true)?.let {
             insertCardTo(player, it, location, true)
         }?: return false

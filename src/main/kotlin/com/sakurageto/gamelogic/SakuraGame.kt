@@ -22,7 +22,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
     private var first_turn = PlayerEnum.PLAYER1
     private var turn_player = PlayerEnum.PLAYER1
 
-    private inline fun getSocket(player: PlayerEnum): Connection{
+    private fun getSocket(player: PlayerEnum): Connection{
         return if(player ==  PlayerEnum.PLAYER1) player1 else player2
     }
 
@@ -353,7 +353,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
     suspend fun startPhase(){
         sendStartPhaseStart(getSocket(this.turn_player), getSocket(this.turn_player.opposite()))
         game_status.startPhaseDefaultFirst(this.turn_player)
-        game_status.startPhaseEffectProcess()
+        game_status.startPhaseEffectProcess(this.turn_player)
         if(turn_number == 0 || turn_number == 1){
             return
         }

@@ -391,28 +391,31 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
 
         for(card in game_status.getPlayer(player).enchantmentCard.values){
-            effectAllMaintainCard(player, game_status, TextEffectTag.WHEN_USE_BEHAVIOR_END)
+            effectAllValidEffect(player, game_status, TextEffectTag.WHEN_USE_BEHAVIOR_END)
         }
 
     }
 
     suspend fun enchantmentUseNormal(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?) {
-        var now_need_nap = returnNap(player, game_status, react_attack) + game_status.getPlayer(player).napBuff
-        if(now_need_nap < 0) now_need_nap = 0
+        for(card in game_status.getPlayer(player.opposite()).enchantmentCard.values){
+            card.effectAllValidEffect(player.opposite(), game_status, TextEffectTag.WHEN_DEPLOYMENT_OTHER)
+        }
+        var nowNeedNap = returnNap(player, game_status, react_attack) + game_status.getPlayer(player).napBuff
+        if(nowNeedNap < 0) nowNeedNap = 0
         game_status.getPlayer(player).napBuff = 0
         when {
-            now_need_nap == 0 -> {}
-            now_need_nap > game_status.getPlayerAura(player) + game_status.dust -> {
+            nowNeedNap == 0 -> {}
+            nowNeedNap > game_status.getPlayerAura(player) + game_status.dust -> {
                 game_status.dustToCard(player, game_status.dust, this)
                 game_status.auraToCard(player, game_status.getPlayerAura(player), this)
             }
             else -> {
                 while (true) {
                     val receive_data =
-                        receiveNapInformation(game_status.getSocket(player), now_need_nap, this.card_number)
+                        receiveNapInformation(game_status.getSocket(player), nowNeedNap, this.card_number)
                     val aura = receive_data.first
                     val dust = receive_data.second
-                    if (aura < 0 || dust < 0 || aura + dust != now_need_nap || game_status.getPlayerAura(player) < aura || game_status.dust < dust) {
+                    if (aura < 0 || dust < 0 || aura + dust != nowNeedNap || game_status.getPlayerAura(player) < aura || game_status.dust < dust) {
                         continue
                     }
                     game_status.auraToCard(player, aura, this)
@@ -536,7 +539,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     }
 
     suspend fun forbidTokenMove(player: PlayerEnum, game_status: GameStatus): Int{
-        val now = effectAllMaintainCard(player, game_status, TextEffectTag.FORBID_MOVE_TOKEN)
+        val now = effectAllValidEffect(player, game_status, TextEffectTag.FORBID_MOVE_TOKEN)
         return if (now == 0) -1
         else now
     }
@@ -577,7 +580,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     suspend fun endPhaseEffect(player: PlayerEnum, game_status: GameStatus) {
         this.card_data.effect?.let {
             for(text in it){
-                if (usedEffectUsable(text)) {
+                if (usedEffectUsable(text) || enchantmentUsable(text)) {
                     if(text.tag == TextEffectTag.WHEN_END_PHASE_YOUR){
                         text.effect!!(this.card_number, player, game_status, null)
                     }
@@ -596,17 +599,12 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
     }
 
-    suspend fun effectAllMaintainCard(player: PlayerEnum, game_status: GameStatus, effectTag: TextEffectTag): Int{
+    suspend fun effectAllValidEffect(player: PlayerEnum, game_status: GameStatus, effectTag: TextEffectTag): Int{
         var now = 0
         card_data.effect?.let {
             for(text in it){
-                if(usedEffectUsable(text)){
+                if(usedEffectUsable(text) || enchantmentUsable(text)){
                     if(text.tag == effectTag) text.effect!!(this.card_number, player, game_status, null)?.let { result ->
-                        now += result
-                    }
-                }
-                else if(enchantmentUsable(text)){
-                    if(text.tag == effectTag) text.effect!!(this.card_number, player, game_status, null)?.let {result ->
                         now += result
                     }
                 }
@@ -615,7 +613,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         return now
     }
 
-    fun operationForbidCheck(forbidYour: Boolean, command: CommandEnum, game_status: GameStatus): Boolean{
+    fun operationForbidCheck(forbidYour: Boolean, command: CommandEnum): Boolean{
         val findTag = when(command){
             CommandEnum.ACTION_GO_BACKWARD -> if(forbidYour) TODO() else TextEffectTag.FORBID_GO_BACKWARD_OTHER
             CommandEnum.ACTION_BREAK_AWAY -> if(forbidYour) TODO() else TextEffectTag.FORBID_BREAK_AWAY_OTHER
@@ -623,7 +621,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
         card_data.effect?.let {
             for(text in it){
-                if(enchantmentUsable(text)){
+                if(enchantmentUsable(text) || usedEffectUsable(text)){
                     if(text.tag == findTag) return true
                 }
             }
@@ -640,4 +638,14 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         return false
     }
 
+    fun canUseEffectCheck(tag: TextEffectTag): Boolean{
+        card_data.effect?.let {
+            for(text in it){
+                if(enchantmentUsable(text) || usedEffectUsable(text)){
+                    if(text.tag == tag) return true
+                }
+            }
+        }
+        return false
+    }
 }

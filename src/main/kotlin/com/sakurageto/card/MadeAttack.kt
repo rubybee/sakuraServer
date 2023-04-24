@@ -200,7 +200,7 @@ class MadeAttack(
 
         return when(distance_type){
             DistanceType.DISCONTINUOUS -> distance_uncont!![now_range]
-            DistanceType.CONTINUOUS -> distance_cont!!.first <= now_range && now_range <= distance_cont!!.second
+            DistanceType.CONTINUOUS -> distance_cont!!.first <= now_range && now_range <= distance_cont.second
         }
     }
 
@@ -365,34 +365,39 @@ class MadeAttack(
     //{-2, 1, 4, -2, 4, 5, -1, 3, 5, 20, 0, 0, 0, 100}
     //{cont, distance..., cont, auro, life, megami, reactable, reactable_normal, reactable_special, cardNumber}
     fun Information(): MutableList<Int>{
-        var return_data = mutableListOf<Int>()
+        val returnData = mutableListOf<Int>()
         when(distance_type){
             DistanceType.DISCONTINUOUS -> {
-                return_data.add(-1)
+                returnData.add(-1)
                 for(i in distance_uncont!!.indices){
-                    if(distance_uncont!![i]) return_data.add(i)
+                    if(distance_uncont[i]) returnData.add(i)
                 }
-                return_data.add(-1)
+                returnData.add(-1)
             }
             DistanceType.CONTINUOUS -> {
-                return_data.add(-2)
-                return_data.add(distance_cont!!.first)
-                return_data.add(distance_cont.second)
-                return_data.add(-2)
+                returnData.add(-2)
+                returnData.add(distance_cont!!.first)
+                returnData.add(distance_cont.second)
+                returnData.add(-2)
             }
         }
-        return_data.add(aura_damage)
-        return_data.add(life_damage)
-        return_data.add(megami.real_number)
-        if(cannotReact) return_data.add(1) else return_data.add(0)
-        if(cannotReactNormal) return_data.add(1) else return_data.add(0)
-        if(cannotReactSpecial) return_data.add(1) else return_data.add(0)
-        return_data.add(card_number)
+        returnData.add(aura_damage)
+        returnData.add(life_damage)
+        returnData.add(megami.real_number)
+        if(cannotReact) returnData.add(1) else returnData.add(0)
+        if(cannotReactNormal) returnData.add(1) else returnData.add(0)
+        if(cannotReactSpecial) returnData.add(1) else returnData.add(0)
+        returnData.add(card_number)
 
-        return return_data
+        return returnData
     }
 
     suspend fun afterAttackProcess(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, damageSelect: DamageSelect){
+        for(card in game_status.getPlayer(player.opposite()).enchantmentCard.values){
+            if(card.canUseEffectCheck(TextEffectTag.AFTER_ATTACK_EFFECT_INVALID_OTHER)){
+                return
+            }
+        }
         this.effect?.let{
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.AFTER_ATTACK){

@@ -457,7 +457,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             CardType.ATTACK -> {
                 attackUseNormal(player, game_status, react_attack)
             }
-            CardType.BEHAVIOR -> {
+            CardType.BEHAVIOR -> {1
                 behaviorUseNormal(player, game_status, react_attack)
             }
             CardType.ENCHANTMENT -> {
@@ -647,5 +647,18 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             }
         }
         return false
+    }
+
+    suspend fun checkCanMoveToken(player: PlayerEnum, game_status: GameStatus): Boolean{
+        card_data.effect?.let {
+            for(text in it){
+                if(enchantmentUsable(text) || usedEffectUsable(text)){
+                    if(text.tag == TextEffectTag.DO_NOT_MOVE_TOKEN){
+                        return text.effect!!(this.card_number, player, game_status, null) == 1
+                    }
+                }
+            }
+        }
+        return true
     }
 }

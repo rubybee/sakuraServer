@@ -3,9 +3,13 @@ package com.sakurageto.gamelogic
 enum class MegamiEnum(var real_number: Int) {
     NONE(0),
     YURINA(10),
+    YURINA_A1(11),
     SAINE(20),
+    SAINE_A1(21),
     HIMIKA(30),
+    HIMIKA_A1(31),
     TOKOYO(40),
+    TOKOYO_A1(41),
     OBORO(50),
     YUKIHI(60),
     SHINRA(70),

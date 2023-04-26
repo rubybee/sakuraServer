@@ -68,11 +68,13 @@ enum class TextEffectTag {
     WHEN_DEPLOYMENT_OTHER,
     WHEN_ENCHANTMENT_DESTRUCTION_YOUR,
     WHEN_GET_DAMAGE_BY_ATTACK,
+    WHEN_USE_REACT_CARD_YOUR_END,
 
     //description when this effect use this is exist in real game
     WHEN_START_PHASE_YOUR,
 
     //check effect when some process is running
+    DO_NOT_MOVE_TOKEN,
     FORBID_BASIC_OPERATION,
     NEXT_ATTACK_ENCHANTMENT,
     NEXT_ATTACK_ENCHANTMENT_OTHER,

@@ -5,6 +5,7 @@ import com.sakurageto.card.CardSet.toCardName
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import com.sakurageto.protocol.SakuraSendData
+import java.lang.Exception
 import java.util.*
 import kotlin.collections.ArrayDeque
 import kotlin.collections.HashMap
@@ -62,6 +63,11 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var freezeToken = 0
 
     var usingCard = ArrayDeque<Card>()
+
+    fun getCard(card_number: Int): Card = getCardFromUsed(card_number)?: getCardFromCover(card_number)?:
+    getCardFromSpecial(card_number)?: getCardFromHand(card_number)?: getCardFromDiscard(card_number)?:
+    getCardFromDeck(card_number)?: getCardFromAdditional(card_number)?: throw Exception("${card_number.toCardName()} not founded")
+
     fun getCardFromPlaying(card_number: Int): Card?{
         for(card in usingCard){
             if(card.card_number == card_number) return card
@@ -129,6 +135,13 @@ class PlayerStatus(val player_enum: PlayerEnum) {
         return usedSpecialCard[index]
     }
 
+    fun getCardFromDeck(card_number: Int): Card?{
+        for(card in normalCardDeck){
+            if(card.card_number == card_number) return card
+        }
+        return null
+    }
+    
     fun getCardFromDeckTop(index: Int): Card?{
         if(normalCardDeck.size > index) return normalCardDeck[index]
         return null
@@ -217,7 +230,7 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var unselected_specialcard: MutableList<CardName> = mutableListOf()
 
     var additional_hand: EnumMap<CardName, Card> = EnumMap(CardName::class.java)
-    fun getCardFromAdditonal(card_name: CardName): Card?{
+    fun getCardFromAdditional(card_name: CardName): Card?{
         return additional_hand[card_name]
     }
     fun getCardFromAdditional(card_number: Int): Card?{

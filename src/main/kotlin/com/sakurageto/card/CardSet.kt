@@ -57,6 +57,9 @@ object CardSet {
         cardNumberHashmap[108] = CardName.YURINA_POBARAM
         cardNumberHashmap[109] = CardName.YURINA_JJOCKBAE
         cardNumberHashmap[110] = CardName.YURINA_JURUCK
+        cardNumberHashmap[111] = CardName.YURINA_NAN_TA
+        cardNumberHashmap[112] = CardName.YURINA_BEAN_BULLET
+        cardNumberHashmap[113] = CardName.YURINA_NOT_COMPLETE_POBARAM
 
         cardNumberHashmap[200] = CardName.SAINE_DOUBLEBEGI
         cardNumberHashmap[201] = CardName.SAINE_HURUBEGI
@@ -69,6 +72,9 @@ object CardSet {
         cardNumberHashmap[208] = CardName.SAINE_HANGMUNGGONGJIN
         cardNumberHashmap[209] = CardName.SAINE_EMMOOSHOEBING
         cardNumberHashmap[210] = CardName.SAINE_JONGGEK
+        cardNumberHashmap[211] = CardName.SAINE_SOUND_OF_ICE
+        cardNumberHashmap[212] = CardName.SAINE_ACCOMPANIMENT
+        cardNumberHashmap[213] = CardName.SAINE_DUET_TAN_JU_BING_MYEONG
 
         cardNumberHashmap[300] = CardName.HIMIKA_SHOOT
         cardNumberHashmap[301] = CardName.HIMIKA_RAPIDFIRE
@@ -81,6 +87,9 @@ object CardSet {
         cardNumberHashmap[308] = CardName.HIMIKA_CRIMSONZERO
         cardNumberHashmap[309] = CardName.HIMIKA_SCARLETIMAGINE
         cardNumberHashmap[310] = CardName.HIMIKA_BURMILIONFIELD
+        cardNumberHashmap[311] = CardName.HIMIKA_FIRE_WAVE
+        cardNumberHashmap[312] = CardName.HIMIKA_SAT_SUI
+        cardNumberHashmap[313] = CardName.HIMIKA_EN_TEN_HIMIKA
 
         cardNumberHashmap[400] = CardName.TOKOYO_BITSUNERIGI
         cardNumberHashmap[401] = CardName.TOKOYO_WOOAHHANTAGUCK
@@ -93,6 +102,9 @@ object CardSet {
         cardNumberHashmap[408] = CardName.TOKOYO_THOUSANDBIRD
         cardNumberHashmap[409] = CardName.TOKOYO_ENDLESSWIND
         cardNumberHashmap[410] = CardName.TOKOYO_TOKOYOMOON
+        cardNumberHashmap[411] = CardName.TOKOYO_FLOWING_PLAY
+        cardNumberHashmap[412] = CardName.TOKOYO_SOUND_OF_SUN
+        cardNumberHashmap[413] = CardName.TOKOYO_DUET_CHI_TAN_YANG_MYEONG
 
         cardNumberHashmap[500] = CardName.OBORO_WIRE
         cardNumberHashmap[501] = CardName.OBORO_SHADOWCALTROP
@@ -230,6 +242,9 @@ object CardSet {
         cardNumberHashmap[10108] = CardName.YURINA_POBARAM
         cardNumberHashmap[10109] = CardName.YURINA_JJOCKBAE
         cardNumberHashmap[10110] = CardName.YURINA_JURUCK
+        cardNumberHashmap[10111] = CardName.YURINA_NAN_TA
+        cardNumberHashmap[10112] = CardName.YURINA_BEAN_BULLET
+        cardNumberHashmap[10113] = CardName.YURINA_NOT_COMPLETE_POBARAM
 
         cardNumberHashmap[10200] = CardName.SAINE_DOUBLEBEGI
         cardNumberHashmap[10201] = CardName.SAINE_HURUBEGI
@@ -242,6 +257,9 @@ object CardSet {
         cardNumberHashmap[10208] = CardName.SAINE_HANGMUNGGONGJIN
         cardNumberHashmap[10209] = CardName.SAINE_EMMOOSHOEBING
         cardNumberHashmap[10210] = CardName.SAINE_JONGGEK
+        cardNumberHashmap[10211] = CardName.SAINE_SOUND_OF_ICE
+        cardNumberHashmap[10212] = CardName.SAINE_ACCOMPANIMENT
+        cardNumberHashmap[10213] = CardName.SAINE_DUET_TAN_JU_BING_MYEONG
 
         cardNumberHashmap[10300] = CardName.HIMIKA_SHOOT
         cardNumberHashmap[10301] = CardName.HIMIKA_RAPIDFIRE
@@ -254,6 +272,9 @@ object CardSet {
         cardNumberHashmap[10308] = CardName.HIMIKA_CRIMSONZERO
         cardNumberHashmap[10309] = CardName.HIMIKA_SCARLETIMAGINE
         cardNumberHashmap[10310] = CardName.HIMIKA_BURMILIONFIELD
+        cardNumberHashmap[10311] = CardName.HIMIKA_FIRE_WAVE
+        cardNumberHashmap[10312] = CardName.HIMIKA_SAT_SUI
+        cardNumberHashmap[10313] = CardName.HIMIKA_EN_TEN_HIMIKA
 
         cardNumberHashmap[10400] = CardName.TOKOYO_BITSUNERIGI
         cardNumberHashmap[10401] = CardName.TOKOYO_WOOAHHANTAGUCK
@@ -266,6 +287,9 @@ object CardSet {
         cardNumberHashmap[10408] = CardName.TOKOYO_THOUSANDBIRD
         cardNumberHashmap[10409] = CardName.TOKOYO_ENDLESSWIND
         cardNumberHashmap[10410] = CardName.TOKOYO_TOKOYOMOON
+        cardNumberHashmap[10411] = CardName.TOKOYO_FLOWING_PLAY
+        cardNumberHashmap[10412] = CardName.TOKOYO_SOUND_OF_SUN
+        cardNumberHashmap[10413] = CardName.TOKOYO_DUET_CHI_TAN_YANG_MYEONG
 
         cardNumberHashmap[10500] = CardName.OBORO_WIRE
         cardNumberHashmap[10501] = CardName.OBORO_SHADOWCALTROP
@@ -567,6 +591,22 @@ object CardSet {
         cardDataHashmap[CardName.UTSURO_HEO_WI] = heoWi
         cardDataHashmap[CardName.UTSURO_JONG_MAL] = jongMal
         cardDataHashmap[CardName.UTSURO_MA_SIG] = maSig
+
+        cardDataHashmap[CardName.YURINA_NAN_TA] = nanta
+        cardDataHashmap[CardName.YURINA_BEAN_BULLET] = beanBullet
+        cardDataHashmap[CardName.YURINA_NOT_COMPLETE_POBARAM] = notCompletePobaram
+
+        cardDataHashmap[CardName.SAINE_SOUND_OF_ICE] = soundOfIce
+        cardDataHashmap[CardName.SAINE_ACCOMPANIMENT] = accompaniment
+        cardDataHashmap[CardName.SAINE_DUET_TAN_JU_BING_MYEONG] = duetTanJuBingMyeong
+
+        cardDataHashmap[CardName.HIMIKA_FIRE_WAVE] = fireWave
+        cardDataHashmap[CardName.HIMIKA_SAT_SUI] = satSui
+        cardDataHashmap[CardName.HIMIKA_EN_TEN_HIMIKA] = enTenHimika
+
+        cardDataHashmap[CardName.TOKOYO_FLOWING_PLAY] = flowingPlay
+        cardDataHashmap[CardName.TOKOYO_SOUND_OF_SUN] = soundOfSun
+        cardDataHashmap[CardName.TOKOYO_DUET_CHI_TAN_YANG_MYEONG] = duetChitanYangMyeong
     }
 
     private suspend fun selectDustToDistance(nowCommand: CommandEnum, game_status: GameStatus): Boolean{
@@ -889,7 +929,7 @@ object CardSet {
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         magnumcanon.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
             if(game_status.lifeToDust(player, 1)){
-                game_status.gameEnd(player.opposite())
+                game_status.gameEnd(null, player)
             }
             null
         })
@@ -1786,7 +1826,7 @@ object CardSet {
             null
         })
         samraBanSho.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MOVE_SAKURA_TOKEN){_, player, game_status, _ ->
-            game_status.gameEnd(player.opposite())
+            game_status.gameEnd(null, player)
             null
         })
     }
@@ -2182,7 +2222,7 @@ object CardSet {
                         return@ret
                     }
                 }
-                game_status.gameEnd(player)
+                game_status.gameEnd(player, null)
             }
 
             null
@@ -3536,6 +3576,284 @@ object CardSet {
         })
     }
 
+    private val nanta = CardData(CardClass.NORMAL, CardName.YURINA_NAN_TA, MegamiEnum.YURINA, CardType.ATTACK, SubType.NONE)
+    private val beanBullet = CardData(CardClass.NORMAL, CardName.YURINA_BEAN_BULLET, MegamiEnum.YURINA, CardType.ENCHANTMENT, SubType.REACTION)
+    private val beanBulletText = Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MAKE_SHRINK) {_, player, game_status, _ ->
+        game_status.setShrink(player.opposite())
+        null
+    }
+    private val notCompletePobaram = CardData(CardClass.SPECIAL, CardName.YURINA_NOT_COMPLETE_POBARAM, MegamiEnum.YURINA, CardType.ATTACK, SubType.REACTION)
+
+    private fun yurinaA1CardInit(){
+        nanta.setAttack(DistanceType.CONTINUOUS, Pair(2, 2), null, 2, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        nanta.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {buff_player, buff_game_status, _ ->
+                gulSa(buff_player, buff_game_status)
+            }, {_, _, attack ->
+                attack.lifePlusMinus(2)
+            }))
+            game_status.addThisTurnOtherBuff(player, OtherBuff(card_number,1, OtherBuffTag.GET_IMMEDIATE, {buff_player, buff_game_status, _ ->
+                gulSa(buff_player, buff_game_status)
+            }, { _, _, attack ->
+                attack.canNotReact()
+            }))
+            null
+        })
+        beanBullet.setEnchantment(1)
+        beanBullet.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
+            if(game_status.addPreAttackZone(player, MadeAttack(CardName.YURINA_BEAN_BULLET, card_number, CardClass.NORMAL,
+                    DistanceType.CONTINUOUS, 1,  999, Pair(0, 4), null, MegamiEnum.YURINA,
+                    cannotReactNormal = false, cannotReactSpecial = false, cannotReact = true, chogek = false
+                ).addTextAndReturn(beanBulletText))){
+                game_status.afterMakeAttack(card_number, player, null)
+            }
+            null
+        })
+        notCompletePobaram.setSpecial(5)
+        notCompletePobaram.setAttack(DistanceType.CONTINUOUS, Pair(0, 10), null, 3, 999,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        notCompletePobaram.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.REACT_ATTACK_CHANGE){ card_number, _, _, reactedAttack ->
+            reactedAttack?.addAttackBuff(Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true },
+                {_, _, attack ->
+                    attack.auraPlusMinus(-3)
+                }))
+            null
+        })
+        notCompletePobaram.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.TERMINATION){_, _, _, _->
+            null
+        })
+    }
+
+    private val soundOfIce = CardData(CardClass.NORMAL, CardName.SAINE_SOUND_OF_ICE, MegamiEnum.SAINE, CardType.BEHAVIOR, SubType.REACTION)
+    private val accompaniment = CardData(CardClass.NORMAL, CardName.SAINE_ACCOMPANIMENT, MegamiEnum.SAINE, CardType.ENCHANTMENT, SubType.NONE)
+    private val duetTanJuBingMyeong = CardData(CardClass.SPECIAL, CardName.SAINE_DUET_TAN_JU_BING_MYEONG, MegamiEnum.SAINE, CardType.BEHAVIOR, SubType.NONE)
+
+
+    private fun saineA1CardInit(){
+        soundOfIce.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){_, player, game_status, react_attack ->
+            if(react_attack == null){
+                game_status.auraToDust(player.opposite(), 1)
+            }
+            else{
+                game_status.auraToDust(player.opposite(), 2)
+            }
+            null
+        })
+        accompaniment.setEnchantment(4)
+        accompaniment.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT_OTHER){card_number, player, game_status, _ ->
+            if(!(game_status.logger.checkThisTurnDoAttack(player.opposite()))){
+                game_status.addThisTurnAttackBuff(player.opposite(), Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE,
+                    buffRet@{ buff_player, buff_game_status, _ ->
+                        for(card in buff_game_status.getPlayer(buff_player.opposite()).usedSpecialCard.values) {
+                            if (card.card_data.megami != MegamiEnum.SAINE) {
+                                return@buffRet true
+                            }
+                        }
+                        return@buffRet false
+                            },
+                    { _, _, madeAttack ->
+                        madeAttack.auraPlusMinus(-1)
+                }))
+            }
+            null
+        })
+        accompaniment.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.COST_BUFF){card_number, player, game_status, _ ->
+            for(card in game_status.getPlayer(player).usedSpecialCard.values) {
+                if (card.card_data.megami == MegamiEnum.SAINE) {
+                    game_status.addThisTurnCostBuff(player, CostBuff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ ->
+                        true}, {cost ->
+                        cost - 1
+                    }))
+                    break
+                }
+            }
+            null
+        })
+        duetTanJuBingMyeong.setSpecial(2)
+        duetTanJuBingMyeong.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.TERMINATION){_, _, _, _->
+            null
+        })
+        duetTanJuBingMyeong.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_SHRINK) {_, player, game_status, _->
+            game_status.setShrink(player.opposite())
+            null
+        })
+        duetTanJuBingMyeong.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.DRAW_CARD) {card_number, player, game_status, _->
+            while(true){
+                when(game_status.receiveCardEffectSelect(player, card_number)){
+                    CommandEnum.SELECT_ONE -> {
+                        game_status.drawCard(player, 1)
+                        break
+                    }
+                    CommandEnum.SELECT_TWO -> {
+                        game_status.addConcentration(player)
+                        break
+                    }
+                    else -> {
+                        continue
+                    }
+                }
+            }
+            null
+        })
+        duetTanJuBingMyeong.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, attack ->
+                attack.megami != MegamiEnum.SAINE
+            }, {_, _, attack ->
+                attack.apply {
+                    lifePlusMinus(1);
+                }
+            }))
+            game_status.addThisTurnOtherBuff(player, OtherBuff(card_number,1, OtherBuffTag.GET, { _, _, attack ->
+                attack.megami != MegamiEnum.SAINE },
+                { _, _, attack ->
+                    attack.makeInevitable()
+                })
+            )
+            null
+        })
+        duetTanJuBingMyeong.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
+            game_status.addImmediateLifeListener(player, Listener(player, card_number) {_, cardNumber, _,
+                                                                                        _, reconstruct, damage ->
+                if(!reconstruct && damage){
+                    game_status.returnSpecialCard(player, cardNumber)
+                    true
+                }
+                else{
+                    false
+                }
+            })
+            null
+        })
+    }
+
+    private val fireWave = CardData(CardClass.NORMAL, CardName.HIMIKA_FIRE_WAVE, MegamiEnum.HIMIKA, CardType.ATTACK, SubType.NONE)
+    private val satSui = CardData(CardClass.NORMAL, CardName.HIMIKA_SAT_SUI, MegamiEnum.HIMIKA, CardType.BEHAVIOR, SubType.NONE)
+    private val enTenHimika = CardData(CardClass.SPECIAL, CardName.HIMIKA_EN_TEN_HIMIKA, MegamiEnum.HIMIKA, CardType.ATTACK, SubType.FULL_POWER)
+
+    private fun himikaA1CardInit(){
+        fireWave.setAttack(DistanceType.CONTINUOUS, Pair(1, 3), null, 2, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        fireWave.addtext((Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE,
+                {conditionPlayer, conditionGameStatus, _ -> yeonwhaAttack(conditionPlayer, conditionGameStatus)},
+                {_, _, attack ->
+                    attack.lifePlusMinus(1)
+                }))
+            null
+        }))
+        satSui.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){_, player, game_status, _ ->
+            if (game_status.getPlayer(player).hand.size == 0) {
+                game_status.auraToDust(player.opposite(), 2)
+            }
+            null
+        })
+        enTenHimika.setAttack(DistanceType.CONTINUOUS, Pair(0, 7), null, 1000, 1000,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = true, chogek = false)
+        enTenHimika.setSpecial(5)
+        enTenHimika.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.INSERT_IMMEDIATE, {_, _, _ ->
+                true
+            }, {nowPlayer, gameStatus, madeAttack ->
+                madeAttack.run {
+                    val temp = abs(gameStatus.getAdjustDistance(nowPlayer) - 8)
+                    editedAuraDamage = temp
+                    editedLifeDamage = temp
+                }
+            }))
+            null
+        })
+        enTenHimika.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.GAME_END) {_, player, game_status, _ ->
+            game_status.gameEnd(null, player)
+            null
+        })
+    }
+
+    private val flowingPlay = CardData(CardClass.NORMAL, CardName.TOKOYO_FLOWING_PLAY, MegamiEnum.TOKOYO, CardType.ATTACK, SubType.NONE)
+    private val soundOfSun = CardData(CardClass.NORMAL, CardName.TOKOYO_SOUND_OF_SUN, MegamiEnum.TOKOYO, CardType.ENCHANTMENT, SubType.NONE)
+    private val duetChitanYangMyeong = CardData(CardClass.SPECIAL, CardName.TOKOYO_DUET_CHI_TAN_YANG_MYEONG, MegamiEnum.TOKOYO, CardType.BEHAVIOR, SubType.NONE)
+
+    private fun tokoyoA1CardInit(){
+        flowingPlay.setAttack(DistanceType.CONTINUOUS, Pair(5, 5), null, 999, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        flowingPlay.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnOtherBuff(player, OtherBuff(card_number,1, OtherBuffTag.GET_IMMEDIATE, buffRet@{ buff_player, buff_game_status, _ ->
+                for(card in buff_game_status.getPlayer(buff_player).usedSpecialCard.values) {
+                    if (card.card_data.megami == MegamiEnum.TOKOYO) {
+                        return@buffRet true
+                    }
+                }
+                return@buffRet false
+            }, { _, _, attack ->
+                attack.canNotReact()
+            }))
+            null
+        })
+        flowingPlay.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.CARD_DISCARD_PLACE_CHANGE) {card_number, player, game_status, _ ->
+            if(kyochi(player, game_status)){
+                for(card in game_status.getPlayer(player).usedSpecialCard.values) {
+                    if (card.card_data.megami != MegamiEnum.TOKOYO) {
+                        game_status.movePlayingCard(player, LocationEnum.YOUR_DECK_TOP, card_number)
+                        break
+                    }
+                }
+            }
+            null
+        })
+        soundOfSun.setEnchantment(2)
+        soundOfSun.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_USE_REACT_CARD_YOUR_END) {_, player, game_status, _ ->
+            game_status.dustToAura(player, 1)
+            null
+        })
+        soundOfSun.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.DO_NOT_MOVE_TOKEN) {_, player, game_status, _ ->
+            if(game_status.turnPlayer == player) 1
+            else 0
+        })
+        duetChitanYangMyeong.setSpecial(1)
+        duetChitanYangMyeong.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_START_PHASE_YOUR){card_number, player, game_status, _ ->
+            while(true){
+                when(game_status.receiveCardEffectSelect(player, card_number)){
+                    CommandEnum.SELECT_ONE -> {
+                        val list = game_status.selectCardFrom(player, player, listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, card_number - 1, 1
+                        ) { true }?: break
+                        game_status.popCardFrom(player, list[0], LocationEnum.COVER_CARD, false)?.let {
+                            game_status.insertCardTo(player, it, LocationEnum.YOUR_DECK_BELOW, false)
+                        }
+                        break
+                    }
+                    CommandEnum.SELECT_TWO -> {
+                        val list = game_status.selectCardFrom(player, player, listOf(LocationEnum.DISCARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, card_number, 1
+                        ) { card -> card.card_data.card_type == CardType.BEHAVIOR }?: break
+                        game_status.popCardFrom(player, list[0], LocationEnum.DISCARD, true)?.let {
+                            game_status.insertCardTo(player, it, LocationEnum.YOUR_DECK_BELOW, true)
+                        }
+                        break
+                    }
+                    CommandEnum.SELECT_NOT -> {
+                        break
+                    }
+                    else -> {
+                        continue
+                    }
+                }
+            }
+            null
+        })
+        duetChitanYangMyeong.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
+            game_status.addImmediateLifeListener(player, Listener(player, card_number) {_, cardNumber, _,
+                                                                                        _, reconstruct, damage ->
+                if(!reconstruct && damage){
+                    game_status.returnSpecialCard(player, cardNumber)
+                    true
+                }
+                else{
+                    false
+                }
+            })
+            null
+        })
+    }
+
     fun init(){
         yurinaCardInit()
         saineCardInit()
@@ -3550,6 +3868,10 @@ object CardSet {
         thallyaCardInit()
         rairaCardInit()
         utsuroCardInit()
+        yurinaA1CardInit()
+        saineA1CardInit()
+        himikaA1CardInit()
+        tokoyoA1CardInit()
 
         hashMapInit()
         hashMapTest()

@@ -237,7 +237,23 @@ enum class CardName {
     UTSURO_HOE_MYEOL,
     UTSURO_HEO_WI,
     UTSURO_JONG_MAL,
-    UTSURO_MA_SIG;
+    UTSURO_MA_SIG,
+
+    YURINA_NAN_TA,
+    YURINA_BEAN_BULLET,
+    YURINA_NOT_COMPLETE_POBARAM,
+
+    SAINE_SOUND_OF_ICE,
+    SAINE_ACCOMPANIMENT,
+    SAINE_DUET_TAN_JU_BING_MYEONG,
+
+    HIMIKA_FIRE_WAVE,
+    HIMIKA_SAT_SUI,
+    HIMIKA_EN_TEN_HIMIKA,
+
+    TOKOYO_FLOWING_PLAY,
+    TOKOYO_SOUND_OF_SUN,
+    TOKOYO_DUET_CHI_TAN_YANG_MYEONG;
 
 
     fun toCardNumber(firstTurn: Boolean): Int{
@@ -262,6 +278,9 @@ enum class CardName {
             put(YURINA_POBARAM, 108)
             put(YURINA_JJOCKBAE, 109)
             put(YURINA_JURUCK, 110)
+            put(YURINA_NAN_TA, 111)
+            put(YURINA_BEAN_BULLET, 112)
+            put(YURINA_NOT_COMPLETE_POBARAM, 113)
 
             put(SAINE_DOUBLEBEGI, 200)
             put(SAINE_HURUBEGI, 201)
@@ -274,6 +293,9 @@ enum class CardName {
             put(SAINE_HANGMUNGGONGJIN, 208)
             put(SAINE_EMMOOSHOEBING, 209)
             put(SAINE_JONGGEK, 210)
+            put(SAINE_SOUND_OF_ICE, 211)
+            put(SAINE_ACCOMPANIMENT, 212)
+            put(SAINE_DUET_TAN_JU_BING_MYEONG, 213)
 
             put(HIMIKA_SHOOT, 300)
             put(HIMIKA_RAPIDFIRE, 301)
@@ -286,6 +308,9 @@ enum class CardName {
             put(HIMIKA_CRIMSONZERO, 308)
             put(HIMIKA_SCARLETIMAGINE, 309)
             put(HIMIKA_BURMILIONFIELD, 310)
+            put(HIMIKA_FIRE_WAVE, 311)
+            put(HIMIKA_SAT_SUI, 312)
+            put(HIMIKA_EN_TEN_HIMIKA, 313)
 
             put(TOKOYO_BITSUNERIGI, 400)
             put(TOKOYO_WOOAHHANTAGUCK, 401)
@@ -298,6 +323,9 @@ enum class CardName {
             put(TOKOYO_THOUSANDBIRD, 408)
             put(TOKOYO_ENDLESSWIND, 409)
             put(TOKOYO_TOKOYOMOON, 410)
+            put(TOKOYO_FLOWING_PLAY, 411)
+            put(TOKOYO_SOUND_OF_SUN, 412)
+            put(TOKOYO_DUET_CHI_TAN_YANG_MYEONG, 413)
 
             put(OBORO_WIRE, 500)
             put(OBORO_SHADOWCALTROP, 501)
@@ -436,6 +464,9 @@ enum class CardName {
             put(YURINA_POBARAM, 10108)
             put(YURINA_JJOCKBAE, 10109)
             put(YURINA_JURUCK, 10110)
+            put(YURINA_NAN_TA, 10111)
+            put(YURINA_BEAN_BULLET, 10112)
+            put(YURINA_NOT_COMPLETE_POBARAM, 10113)
 
             put(SAINE_DOUBLEBEGI, 10200)
             put(SAINE_HURUBEGI, 10201)
@@ -448,6 +479,9 @@ enum class CardName {
             put(SAINE_HANGMUNGGONGJIN, 10208)
             put(SAINE_EMMOOSHOEBING, 10209)
             put(SAINE_JONGGEK, 10210)
+            put(SAINE_SOUND_OF_ICE, 10211)
+            put(SAINE_ACCOMPANIMENT, 10212)
+            put(SAINE_DUET_TAN_JU_BING_MYEONG, 10213)
 
             put(HIMIKA_SHOOT, 10300)
             put(HIMIKA_RAPIDFIRE, 10301)
@@ -460,6 +494,9 @@ enum class CardName {
             put(HIMIKA_CRIMSONZERO, 10308)
             put(HIMIKA_SCARLETIMAGINE, 10309)
             put(HIMIKA_BURMILIONFIELD, 10310)
+            put(HIMIKA_FIRE_WAVE, 10311)
+            put(HIMIKA_SAT_SUI, 10312)
+            put(HIMIKA_EN_TEN_HIMIKA, 10313)
 
             put(TOKOYO_BITSUNERIGI, 10400)
             put(TOKOYO_WOOAHHANTAGUCK, 10401)
@@ -472,6 +509,9 @@ enum class CardName {
             put(TOKOYO_THOUSANDBIRD, 10408)
             put(TOKOYO_ENDLESSWIND, 10409)
             put(TOKOYO_TOKOYOMOON, 10410)
+            put(TOKOYO_FLOWING_PLAY, 411)
+            put(TOKOYO_SOUND_OF_SUN, 412)
+            put(TOKOYO_DUET_CHI_TAN_YANG_MYEONG, 413)
 
             put(OBORO_WIRE, 10500)
             put(OBORO_SHADOWCALTROP, 10501)
@@ -663,6 +703,22 @@ enum class CardName {
                     UTSURO_PRESSURE, UTSURO_SHADOW_WING, UTSURO_SHADOW_WALL,
                     UTSURO_YUE_HOE_JU
                 )
+                YURINA_A1 -> listOf(
+                    YURINA_NAN_TA, YURINA_ILSUM, YURINA_JARUCHIGI, YURINA_GUHAB, YURINA_GIBACK,
+                    YURINA_BEAN_BULLET, YURINA_GIYENBANJO
+                )
+                SAINE_A1 -> listOf(
+                    SAINE_HURUBEGI, SAINE_DOUBLEBEGI, SAINE_SOUND_OF_ICE, SAINE_GANPA, SAINE_GWONYUCK,
+                    SAINE_ACCOMPANIMENT, SAINE_MOOEMBUCK
+                )
+                HIMIKA_A1 -> listOf(
+                    HIMIKA_SHOOT, HIMIKA_FIRE_WAVE, HIMIKA_MAGNUMCANON, HIMIKA_FULLBURST,
+                    HIMIKA_SAT_SUI, HIMIKA_BACKDRAFT, HIMIKA_SMOKE
+                )
+                TOKOYO_A1 -> listOf(
+                    TOKOYO_FLOWING_PLAY, TOKOYO_WOOAHHANTAGUCK, TOKOYO_RUNNINGRABIT, TOKOYO_POETDANCE,
+                    TOKOYO_SOUND_OF_SUN, TOKOYO_WINDSTAGE, TOKOYO_SUNSTAGE
+                )
             }
         }
 
@@ -714,6 +770,18 @@ enum class CardName {
                     UTSURO_HOE_MYEOL, UTSURO_HEO_WI, UTSURO_JONG_MAL,
                     UTSURO_MA_SIG
                 )
+                YURINA_A1 -> listOf(
+                    YURINA_WOLYUNGNACK, YURINA_NOT_COMPLETE_POBARAM, YURINA_JJOCKBAE, YURINA_JURUCK
+                )
+                SAINE_A1 -> listOf(
+                    SAINE_YULDONGHOGEK, SAINE_DUET_TAN_JU_BING_MYEONG, SAINE_EMMOOSHOEBING, SAINE_JONGGEK
+                )
+                HIMIKA_A1 -> listOf(
+                    HIMIKA_REDBULLET, HIMIKA_EN_TEN_HIMIKA, HIMIKA_SCARLETIMAGINE, HIMIKA_BURMILIONFIELD
+                )
+                TOKOYO_A1 -> listOf(
+                    TOKOYO_KUON, TOKOYO_DUET_CHI_TAN_YANG_MYEONG, TOKOYO_ENDLESSWIND, TOKOYO_TOKOYOMOON
+                )
             }
         }
 
@@ -739,6 +807,10 @@ enum class CardName {
                     RAIRA_WIND_ATTACK, RAIRA_WIND_ZEN_KAI, RAIRA_WIND_CELESTIAL_SPHERE
                 )
                 UTSURO -> listOf()
+                YURINA_A1 -> listOf()
+                SAINE_A1 -> listOf()
+                HIMIKA_A1 -> listOf()
+                TOKOYO_A1 -> listOf()
             }
         }
 

@@ -85,6 +85,10 @@ class MadeAttack(
         isItValid = false
     }
 
+    fun makeInevitable(){
+        inevitable = true
+    }
+
     var bothSideDamage = false
 
     fun setBothSideDamage(){

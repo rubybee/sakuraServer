@@ -1221,9 +1221,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         nowAttack.activeOtherBuff(this, player, nowPlayer.otherBuff)
         val damage = nowAttack.getDamage(this, player, nowPlayer.attackBuff)
         var selectedDamage: DamageSelect = DamageSelect.NULL
+
         if(endCurrentPhase){
             return
         }
+
         if(nowAttack.isItValid){
             if(nowAttack.inevitable || nowAttack.rangeCheck(getAdjustDistance(player), this, player, nowPlayer.rangeBuff)){
                 if(nowAttack.isItDamage){
@@ -1244,9 +1246,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     }
                 }
                 nowAttack.afterAttackProcess(player, this, react_attack, selectedDamage)
-                checkWhenGetDamageByAttack(player, selectedDamage, damage)
+                checkWhenGetDamageByAttack(player.opposite(), selectedDamage, damage)
             }
         }
+
+        if(endCurrentPhase){
+            return
+        }
+
         for(card in getPlayer(player.opposite()).usedSpecialCard.values){
             card.effectAllValidEffect(player.opposite(), this, TextEffectTag.AFTER_OTHER_ATTACK_COMPLETE)
         }
@@ -1336,11 +1343,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             card.destructionEnchantmentNormaly(player, this)
         }
 
-        if(endCurrentPhase){
-            endCurrentPhase = false
-            return
-        }
-        else{
+        if(!endCurrentPhase){
             for(enchantmentCard in getPlayer(player).enchantmentCard.values){
                 enchantmentCard.effectAllValidEffect(player, this, TextEffectTag.WHEN_ENCHANTMENT_DESTRUCTION_YOUR)
             }
@@ -1365,23 +1368,23 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val player2Card: HashMap<Int, Boolean> = HashMap()
 
 
-        for(i in player1.enchantmentCard){
-            val nap = i.value.reduceNapNormal()
+        for(nowCard in player1.enchantmentCard.values){
+            val nap = nowCard.reduceNapNormal()
             if(nap >= 1){
-                cardToDust(PlayerEnum.PLAYER1, nap, i.value)
+                cardToDust(PlayerEnum.PLAYER1, nap, nowCard)
             }
-            if(i.value.isItDestruction()){
-                player1Card[i.value.card_number] = true
+            if(nowCard.isItDestruction()){
+                player1Card[nowCard.card_number] = true
             }
         }
 
-        for(i in player2.enchantmentCard){
-            val nap = i.value.reduceNapNormal()
+        for(nowCard in player2.enchantmentCard.values){
+            val nap = nowCard.reduceNapNormal()
             if(nap >= 1){
-                cardToDust(PlayerEnum.PLAYER2, nap, i.value)
+                cardToDust(PlayerEnum.PLAYER2, nap, nowCard)
             }
-            if(i.value.isItDestruction()){
-                player2Card[i.value.card_number] = true
+            if(nowCard.isItDestruction()){
+                player2Card[nowCard.card_number] = true
             }
         }
 

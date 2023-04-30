@@ -1905,7 +1905,7 @@ object CardSet {
             }
             null
         })
-        centrifugalAttack.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.END_CURRENT_PHASE) {_, _, game_status, _ ->
+        centrifugalAttack.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.END_CURRENT_PHASE) {_, _, game_status, _ ->
             game_status.endCurrentPhase = true
             null
         })
@@ -3370,6 +3370,7 @@ object CardSet {
                     CommandEnum.SELECT_ONE -> {
                         if(nowPlayer.aura >= (moveAura + 1)){
                             moveAura += 1
+                            break
                         }
                         else{
                             continue
@@ -3378,6 +3379,7 @@ object CardSet {
                     CommandEnum.SELECT_TWO -> {
                         if(nowPlayer.life >= (moveLife + 1)){
                             moveLife += 1
+                            break
                         }
                         else{
                             continue
@@ -3386,6 +3388,7 @@ object CardSet {
                     CommandEnum.SELECT_THREE -> {
                         if(nowPlayer.flare >= (moveFlare + 1)){
                             moveFlare += 1
+                            break
                         }
                         else{
                             continue

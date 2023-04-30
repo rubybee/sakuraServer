@@ -385,7 +385,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
                     game_status.endCurrentPhase = false
                     return
                 }
-                if(game_status.getEndTurn(this.turn_player)){
+                else if(game_status.getEndTurn(this.turn_player)){
                     return
                 }
                 val data = receiveActionRequest(getSocket(this.turn_player))

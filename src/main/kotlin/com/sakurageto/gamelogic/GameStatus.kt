@@ -1293,10 +1293,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    suspend fun afterCardUsed(card_number: Int, player: PlayerEnum){
-        val cardOwner = getPlayer(getCardOwner(card_number))
-        val thisCard = getPlayer(player).getCardFromPlaying(card_number)?: cardOwner.getCard(card_number)
-
+    suspend fun afterCardUsed(card_number: Int, player: PlayerEnum, thisCard: Card){
         if(thisCard.card_data.sub_type == SubType.REACTION){
             for(card in getPlayer(player).enchantmentCard.values){
                 card.effectAllValidEffect(player, this, TextEffectTag.WHEN_USE_REACT_CARD_YOUR_END)

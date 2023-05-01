@@ -253,8 +253,27 @@ enum class CardName {
 
     TOKOYO_FLOWING_PLAY,
     TOKOYO_SOUND_OF_SUN,
-    TOKOYO_DUET_CHI_TAN_YANG_MYEONG;
+    TOKOYO_DUET_CHI_TAN_YANG_MYEONG,
 
+    HONOKA_SPIRIT_SIK,
+    HONOKA_GUARDIAN_SPIRIT_SIK,
+    HONOKA_ASSAULT_SPIRIT_SIK,
+    HONOKA_DIVINE_OUKA,
+    HONOKA_SAKURA_BLIZZARD,
+    HONOKA_UI_GI_GONG_JIN,
+    HONOKA_SAKURA_WING,
+    HONOKA_REGENERATION,
+    HONOKA_SAKURA_AMULET,
+    HONOKA_HONOKA_SPARKLE,
+    HONOKA_COMMAND,
+    HONOKA_TAIL_WIND,
+
+    HONOKA_CHEST_WILLINGNESS,
+    HONOKA_HAND_FLOWER,
+    HONOKA_A_NEW_OPENING,
+    HONOKA_UNDER_THE_NAME_OF_FLAG,
+    HONOKA_FOUR_SEASON_BACK,
+    HONOKA_FULL_BLOOM_PATH;
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -719,6 +738,12 @@ enum class CardName {
                     TOKOYO_FLOWING_PLAY, TOKOYO_WOOAHHANTAGUCK, TOKOYO_RUNNINGRABIT, TOKOYO_POETDANCE,
                     TOKOYO_SOUND_OF_SUN, TOKOYO_WINDSTAGE, TOKOYO_SUNSTAGE
                 )
+
+                HONOKA -> listOf(
+                    HONOKA_SPIRIT_SIK, HONOKA_SAKURA_BLIZZARD, HONOKA_UI_GI_GONG_JIN,
+                    HONOKA_SAKURA_WING, HONOKA_SAKURA_AMULET, HONOKA_COMMAND,
+                    HONOKA_TAIL_WIND,
+                )
             }
         }
 
@@ -782,6 +807,10 @@ enum class CardName {
                 TOKOYO_A1 -> listOf(
                     TOKOYO_KUON, TOKOYO_DUET_CHI_TAN_YANG_MYEONG, TOKOYO_ENDLESSWIND, TOKOYO_TOKOYOMOON
                 )
+                HONOKA -> listOf(
+                    HONOKA_CHEST_WILLINGNESS, HONOKA_UNDER_THE_NAME_OF_FLAG, HONOKA_FOUR_SEASON_BACK,
+                    HONOKA_FULL_BLOOM_PATH
+                )
             }
         }
 
@@ -811,6 +840,10 @@ enum class CardName {
                 SAINE_A1 -> listOf()
                 HIMIKA_A1 -> listOf()
                 TOKOYO_A1 -> listOf()
+                HONOKA -> listOf(
+                    HONOKA_GUARDIAN_SPIRIT_SIK, HONOKA_ASSAULT_SPIRIT_SIK, HONOKA_DIVINE_OUKA,
+                    HONOKA_REGENERATION, HONOKA_HONOKA_SPARKLE, HONOKA_HAND_FLOWER, HONOKA_A_NEW_OPENING
+                )
             }
         }
 

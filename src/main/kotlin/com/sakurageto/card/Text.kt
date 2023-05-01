@@ -34,6 +34,7 @@ enum class TextEffectTag {
     RUN_STRATAGEM,
 
     //just define what this effect do
+    GET_ADDITIONAL_CARD,
     DAMAGE,
     RECONSTRUCT,
     REACT_ATTACK_CHANGE,

@@ -1,5 +1,6 @@
 package com.sakurageto.card
 
+import com.sakurageto.card.CardSet.toCardName
 import com.sakurageto.gamelogic.*
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
@@ -3857,6 +3858,261 @@ object CardSet {
         })
     }
 
+    private val spiritSik = CardData(CardClass.NORMAL, CardName.HONOKA_SPIRIT_SIK, MegamiEnum.HONOKA, CardType.ATTACK, SubType.NONE)
+    private val guardianSik = CardData(CardClass.NORMAL, CardName.HONOKA_GUARDIAN_SPIRIT_SIK, MegamiEnum.HONOKA, CardType.ATTACK, SubType.REACTION)
+    private val assaultSik = CardData(CardClass.NORMAL, CardName.HONOKA_ASSAULT_SPIRIT_SIK, MegamiEnum.HONOKA, CardType.ATTACK, SubType.NONE)
+    private val divineOuka = CardData(CardClass.NORMAL, CardName.HONOKA_DIVINE_OUKA, MegamiEnum.HONOKA, CardType.ATTACK, SubType.FULL_POWER)
+    private val sakuraBlizzard = CardData(CardClass.NORMAL, CardName.HONOKA_SAKURA_BLIZZARD, MegamiEnum.HONOKA, CardType.ATTACK, SubType.NONE)
+    private val yuGiGongJin = CardData(CardClass.NORMAL, CardName.HONOKA_UI_GI_GONG_JIN, MegamiEnum.HONOKA, CardType.ATTACK, SubType.FULL_POWER)
+    private val sakuraWing = CardData(CardClass.NORMAL, CardName.HONOKA_SAKURA_WING, MegamiEnum.HONOKA, CardType.BEHAVIOR, SubType.NONE)
+    private val regeneration = CardData(CardClass.NORMAL, CardName.HONOKA_REGENERATION, MegamiEnum.HONOKA, CardType.BEHAVIOR, SubType.FULL_POWER)
+    private val sakuraAmulet = CardData(CardClass.NORMAL, CardName.HONOKA_SAKURA_AMULET, MegamiEnum.HONOKA, CardType.BEHAVIOR, SubType.REACTION)
+    private val honokaSparkle = CardData(CardClass.NORMAL, CardName.HONOKA_HONOKA_SPARKLE, MegamiEnum.HONOKA, CardType.ATTACK, SubType.NONE)
+
+    private fun checkCardName(card_number: Int, cardName: CardName) = card_number.toCardName() == cardName
+
+    private suspend fun requestCardChange(player: PlayerEnum, card_number: Int, game_status: GameStatus): Boolean{
+        if(game_status.getCardOwner(card_number) == player) return false
+        while (true){
+            return when(game_status.receiveCardEffectSelect(player, card_number)){
+                CommandEnum.SELECT_ONE -> {
+                    true
+                }
+                CommandEnum.SELECT_TWO -> {
+                    false
+                }
+                else -> {
+                    continue
+                }
+            }
+        }
+    }
+
+    private suspend fun requestDeckBelow(player: PlayerEnum, game_status: GameStatus): Boolean{
+        while (true){
+            return when(game_status.receiveCardEffectSelect(player, 1403)){
+                CommandEnum.SELECT_ONE -> {
+                    true
+                }
+                CommandEnum.SELECT_TWO -> {
+                    false
+                }
+                else -> {
+                    continue
+                }
+            }
+        }
+    }
+
+    fun honokaCardInit(){
+        spiritSik.setAttack(DistanceType.CONTINUOUS, Pair(2, 8), null, 1, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = true, chogek = false)
+        spiritSik.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
+            if(checkCardName(card_number, CardName.HONOKA_SPIRIT_SIK) && requestCardChange(player, card_number, game_status)){
+                game_status.getCardFrom(player, CardName.HONOKA_GUARDIAN_SPIRIT_SIK, LocationEnum.ADDITIONAL_CARD)?.let {
+                    game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
+                    if(requestDeckBelow(player, game_status)){
+                        game_status.moveAdditionalCard(player, CardName.HONOKA_GUARDIAN_SPIRIT_SIK, LocationEnum.YOUR_DECK_BELOW)
+                    }
+                    else{
+                        game_status.moveAdditionalCard(player, CardName.HONOKA_GUARDIAN_SPIRIT_SIK, LocationEnum.DISCARD)
+                    }
+                }
+            }
+            null
+        })
+        guardianSik.setAttack(DistanceType.CONTINUOUS, Pair(2, 3), null, 2, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        guardianSik.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
+            game_status.dustToAura(player, 1)
+            null
+        })
+        guardianSik.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
+            if(checkCardName(card_number, CardName.HONOKA_GUARDIAN_SPIRIT_SIK) && requestCardChange(player, card_number, game_status)){
+                game_status.getCardFrom(player, CardName.HONOKA_ASSAULT_SPIRIT_SIK, LocationEnum.ADDITIONAL_CARD)?.let {
+                    game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
+                    if(requestDeckBelow(player, game_status)){
+                        game_status.moveAdditionalCard(player, CardName.HONOKA_ASSAULT_SPIRIT_SIK, LocationEnum.YOUR_DECK_BELOW)
+                    }
+                    else{
+                        game_status.moveAdditionalCard(player, CardName.HONOKA_ASSAULT_SPIRIT_SIK, LocationEnum.DISCARD)
+                    }
+                }
+            }
+            null
+        })
+        assaultSik.setAttack(DistanceType.CONTINUOUS, Pair(5, 5), null, 3, 2,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = true, chogek = false)
+        assaultSik.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
+            game_status.dustToLife(player, 1)
+            null
+        })
+        assaultSik.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
+            if(checkCardName(card_number, CardName.HONOKA_ASSAULT_SPIRIT_SIK) && requestCardChange(player, card_number, game_status)){
+                game_status.getCardFrom(player, CardName.HONOKA_DIVINE_OUKA, LocationEnum.ADDITIONAL_CARD)?.let {
+                    game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
+                    if(requestDeckBelow(player, game_status)){
+                        game_status.moveAdditionalCard(player, CardName.HONOKA_DIVINE_OUKA, LocationEnum.YOUR_DECK_BELOW)
+                    }
+                    else{
+                        game_status.moveAdditionalCard(player, CardName.HONOKA_DIVINE_OUKA, LocationEnum.DISCARD)
+                    }
+                }
+            }
+            null
+        })
+        divineOuka.setAttack(DistanceType.CONTINUOUS, Pair(1, 4), null, 4, 3,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = true, chogek = false)
+        divineOuka.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
+            game_status.dustToAura(player, 2)
+            null
+        })
+        sakuraBlizzard.setAttack(DistanceType.CONTINUOUS, Pair(3, 5), null, 2, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        sakuraBlizzard.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
+            while(true){
+                when(game_status.receiveCardEffectSelect(player.opposite(), card_number)){
+                    CommandEnum.SELECT_ONE -> {
+                        game_status.distanceToAura(player, 1)
+                        break
+                    }
+                    CommandEnum.SELECT_TWO -> {
+                        game_status.auraToDistance(player.opposite(), 1)
+                        break
+                    }
+                    else -> {
+                        continue
+                    }
+                }
+            }
+            null
+        })
+        yuGiGongJin.setAttack(DistanceType.CONTINUOUS, Pair(2, 9), null, 2, 2,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        yuGiGongJin.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.DRAW_CARD) {card_number, player, game_status, _ ->
+            while(true){
+                when(game_status.receiveCardEffectSelect(player, card_number)){
+                    CommandEnum.SELECT_ONE -> {
+                        game_status.drawCard(player, 1)
+                        break
+                    }
+                    CommandEnum.SELECT_NOT -> {
+                        break
+                    }
+                    else -> {
+                        continue
+                    }
+                }
+            }
+            null
+        })
+        yuGiGongJin.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) {card_number, player, game_status, _->
+            while (true){
+                val list = game_status.selectCardFrom(player, player, listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, card_number
+                ) { true }?: break
+                if (list.size == 0){
+                    break
+                }
+                else if (list.size == 1){
+                    game_status.popCardFrom(player, list[0], LocationEnum.HAND, false)?.let {
+                        game_status.insertCardTo(player, it, LocationEnum.YOUR_DECK_BELOW, false)
+                    }
+                    break
+                }
+                else {
+                    continue
+                }
+            }
+            null
+        })
+        yuGiGongJin.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) {card_number, player, game_status, _->
+            while(true){
+                when(game_status.receiveCardEffectSelect(player, card_number + 2)){
+                    CommandEnum.SELECT_ONE -> {
+                        game_status.movePlayingCard(player, LocationEnum.YOUR_DECK_BELOW, card_number)
+                        break
+                    }
+                    CommandEnum.SELECT_NOT -> {
+                        break
+                    }
+                    else -> {
+                        continue
+                    }
+                }
+            }
+            null
+        })
+        sakuraWing.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){_, _, game_status, _ ->
+            game_status.dustToDistance(2)
+            null
+        })
+        sakuraWing.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
+            if(checkCardName(card_number, CardName.HONOKA_SAKURA_WING)){
+                game_status.getCardFrom(player, CardName.HONOKA_REGENERATION, LocationEnum.ADDITIONAL_CARD)?.let {
+                    game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
+                    game_status.moveAdditionalCard(player, CardName.HONOKA_REGENERATION, LocationEnum.DISCARD)
+                }
+            }
+            null
+        })
+        regeneration.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){_, player, game_status, _ ->
+            game_status.dustToAura(player, 1)
+            game_status.dustToFlare(player, 1)
+            null
+        })
+        regeneration.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
+            if(checkCardName(card_number, CardName.HONOKA_REGENERATION)){
+                game_status.getCardFrom(player, CardName.HONOKA_SAKURA_WING, LocationEnum.ADDITIONAL_CARD)?.let {
+                    game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
+                    game_status.moveAdditionalCard(player, CardName.HONOKA_SAKURA_WING, LocationEnum.DISCARD)
+                }
+            }
+            null
+        })
+        sakuraAmulet.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.REACT_ATTACK_INVALID) {card_number, player, game_status, react_attack ->
+            while (true){
+                val list = game_status.selectCardFrom(player, player, listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, card_number
+                ) { card -> card.card_data.canCover }?: break
+                if (list.size == 0){
+                    break
+                }
+                else if (list.size == 1){
+                    game_status.popCardFrom(player, list[0], LocationEnum.HAND, false)?.let {
+                        game_status.insertCardTo(player, it, LocationEnum.COVER_CARD, false)
+                    }
+                    if(react_attack?.card_class != CardClass.SPECIAL){
+                        react_attack?.addOtherBuff(OtherBuff(card_number, 1, OtherBuffTag.GET, { _, _, _ ->
+                            true
+                        }, { _, _, attack ->
+                            attack.makeNotValid()
+                        }))
+                    }
+                    break
+                }
+                else {
+                    continue
+                }
+            }
+            null
+        })
+        sakuraAmulet.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
+            if(checkCardName(card_number, CardName.HONOKA_SAKURA_AMULET) && requestCardChange(player, card_number, game_status)){
+                game_status.getCardFrom(player, CardName.HONOKA_HONOKA_SPARKLE, LocationEnum.ADDITIONAL_CARD)?.let {
+                    game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
+                    if(requestDeckBelow(player, game_status)){
+                        game_status.moveAdditionalCard(player, CardName.HONOKA_HONOKA_SPARKLE, LocationEnum.YOUR_DECK_BELOW)
+                    }
+                    else{
+                        game_status.moveAdditionalCard(player, CardName.HONOKA_HONOKA_SPARKLE, LocationEnum.DISCARD)
+                    }
+                }
+            }
+            null
+        })
+        honokaSparkle.setAttack(DistanceType.CONTINUOUS, Pair(1, 3), null, 1, 2,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+    }
+
     fun init(){
         yurinaCardInit()
         saineCardInit()
@@ -3875,6 +4131,7 @@ object CardSet {
         saineA1CardInit()
         himikaA1CardInit()
         tokoyoA1CardInit()
+        honokaCardInit()
 
         hashMapInit()
         hashMapTest()
@@ -3886,5 +4143,4 @@ object CardSet {
             else -> false
         }
     }
-    fun isFullPower(card_number: Int): Boolean = card_number.toCardName().toCardData().sub_type == SubType.FULL_POWER
 }

@@ -52,6 +52,7 @@ enum class TextEffectTag {
     SEAL_CARD,
     CARD_DISCARD_PLACE_CHANGE,
     ADD_LOG,
+    ADD_TEXT_TO_ATTACK,
     INSERT_POISON,
     CHANGE_THIS_TURN_DISTANCE,
     CHANGE_THIS_TURN_SWELL_DISTANCE,
@@ -70,6 +71,9 @@ enum class TextEffectTag {
     WHEN_ENCHANTMENT_DESTRUCTION_YOUR,
     WHEN_GET_DAMAGE_BY_ATTACK,
     WHEN_USE_REACT_CARD_YOUR_END,
+    WHEN_DO_WIND_AROUND,
+
+    CONDITION_ADD_DO_WIND_AROUND,
 
     //description when this effect use this is exist in real game
     WHEN_START_PHASE_YOUR,

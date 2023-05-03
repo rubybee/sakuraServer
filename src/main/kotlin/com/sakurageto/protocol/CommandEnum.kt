@@ -72,6 +72,7 @@ enum class CommandEnum {
     HAND_YOUR,
     OUT_OF_GAME_YOUR,
     TRANSFORM_YOUR,
+    ADDITIONAL_YOUR,
     SPECIAL_OTHER,
     DISCARD_CARD_OTHER,
     USED_CARD_OTHER,
@@ -83,6 +84,7 @@ enum class CommandEnum {
     HAND_OTHER,
     OUT_OF_GAME_OTHER,
     TRANSFORM_OTHER,
+    ADDITIONAL_OTHER,
 
 
     MAKE_ATTACK_COMPLETE_YOUR,
@@ -300,6 +302,7 @@ enum class CommandEnum {
             INCREASE_THUNDER_GAUGE_OTHER -> return INCREASE_THUNDER_GAUGE_YOUR
             INCREASE_WIND_GAUGE_YOUR -> return INCREASE_WIND_GAUGE_OTHER
             INCREASE_WIND_GAUGE_OTHER -> return INCREASE_WIND_GAUGE_YOUR
+            ADDITIONAL_YOUR -> return ADDITIONAL_OTHER
             else -> TODO()
         }
     }

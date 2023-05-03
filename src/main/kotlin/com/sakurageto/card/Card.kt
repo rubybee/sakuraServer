@@ -445,6 +445,9 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         TextEffectTag.ADD_LOG -> {
                             text.effect!!(this.card_number, player, game_status, react_attack)
                         }
+                        TextEffectTag.ADD_TEXT_TO_ATTACK -> {
+                            text.effect!!(this.card_number, player, game_status, react_attack)
+                        }
                         else -> {
 
                         }

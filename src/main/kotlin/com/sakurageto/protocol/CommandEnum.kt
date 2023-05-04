@@ -388,6 +388,7 @@ enum class LocationEnum(var real_number: Int){
             YOUR_DECK_BELOW -> OTHER_DECK_BELOW
             MACHINE_YOUR -> MACHINE_OTHER
             MACHINE_BURN_YOUR -> MACHINE_BURN_OTHER
+            OUT_OF_GAME -> OUT_OF_GAME
             else -> DISCARD
         }
     }

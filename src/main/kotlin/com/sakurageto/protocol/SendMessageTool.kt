@@ -234,8 +234,8 @@ suspend fun sendActionRequest(mine: Connection){
 }
 
 suspend fun sendDoBasicAction(mine: Connection, other: Connection, command: CommandEnum, card: Int){
-    val dataYour = SakuraCardCommand(command, card)
-    val dataOther = SakuraCardCommand(command.Opposite(), if(card == -1) -1 else if(card >= 200000) card - 200000 else 0 )
+    val dataYour = SakuraCardCommand(command, if(card == -1) -1 else if(card >= 200000) card - 200000 else card)
+    val dataOther = SakuraCardCommand(command.Opposite(), if(card == -1) -1 else if(card >= 200000) card - 200000 else 0)
     send(mine, Json.encodeToString(dataYour))
     send(other, Json.encodeToString(dataOther))
 }

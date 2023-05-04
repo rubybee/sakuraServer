@@ -17,7 +17,8 @@ class MadeAttack(
     private val cannotReactNormal: Boolean,
     private val cannotReactSpecial: Boolean,
     private val cannotReact: Boolean,
-    private val chogek: Boolean
+    private val chogek: Boolean,
+    private val inevitable: Boolean = false
 ) {
     var editedChogek = false
 
@@ -86,7 +87,7 @@ class MadeAttack(
     }
 
     fun makeInevitable(){
-        inevitable = true
+        editedInevitable = true
     }
 
     var bothSideDamage = false
@@ -95,6 +96,7 @@ class MadeAttack(
         bothSideDamage = true
     }
 
+    var editedInevitable = false
     var editedCannotReactNormal = false
     var editedCannotReactSpecial = false
     var editedCannotReact = false
@@ -112,6 +114,7 @@ class MadeAttack(
     }
 
     suspend fun activeOtherBuff(game_status: GameStatus, player: PlayerEnum, continuousOtherBuff: OtherBuffQueue){
+        editedInevitable = inevitable
         editedCannotReactNormal = cannotReactNormal
         editedCannotReactSpecial = cannotReactSpecial
         editedCannotReact = cannotReact
@@ -184,8 +187,6 @@ class MadeAttack(
     fun addRangeBuff(buff: RangeBuff){
         thisTempRangeBuff.addRangeBuff(buff)
     }
-
-    var inevitable = false
 
     suspend fun rangeCheck(now_range: Int, game_status: GameStatus, player: PlayerEnum, continuousRangeBuff: RangeBuffQueue): Boolean{
         editedDistanceType = distance_type
@@ -407,6 +408,11 @@ class MadeAttack(
                 if(text.timing_tag == TextEffectTimingTag.AFTER_ATTACK){
                     if(text.tag == TextEffectTag.WHEN_CHOOSE_AURA_DAMAGE){
                         if(damageSelect == DamageSelect.AURA){
+                            text.effect!!(this.card_number, player, game_status, react_attack)
+                        }
+                    }
+                    else if(text.tag == TextEffectTag.WHEN_CHOOSE_LIFE_DAMAGE){
+                        if(damageSelect == DamageSelect.LIFE){
                             text.effect!!(this.card_number, player, game_status, react_attack)
                         }
                     }

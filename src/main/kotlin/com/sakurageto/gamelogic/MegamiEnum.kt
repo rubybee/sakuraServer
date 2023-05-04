@@ -11,14 +11,17 @@ enum class MegamiEnum(var real_number: Int) {
     TOKOYO(40),
     TOKOYO_A1(41),
     OBORO(50),
+    OBORO_A1(51),
     YUKIHI(60),
     SHINRA(70),
     HAGANE(80),
     CHIKAGE(90),
+    CHIKAGE_A1(91),
     KURURU(100),
     THALLYA(110),
     RAIRA(120),
     UTSURO(130),
+    UTSURO_A1(131),
     HONOKA(140);
 
     companion object {

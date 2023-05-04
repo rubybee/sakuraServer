@@ -3,6 +3,9 @@ package com.sakurageto.gamelogic
 import com.sakurageto.Connection
 import com.sakurageto.RoomInformation
 import com.sakurageto.card.*
+import com.sakurageto.gamelogic.GameStatus.Companion.END_PHASE
+import com.sakurageto.gamelogic.GameStatus.Companion.MAIN_PHASE
+import com.sakurageto.gamelogic.GameStatus.Companion.START_PHASE
 import com.sakurageto.protocol.*
 import io.ktor.websocket.*
 import kotlinx.serialization.encodeToString
@@ -155,7 +158,8 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
             }
         }
 
-        if(game_status.player1.megami_1 == MegamiEnum.CHIKAGE || game_status.player1.megami_2 == MegamiEnum.CHIKAGE){
+        if(game_status.player1.megami_1 == MegamiEnum.CHIKAGE || game_status.player1.megami_2 == MegamiEnum.CHIKAGE
+            || game_status.player1.megami_1 == MegamiEnum.CHIKAGE_A1 || game_status.player1.megami_2 == MegamiEnum.CHIKAGE_A1){
             for(card_name in CardName.returnPoisonCardName()){
                 val turnCheck = first_turn == PlayerEnum.PLAYER2
                 val card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER2)
@@ -163,7 +167,8 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
             }
         }
 
-        if(game_status.player2.megami_1 == MegamiEnum.CHIKAGE || game_status.player2.megami_2 == MegamiEnum.CHIKAGE){
+        if(game_status.player2.megami_1 == MegamiEnum.CHIKAGE || game_status.player2.megami_2 == MegamiEnum.CHIKAGE
+            || game_status.player2.megami_1 == MegamiEnum.CHIKAGE_A1 || game_status.player2.megami_2 == MegamiEnum.CHIKAGE_A1){
             for(card_name in CardName.returnPoisonCardName()){
                 val turnCheck = first_turn == PlayerEnum.PLAYER1
                 val card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER1)
@@ -351,6 +356,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
     }
 
     suspend fun startPhase(){
+        game_status.nowPhase = START_PHASE
         sendStartPhaseStart(getSocket(this.turn_player), getSocket(this.turn_player.opposite()))
         game_status.startPhaseDefaultFirst(this.turn_player)
         game_status.startPhaseEffectProcess(this.turn_player)
@@ -361,8 +367,9 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
     }
 
     suspend fun mainPhase(){
+        game_status.nowPhase = MAIN_PHASE
         sendMainPhaseStart(getSocket(this.turn_player), getSocket(this.turn_player.opposite()))
-        game_status.mainPhaseEffectProcess()
+        game_status.mainPhaseEffectProcess(this.turn_player)
         if(receiveFullPowerRequest(getSocket(this.turn_player))){
             game_status.setPlayerFullAction(this.turn_player, true)
             while (true){
@@ -405,6 +412,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
     }
 
     suspend fun endPhase(){
+        game_status.nowPhase = END_PHASE
         sendEndPhaseStart(getSocket(this.turn_player), getSocket(this.turn_player.opposite()))
         game_status.endPhaseEffectProcess(this.turn_player)
         game_status.setEndTurn(PlayerEnum.PLAYER1, false)

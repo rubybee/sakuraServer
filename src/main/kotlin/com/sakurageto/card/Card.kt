@@ -235,7 +235,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         cannotReactNormal = this.card_data.cannotReactNormal,
                         cannotReactSpecial = this.card_data.cannotReactSpecial,
                         cannotReact = this.card_data.cannotReact,
-                        chogek = this.card_data.chogek
+                        chogek = this.card_data.chogek,
+                        inevitable = this.card_data.inevitable
                     )
                 }
                 Umbrella.UNFOLD -> {
@@ -252,7 +253,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         cannotReactNormal = this.card_data.cannotReactNormal,
                         cannotReactSpecial = this.card_data.cannotReactSpecial,
                         cannotReact = this.card_data.cannotReact,
-                        chogek = this.card_data.chogek
+                        chogek = this.card_data.chogek,
+                        inevitable = this.card_data.inevitable
                     )
                 }
                 null -> {
@@ -274,7 +276,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 cannotReactNormal = this.card_data.cannotReactNormal,
                 cannotReactSpecial = this.card_data.cannotReactSpecial,
                 cannotReact = this.card_data.cannotReact,
-                chogek = this.card_data.chogek
+                chogek = this.card_data.chogek,
+                inevitable = this.card_data.inevitable
             )
         }
     }
@@ -335,7 +338,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         cannotReactNormal = false,
                         cannotReactSpecial = false,
                         cannotReact = false,
-                        chogek = false
+                        chogek = false ,
+                        inevitable = this.card_data.inevitable
                     ))){
                     return cost
                 }
@@ -585,6 +589,18 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             for(text in it){
                 if (usedEffectUsable(text) || enchantmentUsable(text)) {
                     if(text.tag == TextEffectTag.WHEN_END_PHASE_YOUR){
+                        text.effect!!(this.card_number, player, game_status, null)
+                    }
+                }
+            }
+        }
+    }
+
+    suspend fun endPhaseDiscardEffect(player: PlayerEnum, game_status: GameStatus) {
+        this.card_data.effect?.let {
+            for(text in it){
+                if (text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT) {
+                    if(text.tag == TextEffectTag.WHEN_END_PHASE_YOUR_IN_DISCARD){
                         text.effect!!(this.card_number, player, game_status, null)
                     }
                 }

@@ -490,8 +490,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.YOUR_AURA, value, card.card_number)
     }
 
-    suspend fun cardToFlare(player: PlayerEnum, number: Int, card: Card){
-        if(!(card.checkCanMoveToken(player, this)) || number == 0 || card.nap == 0 || card.nap == null) return
+    suspend fun cardToFlare(player: PlayerEnum, number: Int?, card: Card, location: LocationEnum = LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD){
+        if(!(card.checkCanMoveToken(player, this)) || number == 0 || number == null || card.nap == 0 || card.nap == null) return
         val nowPlayer = getPlayer(player)
         var value = number
 
@@ -507,7 +507,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         card.nap = card.nap!! - value
 
         sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
-            LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.YOUR_FLARE, value, card.card_number)
+            location, LocationEnum.YOUR_FLARE, value, card.card_number)
     }
 
     suspend fun cardToDistance(player: PlayerEnum, number: Int, card: Card){
@@ -1436,7 +1436,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 CardClass.SPECIAL -> {
                     card.addReturnListener(card.player, this)
                     card.special_card_state = SpecialCardEnum.PLAYED
-                    insertCardTo(card.player, card, LocationEnum.USED_CARD, true)
+                    insertCardTo(card.player, card, LocationEnum.YOUR_USED_CARD, true)
                 }
                 CardClass.NORMAL -> {
                     insertCardTo(card.player, card, LocationEnum.DISCARD, true)
@@ -1465,7 +1465,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             CardClass.SPECIAL -> {
                 card.addReturnListener(card.player, this)
                 card.special_card_state = SpecialCardEnum.PLAYED
-                insertCardTo(card.player, card, LocationEnum.USED_CARD, true)
+                insertCardTo(card.player, card, LocationEnum.YOUR_USED_CARD, true)
             }
             CardClass.NORMAL -> {
                 insertCardTo(card.player, card, location, true)
@@ -2416,7 +2416,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 nowPlayer.special_card_deck.remove(card_number)
                 return result
             }
-            LocationEnum.USED_CARD -> {
+            LocationEnum.YOUR_USED_CARD -> {
                 val result = nowPlayer.usedSpecialCard[card_number]?: return null
                 sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_USED_YOUR)
                 nowPlayer.usedSpecialCard.remove(card_number)
@@ -2498,7 +2498,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 nowPlayer.usingCard.addFirst(card)
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, public, CommandEnum.PLAYING_CARD_YOUR)
             }
-            LocationEnum.USED_CARD -> {
+            LocationEnum.YOUR_USED_CARD -> {
                 cardOwner.usedSpecialCard[card.card_number] = card
                 sendAddCardZone(cardOwnerSocket, cardOwnerOppositeSocket, card.card_number, public, CommandEnum.USED_CARD_YOUR)
             }
@@ -2568,7 +2568,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             LocationEnum.YOUR_DECK_TOP -> getPlayer(player).getCardFromDeckTop(card_number)
             LocationEnum.PLAYING_ZONE -> getPlayer(player).getCardFromPlaying(card_number)
             LocationEnum.ADDITIONAL_CARD -> getPlayer(player).getCardFromAdditional(card_number)
-            LocationEnum.USED_CARD -> getPlayer(player).getCardFromUsed(card_number)
+            LocationEnum.YOUR_USED_CARD -> getPlayer(player).getCardFromUsed(card_number)
             LocationEnum.ENCHANTMENT_ZONE -> getPlayer(player).getCardFromEnchantment(card_number)
             else -> TODO()
         }
@@ -2582,7 +2582,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun returnSpecialCard(player: PlayerEnum, card_number: Int): Boolean{
-        val card = popCardFrom(player, card_number, LocationEnum.USED_CARD, true)?: return false
+        val card = popCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD, true)?: return false
         insertCardTo(player, card, LocationEnum.SPECIAL_CARD, true)
         card.effectAllValidEffect(player, this, TextEffectTag.WHEN_THIS_CARD_RETURN)
         card.special_card_state = SpecialCardEnum.UNUSED
@@ -2690,7 +2690,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     count += card.nap?: 0
                 }
             }
-            LocationEnum.USED_CARD -> {
+            LocationEnum.YOUR_USED_CARD -> {
                 for(card in getPlayer(player).usedSpecialCard.values){
                     count += card.nap?: 0
                 }

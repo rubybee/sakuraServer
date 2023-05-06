@@ -363,7 +363,8 @@ enum class LocationEnum(var real_number: Int){
     OTHER_DECK_BELOW(17),
     PLAYING_ZONE(18),
     SPECIAL_CARD(19),
-    USED_CARD(20),
+    YOUR_USED_CARD(20),
+    OTHER_USED_CARD(32),
     ENCHANTMENT_ZONE(21),
     SEAL_ZONE(22),
     POISON_BAG(23),
@@ -389,6 +390,8 @@ enum class LocationEnum(var real_number: Int){
             MACHINE_YOUR -> MACHINE_OTHER
             MACHINE_BURN_YOUR -> MACHINE_BURN_OTHER
             OUT_OF_GAME -> OUT_OF_GAME
+            YOUR_USED_CARD -> OTHER_USED_CARD
+            OTHER_USED_CARD -> YOUR_USED_CARD
             else -> DISCARD
         }
     }

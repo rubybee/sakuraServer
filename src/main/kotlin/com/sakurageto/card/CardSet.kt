@@ -1,11 +1,9 @@
 package com.sakurageto.card
 
-import com.sakurageto.card.CardSet.toCardName
 import com.sakurageto.gamelogic.*
 import com.sakurageto.gamelogic.GameStatus.Companion.START_PHASE
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
-import com.sakurageto.protocol.sendGameEnd
 import java.util.EnumMap
 import kotlin.collections.HashMap
 import kotlin.math.abs
@@ -1374,7 +1372,7 @@ object CardSet {
         bioactivity.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CHASM, null))
         bioactivity.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.RETURN_OTHER_CARD) {_, player, game_status, _ ->
             while(true) {
-                val selected = game_status.selectCardFrom(player, player, listOf(LocationEnum.USED_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                val selected = game_status.selectCardFrom(player, player, listOf(LocationEnum.YOUR_USED_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
                     506) { true }?: break
                 if(selected.size == 1){
                     game_status.returnSpecialCard(player, selected[0])
@@ -1873,11 +1871,11 @@ object CardSet {
             when(game_status.getStratagem(player)){
                 Stratagem.SHIN_SAN -> {
                     while (true){
-                        val list = game_status.selectCardFrom(player, player, listOf(LocationEnum.DISCARD, LocationEnum.USED_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 708)
+                        val list = game_status.selectCardFrom(player, player, listOf(LocationEnum.DISCARD, LocationEnum.YOUR_USED_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 708)
                         {card -> card.card_data.card_type == CardType.ENCHANTMENT}?: break
                         if (list.size == 1){
                             val card = game_status.popCardFrom(player, list[0], LocationEnum.DISCARD, true)?:
-                            game_status.popCardFrom(player, list[0], LocationEnum.USED_CARD, true)?: continue
+                            game_status.popCardFrom(player, list[0], LocationEnum.YOUR_USED_CARD, true)?: continue
                             if(card.card_data.card_class == CardClass.SPECIAL) card.special_card_state = SpecialCardEnum.PLAYING
                             if(!card.textUseCheck(player, game_status, null)) break
                             card.use(player, game_status, null)
@@ -2532,7 +2530,7 @@ object CardSet {
             val kikou = getKikou(player, game_status)
             if(kikou.enchantment >= 1 && kikou.reaction >= 1) {
                 while(true){
-                    val list = game_status.selectCardFrom(player, player, listOf(LocationEnum.COVER_CARD, LocationEnum.USED_CARD, LocationEnum.DISCARD),
+                    val list = game_status.selectCardFrom(player, player, listOf(LocationEnum.COVER_CARD, LocationEnum.YOUR_USED_CARD, LocationEnum.DISCARD),
                         CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1004)
                     { card -> card.card_data.sub_type != SubType.FULL_POWER && card.special_card_state != SpecialCardEnum.UNUSED &&
                             card.card_data.megami != MegamiEnum.KURURU}?: break
@@ -2545,8 +2543,8 @@ object CardSet {
                     else{
                         var location = LocationEnum.DISCARD
                         val card = game_status.getCardFrom(player, list[0], LocationEnum.DISCARD) ?:
-                        game_status.getCardFrom(player, list[0], LocationEnum.USED_CARD).let {
-                            location = LocationEnum.USED_CARD
+                        game_status.getCardFrom(player, list[0], LocationEnum.YOUR_USED_CARD).let {
+                            location = LocationEnum.YOUR_USED_CARD
                             it
                         }?:game_status.getCardFrom(player, list[0], LocationEnum.COVER_CARD).let {
                             location = LocationEnum.COVER_CARD
@@ -2720,8 +2718,8 @@ object CardSet {
                 while(true){
                     when(game_status.receiveCardEffectSelect(player, 1007)){
                         CommandEnum.SELECT_ONE -> {
-                            game_status.getCardFrom(player, card_number, LocationEnum.USED_CARD)?.let {
-                                game_status.useCardFrom(player, it, LocationEnum.USED_CARD, false, null,
+                            game_status.getCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD)?.let {
+                                game_status.useCardFrom(player, it, LocationEnum.YOUR_USED_CARD, false, null,
                                     isCost = false, isConsume = true)
                             }
                             break
@@ -2881,7 +2879,7 @@ object CardSet {
                     if(list.size == 1){
                         game_status.popCardFrom(player.opposite(), list[0], LocationEnum.SPECIAL_CARD, true)?.let {
                             it.special_card_state = SpecialCardEnum.PLAYED
-                            game_status.insertCardTo(player.opposite(), it, LocationEnum.USED_CARD, true)
+                            game_status.insertCardTo(player.opposite(), it, LocationEnum.YOUR_USED_CARD, true)
                         }
                         break
                     }
@@ -2894,12 +2892,12 @@ object CardSet {
         })
         kanshousouchiKururusik.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) {card_number, player, game_status, _->
             while(true){
-                val list = game_status.selectCardFrom(player.opposite(), player, listOf(LocationEnum.USED_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1012){
+                val list = game_status.selectCardFrom(player.opposite(), player, listOf(LocationEnum.YOUR_USED_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1012){
                     true
                 }?: break
                 if(list.size == 1){
-                    val card = game_status.getCardFrom(player.opposite(), list[0], LocationEnum.USED_CARD)?: continue
-                    game_status.useCardFrom(player, card, LocationEnum.USED_CARD, false, null,
+                    val card = game_status.getCardFrom(player.opposite(), list[0], LocationEnum.YOUR_USED_CARD)?: continue
+                    game_status.useCardFrom(player, card, LocationEnum.YOUR_USED_CARD, false, null,
                         isCost = true, isConsume = false)
                     game_status.movePlayingCard(player, LocationEnum.OUT_OF_GAME, card_number)
                     break
@@ -3379,7 +3377,7 @@ object CardSet {
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         windZenKai.setSpecial(1)
         windZenKai.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) ret@{card_number, player, game_status, _->
-            val selected = game_status.selectCardFrom(player, player, listOf(LocationEnum.USED_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+            val selected = game_status.selectCardFrom(player, player, listOf(LocationEnum.YOUR_USED_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
                 1212, 1){
                 true
             }?: return@ret null
@@ -3984,7 +3982,7 @@ object CardSet {
                 CommandEnum.SELECT_ONE -> {
                     true
                 }
-                CommandEnum.SELECT_TWO -> {
+                CommandEnum.SELECT_NOT -> {
                     false
                 }
                 else -> {
@@ -4000,7 +3998,7 @@ object CardSet {
                 CommandEnum.SELECT_ONE -> {
                     true
                 }
-                CommandEnum.SELECT_TWO -> {
+                CommandEnum.SELECT_NOT -> {
                     false
                 }
                 else -> {
@@ -4017,7 +4015,7 @@ object CardSet {
         if(player1.aura == 5) count += 1
         if(player1.flare == 5) count += 1
         if(player1.life == 5) count += 1
-        if(game_status.countToken(player?: PlayerEnum.PLAYER1, LocationEnum.USED_CARD) == 5) count += 1
+        if(game_status.countToken(player?: PlayerEnum.PLAYER1, LocationEnum.YOUR_USED_CARD) == 5) count += 1
         if(game_status.countToken(player?: PlayerEnum.PLAYER1, LocationEnum.ENCHANTMENT_ZONE) == 5) count += 1
         if(game_status.dust == 5) count += 1
         if(game_status.distanceToken == 5) count += 1
@@ -4025,7 +4023,7 @@ object CardSet {
         if(player2.aura == 5) count += 1
         if(player2.flare == 5) count += 1
         if(player2.life == 5) count += 1
-        if(game_status.countToken(PlayerEnum.PLAYER2, LocationEnum.USED_CARD) == 5) count += 1
+        if(game_status.countToken(PlayerEnum.PLAYER2, LocationEnum.YOUR_USED_CARD) == 5) count += 1
         if(game_status.countToken(PlayerEnum.PLAYER2, LocationEnum.ENCHANTMENT_ZONE) == 5) count += 1
         return count
     }
@@ -4175,7 +4173,7 @@ object CardSet {
                         game_status.dustToDistance(2)
                         break
                     }
-                    CommandEnum.SELECT_NOT -> {
+                    CommandEnum.SELECT_TWO -> {
                         game_status.distanceToDust(2)
                         break
                     }
@@ -4274,7 +4272,7 @@ object CardSet {
                 game_status.getCardFrom(player, CardName.HONOKA_HAND_FLOWER, LocationEnum.ADDITIONAL_CARD)?.let {
                     game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
                     it.special_card_state = SpecialCardEnum.PLAYED
-                    game_status.moveAdditionalCard(player, CardName.HONOKA_HAND_FLOWER, LocationEnum.USED_CARD)
+                    game_status.moveAdditionalCard(player, CardName.HONOKA_HAND_FLOWER, LocationEnum.YOUR_USED_CARD)
                     game_status.returnSpecialCard(player, it.card_number)
                 }
             }
@@ -4303,14 +4301,16 @@ object CardSet {
                         if (game_status.getPlayerAura(player) == 0){
                             continue
                         }
-                        game_status.getCardFrom(player, card_number, LocationEnum.USED_CARD)?.let {
-                            game_status.auraToCard(player, 1, it, LocationEnum.USED_CARD)
+                        game_status.getCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD)?.let {
+                            game_status.auraToCard(player, 1, it, LocationEnum.YOUR_USED_CARD)
                             if(it.nap == 5){
                                 if(checkCardName(card_number, CardName.HONOKA_HAND_FLOWER)){
                                     game_status.getCardFrom(player, CardName.HONOKA_A_NEW_OPENING, LocationEnum.ADDITIONAL_CARD)?.let { additionalCard ->
-                                        game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
+                                        game_status.cardToFlare(player, it.nap, it, LocationEnum.YOUR_USED_CARD)
+                                        game_status.popCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD, true)
+                                        game_status.insertCardTo(player, it, LocationEnum.ADDITIONAL_CARD, true)
                                         additionalCard.special_card_state = SpecialCardEnum.PLAYED
-                                        game_status.moveAdditionalCard(player, CardName.HONOKA_A_NEW_OPENING, LocationEnum.USED_CARD)
+                                        game_status.moveAdditionalCard(player, CardName.HONOKA_A_NEW_OPENING, LocationEnum.YOUR_USED_CARD)
                                         game_status.returnSpecialCard(player, additionalCard.card_number)
                                     }
                                 }
@@ -4322,14 +4322,16 @@ object CardSet {
                         if (game_status.dust == 0){
                             continue
                         }
-                        game_status.getCardFrom(player, card_number, LocationEnum.USED_CARD)?.let {
-                            game_status.dustToCard(player, 1, it, LocationEnum.USED_CARD)
+                        game_status.getCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD)?.let {
+                            game_status.dustToCard(player, 1, it, LocationEnum.YOUR_USED_CARD)
                             if(it.nap == 5){
                                 if(checkCardName(card_number, CardName.HONOKA_HAND_FLOWER)){
                                     game_status.getCardFrom(player, CardName.HONOKA_A_NEW_OPENING, LocationEnum.ADDITIONAL_CARD)?.let { additionalCard ->
-                                        game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
+                                        game_status.cardToFlare(player, it.nap, it, LocationEnum.YOUR_USED_CARD)
+                                        game_status.popCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD, true)
+                                        game_status.insertCardTo(player, it, LocationEnum.ADDITIONAL_CARD, true)
                                         additionalCard.special_card_state = SpecialCardEnum.PLAYED
-                                        game_status.moveAdditionalCard(player, CardName.HONOKA_A_NEW_OPENING, LocationEnum.USED_CARD)
+                                        game_status.moveAdditionalCard(player, CardName.HONOKA_A_NEW_OPENING, LocationEnum.YOUR_USED_CARD)
                                         game_status.returnSpecialCard(player, additionalCard.card_number)
                                     }
                                 }
@@ -4424,14 +4426,13 @@ object CardSet {
         })
         fourSeason.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {_, player, game_status, _->
             while (true){
-                val list = game_status.selectCardFrom(player, player, listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1417
+                val list = game_status.selectCardFrom(player, player, listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1417, 1
                 ) { card -> card.card_data.canCover }?: break
-                if (list.size == 1){
-                    game_status.popCardFrom(player, list[0], LocationEnum.HAND, false)?.let {
-                        game_status.insertCardTo(player, it, LocationEnum.COVER_CARD, false)
-                    }
-                    break
+                game_status.popCardFrom(player, list[0], LocationEnum.HAND, false)?.let {
+                    game_status.insertCardTo(player, it, LocationEnum.COVER_CARD, false)
                 }
+                game_status.doWindAround(player, 201416)
+                break
             }
             null
         })
@@ -4440,17 +4441,18 @@ object CardSet {
                 while(true){
                     when(game_status.receiveCardEffectSelect(player, 1417)){
                         CommandEnum.SELECT_ONE -> {
-                            return@ret false
+                            break
                         }
                         CommandEnum.SELECT_NOT -> {
-                            break
+                            return@ret false
                         }
                         else -> {
                             continue
                         }
                     }
                 }
-                gameStatus.popCardFrom(player, cardNumber, LocationEnum.USED_CARD, true)?.let {
+                gameStatus.popCardFrom(player, cardNumber, LocationEnum.YOUR_USED_CARD, true)?.let {
+                    it.special_card_state = SpecialCardEnum.UNUSED
                     gameStatus.insertCardTo(player, it, LocationEnum.ADDITIONAL_CARD, true)
                     gameStatus.moveAdditionalCard(player, CardName.HONOKA_FOUR_SEASON_BACK, LocationEnum.SPECIAL_CARD)
                 }
@@ -4509,7 +4511,7 @@ object CardSet {
             }))
             null
         })
-        branchOfDivine.setSpecial(1)
+        branchOfDivine.setSpecial(0)
         branchOfDivine.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
             game_status.outToAura(player, 1)
             game_status.outToFlare(player, 1)
@@ -4538,12 +4540,12 @@ object CardSet {
                     when(game_status.receiveCardEffectSelect(player, 514)){
                         CommandEnum.SELECT_ONE -> {
                             game_status.lifeToDust(player, nowPlayer.life, true)
-                            val useSuccess = game_status.getCardFrom(player, card_number, LocationEnum.USED_CARD)?.let {
-                                game_status.useCardFrom(player, it, LocationEnum.USED_CARD, false, null,
+                            val useSuccess = game_status.getCardFrom(player, card_number, LocationEnum.SPECIAL_CARD)?.let {
+                                game_status.useCardFrom(player, it, LocationEnum.SPECIAL_CARD, false, null,
                                     isCost = true, isConsume = true
                                 )
-                            }?: game_status.getCardFrom(player, card_number, LocationEnum.USED_CARD)?.let {
-                                game_status.useCardFrom(player, it, LocationEnum.USED_CARD, false, null,
+                            }?: game_status.getCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD)?.let {
+                                game_status.useCardFrom(player, it, LocationEnum.YOUR_USED_CARD, false, null,
                                     isCost = true, isConsume = true
                                 )
                             }?: false
@@ -4698,7 +4700,7 @@ object CardSet {
         deviceKururusik.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.GET_ADDITIONAL_CARD) {_, player, game_status, _ ->
             if(game_status.nowPhase == START_PHASE) {
                 reviveDemise(player, game_status)
-                game_status.moveAdditionalCard(player, CardName.UTSURO_MANG_A, LocationEnum.USED_CARD)?.let {
+                game_status.moveAdditionalCard(player, CardName.UTSURO_MANG_A, LocationEnum.YOUR_USED_CARD)?.let {
                     it.special_card_state = SpecialCardEnum.PLAYED
                 }
                 game_status.drawCard(player, 1)

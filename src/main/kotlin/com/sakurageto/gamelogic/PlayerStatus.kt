@@ -383,7 +383,7 @@ class PlayerStatus(val player_enum: PlayerEnum) {
             LocationEnum.HAND -> for (card in hand.values) if(condition(card)) list.add(card.card_number)
             LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.ENCHANTMENT_ZONE  -> for (card in enchantmentCard.values) if(condition(card)) list.add(card.card_number)
             LocationEnum.COVER_CARD -> for (card in cover_card) if(condition(card)) list.add(card.card_number)
-            LocationEnum.USED_CARD -> for (card in usedSpecialCard.values) if(condition(card)) list.add(card.card_number)
+            LocationEnum.YOUR_USED_CARD -> for (card in usedSpecialCard.values) if(condition(card)) list.add(card.card_number)
             else -> TODO()
         }
     }

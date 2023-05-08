@@ -203,67 +203,132 @@ class MadeAttack(
             }
         }
 
-        return when(distance_type){
-            DistanceType.DISCONTINUOUS -> distance_uncont!![now_range]
-            DistanceType.CONTINUOUS -> distance_cont!!.first <= now_range && now_range <= distance_cont.second
+        return when(editedDistanceType){
+            DistanceType.DISCONTINUOUS -> editedDistanceUncont!![now_range]
+            DistanceType.CONTINUOUS -> editedDistanceCont!!.first <= now_range && now_range <= editedDistanceCont!!.second
         }
     }
 
     //closable true -> increment range from left
     fun plusMinusRange(number: Int, closable: Boolean){
-        when(editedDistanceType){
-            DistanceType.DISCONTINUOUS -> {
-                if (closable) {
-                    var min = -1
-                    for (i in 0..10) {
-                        if(editedDistanceUncont!![i]){
-                            min = i
-                            break
+        if(number >= 0){
+            when(editedDistanceType){
+                DistanceType.DISCONTINUOUS -> {
+                    if (closable) {
+                        var min = -1
+                        for (i in 0..10) {
+                            if(editedDistanceUncont!![i]){
+                                min = i
+                                break
+                            }
                         }
-                    }
-                    if(min != -1){
-                        for (i in min - 1 downTo  min - number){
-                            if(i < 0) continue
-                            editedDistanceUncont!![i] = true
+                        if(min != -1){
+                            for (i in min - 1 downTo  min - number){
+                                if(i < 0) continue
+                                editedDistanceUncont!![i] = true
+                            }
                         }
-                    }
-                }
-                else{
-                    var max = 11
-                    for (i in 10 downTo 0) {
-                        if(editedDistanceUncont!![i]){
-                            max = i
-                            break
-                        }
-                    }
-                    if(max != 11){
-                        for (i in max + 1..max + number){
-                            editedDistanceUncont!![i] = true
-                        }
-                    }
-                }
-            }
-            DistanceType.CONTINUOUS -> {
-                if (closable){
-                    if(editedDistanceCont!!.first == 0){
-                        return
                     }
                     else{
-                        var now = editedDistanceCont!!.first
-                        now -= number
-                        if(now < 0){
-                            now = 0
+                        var max = 11
+                        for (i in 10 downTo 0) {
+                            if(editedDistanceUncont!![i]){
+                                max = i
+                                break
+                            }
                         }
-                        editedDistanceCont = editedDistanceCont!!.copy(first = now)
+                        if(max != 11){
+                            for (i in max + 1..max + number){
+                                editedDistanceUncont!![i] = true
+                            }
+                        }
                     }
                 }
-                else{
-                    var now = editedDistanceCont!!.second
-                    now += number
-                    editedDistanceCont = editedDistanceCont!!.copy(second = now)
+                DistanceType.CONTINUOUS -> {
+                    if (closable){
+                        if(editedDistanceCont!!.first == 0){
+                            return
+                        }
+                        else{
+                            var now = editedDistanceCont!!.first
+                            now -= number
+                            if(now < 0){
+                                now = 0
+                            }
+                            editedDistanceCont = editedDistanceCont!!.copy(first = now)
+                        }
+                    }
+                    else{
+                        var now = editedDistanceCont!!.second
+                        now += number
+                        editedDistanceCont = editedDistanceCont!!.copy(second = now)
+                    }
                 }
             }
         }
+        else{
+
+            when(editedDistanceType){
+                DistanceType.DISCONTINUOUS -> {
+                    if (closable) {
+                        var min = -1
+                        for (i in 0..10) {
+                            if(editedDistanceUncont!![i]){
+                                min = i
+                                break
+                            }
+                        }
+                        if(min != -1){
+                            for (i in min + number + 1..min){
+                                if(i < 0) continue
+                                editedDistanceUncont!![i] = false
+                            }
+                        }
+                    }
+                    else{
+                        var max = 11
+                        for (i in 10 downTo 0) {
+                            if(editedDistanceUncont!![i]){
+                                max = i
+                                break
+                            }
+                        }
+                        if(max != 11){
+                            for (i in max + number + 1..max){
+                                editedDistanceUncont!![i] = false
+                            }
+                        }
+                    }
+                }
+                DistanceType.CONTINUOUS -> {
+                    if (closable){
+                        if(editedDistanceCont!!.first == 0){
+                            return
+                        }
+                        else{
+                            var now = editedDistanceCont!!.first
+                            now -= number
+                            if(now < 0){
+                                now = 0
+                            }
+                            editedDistanceCont = editedDistanceCont!!.copy(first = now)
+                        }
+                    }
+                    else{
+                        var now = editedDistanceCont!!.second
+                        now += number
+                        editedDistanceCont = editedDistanceCont!!.copy(second = now)
+                    }
+                    if(editedDistanceCont!!.first < editedDistanceCont!!.second){
+                        editedDistanceType = DistanceType.DISCONTINUOUS
+                        editedDistanceUncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false)
+                        editedDistanceCont = null
+                    }
+                }
+            }
+        }
+
+
     }
 
     fun addRange(range: Pair<Int, Int>){

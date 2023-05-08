@@ -318,7 +318,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 for(card in gameStatus.getPlayer(player).enchantmentCard.values){
                     card.card_data.effect?.let {
                         for(text in it){
-                            if(enchantmentUsable(text)){
+                            if(card.enchantmentUsable(text)){
                                 if(text.tag == TextEffectTag.CAN_NOT_USE_ATTACK) return -2
                             }
                         }

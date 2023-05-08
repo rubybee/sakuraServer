@@ -4407,7 +4407,7 @@ object CardSet {
             }
             null
         })
-        fourSeason.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.MOVE_CARD) ret@{_, player, game_status, _ ->
+        fourSeason.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) ret@{_, player, game_status, _ ->
             while(true){
                 when(game_status.receiveCardEffectSelect(player, 1416)){
                     CommandEnum.SELECT_ONE -> {
@@ -4688,7 +4688,7 @@ object CardSet {
         biteDust.setAttack(DistanceType.CONTINUOUS, Pair(3, 6), null, 2, 0,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false, inevitable = false)
         biteDust.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.WHEN_CHOOSE_LIFE_DAMAGE) {_, player, game_status, _ ->
-            game_status.flareToDust(player, 2)
+            game_status.flareToDust(player.opposite(), 2)
             null
         })
         deviceKururusik.setSpecial(2)

@@ -135,7 +135,7 @@ class RangeBuffQueue() {
         }
     }
 
-    suspend fun applyBuff(index: Int, player: PlayerEnum, game_status: GameStatus, madeAttack: MadeAttack, tempQueue: ArrayDeque<RangeBuff>, receiveQueue: RangeBuffQueue){
+    fun applyBuff(index: Int, player: PlayerEnum, game_status: GameStatus, madeAttack: MadeAttack, tempQueue: ArrayDeque<RangeBuff>, receiveQueue: RangeBuffQueue){
         for(i in 1..rangeBuff[index].size){
             val now = rangeBuff[index].first()
             rangeBuff[index].removeFirst()

@@ -32,6 +32,7 @@ enum class TextEffectTag {
     INSTALLATION,
     INSTALLATION_INFINITE,
     RUN_STRATAGEM,
+    FREEZE,
 
     //just define what this effect do
     GET_ADDITIONAL_CARD,
@@ -75,6 +76,7 @@ enum class TextEffectTag {
     WHEN_DO_WIND_AROUND,
     WHEN_LOSE_GAME,
     WHEN_CHOOSE_LIFE_DAMAGE,
+    WHEN_THIS_CARD_REACTED,
 
     CONDITION_ADD_DO_WIND_AROUND,
 

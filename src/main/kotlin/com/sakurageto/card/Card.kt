@@ -14,6 +14,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     var flipped: Boolean
     var nap: Int? = null
 
+    var cardUseEndEffect = HashMap<Int, Text>()
+
     init {
         vertical = true
         flipped = true
@@ -360,6 +362,10 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     }
 
     suspend fun behaviorUseNormal(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?){
+        for(card in game_status.getPlayer(player).enchantmentCard.values){
+            card.addValidEffect(TextEffectTag.WHEN_USE_BEHAVIOR_END, cardUseEndEffect)
+        }
+
         if(this.card_data.umbrellaMark) {
             when (game_status.getUmbrella(this.player)) {
                 Umbrella.FOLD -> {
@@ -393,11 +399,6 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 }
             }
         }
-
-        for(card in game_status.getPlayer(player).enchantmentCard.values){
-            effectAllValidEffect(player, game_status, TextEffectTag.WHEN_USE_BEHAVIOR_END)
-        }
-
     }
 
     suspend fun enchantmentUseNormal(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?) {
@@ -459,6 +460,18 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 }
             }
         }
+
+        if(card_data.sub_type == SubType.FULL_POWER){
+            for(card in game_status.getPlayer(player).usedSpecialCard.values){
+                card.addValidEffect(TextEffectTag.WHEN_FULL_POWER_USED_YOUR, cardUseEndEffect)
+            }
+        }
+        else if(card_data.sub_type == SubType.REACTION){
+            for(card in game_status.getPlayer(player).enchantmentCard.values){
+                card.addValidEffect(TextEffectTag.WHEN_USE_REACT_CARD_YOUR_END, cardUseEndEffect)
+            }
+        }
+        react_attack?.addValidEffect(TextEffectTag.WHEN_THIS_CARD_REACTED, cardUseEndEffect)
 
         when(this.card_data.card_type){
             CardType.ATTACK -> {
@@ -613,6 +626,20 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             for(text in it){
                 if (text.tag == TextEffectTag.SHOW_HAND_WHEN_CHANGE_UMBRELLA){
                     text.effect!!(card_number, player, game_status, null)
+                }
+            }
+        }
+    }
+
+    // It is assumed that no more than two are added
+    fun addValidEffect(effectTag: TextEffectTag, queue: HashMap<Int, Text>){
+        card_data.effect?.let {
+            for(text in it){
+                if(usedEffectUsable(text) || enchantmentUsable(text)){
+                    if(text.tag == effectTag) {
+                        queue[this.card_number] = text
+                        return
+                    }
                 }
             }
         }

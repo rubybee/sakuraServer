@@ -94,6 +94,8 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var sealInformation = HashMap<Int, Int>()
     var outOfGame = HashMap<Int, Card>()
 
+    fun checkAuraFull(): Boolean = aura + freezeToken >= maxAura
+
     fun getFullAuraDamage(): MutableList<Int>{
         val selectable = mutableListOf<Int>()
         if(this.aura > 0){

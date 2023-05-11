@@ -2198,7 +2198,7 @@ object CardSet {
             if(cardList.size != 0){
                 val get = game_status.selectCardFrom(player, cardList, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 901, 1)[0]
                 game_status.popCardFrom(player, get, LocationEnum.POISON_BAG, false)?.let {
-                    game_status.insertCardTo(player.opposite(), it, LocationEnum.YOUR_DECK_TOP, false)
+                    game_status.insertCardTo(player.opposite(), it, LocationEnum.YOUR_DECK_TOP, publicForOther = true, publicForYour = false)
                 }
             }
             null
@@ -4805,6 +4805,48 @@ object CardSet {
         })
     }
 
+    private val snowBlade = CardData(CardClass.NORMAL, CardName.KORUNU_SNOW_BLADE, MegamiEnum.KORUNU, CardType.ATTACK, SubType.NONE)
+    private val revolvingBlade = CardData(CardClass.NORMAL, CardName.KORUNU_REVOLVING_BLADE, MegamiEnum.KORUNU, CardType.ATTACK, SubType.NONE)
+    private val bladeDance = CardData(CardClass.NORMAL, CardName.KORUNU_BLADE_DANCE, MegamiEnum.KORUNU, CardType.ATTACK, SubType.NONE)
+
+    private fun korunuCardInit(){
+        snowBlade.setAttack(DistanceType.CONTINUOUS, Pair(3, 4), null, 1, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        snowBlade.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.FREEZE) {_, player, game_status, _ ->
+            game_status.outToAuraFreeze(player.opposite(), 1)
+            null
+        })
+        revolvingBlade.setAttack(DistanceType.CONTINUOUS, Pair(2, 3), null, 2, 2,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        revolvingBlade.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_THIS_CARD_REACTED) { card_number, player, game_status, _->
+            while(true){
+                val nowCommand = game_status.receiveCardEffectSelect(player, 1501)
+                if(nowCommand == CommandEnum.SELECT_ONE){
+                    game_status.dustToDistance(2)
+                    break
+                }
+                else if(nowCommand == CommandEnum.SELECT_TWO){
+                    game_status.distanceToDust(2)
+                    break
+                }
+            }
+            null
+        })
+        bladeDance.setAttack(DistanceType.CONTINUOUS, Pair(4, 5), null, 2, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        bladeDance.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {buff_player, buff_game_status, _ ->
+                buff_game_status.getPlayer(buff_player.opposite()).checkAuraFull()
+            }, {_, _, attack ->
+                attack.apply {
+                    auraPlusMinus(1); lifePlusMinus(1)
+                }
+            }))
+            null
+        })
+
+    }
+
     fun init(){
         yurinaCardInit()
         saineCardInit()
@@ -4827,6 +4869,7 @@ object CardSet {
         oboroA1CardInit()
         chikageA1CardInit()
         utsuroA1CardInit()
+        korunuCardInit()
 
         hashMapInit()
         hashMapTest()

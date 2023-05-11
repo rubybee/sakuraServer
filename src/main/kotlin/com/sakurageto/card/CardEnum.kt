@@ -288,8 +288,20 @@ enum class CardName {
     UTSURO_MANG_A,
     UTSURO_ANNIHILATION_SHADOW,
     UTSURO_SILENT_WALK,
-    UTSURO_DE_MISE;
+    UTSURO_DE_MISE,
 
+    KORUNU_SNOW_BLADE,
+    KORUNU_REVOLVING_BLADE,
+    KORUNU_BLADE_DANCE,
+    KORUNU_RIDE_SNOW,
+    KORUNU_ABSOLUTE_ZERO,
+    KORUNU_FROSTBITE,
+    KORUNU_FROST_THORN_BUSH,
+
+    KORUNU_CONLU_RUYANPEH,
+    KORUNU_LETAR_LERA,
+    KORUNU_UPPASTUM,
+    KORUNU_PORUCHARTO;
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -841,6 +853,11 @@ enum class CardName {
                     HONOKA_SAKURA_WING, HONOKA_SAKURA_AMULET, HONOKA_COMMAND,
                     HONOKA_TAIL_WIND,
                 )
+                KORUNU -> listOf(
+                    KORUNU_SNOW_BLADE, KORUNU_REVOLVING_BLADE, KORUNU_BLADE_DANCE,
+                    KORUNU_RIDE_SNOW, KORUNU_ABSOLUTE_ZERO, KORUNU_FROSTBITE,
+                    KORUNU_FROST_THORN_BUSH
+                )
             }
         }
 
@@ -919,6 +936,10 @@ enum class CardName {
                     UTSURO_REVERBERATE_DEVICE_KURURUSIK, UTSURO_HEO_WI, UTSURO_JONG_MAL,
                     UTSURO_MA_SIG
                 )
+                KORUNU -> listOf(
+                    KORUNU_CONLU_RUYANPEH, KORUNU_LETAR_LERA, KORUNU_UPPASTUM,
+                    KORUNU_PORUCHARTO
+                )
             }
         }
 
@@ -960,6 +981,7 @@ enum class CardName {
                     HONOKA_GUARDIAN_SPIRIT_SIK, HONOKA_ASSAULT_SPIRIT_SIK, HONOKA_DIVINE_OUKA,
                     HONOKA_REGENERATION, HONOKA_HONOKA_SPARKLE, HONOKA_HAND_FLOWER, HONOKA_A_NEW_OPENING
                 )
+                KORUNU -> listOf()
             }
         }
 

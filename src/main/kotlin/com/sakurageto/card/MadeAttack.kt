@@ -500,4 +500,15 @@ class MadeAttack(
         return true
     }
 
+    fun addValidEffect(effectTag: TextEffectTag, queue: HashMap<Int, Text>){
+        this.effect?.let {
+            for(text in it){
+                if(text.tag == effectTag) {
+                    queue[this.card_number] = text
+                    return
+                }
+            }
+        }
+    }
+
 }

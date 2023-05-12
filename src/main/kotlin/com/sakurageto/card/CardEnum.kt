@@ -300,8 +300,22 @@ enum class CardName {
 
     KORUNU_CONLU_RUYANPEH,
     KORUNU_LETAR_LERA,
-    KORUNU_UPPASTUM,
-    KORUNU_PORUCHARTO;
+    KORUNU_UPASTUM,
+    KORUNU_PORUCHARTO,
+
+    YATSUHA_STAR_NAIL,
+    YATSUHA_DARKNESS_GILL,
+    YATSUHA_MIRROR_DEVIL,
+    YATSUHA_GHOST_STEP,
+    YATSUHA_WILLING,
+    YATSUHA_CONTRACT,
+    YATSUHA_CLINGY_FLOWER,
+
+    YATSUHA_TWO_LEAP_MIRROR_DIVINE,
+    YATSUHA_FOUR_LEAP_SONG,
+    YATSUHA_SIX_STAR_SEA,
+    YATSUHA_EIGHT_MIRROR_OTHER_SIDE;
+
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -858,6 +872,11 @@ enum class CardName {
                     KORUNU_RIDE_SNOW, KORUNU_ABSOLUTE_ZERO, KORUNU_FROSTBITE,
                     KORUNU_FROST_THORN_BUSH
                 )
+                YATSUHA -> listOf(
+                    YATSUHA_STAR_NAIL, YATSUHA_DARKNESS_GILL, YATSUHA_MIRROR_DEVIL,
+                    YATSUHA_GHOST_STEP, YATSUHA_WILLING, YATSUHA_CONTRACT,
+                    YATSUHA_CLINGY_FLOWER
+                )
             }
         }
 
@@ -937,8 +956,12 @@ enum class CardName {
                     UTSURO_MA_SIG
                 )
                 KORUNU -> listOf(
-                    KORUNU_CONLU_RUYANPEH, KORUNU_LETAR_LERA, KORUNU_UPPASTUM,
+                    KORUNU_CONLU_RUYANPEH, KORUNU_LETAR_LERA, KORUNU_UPASTUM,
                     KORUNU_PORUCHARTO
+                )
+                YATSUHA -> listOf(
+                    YATSUHA_TWO_LEAP_MIRROR_DIVINE, YATSUHA_FOUR_LEAP_SONG, YATSUHA_SIX_STAR_SEA,
+                    YATSUHA_EIGHT_MIRROR_OTHER_SIDE
                 )
             }
         }
@@ -982,6 +1005,7 @@ enum class CardName {
                     HONOKA_REGENERATION, HONOKA_HONOKA_SPARKLE, HONOKA_HAND_FLOWER, HONOKA_A_NEW_OPENING
                 )
                 KORUNU -> listOf()
+                YATSUHA -> listOf()
             }
         }
 
@@ -999,4 +1023,10 @@ enum class DamageSelect {
     AURA,
     LIFE,
     BOTH
+}
+
+enum class Arrow {
+    ONE_DIRECTION,
+    BOTH_DIRECTION,
+    NULL;
 }

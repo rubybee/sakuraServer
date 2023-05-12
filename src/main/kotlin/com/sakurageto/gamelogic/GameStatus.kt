@@ -363,6 +363,22 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
+    var player1AuraListener: ArrayDeque<Listener> = ArrayDeque()
+    var player2AuraListener: ArrayDeque<Listener> = ArrayDeque()
+
+    fun getAuraListener(player: PlayerEnum): ArrayDeque<Listener>{
+        return when(player){
+            PlayerEnum.PLAYER1 -> player1AuraListener
+            PlayerEnum.PLAYER2 -> player2AuraListener
+        }
+    }
+
+    fun addAuraListener(player: PlayerEnum, listener: Listener) {
+        when (player) {
+            PlayerEnum.PLAYER1 -> player1AuraListener.addLast(listener)
+            PlayerEnum.PLAYER2 -> player2AuraListener.addLast(listener)
+        }
+    }
 
     suspend fun moveTokenCardToSome(player: PlayerEnum, place: Int, number: Int, card: Card){
         if(place == 9) cardToDistance(player, number, card)
@@ -389,9 +405,25 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return false
     }
 
+    suspend fun auraListenerProcess(player: PlayerEnum, beforeFull: Boolean, afterFull: Boolean){
+        val auraListener = getAuraListener(player)
+        if(!(auraListener.isEmpty())){
+            for(i in 1..auraListener.size){
+                if(auraListener.isEmpty()) break
+                val now = auraListener.first()
+                auraListener.removeFirst()
+                if(!(now.doAction(this, -1, -1, booleanPara1 = beforeFull, booleanPara2 = afterFull))){
+                    auraListener.addLast(now)
+                }
+            }
+        }
+        //TODO("SOME AURA CHANGE FUNCTION ADDED, THIS FUNCTION MUST BE EDDITED")
+    }
+
     suspend fun outToAuraFreeze(player: PlayerEnum, number: Int){
         if (number == 0) return
         val nowPlayer = getPlayer(player)
+        val beforeFull = nowPlayer.checkAuraFull()
         var value = number
         val emptyPlace = nowPlayer.maxAura - nowPlayer.freezeToken - nowPlayer.aura
 
@@ -403,11 +435,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.FREEZE_TOKEN,
             LocationEnum.OUT_OF_GAME, LocationEnum.YOUR_AURA, value, -1)
+        val afterFull = nowPlayer.checkAuraFull()
+        auraListenerProcess(player, beforeFull, afterFull)
     }
 
     suspend fun outToAura(player: PlayerEnum, number: Int){
         if (number == 0) return
         val nowPlayer = getPlayer(player)
+        val beforeFull = nowPlayer.checkAuraFull()
         var value = number
 
         val emptyPlace = nowPlayer.maxAura - nowPlayer.aura - nowPlayer.freezeToken
@@ -419,6 +454,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.OUT_OF_GAME, LocationEnum.YOUR_AURA, value, -1)
+        val afterFull = nowPlayer.checkAuraFull()
+        auraListenerProcess(player, beforeFull, afterFull)
     }
 
     suspend fun outToFlare(player: PlayerEnum, number: Int){
@@ -436,6 +473,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         var value = number
 
         val nowPlayer = getPlayer(playerGet)
+        val beforeFull = nowPlayer.checkAuraFull()
         val emptyPlace = nowPlayer.maxAura - nowPlayer.aura - nowPlayer.freezeToken
 
         if(getPlayerAura(playerGive) < value) value = getPlayerAura(playerGive)
@@ -448,6 +486,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         sendMoveToken(getSocket(playerGive), getSocket(playerGet), TokenEnum.SAKURA_TOKEN,
             LocationEnum.YOUR_AURA, LocationEnum.OTHER_AURA, value, -1)
+        val afterFull = nowPlayer.checkAuraFull()
+        auraListenerProcess(playerGet, beforeFull, afterFull)
     }
 
     suspend fun auraToDistance(player: PlayerEnum, number: Int){
@@ -493,6 +533,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         var value = number
 
         val nowPlayer = getPlayer(player)
+        val beforeFull = nowPlayer.checkAuraFull()
         val emptyPlace = nowPlayer.maxAura - nowPlayer.aura - nowPlayer.freezeToken
 
         if(emptyPlace < value){
@@ -510,6 +551,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.YOUR_AURA, value, card.card_number)
+        val afterFull = nowPlayer.checkAuraFull()
+        auraListenerProcess(player, beforeFull, afterFull)
     }
 
     suspend fun cardToFlare(player: PlayerEnum, number: Int?, card: Card, location: LocationEnum = LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD){
@@ -588,6 +631,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         var value = number
         val nowPlayer = getPlayer(player)
+        val beforeFull = nowPlayer.checkAuraFull()
         val emptyPlace = nowPlayer.maxAura - nowPlayer.aura - nowPlayer.freezeToken
 
         if(emptyPlace < value){
@@ -604,6 +648,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         nowPlayer.aura += value
         sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.DISTANCE, LocationEnum.YOUR_AURA, value, -1)
+        val afterFull = nowPlayer.checkAuraFull()
+        auraListenerProcess(player, beforeFull, afterFull)
     }
 
     suspend fun cardToDustCheck(player: PlayerEnum, number: Int, card: Card): Boolean{
@@ -777,6 +823,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if (number == 0) return
         val nowPlayer = getPlayer(player)
         var value = number
+        val beforeFull = nowPlayer.checkAuraFull()
         val emptyPlace = nowPlayer.maxAura - nowPlayer.freezeToken - nowPlayer.aura
 
         if(number > dust){
@@ -792,6 +839,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.DUST, LocationEnum.YOUR_AURA, value, -1)
+        val afterFull = nowPlayer.checkAuraFull()
+        auraListenerProcess(player, beforeFull, afterFull)
     }
 
     suspend fun dustToFlare(player: PlayerEnum, number: Int){
@@ -871,6 +920,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         val flarePlayer = getPlayer(flare_player)
         val auraPlayer = getPlayer(aura_player)
+        val beforeFull = auraPlayer.checkAuraFull()
+
         var value = number
 
         if(flarePlayer.flare < number){
@@ -892,7 +943,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             sendMoveToken(getSocket(flare_player), getSocket(flare_player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.YOUR_FLARE, LocationEnum.OTHER_AURA, value, -1)
         }
-
+        val afterFull = auraPlayer.checkAuraFull()
+        auraListenerProcess(aura_player, beforeFull, afterFull)
     }
 
     suspend fun chasmProcess(player: PlayerEnum){
@@ -1292,7 +1344,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun useCardFrom(player: PlayerEnum, card: Card, location: LocationEnum, react: Boolean, react_attack: MadeAttack?,
-                            isCost: Boolean, isConsume: Boolean): Boolean{
+                            isCost: Boolean, isConsume: Boolean, napChange: Int = -1): Boolean{
         val cost = card.canUse(player, this, react_attack, isCost, isConsume)
         if(cost != -2){
             if(isCost) card.effectText(player, this, react_attack, TextEffectTag.COST)
@@ -1568,7 +1620,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
 
         for(nowCard in player1.enchantmentCard.values){
-            val nap = nowCard.reduceNapNormal()
+            val nap = nowCard.reduceNapNormal(PlayerEnum.PLAYER1, this)
             if(nap >= 1){
                 cardToDust(PlayerEnum.PLAYER1, nap, nowCard)
             }
@@ -1578,7 +1630,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
 
         for(nowCard in player2.enchantmentCard.values){
-            val nap = nowCard.reduceNapNormal()
+            val nap = nowCard.reduceNapNormal(PlayerEnum.PLAYER2, this)
             if(nap >= 1){
                 cardToDust(PlayerEnum.PLAYER2, nap, nowCard)
             }
@@ -2196,7 +2248,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
             CommandEnum.ACTION_WIND_AROUND -> !(dust == 0 || nowPlayer.aura == nowPlayer.maxAura ||
                     checkAdditionalBasicOperation(player, TextEffectTag.CONDITION_ADD_DO_WIND_AROUND))
-            CommandEnum.ACTION_INCUBATE -> nowPlayer.aura != 0
+            CommandEnum.ACTION_INCUBATE -> (nowPlayer.aura != 0 || nowPlayer.freezeToken != 0) && basicOperationEnchantmentCheck(player, CommandEnum.ACTION_INCUBATE)
             CommandEnum.ACTION_BREAK_AWAY -> {
                 !(dust == 0 || getAdjustDistance(player) > getAdjustSwellDistance(player) || distanceToken == 10) && basicOperationEnchantmentCheck(player, CommandEnum.ACTION_BREAK_AWAY)
             }
@@ -2257,6 +2309,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(canDoBasicOperation(player, CommandEnum.ACTION_GO_FORWARD)){
             val nowSocket = getSocket(player)
             val otherSocket = getSocket(player.opposite())
+            val nowPlayer = getPlayer(player)
+            val beforeFull = nowPlayer.checkAuraFull()
 
             sendDoBasicAction(nowSocket, otherSocket, CommandEnum.ACTION_GO_FORWARD_YOUR, card)
             distanceToken -= 1
@@ -2264,9 +2318,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             if(thisTurnDistance < 0){
                 thisTurnDistance = 0
             }
-            getPlayer(player).aura += 1
+            nowPlayer.aura += 1
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.DISTANCE, LocationEnum.YOUR_AURA, 1, -1)
+            val afterFull = nowPlayer.checkAuraFull()
+            auraListenerProcess(player, beforeFull, afterFull)
         }
 
 
@@ -2301,6 +2357,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
             if(additionalCheck != 0) return
             val nowPlayer = getPlayer(player)
+            val beforeFull = nowPlayer.checkAuraFull()
 
             val nowSocket = getSocket(player)
             val otherSocket = getSocket(player.opposite())
@@ -2310,6 +2367,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             nowPlayer.aura += 1
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.DUST, LocationEnum.YOUR_AURA, 1, -1)
+            val afterFull = nowPlayer.checkAuraFull()
+            auraListenerProcess(player, beforeFull, afterFull)
         }
     }
 
@@ -2322,10 +2381,17 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             val otherSocket = getSocket(player.opposite())
 
             sendDoBasicAction(nowSocket, otherSocket, CommandEnum.ACTION_INCUBATE_YOUR, card)
-            nowPlayer.aura -= 1
-            nowPlayer.flare += 1
-            sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
-                LocationEnum.YOUR_AURA, LocationEnum.YOUR_FLARE, 1, -1)
+            if(nowPlayer.freezeToken >= 1){
+                nowPlayer.freezeToken -= 1
+                sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.FREEZE_TOKEN,
+                    LocationEnum.YOUR_AURA, LocationEnum.OUT_OF_GAME, 1, -1)
+            }
+            else{
+                nowPlayer.aura -= 1
+                nowPlayer.flare += 1
+                sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
+                    LocationEnum.YOUR_AURA, LocationEnum.YOUR_FLARE, 1, -1)
+            }
         }
     }
 

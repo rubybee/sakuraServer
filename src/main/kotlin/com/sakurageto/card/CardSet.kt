@@ -4808,6 +4808,14 @@ object CardSet {
     private val snowBlade = CardData(CardClass.NORMAL, CardName.KORUNU_SNOW_BLADE, MegamiEnum.KORUNU, CardType.ATTACK, SubType.NONE)
     private val revolvingBlade = CardData(CardClass.NORMAL, CardName.KORUNU_REVOLVING_BLADE, MegamiEnum.KORUNU, CardType.ATTACK, SubType.NONE)
     private val bladeDance = CardData(CardClass.NORMAL, CardName.KORUNU_BLADE_DANCE, MegamiEnum.KORUNU, CardType.ATTACK, SubType.NONE)
+    private val snowRide = CardData(CardClass.NORMAL, CardName.KORUNU_RIDE_SNOW, MegamiEnum.KORUNU, CardType.BEHAVIOR, SubType.NONE)
+    private val absoluteZero = CardData(CardClass.NORMAL, CardName.KORUNU_ABSOLUTE_ZERO, MegamiEnum.KORUNU, CardType.BEHAVIOR, SubType.NONE)
+    private val frostbite = CardData(CardClass.NORMAL, CardName.KORUNU_FROSTBITE, MegamiEnum.KORUNU, CardType.ENCHANTMENT, SubType.NONE)
+    private val thornBush = CardData(CardClass.NORMAL, CardName.KORUNU_FROST_THORN_BUSH, MegamiEnum.KORUNU, CardType.ENCHANTMENT, SubType.NONE)
+    private val conluRuyanpeh = CardData(CardClass.SPECIAL, CardName.KORUNU_CONLU_RUYANPEH, MegamiEnum.KORUNU, CardType.ATTACK, SubType.NONE)
+    private val letarLera = CardData(CardClass.SPECIAL, CardName.KORUNU_LETAR_LERA, MegamiEnum.KORUNU, CardType.BEHAVIOR, SubType.REACTION)
+    private val upastum = CardData(CardClass.SPECIAL, CardName.KORUNU_UPASTUM, MegamiEnum.KORUNU, CardType.ATTACK, SubType.NONE)
+    private val porucharto = CardData(CardClass.SPECIAL, CardName.KORUNU_PORUCHARTO, MegamiEnum.KORUNU, CardType.ENCHANTMENT, SubType.NONE)
 
     private fun korunuCardInit(){
         snowBlade.setAttack(DistanceType.CONTINUOUS, Pair(3, 4), null, 1, 1,
@@ -4844,6 +4852,167 @@ object CardSet {
             }))
             null
         })
+        snowRide.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _->
+            while(true){
+                val nowCommand = game_status.receiveCardEffectSelect(player, 1502)
+                if(selectDustToDistance(nowCommand, game_status)){
+                    break
+                }
+            }
+            if(game_status.getPlayer(player.opposite()).checkAuraFull()){
+                while(true){
+                    val nowCommand = game_status.receiveCardEffectSelect(player, 1503)
+                    when(nowCommand){
+                        CommandEnum.SELECT_ONE -> {
+                            game_status.dustToDistance(1)
+                            break
+                        }
+                        CommandEnum.SELECT_NOT -> {
+                            break
+                        }
+                        else -> {}
+                    }
+                }
+            }
+            null
+        })
+        absoluteZero.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
+            if(game_status.getFullAction(player)){
+                if(game_status.addPreAttackZone(player, MadeAttack(CardName.KORUNU_ABSOLUTE_ZERO, card_number, CardClass.NORMAL,
+                        DistanceType.CONTINUOUS, 1,  2, Pair(2, 5), null, MegamiEnum.KORUNU,
+                        cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
+                    )) ){
+                    game_status.afterMakeAttack(card_number, player, null)
+                }
+                val freezePlayer = game_status.getPlayer(player.opposite())
+                game_status.outToAuraFreeze(player.opposite(), freezePlayer.maxAura - freezePlayer.aura - freezePlayer.freezeToken)
+            }
+            null
+        })
+        absoluteZero.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
+            game_status.doWindAround(player, 201504)
+            if(game_status.getPlayer(player.opposite()).freezeToken >= 3){
+                game_status.doWindAround(player, 201504)
+            }
+            null
+        })
+        frostbite.setEnchantment(2)
+        frostbite.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.FREEZE) {_, player, game_status, _ ->
+            game_status.outToAuraFreeze(player.opposite(), 1)
+            null
+        })
+        frostbite.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.FORBID_INCUBATE_OTHER){_, _, _, _ ->
+            1
+        })
+        thornBush.setEnchantment(2)
+        thornBush.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT){card_number, player, game_status, _ ->
+            if(!(game_status.logger.checkThisTurnDoAttackNotSpecial(player))){
+                game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {
+                        _, _, _ -> true },
+                    { _, _, madeAttack ->
+                        madeAttack.apply {
+                            auraPlusMinus(1); lifePlusMinus(1)
+                        }
+                    }))
+            }
+            null
+        })
+        thornBush.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.DO_NOT_NAP) {_, player, game_status, _ ->
+            if(game_status.turnPlayer == player && game_status.getPlayer(player.opposite()).freezeToken >= 1) 1
+            else 0
+        })
+        conluRuyanpeh.setSpecial(4)
+        conluRuyanpeh.setAttack(DistanceType.CONTINUOUS, Pair(2, 3), null, 2, 3,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        conluRuyanpeh.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.WHEN_CHOOSE_AURA_DAMAGE) { _, player, game_status, _ ->
+            val freezePlayer = game_status.getPlayer(player.opposite())
+            game_status.outToAuraFreeze(player.opposite(), freezePlayer.maxAura - freezePlayer.aura - freezePlayer.freezeToken)
+            null
+        })
+        letarLera.setSpecial(2)
+        letarLera.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.REACT_ATTACK_INVALID) {card_number, player, game_status, reactedAttack ->
+            if(game_status.getPlayer(player.opposite()).checkAuraFull()){
+                reactedAttack?.addOtherBuff(OtherBuff(card_number, 1, OtherBuffTag.GET, { _, _, _ ->
+                    true
+                }, { _, _, attack ->
+                    attack.makeNotValid()
+                }))
+            }
+            else{
+                game_status.distanceToAura(player.opposite(), 1)
+            }
+            null
+        })
+        upastum.setSpecial(0)
+        upastum.setAttack(DistanceType.CONTINUOUS, Pair(2, 3), null, 0, 999,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        upastum.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.FREEZE) {_, player, game_status, _ ->
+            game_status.outToAuraFreeze(player.opposite(), 1)
+            null
+        })
+        upastum.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
+            game_status.addAuraListener(player, Listener(player, card_number) {_, cardNumber, _,
+                                                                                        _, before_full, after_full ->
+                if(!before_full && after_full){
+                    game_status.returnSpecialCard(player, cardNumber)
+                    true
+                }
+                else{
+                    false
+                }
+            })
+            null
+        })
+        porucharto.setSpecial(2)
+        porucharto.setEnchantment(2)
+        porucharto.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.CAN_REACTABLE) {_, _, _, _ ->
+            1
+        })
+        porucharto.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.COST_BUFF) {card_number, player, game_status, react_attack->
+            if(react_attack != null){
+                game_status.addThisTurnCostBuff(player, CostBuff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, card ->
+                    (card.card_data.card_name == CardName.KORUNU_PORUCHARTO)}, {cost ->
+                    cost + 2
+                }))
+            }
+            null
+        })
+        porucharto.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_SAKURA_TOKEN) { _, player, game_status, _ ->
+            while(true){
+                val nowCommand = game_status.receiveCardEffectSelect(player, 1509)
+                if(selectDustToDistance(nowCommand, game_status)) break
+            }
+            null
+        })
+        porucharto.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.FREEZE) { _, player, game_status, _ ->
+            game_status.outToAuraFreeze(player.opposite(), 1)
+            null
+        })
+        porucharto.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.USE_CARD) {card_number, player, game_status, _ ->
+            while(true){
+                when(game_status.receiveCardEffectSelect(player, 1510)){
+                    CommandEnum.SELECT_ONE -> {
+                        val card = game_status.getCardFrom(player, card_number, LocationEnum.ENCHANTMENT_ZONE)?: continue
+                        game_status.useCardFrom(player, card, LocationEnum.ENCHANTMENT_ZONE, false, null,
+                            isCost = true, isConsume = true, 4)
+                        break
+                    }
+                    CommandEnum.SELECT_NOT -> {
+                        break
+                    }
+                    else -> {
+
+                    }
+                }
+
+            }
+            null
+        })
+    }
+
+    private val willing = 1
+
+    private fun yatsuhaCardInit(){
 
     }
 
@@ -4870,6 +5039,7 @@ object CardSet {
         chikageA1CardInit()
         utsuroA1CardInit()
         korunuCardInit()
+        yatsuhaCardInit()
 
         hashMapInit()
         hashMapTest()

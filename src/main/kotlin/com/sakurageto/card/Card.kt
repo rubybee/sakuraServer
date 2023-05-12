@@ -76,12 +76,13 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     fun usedEffectUsable(text: Text): Boolean =
         text.timing_tag == TextEffectTimingTag.USED && this.special_card_state == SpecialCardEnum.PLAYED
 
-    fun reduceNapNormal(): Int{
+    suspend fun reduceNapNormal(player: PlayerEnum, game_status: GameStatus): Int{
        card_data.effect?.let {
-           for(i in it){
-               if(i.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT || i.timing_tag == TextEffectTimingTag.IN_DEPLOYMENT){
-                   when(i.tag){
+           for(text in it){
+               if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT || text.timing_tag == TextEffectTimingTag.IN_DEPLOYMENT){
+                   when(text.tag){
                        TextEffectTag.DO_NOT_NAP -> {
+                           text.effect!!(this.card_number, player, game_status, null)
                            return 0
                        }
                        else -> {
@@ -401,11 +402,16 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
     }
 
-    suspend fun enchantmentUseNormal(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?) {
+    suspend fun enchantmentUseNormal(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, nap_change: Int = -1) {
         for(card in game_status.getPlayer(player.opposite()).enchantmentCard.values){
             card.effectAllValidEffect(player.opposite(), game_status, TextEffectTag.WHEN_DEPLOYMENT_OTHER)
         }
-        var nowNeedNap = returnNap(player, game_status, react_attack) + game_status.getPlayer(player).napBuff
+        var nowNeedNap = if(nap_change == -1){
+            returnNap(player, game_status, react_attack) + game_status.getPlayer(player).napBuff
+        } else{
+            nap_change + game_status.getPlayer(player).napBuff
+        }
+
         if(nowNeedNap < 0) nowNeedNap = 0
         game_status.getPlayer(player).napBuff = 0
         when {
@@ -439,7 +445,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
     }
 
-    suspend fun use(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?){
+    suspend fun use(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, nap_change: Int = -1){
         this.card_data.effect?.let {
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
@@ -481,7 +487,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 behaviorUseNormal(player, game_status, react_attack)
             }
             CardType.ENCHANTMENT -> {
-                enchantmentUseNormal(player, game_status, react_attack)
+                enchantmentUseNormal(player, game_status, react_attack, nap_change)
             }
             CardType.UNDEFINED -> {}
         }
@@ -663,6 +669,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         val findTag = when(command){
             CommandEnum.ACTION_GO_BACKWARD -> if(forbidYour) TODO() else TextEffectTag.FORBID_GO_BACKWARD_OTHER
             CommandEnum.ACTION_BREAK_AWAY -> if(forbidYour) TODO() else TextEffectTag.FORBID_BREAK_AWAY_OTHER
+            CommandEnum.ACTION_INCUBATE -> if(forbidYour) TODO() else TextEffectTag.FORBID_INCUBATE_OTHER
             else -> TODO()
         }
         card_data.effect?.let {

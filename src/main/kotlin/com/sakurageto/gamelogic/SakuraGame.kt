@@ -356,6 +356,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
     }
 
     suspend fun startPhase(){
+        game_status.endCurrentPhase = false
         game_status.nowPhase = START_PHASE
         sendStartPhaseStart(getSocket(this.turn_player), getSocket(this.turn_player.opposite()))
         game_status.startPhaseDefaultFirst(this.turn_player)
@@ -367,6 +368,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
     }
 
     suspend fun mainPhase(){
+        game_status.endCurrentPhase = false
         game_status.nowPhase = MAIN_PHASE
         sendMainPhaseStart(getSocket(this.turn_player), getSocket(this.turn_player.opposite()))
         game_status.mainPhaseEffectProcess(this.turn_player)
@@ -388,11 +390,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         else{
             game_status.setPlayerFullAction(this.turn_player, false)
             while (true){
-                if(game_status.endCurrentPhase){
-                    game_status.endCurrentPhase = false
-                    return
-                }
-                else if(game_status.getEndTurn(this.turn_player)){
+                if(game_status.endCurrentPhase || game_status.getEndTurn(this.turn_player)){
                     return
                 }
                 val data = receiveActionRequest(getSocket(this.turn_player))
@@ -412,6 +410,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
     }
 
     suspend fun endPhase(){
+        game_status.endCurrentPhase = false
         game_status.nowPhase = END_PHASE
         sendEndPhaseStart(getSocket(this.turn_player), getSocket(this.turn_player.opposite()))
         game_status.endPhaseEffectProcess(this.turn_player)

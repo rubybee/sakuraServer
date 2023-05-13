@@ -150,12 +150,12 @@ class PlayerStatus(val player_enum: PlayerEnum) {
         return null
     }
 
-    suspend fun usedCardReturn(game_status: GameStatus): MutableList<Int>{
-        val result = mutableListOf<Int>()
+    suspend fun usedCardReturn(game_status: GameStatus){
         for (cardNumber in usedSpecialCard.keys){
-            if (usedSpecialCard[cardNumber]!!.returnCheck(player_enum, game_status)) result.add(cardNumber)
+            if (usedSpecialCard[cardNumber]!!.returnCheck(player_enum, game_status)){
+                game_status.endPhaseEffect[cardNumber] = Pair(CardEffectLocation.RETURN_YOUR, null)
+            }
         }
-        return result
     }
 
     fun infiniteInstallationCheck(): Boolean{
@@ -380,10 +380,12 @@ class PlayerStatus(val player_enum: PlayerEnum) {
 
     fun insertCardNumber(location: LocationEnum, list: MutableList<Int>, condition: (Card) -> Boolean){
         when(location){
-            LocationEnum.DISCARD -> for (card in discard) if(condition(card)) list.add(card.card_number)
+            LocationEnum.DISCARD_YOUR -> for (card in discard) if(condition(card)) list.add(card.card_number)
             LocationEnum.DECK -> for (card in normalCardDeck) if(condition(card)) list.add(card.card_number)
             LocationEnum.HAND -> for (card in hand.values) if(condition(card)) list.add(card.card_number)
-            LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.ENCHANTMENT_ZONE  -> for (card in enchantmentCard.values) if(condition(card)) list.add(card.card_number)
+            LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.ENCHANTMENT_ZONE, LocationEnum.OTHER_ENCHANTMENT_ZONE_CARD  -> {
+                for (card in enchantmentCard.values) if(condition(card)) list.add(card.card_number)
+            }
             LocationEnum.COVER_CARD -> for (card in cover_card) if(condition(card)) list.add(card.card_number)
             LocationEnum.YOUR_USED_CARD -> for (card in usedSpecialCard.values) if(condition(card)) list.add(card.card_number)
             else -> TODO()

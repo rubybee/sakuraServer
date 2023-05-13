@@ -1,19 +1,14 @@
 package com.sakurageto.protocol
 
 import com.sakurageto.Connection
-import com.sakurageto.RoomInformation
 import com.sakurageto.card.CardSet
-import com.sakurageto.card.PlayerEnum
 import com.sakurageto.gamelogic.Stratagem
 import com.sakurageto.protocol.CommandEnum.*
 import io.ktor.websocket.*
-import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.util.logging.LogManager
 
 val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
 
@@ -247,9 +242,9 @@ suspend fun sendGameEnd(winner: Connection, loser: Connection){
     send(loser, Json.encodeToString(dataLoser))
 }
 
-suspend fun sendCardEffectOrder(player: Connection, list: MutableList<Int>){
-    val preData = SakuraCardCommand(SELECT_EFFECT_ORDER, -1)
-    val data = SakuraSendData(SELECT_EFFECT_ORDER, list)
+suspend fun sendCardEffectOrder(player: Connection, command: CommandEnum, list: MutableList<Int>){
+    val preData = SakuraCardCommand(command, -1)
+    val data = SakuraSendData(command, list)
     send(player, Json.encodeToString(preData))
     send(player, Json.encodeToString(data))
 }
@@ -261,8 +256,8 @@ suspend fun sendCoverCardSelect(player: Connection, list: MutableList<Int>, reas
     send(player, Json.encodeToString(data))
 }
 
-suspend fun sendCardEffectSelect(player: Connection, card_number: Int){
-    val data = SakuraCardCommand(SELECT_CARD_EFFECT, card_number)
+suspend fun sendCardEffectSelect(player: Connection, card_number: Int, command: CommandEnum = SELECT_CARD_EFFECT){
+    val data = SakuraCardCommand(command, card_number)
     send(player, Json.encodeToString(data))
 }
 
@@ -652,12 +647,12 @@ suspend fun receiveActionRequestMain(player: Connection): Pair<CommandEnum, Int>
     }
 }
 
-suspend fun receiveCardEffectOrder(player: Connection, list: MutableList<Int>): Int{
-    sendCardEffectOrder(player, list)
-    return receiveCardEffectOrderMain(player, list)
+suspend fun receiveCardEffectOrder(player: Connection, command: CommandEnum, list: MutableList<Int>): Int{
+    sendCardEffectOrder(player, command, list)
+    return receiveCardEffectOrderMain(player, command, list)
 }
 
-suspend fun receiveCardEffectOrderMain(player: Connection, list: MutableList<Int>): Int{
+suspend fun receiveCardEffectOrderMain(player: Connection, command: CommandEnum, list: MutableList<Int>): Int{
     val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
 
     while (true) {
@@ -667,7 +662,7 @@ suspend fun receiveCardEffectOrderMain(player: Connection, list: MutableList<Int
                 val text = frame.readText()
                 try {
                     val data = json.decodeFromString<SakuraCardCommand>(text)
-                    if (data.command == SELECT_EFFECT_ORDER){
+                    if (data.command == command){
                         return data.card
                     }
                     else {
@@ -716,8 +711,8 @@ suspend fun receiveCoverCardSelectMain(player: Connection, list: MutableList<Int
     }
 }
 
-suspend fun receiveCardEffectSelect(player: Connection, card_number: Int): CommandEnum{
-    sendCardEffectSelect(player, card_number)
+suspend fun receiveCardEffectSelect(player: Connection, card_number: Int, command: CommandEnum = SELECT_CARD_EFFECT): CommandEnum{
+    sendCardEffectSelect(player, card_number, command)
     return receiveCardEffectSelectMain(player, card_number)
 }
 

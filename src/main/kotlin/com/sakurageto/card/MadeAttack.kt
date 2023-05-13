@@ -511,4 +511,19 @@ class MadeAttack(
         }
     }
 
+    fun copyAfterAttackTo(madeAttack: MadeAttack){
+        effect?.let {
+            for(text in it){
+                if(text.timing_tag == TextEffectTimingTag.AFTER_ATTACK){
+                    if(this.effect == null){
+                        this.effect = mutableListOf()
+                    }
+                    else{
+                        this.effect!!.add(text)
+                    }
+                }
+            }
+        }
+    }
+
 }

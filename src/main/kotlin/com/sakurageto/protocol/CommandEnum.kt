@@ -183,7 +183,8 @@ enum class CommandEnum {
 
     SELECT_CARD_REASON_CARD_EFFECT,
     SELECT_CARD_REASON_INSTALLATION,
-    SELECT_EFFECT_ORDER,
+    SELECT_AFTER_CARD_USED_EFFECT_ORDER,
+    SELECT_END_PHASE_EFFECT_ORDER,
 
     CHANGE_UMBRELLA_YOUR,
     CHANGE_UMBRELLA_OTHER,
@@ -205,7 +206,14 @@ enum class CommandEnum {
     SET_THUNDER_GAUGE_YOUR,
     SET_WIND_GAUGE_YOUR,
     SET_THUNDER_GAUGE_OTHER,
-    SET_WIND_GUAGE_OTHER;
+    SET_WIND_GUAGE_OTHER,
+
+    REDUCE_THIS_TURN_DISTANCE,
+    ADD_THIS_TURN_DISTANCE,
+    REDUCE_THIS_TURN_SWELL_DISTANCE,
+    ADD_THIS_TURN_SWELL_DISTANCE,
+
+    SELECT_ARROW_DIRECTION;
 
     fun Opposite(): CommandEnum{
         when(this){
@@ -356,7 +364,7 @@ enum class LocationEnum(var real_number: Int){
 
     //they are all only used to select card move location
     COVER_CARD(10),
-    DISCARD(11),
+    DISCARD_YOUR(11),
     DECK(12),
     HAND(13),
     OTHER_HAND(29),
@@ -373,7 +381,8 @@ enum class LocationEnum(var real_number: Int){
     POISON_BAG(23),
     ADDITIONAL_CARD(24),
     OUT_OF_GAME(25),
-    TRANSFORM(28);
+    TRANSFORM(28),
+    DISCARD_OTHER(32);
 
 
     fun Opposite(): LocationEnum{
@@ -395,10 +404,45 @@ enum class LocationEnum(var real_number: Int){
             OUT_OF_GAME -> OUT_OF_GAME
             YOUR_USED_CARD -> OTHER_USED_CARD
             OTHER_USED_CARD -> YOUR_USED_CARD
-            else -> DISCARD
+            else -> DISCARD_YOUR
         }
     }
     companion object {
         fun fromInt(value: Int) = LocationEnum.values().first { it.real_number == value }
+    }
+}
+
+//SELECT_ONE MEANS I SELECT AURA TO OUT
+enum class LocToLoc(var real_number: Int){
+    AURA_YOUR_TO_OUT(0),
+    FLARE_YOUR_TO_OUT(1),
+    AURA_OTHER_TO_AURA_YOUR(2),
+    AURA_YOUR_TO_DISTANCE(3),
+    AURA_YOUR_TO_FLARE_OTHER(4),
+    DISTANCE_TO_FLARE_YOUR(5),
+    AURA_OTHER_TO_DISTANCE(6),
+    DISTANCE_TO_DUST(7),
+    DUST_TO_LIFE_YOUR(8),
+    YOUR_LIFE_TO_YOUR_FLARE(9),
+    LIFE_YOUR_TO_DISTANCE(10),
+    DUST_TO_AURA_YOUR(11),
+    DUST_TO_FLARE_YOUR(12),
+    DUST_TO_LIFE_OTHER(13),
+    DUST_TO_FLARE_OTHER(14),
+    DUST_TO_AURA_OTHER(15),
+    DISTANCE_TO_FLARE_OTHER(16),
+    AURA_OTHER_TO_OUT(17),
+    FLARE_OTHER_TO_OUT(18),
+    AURA_OTHER_TO_FLARE_YOUR(19),
+    AURA_YOUR_TO_FLARE_YOUR(20),
+    AURA_OTHER_TO_FLARE_OTHER(21),
+    LIFE_OTHER_TO_DISTANCE(22);
+
+
+    fun encode(value: Int) = this.real_number + value * 100
+
+    companion object {
+        fun fromInt(value: Int) = LocToLoc.values().first { it.real_number == value }
+
     }
 }

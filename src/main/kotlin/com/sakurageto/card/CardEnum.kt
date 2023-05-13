@@ -25,7 +25,8 @@ enum class SpecialCardEnum {
 
 enum class CardClass {
     SPECIAL,
-    NORMAL
+    NORMAL,
+    NULL
 }
 
 enum class CardType {
@@ -1029,4 +1030,14 @@ enum class Arrow {
     ONE_DIRECTION,
     BOTH_DIRECTION,
     NULL;
+}
+
+enum class CardEffectLocation {
+    ENCHANTMENT_YOUR,
+    DISCARD_YOUR,
+    RETURN_YOUR,
+    USED_YOUR,
+    MEGAMI_1_YOUR,
+    MEGAMI_2_YOUR,
+    TEMP
 }

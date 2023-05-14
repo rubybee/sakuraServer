@@ -887,7 +887,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     //must check card is destruction
-    suspend fun cardToDust(player: PlayerEnum, number: Int?, card: Card){
+    suspend fun cardToDust(player: PlayerEnum, number: Int?, card: Card, location: LocationEnum = LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD){
         if(!(card.checkCanMoveToken(player, this)) || number == 0 || card.nap == 0 || card.nap == null || number == null) return
         val cardNap = card.nap!!
         var value = number
@@ -902,7 +902,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             card.nap = cardNap - value
 
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
-                LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.DUST, number, card.card_number)
+                location, LocationEnum.DUST, number, card.card_number)
         }
     }
 
@@ -2812,7 +2812,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     //select_player -> player who select card ||| player -> victim ||| function that select card in list(list check is not needed)
     suspend fun selectCardFrom(player: PlayerEnum, select_player: PlayerEnum, location_list: List<LocationEnum>,
-                               reason: CommandEnum, card_number: Int, condition: (Card) -> Boolean): MutableList<Int>?{
+                               reason: CommandEnum, card_number: Int, condition: suspend (Card) -> Boolean): MutableList<Int>?{
         val cardList = mutableListOf<Int>()
         val searchPlayer = getPlayer(player)
         val otherPlayer = getPlayer(player.opposite())
@@ -2960,9 +2960,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val otherSocket = getSocket(player.opposite())
         when(location){
             LocationEnum.ADDITIONAL_CARD -> {
-                val result = nowPlayer.additional_hand[card_name]?: return null
+                val result = nowPlayer.additionalHand[card_name]?: return null
                 sendPopCardZone(nowSocket, otherSocket, result.card_number, public, CommandEnum.POP_ADDITIONAL_YOUR)
-                nowPlayer.additional_hand.remove(card_name)
+                nowPlayer.additionalHand.remove(card_name)
                 return result
             }
             else -> TODO()
@@ -3033,7 +3033,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, publicForOther, CommandEnum.TRANSFORM_YOUR, publicForYour)
             }
             LocationEnum.ADDITIONAL_CARD -> {
-                nowPlayer.additional_hand[card.card_data.card_name] = card
+                nowPlayer.additionalHand[card.card_data.card_name] = card
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, publicForOther, CommandEnum.ADDITIONAL_YOUR, publicForYour)
             }
             else -> TODO()
@@ -3049,6 +3049,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
             CommandEnum.SHOW_HAND_ALL_YOUR -> list.addAll(nowPlayer.hand.keys)
             CommandEnum.SHOW_HAND_YOUR -> list.addAll(arrayOf(card_number))
+            CommandEnum.SHOW_SPECIAL_YOUR -> list.addAll(nowPlayer.special_card_deck.keys)
             else -> TODO()
         }
         sendShowInformation(command, getSocket(show_player), getSocket(show_player.opposite()), list)
@@ -3180,6 +3181,15 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
 
         return card
+    }
+
+    suspend fun moveOutCard(to_player: PlayerEnum, nameList: MutableList<CardName>, to_location: LocationEnum){
+        for(card_name in nameList){
+            Card.cardMakerByName(getPlayer(to_player).first_turn, card_name, to_player).let {
+                insertCardTo(to_player, it, to_location, false)
+            }
+        }
+
     }
 
     fun countToken(player: PlayerEnum, location: LocationEnum): Int{

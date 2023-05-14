@@ -213,7 +213,9 @@ enum class CommandEnum {
     REDUCE_THIS_TURN_SWELL_DISTANCE,
     ADD_THIS_TURN_SWELL_DISTANCE,
 
-    SELECT_ARROW_DIRECTION;
+    SELECT_ARROW_DIRECTION,
+    SHOW_SPECIAL_YOUR,
+    SHOW_SPECIAL_OTHER;
 
     fun Opposite(): CommandEnum{
         when(this){
@@ -312,6 +314,8 @@ enum class CommandEnum {
             INCREASE_WIND_GAUGE_YOUR -> return INCREASE_WIND_GAUGE_OTHER
             INCREASE_WIND_GAUGE_OTHER -> return INCREASE_WIND_GAUGE_YOUR
             ADDITIONAL_YOUR -> return ADDITIONAL_OTHER
+            SHOW_SPECIAL_YOUR -> return SHOW_SPECIAL_OTHER
+            SHOW_SPECIAL_OTHER -> return SHOW_SPECIAL_YOUR
             else -> TODO()
         }
     }
@@ -382,7 +386,9 @@ enum class LocationEnum(var real_number: Int){
     ADDITIONAL_CARD(24),
     OUT_OF_GAME(25),
     TRANSFORM(28),
-    DISCARD_OTHER(32);
+    DISCARD_OTHER(32),
+
+    ALL(33);
 
 
     fun Opposite(): LocationEnum{

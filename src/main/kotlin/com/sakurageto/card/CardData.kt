@@ -123,7 +123,7 @@ class CardData(
         this.charge = charge
     }
 
-    fun setSpecial(cost: Int){
+    fun setSpecial(cost: Int?){
         this.cost = cost
     }
 

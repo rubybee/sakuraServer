@@ -739,4 +739,23 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
         return true
     }
+
+    fun thisCardHaveStratagem(): Boolean{
+        card_data.effect?.let {
+            for(text in it){
+                if(text.tag == TextEffectTag.RUN_STRATAGEM) return true
+            }
+        }
+        return false
+    }
+
+    suspend fun runStratagem(player: PlayerEnum, game_status: GameStatus){
+        card_data.effect?.let {
+            for(text in it){
+                if(text.tag == TextEffectTag.RUN_STRATAGEM) {
+                    text.effect!!(card_number, player, game_status, null)
+                }
+            }
+        }
+    }
 }

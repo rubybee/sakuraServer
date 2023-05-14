@@ -315,8 +315,20 @@ enum class CardName {
     YATSUHA_TWO_LEAP_MIRROR_DIVINE,
     YATSUHA_FOUR_LEAP_SONG,
     YATSUHA_SIX_STAR_SEA,
-    YATSUHA_EIGHT_MIRROR_OTHER_SIDE;
+    YATSUHA_EIGHT_MIRROR_OTHER_SIDE,
 
+    SHINRA_ZHEN_YEN,
+    SHINRA_SA_DO,
+    SHINRA_ZEN_CHI_KYO_TEN,
+
+    KURURU_ANALYZE,
+    KURURU_DAUZING,
+    KURURU_LAST_RESEARCH,
+    KURURU_GRAND_GULLIVER,
+
+    SAINE_BETRAYAL,
+    SAINE_FLOWING_WALL,
+    SAINE_JEOL_CHANG_JEOL_HWA;
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -788,6 +800,10 @@ enum class CardName {
                     SAINE_HURUBEGI, SAINE_DOUBLEBEGI, SAINE_SOUND_OF_ICE, SAINE_GANPA, SAINE_GWONYUCK,
                     SAINE_ACCOMPANIMENT, SAINE_MOOEMBUCK
                 )
+                SAINE_A2 -> listOf(
+                    SAINE_BETRAYAL, SAINE_DOUBLEBEGI, SAINE_MOOGECHOO, SAINE_GANPA, SAINE_GWONYUCK,
+                    SAINE_CHOONGEMJUNG, SAINE_FLOWING_WALL
+                )
                 HIMIKA -> listOf(
                     HIMIKA_SHOOT, HIMIKA_RAPIDFIRE, HIMIKA_MAGNUMCANON, HIMIKA_FULLBURST,
                     HIMIKA_BACKSTEP, HIMIKA_BACKDRAFT, HIMIKA_SMOKE
@@ -822,6 +838,11 @@ enum class CardName {
                     SHINRA_KIBEN, SHINRA_INYONG, SHINRA_SEONDONG,
                     SHINRA_JANGDAM, SHINRA_NONPA
                 )
+                SHINRA_A1 -> listOf(
+                    SHINRA_IBLON, SHINRA_ZHEN_YEN,
+                    SHINRA_KIBEN, SHINRA_INYONG, SHINRA_SEONDONG,
+                    SHINRA_JANGDAM, SHINRA_SA_DO
+                )
                 HAGANE -> listOf(
                     HAGANE_CENTRIFUGAL_ATTACK, HAGANE_FOUR_WINDED_EARTHQUAKE,
                     HAGANE_GROUND_BREAKING, HAGANE_HYPER_RECOIL,
@@ -840,6 +861,11 @@ enum class CardName {
                 )
                 KURURU -> listOf(
                     KURURU_ELEKITTEL, KURURU_ACCELERATOR, KURURU_KURURUOONG,
+                    KURURU_TORNADO, KURURU_REGAINER, KURURU_MODULE,
+                    KURURU_REFLECTOR
+                )
+                KURURU_A1 -> listOf(
+                    KURURU_ANALYZE, KURURU_ACCELERATOR, KURURU_DAUZING,
                     KURURU_TORNADO, KURURU_REGAINER, KURURU_MODULE,
                     KURURU_REFLECTOR
                 )
@@ -896,6 +922,9 @@ enum class CardName {
                 SAINE_A1 -> listOf(
                     SAINE_YULDONGHOGEK, SAINE_DUET_TAN_JU_BING_MYEONG, SAINE_EMMOOSHOEBING, SAINE_JONGGEK
                 )
+                SAINE_A2 -> listOf(
+                    SAINE_YULDONGHOGEK, SAINE_HANGMUNGGONGJIN, SAINE_JEOL_CHANG_JEOL_HWA, SAINE_JONGGEK
+                )
                 HIMIKA -> listOf(
                     HIMIKA_REDBULLET, HIMIKA_CRIMSONZERO, HIMIKA_SCARLETIMAGINE, HIMIKA_BURMILIONFIELD
                 )
@@ -920,6 +949,9 @@ enum class CardName {
                 SHINRA -> listOf(
                     SHINRA_WANJEON_NONPA, SHINRA_DASIG_IHAE, SHINRA_CHEONJI_BANBAG, SHINRA_SAMRA_BAN_SHO
                 )
+                SHINRA_A1 -> listOf(
+                    SHINRA_WANJEON_NONPA, SHINRA_DASIG_IHAE, SHINRA_ZEN_CHI_KYO_TEN, SHINRA_SAMRA_BAN_SHO
+                )
                 HAGANE -> listOf(
                     HAGANE_GRAND_SKY_HOLE_CRASH, HAGANE_GRAND_BELL_MEGALOBEL, HAGANE_GRAND_GRAVITATION_ATTRACT,
                     HAGANE_GRAND_MOUNTAIN_RESPECT
@@ -934,6 +966,10 @@ enum class CardName {
                 )
                 KURURU -> listOf(
                     KURURU_DRAIN_DEVIL, KURURU_BIG_GOLEM, KURURU_INDUSTRIA,
+                    KURURU_KANSHOUSOUCHI_KURURUSIK
+                )
+                KURURU_A1 -> listOf(
+                    KURURU_DRAIN_DEVIL, KURURU_BIG_GOLEM, KURURU_LAST_RESEARCH,
                     KURURU_KANSHOUSOUCHI_KURURUSIK
                 )
                 THALLYA -> listOf(
@@ -974,6 +1010,7 @@ enum class CardName {
                 YURINA_A1 -> listOf()
                 SAINE -> listOf()
                 SAINE_A1 -> listOf()
+                SAINE_A2 -> listOf()
                 HIMIKA -> listOf()
                 HIMIKA_A1 -> listOf()
                 TOKOYO -> listOf()
@@ -1007,6 +1044,10 @@ enum class CardName {
                 )
                 KORUNU -> listOf()
                 YATSUHA -> listOf()
+                SHINRA_A1 -> listOf()
+                KURURU_A1 -> listOf(
+                    KURURU_GRAND_GULLIVER
+                )
             }
         }
 

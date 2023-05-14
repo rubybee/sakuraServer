@@ -220,17 +220,17 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
     }
 
     suspend fun selectCard(){
-        game_status.player1.unselected_card.addAll(CardName.returnNormalCardNameByMegami(game_status.player1.megami_1))
-        game_status.player1.unselected_card.addAll(CardName.returnNormalCardNameByMegami(game_status.player1.megami_2))
-        game_status.player2.unselected_card.addAll(CardName.returnNormalCardNameByMegami(game_status.player2.megami_1))
-        game_status.player2.unselected_card.addAll(CardName.returnNormalCardNameByMegami(game_status.player2.megami_2))
-        game_status.player1.unselected_specialcard.addAll(CardName.returnSpecialCardNameByMegami(game_status.player1.megami_1))
-        game_status.player1.unselected_specialcard.addAll(CardName.returnSpecialCardNameByMegami(game_status.player1.megami_2))
-        game_status.player2.unselected_specialcard.addAll(CardName.returnSpecialCardNameByMegami(game_status.player2.megami_1))
-        game_status.player2.unselected_specialcard.addAll(CardName.returnSpecialCardNameByMegami(game_status.player2.megami_2))
+        game_status.player1.unselectedCard.addAll(CardName.returnNormalCardNameByMegami(game_status.player1.megami_1))
+        game_status.player1.unselectedCard.addAll(CardName.returnNormalCardNameByMegami(game_status.player1.megami_2))
+        game_status.player2.unselectedCard.addAll(CardName.returnNormalCardNameByMegami(game_status.player2.megami_1))
+        game_status.player2.unselectedCard.addAll(CardName.returnNormalCardNameByMegami(game_status.player2.megami_2))
+        game_status.player1.unselectedSpecialCard.addAll(CardName.returnSpecialCardNameByMegami(game_status.player1.megami_1))
+        game_status.player1.unselectedSpecialCard.addAll(CardName.returnSpecialCardNameByMegami(game_status.player1.megami_2))
+        game_status.player2.unselectedSpecialCard.addAll(CardName.returnSpecialCardNameByMegami(game_status.player2.megami_1))
+        game_status.player2.unselectedSpecialCard.addAll(CardName.returnSpecialCardNameByMegami(game_status.player2.megami_2))
 
-        val send_request_player1 = SakuraCardSetSend(CommandEnum.SELECT_CARD, game_status.player1.unselected_card, game_status.player1.unselected_specialcard)
-        val send_request_player2 = SakuraCardSetSend(CommandEnum.SELECT_CARD, game_status.player2.unselected_card, game_status.player2.unselected_specialcard)
+        val send_request_player1 = SakuraCardSetSend(CommandEnum.SELECT_CARD, game_status.player1.unselectedCard, game_status.player1.unselectedSpecialCard)
+        val send_request_player2 = SakuraCardSetSend(CommandEnum.SELECT_CARD, game_status.player2.unselectedCard, game_status.player2.unselectedSpecialCard)
 
         player1.session.send(Json.encodeToString(send_request_player1))
         player2.session.send(Json.encodeToString(send_request_player2))
@@ -243,25 +243,25 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         val card_data_player2 : MutableList<CardName> = mutableListOf()
         val specialcard_data_player2 : MutableList<CardName> = mutableListOf()
 
-        if(checkCardSet(game_status.player1.unselected_card, player1_data.normal_card, 7))
+        if(checkCardSet(game_status.player1.unselectedCard, player1_data.normal_card, 7))
             card_data_player1.addAll(player1_data.normal_card!!)
         else
-            card_data_player1.addAll(game_status.player1.unselected_card.subList(0, 7))
+            card_data_player1.addAll(game_status.player1.unselectedCard.subList(0, 7))
 
-        if(checkCardSet(game_status.player2.unselected_card, player2_data.normal_card, 7))
+        if(checkCardSet(game_status.player2.unselectedCard, player2_data.normal_card, 7))
             card_data_player2.addAll(player2_data.normal_card!!)
         else
-            card_data_player2.addAll(game_status.player2.unselected_card.subList(0, 7))
+            card_data_player2.addAll(game_status.player2.unselectedCard.subList(0, 7))
 
-        if(checkCardSet(game_status.player1.unselected_specialcard, player1_data.special_card, 3))
+        if(checkCardSet(game_status.player1.unselectedSpecialCard, player1_data.special_card, 3))
             specialcard_data_player1.addAll(player1_data.special_card!!)
         else
-            specialcard_data_player1.addAll(game_status.player1.unselected_specialcard.subList(0, 3))
+            specialcard_data_player1.addAll(game_status.player1.unselectedSpecialCard.subList(0, 3))
 
-        if(checkCardSet(game_status.player2.unselected_specialcard, player2_data.special_card, 3))
+        if(checkCardSet(game_status.player2.unselectedSpecialCard, player2_data.special_card, 3))
             specialcard_data_player2.addAll(player2_data.special_card!!)
         else
-            specialcard_data_player2.addAll(game_status.player2.unselected_specialcard.subList(0, 3))
+            specialcard_data_player2.addAll(game_status.player2.unselectedSpecialCard.subList(0, 3))
 
         val end_player1_select = SakuraCardSetSend(CommandEnum.END_SELECT_CARD, card_data_player1, specialcard_data_player1)
         val end_player2_select = SakuraCardSetSend(CommandEnum.END_SELECT_CARD, card_data_player2, specialcard_data_player2)
@@ -295,7 +295,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
             val turnCheck = first_turn == PlayerEnum.PLAYER1
             for(card_name in additional_card_player1){
                 val card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER1)
-                game_status.player1.additional_hand[card.card_data.card_name] = card
+                game_status.player1.additionalHand[card.card_data.card_name] = card
             }
         }
 
@@ -303,7 +303,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
             val turnCheck = first_turn == PlayerEnum.PLAYER2
             for(card_name in additional_card_player2){
                 val card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER2)
-                game_status.player2.additional_hand[card.card_data.card_name] = card
+                game_status.player2.additionalHand[card.card_data.card_name] = card
             }
         }
 

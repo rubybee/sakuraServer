@@ -92,6 +92,9 @@ object CardSet {
         cardNumberHashmap[211] = CardName.SAINE_SOUND_OF_ICE
         cardNumberHashmap[212] = CardName.SAINE_ACCOMPANIMENT
         cardNumberHashmap[213] = CardName.SAINE_DUET_TAN_JU_BING_MYEONG
+        cardNumberHashmap[214] = CardName.SAINE_BETRAYAL
+        cardNumberHashmap[215] = CardName.SAINE_FLOWING_WALL
+        cardNumberHashmap[216] = CardName.SAINE_JEOL_CHANG_JEOL_HWA
 
         cardNumberHashmap[300] = CardName.HIMIKA_SHOOT
         cardNumberHashmap[301] = CardName.HIMIKA_RAPIDFIRE
@@ -164,6 +167,9 @@ object CardSet {
         cardNumberHashmap[708] = CardName.SHINRA_DASIG_IHAE
         cardNumberHashmap[709] = CardName.SHINRA_CHEONJI_BANBAG
         cardNumberHashmap[710] = CardName.SHINRA_SAMRA_BAN_SHO
+        cardNumberHashmap[711] = CardName.SHINRA_ZHEN_YEN
+        cardNumberHashmap[712] = CardName.SHINRA_SA_DO
+        cardNumberHashmap[713] = CardName.SHINRA_ZEN_CHI_KYO_TEN
 
         cardNumberHashmap[800] = CardName.HAGANE_CENTRIFUGAL_ATTACK
         cardNumberHashmap[801] = CardName.HAGANE_FOUR_WINDED_EARTHQUAKE
@@ -211,6 +217,10 @@ object CardSet {
         cardNumberHashmap[1011] = CardName.KURURU_DUPLICATED_GEAR_2
         cardNumberHashmap[1012] = CardName.KURURU_DUPLICATED_GEAR_3
         cardNumberHashmap[1013] = CardName.KURURU_KANSHOUSOUCHI_KURURUSIK
+        cardNumberHashmap[1014] = CardName.KURURU_ANALYZE
+        cardNumberHashmap[1015] = CardName.KURURU_DAUZING
+        cardNumberHashmap[1016] = CardName.KURURU_LAST_RESEARCH
+        cardNumberHashmap[1017] = CardName.KURURU_GRAND_GULLIVER
 
         cardNumberHashmap[1100] = CardName.THALLYA_BURNING_STEAM
         cardNumberHashmap[1101] = CardName.THALLYA_WAVING_EDGE
@@ -279,6 +289,31 @@ object CardSet {
         cardNumberHashmap[1416] = CardName.HONOKA_FOUR_SEASON_BACK
         cardNumberHashmap[1417] = CardName.HONOKA_FULL_BLOOM_PATH
 
+        cardNumberHashmap[1500] = CardName.KORUNU_SNOW_BLADE
+        cardNumberHashmap[1501] = CardName.KORUNU_REVOLVING_BLADE
+        cardNumberHashmap[1502] = CardName.KORUNU_BLADE_DANCE
+        cardNumberHashmap[1503] = CardName.KORUNU_RIDE_SNOW
+        cardNumberHashmap[1504] = CardName.KORUNU_ABSOLUTE_ZERO
+        cardNumberHashmap[1505] = CardName.KORUNU_FROSTBITE
+        cardNumberHashmap[1506] = CardName.KORUNU_FROST_THORN_BUSH
+        cardNumberHashmap[1507] = CardName.KORUNU_CONLU_RUYANPEH
+        cardNumberHashmap[1508] = CardName.KORUNU_LETAR_LERA
+        cardNumberHashmap[1509] = CardName.KORUNU_UPASTUM
+        cardNumberHashmap[1510] = CardName.KORUNU_PORUCHARTO
+
+        cardNumberHashmap[1600] = CardName.YATSUHA_STAR_NAIL
+        cardNumberHashmap[1601] = CardName.YATSUHA_DARKNESS_GILL
+        cardNumberHashmap[1602] = CardName.YATSUHA_MIRROR_DEVIL
+        cardNumberHashmap[1603] = CardName.YATSUHA_GHOST_STEP
+        cardNumberHashmap[1604] = CardName.YATSUHA_WILLING
+        cardNumberHashmap[1605] = CardName.YATSUHA_CONTRACT
+        cardNumberHashmap[1606] = CardName.YATSUHA_CLINGY_FLOWER
+        cardNumberHashmap[1607] = CardName.YATSUHA_TWO_LEAP_MIRROR_DIVINE
+        cardNumberHashmap[1608] = CardName.YATSUHA_FOUR_LEAP_SONG
+        cardNumberHashmap[1609] = CardName.YATSUHA_SIX_STAR_SEA
+        cardNumberHashmap[1610] = CardName.YATSUHA_EIGHT_MIRROR_OTHER_SIDE
+
+
         cardNumberHashmap[10100] = CardName.YURINA_CHAM
         cardNumberHashmap[10101] = CardName.YURINA_ILSUM
         cardNumberHashmap[10102] = CardName.YURINA_JARUCHIGI
@@ -308,6 +343,9 @@ object CardSet {
         cardNumberHashmap[10211] = CardName.SAINE_SOUND_OF_ICE
         cardNumberHashmap[10212] = CardName.SAINE_ACCOMPANIMENT
         cardNumberHashmap[10213] = CardName.SAINE_DUET_TAN_JU_BING_MYEONG
+        cardNumberHashmap[10214] = CardName.SAINE_BETRAYAL
+        cardNumberHashmap[10215] = CardName.SAINE_FLOWING_WALL
+        cardNumberHashmap[10216] = CardName.SAINE_JEOL_CHANG_JEOL_HWA
 
         cardNumberHashmap[10300] = CardName.HIMIKA_SHOOT
         cardNumberHashmap[10301] = CardName.HIMIKA_RAPIDFIRE
@@ -380,6 +418,9 @@ object CardSet {
         cardNumberHashmap[10708] = CardName.SHINRA_DASIG_IHAE
         cardNumberHashmap[10709] = CardName.SHINRA_CHEONJI_BANBAG
         cardNumberHashmap[10710] = CardName.SHINRA_SAMRA_BAN_SHO
+        cardNumberHashmap[10711] = CardName.SHINRA_ZHEN_YEN
+        cardNumberHashmap[10712] = CardName.SHINRA_SA_DO
+        cardNumberHashmap[10713] = CardName.SHINRA_ZEN_CHI_KYO_TEN
 
         cardNumberHashmap[10800] = CardName.HAGANE_CENTRIFUGAL_ATTACK
         cardNumberHashmap[10801] = CardName.HAGANE_FOUR_WINDED_EARTHQUAKE
@@ -427,6 +468,10 @@ object CardSet {
         cardNumberHashmap[11011] = CardName.KURURU_DUPLICATED_GEAR_2
         cardNumberHashmap[11012] = CardName.KURURU_DUPLICATED_GEAR_3
         cardNumberHashmap[11013] = CardName.KURURU_KANSHOUSOUCHI_KURURUSIK
+        cardNumberHashmap[11014] = CardName.KURURU_ANALYZE
+        cardNumberHashmap[11015] = CardName.KURURU_DAUZING
+        cardNumberHashmap[11016] = CardName.KURURU_LAST_RESEARCH
+        cardNumberHashmap[11017] = CardName.KURURU_GRAND_GULLIVER
 
         cardNumberHashmap[11100] = CardName.THALLYA_BURNING_STEAM
         cardNumberHashmap[11101] = CardName.THALLYA_WAVING_EDGE
@@ -495,6 +540,31 @@ object CardSet {
         cardNumberHashmap[11416] = CardName.HONOKA_FOUR_SEASON_BACK
         cardNumberHashmap[11417] = CardName.HONOKA_FULL_BLOOM_PATH
 
+        cardNumberHashmap[11500] = CardName.KORUNU_SNOW_BLADE
+        cardNumberHashmap[11501] = CardName.KORUNU_REVOLVING_BLADE
+        cardNumberHashmap[11502] = CardName.KORUNU_BLADE_DANCE
+        cardNumberHashmap[11503] = CardName.KORUNU_RIDE_SNOW
+        cardNumberHashmap[11504] = CardName.KORUNU_ABSOLUTE_ZERO
+        cardNumberHashmap[11505] = CardName.KORUNU_FROSTBITE
+        cardNumberHashmap[11506] = CardName.KORUNU_FROST_THORN_BUSH
+        cardNumberHashmap[11507] = CardName.KORUNU_CONLU_RUYANPEH
+        cardNumberHashmap[11508] = CardName.KORUNU_LETAR_LERA
+        cardNumberHashmap[11509] = CardName.KORUNU_UPASTUM
+        cardNumberHashmap[11510] = CardName.KORUNU_PORUCHARTO
+
+        cardNumberHashmap[11600] = CardName.YATSUHA_STAR_NAIL
+        cardNumberHashmap[11601] = CardName.YATSUHA_DARKNESS_GILL
+        cardNumberHashmap[11602] = CardName.YATSUHA_MIRROR_DEVIL
+        cardNumberHashmap[11603] = CardName.YATSUHA_GHOST_STEP
+        cardNumberHashmap[11604] = CardName.YATSUHA_WILLING
+        cardNumberHashmap[11605] = CardName.YATSUHA_CONTRACT
+        cardNumberHashmap[11606] = CardName.YATSUHA_CLINGY_FLOWER
+        cardNumberHashmap[11607] = CardName.YATSUHA_TWO_LEAP_MIRROR_DIVINE
+        cardNumberHashmap[11608] = CardName.YATSUHA_FOUR_LEAP_SONG
+        cardNumberHashmap[11609] = CardName.YATSUHA_SIX_STAR_SEA
+        cardNumberHashmap[11610] = CardName.YATSUHA_EIGHT_MIRROR_OTHER_SIDE
+
+
         cardDataHashmap[CardName.CARD_UNNAME] = unused
         cardDataHashmap[CardName.POISON_ANYTHING] = unused
 
@@ -521,6 +591,9 @@ object CardSet {
         cardDataHashmap[CardName.SAINE_HANGMUNGGONGJIN] = hangmunggongjin
         cardDataHashmap[CardName.SAINE_EMMOOSHOEBING] = emmooshoebing
         cardDataHashmap[CardName.SAINE_JONGGEK] = jonggek
+        cardDataHashmap[CardName.SAINE_BETRAYAL] = betrayer
+        cardDataHashmap[CardName.SAINE_FLOWING_WALL] = flowingWall
+        cardDataHashmap[CardName.SAINE_JEOL_CHANG_JEOL_HWA] = jeolChangJeolWha
 
         cardDataHashmap[CardName.HIMIKA_SHOOT] = shoot
         cardDataHashmap[CardName.HIMIKA_RAPIDFIRE] = rapidfire
@@ -583,6 +656,9 @@ object CardSet {
         cardDataHashmap[CardName.SHINRA_DASIG_IHAE] = dasicIhae
         cardDataHashmap[CardName.SHINRA_CHEONJI_BANBAG] = cheonjiBanBag
         cardDataHashmap[CardName.SHINRA_SAMRA_BAN_SHO] = samraBanSho
+        cardDataHashmap[CardName.SHINRA_ZHEN_YEN] = zhenYen
+        cardDataHashmap[CardName.SHINRA_SA_DO] = sado
+        cardDataHashmap[CardName.SHINRA_ZEN_CHI_KYO_TEN] = zenChiKyoTen
 
         cardDataHashmap[CardName.HAGANE_CENTRIFUGAL_ATTACK] = centrifugalAttack
         cardDataHashmap[CardName.HAGANE_FOUR_WINDED_EARTHQUAKE] = fourWindedEarthquake
@@ -628,6 +704,10 @@ object CardSet {
         cardDataHashmap[CardName.KURURU_DUPLICATED_GEAR_1] = dupliGear1
         cardDataHashmap[CardName.KURURU_DUPLICATED_GEAR_2] = dupliGear2
         cardDataHashmap[CardName.KURURU_DUPLICATED_GEAR_3] = dupliGear3
+        cardDataHashmap[CardName.KURURU_ANALYZE] = analyze
+        cardDataHashmap[CardName.KURURU_DAUZING] = dauzing
+        cardDataHashmap[CardName.KURURU_LAST_RESEARCH] = lastResearch
+        cardDataHashmap[CardName.KURURU_GRAND_GULLIVER] = grandGulliver
 
         cardDataHashmap[CardName.THALLYA_BURNING_STEAM] = burningSteam
         cardDataHashmap[CardName.THALLYA_WAVING_EDGE] = wavingEdge
@@ -721,6 +801,30 @@ object CardSet {
         cardDataHashmap[CardName.UTSURO_ANNIHILATION_SHADOW] = annihilationShadow
         cardDataHashmap[CardName.UTSURO_SILENT_WALK] = silentWalk
         cardDataHashmap[CardName.UTSURO_DE_MISE] = deMise
+
+        cardDataHashmap[CardName.KORUNU_SNOW_BLADE] = snowBlade
+        cardDataHashmap[CardName.KORUNU_REVOLVING_BLADE] = revolvingBlade
+        cardDataHashmap[CardName.KORUNU_BLADE_DANCE] = bladeDance
+        cardDataHashmap[CardName.KORUNU_RIDE_SNOW] = snowRide
+        cardDataHashmap[CardName.KORUNU_ABSOLUTE_ZERO] = absoluteZero
+        cardDataHashmap[CardName.KORUNU_FROSTBITE] = frostbite
+        cardDataHashmap[CardName.KORUNU_FROST_THORN_BUSH] = thornBush
+        cardDataHashmap[CardName.KORUNU_CONLU_RUYANPEH] = conluRuyanpeh
+        cardDataHashmap[CardName.KORUNU_LETAR_LERA] = letarLera
+        cardDataHashmap[CardName.KORUNU_UPASTUM] = upastum
+        cardDataHashmap[CardName.KORUNU_PORUCHARTO] = porucharto
+
+        cardDataHashmap[CardName.YATSUHA_STAR_NAIL] = starNail
+        cardDataHashmap[CardName.YATSUHA_DARKNESS_GILL] = darknessGill
+        cardDataHashmap[CardName.YATSUHA_MIRROR_DEVIL] = mirrorDevil
+        cardDataHashmap[CardName.YATSUHA_GHOST_STEP] = ghostStep
+        cardDataHashmap[CardName.YATSUHA_WILLING] = willing
+        cardDataHashmap[CardName.YATSUHA_CONTRACT] = contract
+        cardDataHashmap[CardName.YATSUHA_CLINGY_FLOWER] = clingyFlower
+        cardDataHashmap[CardName.YATSUHA_TWO_LEAP_MIRROR_DIVINE] = twoLeapMirrorDivine
+        cardDataHashmap[CardName.YATSUHA_FOUR_LEAP_SONG] = fourLeapSong
+        cardDataHashmap[CardName.YATSUHA_SIX_STAR_SEA] = sixStarSea
+        cardDataHashmap[CardName.YATSUHA_EIGHT_MIRROR_OTHER_SIDE] = eightMirrorOtherSide
     }
 
     private suspend fun selectDustToDistance(nowCommand: CommandEnum, game_status: GameStatus,
@@ -5616,6 +5720,53 @@ object CardSet {
         })
     }
 
+    private val betrayer = CardData(CardClass.NORMAL, CardName.SAINE_BETRAYAL, MegamiEnum.SAINE, CardType.ATTACK, SubType.NONE)
+    private val flowingWall = CardData(CardClass.NORMAL, CardName.SAINE_FLOWING_WALL, MegamiEnum.SAINE, CardType.ENCHANTMENT, SubType.NONE)
+    private val flowingWallText = Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
+        game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_AURA, Pair(2, 999), false, null, null)
+        game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {buff_player, buff_game_status, _ ->
+            gulSa(buff_player, buff_game_status)
+        }, {_, _, attack ->
+            attack.auraPlusMinus(1)
+        }))
+        null
+    }
+    private val jeolChangJeolWha = CardData(CardClass.SPECIAL, CardName.SAINE_JEOL_CHANG_JEOL_HWA, MegamiEnum.SAINE, CardType.ATTACK, SubType.NONE)
+
+    private fun saineA2CardInit(){
+        betrayer.setAttack(DistanceType.CONTINUOUS, Pair(4, 5), null, 1, 3,
+            cannotReactNormal = true, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        flowingWall.setEnchantment(2)
+        flowingWall.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.DAMAGE_AURA_REPLACEABLE_HERE) {_, _, _, _ ->
+            null
+        })
+        flowingWall.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
+            if(palSang(player, game_status) && game_status.turnPlayer == player){
+                if(game_status.addPreAttackZone(player, MadeAttack(CardName.SAINE_FLOWING_WALL, card_number, CardClass.NULL,
+                        DistanceType.CONTINUOUS, 0,  0, Pair(0, 5), null, MegamiEnum.SAINE,
+                        cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false).addTextAndReturn(flowingWallText))){
+                    game_status.afterMakeAttack(card_number, player, null)
+                }
+            }
+            null
+        })
+        jeolChangJeolWha.setSpecial(1)
+        jeolChangJeolWha.setAttack(DistanceType.CONTINUOUS, Pair(0, 10), null, 2, 999,
+            cannotReactNormal = true, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        jeolChangJeolWha.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.TERMINATION){_, _, _, _->
+            null
+        })
+        jeolChangJeolWha.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {_, player, game_status, react_attack ->
+            react_attack?.addTextAndReturn(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.WHEN_CHOOSE_AURA_DAMAGE) { _, in_player, in_game_status, _ ->
+                if(in_game_status.getPlayerAura(in_player.opposite()) == 0){
+                    game_status.endCurrentPhase = true
+                }
+                null
+            })
+            null
+        })
+
+    }
 
     fun init(){
         yurinaCardInit()
@@ -5643,6 +5794,7 @@ object CardSet {
         yatsuhaCardInit()
         shinraA1CardInit()
         kururuA1CardInit()
+        saineA2CardInit()
 
         hashMapInit()
         hashMapTest()

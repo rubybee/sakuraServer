@@ -62,6 +62,7 @@ enum class TextEffectTag {
     CHANGE_THIS_TURN_SWELL_DISTANCE,
     GAME_END,
     END_CURRENT_PHASE,
+    ADD_TEXT_TO_REACT_ATTACK,
 
     //description when this effect use
     WHEN_USE_BEHAVIOR_END,

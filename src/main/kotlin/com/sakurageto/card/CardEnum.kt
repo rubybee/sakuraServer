@@ -370,6 +370,9 @@ enum class CardName {
             put(SAINE_SOUND_OF_ICE, 211)
             put(SAINE_ACCOMPANIMENT, 212)
             put(SAINE_DUET_TAN_JU_BING_MYEONG, 213)
+            put(SAINE_BETRAYAL, 214)
+            put(SAINE_FLOWING_WALL, 215)
+            put(SAINE_JEOL_CHANG_JEOL_HWA, 216)
 
             put(HIMIKA_SHOOT, 300)
             put(HIMIKA_RAPIDFIRE, 301)
@@ -443,6 +446,9 @@ enum class CardName {
             put(SHINRA_DASIG_IHAE, 708)
             put(SHINRA_CHEONJI_BANBAG, 709)
             put(SHINRA_SAMRA_BAN_SHO, 710)
+            put(SHINRA_ZHEN_YEN, 711)
+            put(SHINRA_SA_DO, 712)
+            put(SHINRA_ZEN_CHI_KYO_TEN, 713)
 
             put(HAGANE_CENTRIFUGAL_ATTACK, 800)
             put(HAGANE_FOUR_WINDED_EARTHQUAKE, 801)
@@ -492,6 +498,10 @@ enum class CardName {
             put(KURURU_DUPLICATED_GEAR_2, 1011)
             put(KURURU_DUPLICATED_GEAR_3, 1012)
             put(KURURU_KANSHOUSOUCHI_KURURUSIK, 1013)
+            put(KURURU_ANALYZE, 1014)
+            put(KURURU_DAUZING, 1015)
+            put(KURURU_LAST_RESEARCH, 1016)
+            put(KURURU_GRAND_GULLIVER, 1017)
 
             put(THALLYA_BURNING_STEAM, 1100)
             put(THALLYA_WAVING_EDGE, 1101)
@@ -560,6 +570,30 @@ enum class CardName {
             put(HONOKA_UNDER_THE_NAME_OF_FLAG, 1415)
             put(HONOKA_FOUR_SEASON_BACK, 1416)
             put(HONOKA_FULL_BLOOM_PATH, 1417)
+
+            put(KORUNU_SNOW_BLADE, 1500)
+            put(KORUNU_REVOLVING_BLADE, 1501)
+            put(KORUNU_BLADE_DANCE, 1502)
+            put(KORUNU_RIDE_SNOW, 1503)
+            put(KORUNU_ABSOLUTE_ZERO, 1504)
+            put(KORUNU_FROSTBITE, 1505)
+            put(KORUNU_FROST_THORN_BUSH, 1506)
+            put(KORUNU_CONLU_RUYANPEH, 1507)
+            put(KORUNU_LETAR_LERA, 1508)
+            put(KORUNU_UPASTUM, 1509)
+            put(KORUNU_PORUCHARTO, 1510)
+
+            put(YATSUHA_STAR_NAIL, 1600)
+            put(YATSUHA_DARKNESS_GILL, 1601)
+            put(YATSUHA_MIRROR_DEVIL, 1602)
+            put(YATSUHA_GHOST_STEP, 1603)
+            put(YATSUHA_WILLING, 1604)
+            put(YATSUHA_CONTRACT, 1605)
+            put(YATSUHA_CLINGY_FLOWER, 1606)
+            put(YATSUHA_TWO_LEAP_MIRROR_DIVINE, 1607)
+            put(YATSUHA_FOUR_LEAP_SONG, 1608)
+            put(YATSUHA_SIX_STAR_SEA, 1609)
+            put(YATSUHA_EIGHT_MIRROR_OTHER_SIDE, 1610)
         }
         private val cardNameHashmapSecond = EnumMap<CardName, Int>(CardName::class.java).apply {
             //for second turn player 10000~19999
@@ -592,6 +626,9 @@ enum class CardName {
             put(SAINE_SOUND_OF_ICE, 10211)
             put(SAINE_ACCOMPANIMENT, 10212)
             put(SAINE_DUET_TAN_JU_BING_MYEONG, 10213)
+            put(SAINE_BETRAYAL, 10214)
+            put(SAINE_FLOWING_WALL, 10215)
+            put(SAINE_JEOL_CHANG_JEOL_HWA, 10216)
 
             put(HIMIKA_SHOOT, 10300)
             put(HIMIKA_RAPIDFIRE, 10301)
@@ -665,6 +702,9 @@ enum class CardName {
             put(SHINRA_DASIG_IHAE, 10708)
             put(SHINRA_CHEONJI_BANBAG, 10709)
             put(SHINRA_SAMRA_BAN_SHO, 10710)
+            put(SHINRA_ZHEN_YEN, 10711)
+            put(SHINRA_SA_DO, 10712)
+            put(SHINRA_ZEN_CHI_KYO_TEN, 10713)
 
             put(HAGANE_CENTRIFUGAL_ATTACK, 10800)
             put(HAGANE_FOUR_WINDED_EARTHQUAKE, 10801)
@@ -712,6 +752,10 @@ enum class CardName {
             put(KURURU_DUPLICATED_GEAR_2, 11011)
             put(KURURU_DUPLICATED_GEAR_3, 11012)
             put(KURURU_KANSHOUSOUCHI_KURURUSIK, 11013)
+            put(KURURU_ANALYZE, 11014)
+            put(KURURU_DAUZING, 11015)
+            put(KURURU_LAST_RESEARCH, 11016)
+            put(KURURU_GRAND_GULLIVER, 11017)
 
             put(THALLYA_BURNING_STEAM, 11100)
             put(THALLYA_WAVING_EDGE, 11101)
@@ -779,6 +823,30 @@ enum class CardName {
             put(HONOKA_UNDER_THE_NAME_OF_FLAG, 11415)
             put(HONOKA_FOUR_SEASON_BACK, 11416)
             put(HONOKA_FULL_BLOOM_PATH, 11417)
+
+            put(KORUNU_SNOW_BLADE, 11500)
+            put(KORUNU_REVOLVING_BLADE, 11501)
+            put(KORUNU_BLADE_DANCE, 11502)
+            put(KORUNU_RIDE_SNOW, 11503)
+            put(KORUNU_ABSOLUTE_ZERO, 11504)
+            put(KORUNU_FROSTBITE, 11505)
+            put(KORUNU_FROST_THORN_BUSH, 11506)
+            put(KORUNU_CONLU_RUYANPEH, 11507)
+            put(KORUNU_LETAR_LERA, 11508)
+            put(KORUNU_UPASTUM, 11509)
+            put(KORUNU_PORUCHARTO, 11510)
+
+            put(YATSUHA_STAR_NAIL, 11600)
+            put(YATSUHA_DARKNESS_GILL, 11601)
+            put(YATSUHA_MIRROR_DEVIL, 11602)
+            put(YATSUHA_GHOST_STEP, 11603)
+            put(YATSUHA_WILLING, 11604)
+            put(YATSUHA_CONTRACT, 11605)
+            put(YATSUHA_CLINGY_FLOWER, 11606)
+            put(YATSUHA_TWO_LEAP_MIRROR_DIVINE, 11607)
+            put(YATSUHA_FOUR_LEAP_SONG, 11608)
+            put(YATSUHA_SIX_STAR_SEA, 11609)
+            put(YATSUHA_EIGHT_MIRROR_OTHER_SIDE, 11610)
         }
 
         fun returnNormalCardNameByMegami(megami_name: MegamiEnum):List<CardName>{

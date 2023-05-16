@@ -17,7 +17,8 @@ class MadeAttack(
     private val cannotReactNormal: Boolean,
     private val cannotReactSpecial: Boolean,
     private val cannotReact: Boolean,
-    private val chogek: Boolean
+    private val chogek: Boolean,
+    private val inevitable: Boolean = false
 ) {
     var editedChogek = false
 
@@ -85,12 +86,17 @@ class MadeAttack(
         isItValid = false
     }
 
+    fun makeInevitable(){
+        editedInevitable = true
+    }
+
     var bothSideDamage = false
 
     fun setBothSideDamage(){
         bothSideDamage = true
     }
 
+    var editedInevitable = false
     var editedCannotReactNormal = false
     var editedCannotReactSpecial = false
     var editedCannotReact = false
@@ -108,6 +114,7 @@ class MadeAttack(
     }
 
     suspend fun activeOtherBuff(game_status: GameStatus, player: PlayerEnum, continuousOtherBuff: OtherBuffQueue){
+        editedInevitable = inevitable
         editedCannotReactNormal = cannotReactNormal
         editedCannotReactSpecial = cannotReactSpecial
         editedCannotReact = cannotReact
@@ -181,8 +188,6 @@ class MadeAttack(
         thisTempRangeBuff.addRangeBuff(buff)
     }
 
-    var inevitable = false
-
     suspend fun rangeCheck(now_range: Int, game_status: GameStatus, player: PlayerEnum, continuousRangeBuff: RangeBuffQueue): Boolean{
         editedDistanceType = distance_type
         editedDistanceCont = distance_cont
@@ -198,67 +203,132 @@ class MadeAttack(
             }
         }
 
-        return when(distance_type){
-            DistanceType.DISCONTINUOUS -> distance_uncont!![now_range]
-            DistanceType.CONTINUOUS -> distance_cont!!.first <= now_range && now_range <= distance_cont!!.second
+        return when(editedDistanceType){
+            DistanceType.DISCONTINUOUS -> editedDistanceUncont!![now_range]
+            DistanceType.CONTINUOUS -> editedDistanceCont!!.first <= now_range && now_range <= editedDistanceCont!!.second
         }
     }
 
     //closable true -> increment range from left
     fun plusMinusRange(number: Int, closable: Boolean){
-        when(editedDistanceType){
-            DistanceType.DISCONTINUOUS -> {
-                if (closable) {
-                    var min = -1
-                    for (i in 0..10) {
-                        if(editedDistanceUncont!![i]){
-                            min = i
-                            break
+        if(number >= 0){
+            when(editedDistanceType){
+                DistanceType.DISCONTINUOUS -> {
+                    if (closable) {
+                        var min = -1
+                        for (i in 0..10) {
+                            if(editedDistanceUncont!![i]){
+                                min = i
+                                break
+                            }
                         }
-                    }
-                    if(min != -1){
-                        for (i in min - 1 downTo  min - number){
-                            if(i < 0) continue
-                            editedDistanceUncont!![i] = true
+                        if(min != -1){
+                            for (i in min - 1 downTo  min - number){
+                                if(i < 0) continue
+                                editedDistanceUncont!![i] = true
+                            }
                         }
-                    }
-                }
-                else{
-                    var max = 11
-                    for (i in 10 downTo 0) {
-                        if(editedDistanceUncont!![i]){
-                            max = i
-                            break
-                        }
-                    }
-                    if(max != 11){
-                        for (i in max + 1..max + number){
-                            editedDistanceUncont!![i] = true
-                        }
-                    }
-                }
-            }
-            DistanceType.CONTINUOUS -> {
-                if (closable){
-                    if(editedDistanceCont!!.first == 0){
-                        return
                     }
                     else{
-                        var now = editedDistanceCont!!.first
-                        now -= number
-                        if(now < 0){
-                            now = 0
+                        var max = 11
+                        for (i in 10 downTo 0) {
+                            if(editedDistanceUncont!![i]){
+                                max = i
+                                break
+                            }
                         }
-                        editedDistanceCont = editedDistanceCont!!.copy(first = now)
+                        if(max != 11){
+                            for (i in max + 1..max + number){
+                                editedDistanceUncont!![i] = true
+                            }
+                        }
                     }
                 }
-                else{
-                    var now = editedDistanceCont!!.second
-                    now += number
-                    editedDistanceCont = editedDistanceCont!!.copy(second = now)
+                DistanceType.CONTINUOUS -> {
+                    if (closable){
+                        if(editedDistanceCont!!.first == 0){
+                            return
+                        }
+                        else{
+                            var now = editedDistanceCont!!.first
+                            now -= number
+                            if(now < 0){
+                                now = 0
+                            }
+                            editedDistanceCont = editedDistanceCont!!.copy(first = now)
+                        }
+                    }
+                    else{
+                        var now = editedDistanceCont!!.second
+                        now += number
+                        editedDistanceCont = editedDistanceCont!!.copy(second = now)
+                    }
                 }
             }
         }
+        else{
+
+            when(editedDistanceType){
+                DistanceType.DISCONTINUOUS -> {
+                    if (closable) {
+                        var min = -1
+                        for (i in 0..10) {
+                            if(editedDistanceUncont!![i]){
+                                min = i
+                                break
+                            }
+                        }
+                        if(min != -1){
+                            for (i in min + number + 1..min){
+                                if(i < 0) continue
+                                editedDistanceUncont!![i] = false
+                            }
+                        }
+                    }
+                    else{
+                        var max = 11
+                        for (i in 10 downTo 0) {
+                            if(editedDistanceUncont!![i]){
+                                max = i
+                                break
+                            }
+                        }
+                        if(max != 11){
+                            for (i in max + number + 1..max){
+                                editedDistanceUncont!![i] = false
+                            }
+                        }
+                    }
+                }
+                DistanceType.CONTINUOUS -> {
+                    if (closable){
+                        if(editedDistanceCont!!.first == 0){
+                            return
+                        }
+                        else{
+                            var now = editedDistanceCont!!.first
+                            now -= number
+                            if(now < 0){
+                                now = 0
+                            }
+                            editedDistanceCont = editedDistanceCont!!.copy(first = now)
+                        }
+                    }
+                    else{
+                        var now = editedDistanceCont!!.second
+                        now += number
+                        editedDistanceCont = editedDistanceCont!!.copy(second = now)
+                    }
+                    if(editedDistanceCont!!.first < editedDistanceCont!!.second){
+                        editedDistanceType = DistanceType.DISCONTINUOUS
+                        editedDistanceUncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false)
+                        editedDistanceCont = null
+                    }
+                }
+            }
+        }
+
+
     }
 
     fun addRange(range: Pair<Int, Int>){
@@ -323,6 +393,13 @@ class MadeAttack(
                     for(text in it){
                         this.effect!!.add(text)
                     }
+                }?: run{
+                    card_data.effect?.let {
+                        this.effect = mutableListOf()
+                        for(text in it){
+                            this.effect!!.add(text)
+                        }
+                    }
                 }
             }
             Umbrella.UNFOLD -> {
@@ -330,6 +407,13 @@ class MadeAttack(
                     this.effect = mutableListOf()
                     for(text in it){
                         this.effect!!.add(text)
+                    }
+                }?: run{
+                    card_data.effect?.let {
+                        this.effect = mutableListOf()
+                        for(text in it){
+                            this.effect!!.add(text)
+                        }
                     }
                 }
             }
@@ -351,38 +435,55 @@ class MadeAttack(
     //{-2, 1, 4, -2, 4, 5, -1, 3, 5, 20, 0, 0, 0, 100}
     //{cont, distance..., cont, auro, life, megami, reactable, reactable_normal, reactable_special, cardNumber}
     fun Information(): MutableList<Int>{
-        var return_data = mutableListOf<Int>()
+        val returnData = mutableListOf<Int>()
         when(distance_type){
             DistanceType.DISCONTINUOUS -> {
-                return_data.add(-1)
+                returnData.add(-1)
                 for(i in distance_uncont!!.indices){
-                    if(distance_uncont!![i]) return_data.add(i)
+                    if(distance_uncont[i]) returnData.add(i)
                 }
-                return_data.add(-1)
+                returnData.add(-1)
             }
             DistanceType.CONTINUOUS -> {
-                return_data.add(-2)
-                return_data.add(distance_cont!!.first)
-                return_data.add(distance_cont!!.second)
-                return_data.add(-2)
+                returnData.add(-2)
+                returnData.add(distance_cont!!.first)
+                returnData.add(distance_cont.second)
+                returnData.add(-2)
             }
         }
-        return_data.add(aura_damage)
-        return_data.add(life_damage)
-        return_data.add(megami.real_number)
-        if(cannotReact) return_data.add(1) else return_data.add(0)
-        if(cannotReactNormal) return_data.add(1) else return_data.add(0)
-        if(cannotReactSpecial) return_data.add(1) else return_data.add(0)
-        return_data.add(card_number)
+        returnData.add(aura_damage)
+        returnData.add(life_damage)
+        returnData.add(megami.real_number)
+        if(cannotReact) returnData.add(1) else returnData.add(0)
+        if(cannotReactNormal) returnData.add(1) else returnData.add(0)
+        if(cannotReactSpecial) returnData.add(1) else returnData.add(0)
+        returnData.add(card_number)
 
-        return return_data
+        return returnData
     }
 
-    suspend fun afterAttackProcess(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?){
+    suspend fun afterAttackProcess(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, damageSelect: DamageSelect){
+        for(card in game_status.getPlayer(player.opposite()).enchantmentCard.values){
+            if(card.canUseEffectCheck(TextEffectTag.AFTER_ATTACK_EFFECT_INVALID_OTHER)){
+                return
+            }
+        }
         this.effect?.let{
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.AFTER_ATTACK){
-                    text.effect!!(this.card_number, player, game_status, react_attack)
+                    if(text.tag == TextEffectTag.WHEN_CHOOSE_AURA_DAMAGE){
+                        if(damageSelect == DamageSelect.AURA){
+                            text.effect!!(this.card_number, player, game_status, react_attack)
+                        }
+                    }
+                    else if(text.tag == TextEffectTag.WHEN_CHOOSE_LIFE_DAMAGE){
+                        if(damageSelect == DamageSelect.LIFE){
+                            text.effect!!(this.card_number, player, game_status, react_attack)
+                        }
+                    }
+                    else{
+                        text.effect!!(this.card_number, player, game_status, react_attack)
+                    }
                 }
             }
         }
@@ -397,6 +498,32 @@ class MadeAttack(
             }
         }
         return true
+    }
+
+    fun addValidEffect(effectTag: TextEffectTag, queue: HashMap<Int, Text>){
+        this.effect?.let {
+            for(text in it){
+                if(text.tag == effectTag) {
+                    queue[this.card_number] = text
+                    return
+                }
+            }
+        }
+    }
+
+    fun copyAfterAttackTo(madeAttack: MadeAttack){
+        effect?.let {
+            for(text in it){
+                if(text.timing_tag == TextEffectTimingTag.AFTER_ATTACK){
+                    if(this.effect == null){
+                        this.effect = mutableListOf()
+                    }
+                    else{
+                        this.effect!!.add(text)
+                    }
+                }
+            }
+        }
     }
 
 }

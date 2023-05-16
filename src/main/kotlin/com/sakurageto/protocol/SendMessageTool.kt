@@ -1,19 +1,14 @@
 package com.sakurageto.protocol
 
 import com.sakurageto.Connection
-import com.sakurageto.RoomInformation
 import com.sakurageto.card.CardSet
-import com.sakurageto.card.PlayerEnum
 import com.sakurageto.gamelogic.Stratagem
 import com.sakurageto.protocol.CommandEnum.*
 import io.ktor.websocket.*
-import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.util.logging.LogManager
 
 val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
 
@@ -29,6 +24,7 @@ suspend fun waitReconnect(player: Connection){
 
 suspend fun send(player: Connection, data: String){
     try {
+//        println("send message to ${player.socketPlayer}: $data")
         player.session.send(data)
         val frame = player.session.incoming.receive()
         if (frame is Frame.Text) {
@@ -90,9 +86,9 @@ suspend fun sendPopCardZone(mine: Connection, other: Connection, card_number: In
     send(other, Json.encodeToString(dataOther))
 }
 
-suspend fun sendAddCardZone(mine: Connection, other: Connection, card_number: Int, public: Boolean, command: CommandEnum){
-    val dataYour = SakuraCardCommand(command, card_number)
-    val dataOther = if(public) SakuraCardCommand(command.Opposite(), card_number) else SakuraCardCommand(command.Opposite(), if(CardSet.isPoison(card_number)) 1 else 0)
+suspend fun sendAddCardZone(mine: Connection, other: Connection, card_number: Int, publicForOther: Boolean, command: CommandEnum, publicForYour: Boolean = true){
+    val dataYour = if(publicForYour)SakuraCardCommand(command, card_number) else SakuraCardCommand(command, if(CardSet.isPoison(card_number)) 1 else 0)
+    val dataOther = if(publicForOther) SakuraCardCommand(command.Opposite(), card_number) else SakuraCardCommand(command.Opposite(), if(CardSet.isPoison(card_number)) 1 else 0)
     send(mine, Json.encodeToString(dataYour))
     send(other, Json.encodeToString(dataOther))
 }
@@ -233,8 +229,8 @@ suspend fun sendActionRequest(mine: Connection){
 }
 
 suspend fun sendDoBasicAction(mine: Connection, other: Connection, command: CommandEnum, card: Int){
-    val dataYour = SakuraCardCommand(command, card)
-    val dataOther = SakuraCardCommand(command.Opposite(), if(card == -1) -1 else 0)
+    val dataYour = SakuraCardCommand(command, if(card == -1) -1 else if(card >= 200000) card - 200000 else card)
+    val dataOther = SakuraCardCommand(command.Opposite(), if(card == -1) -1 else if(card >= 200000) card - 200000 else 0)
     send(mine, Json.encodeToString(dataYour))
     send(other, Json.encodeToString(dataOther))
 }
@@ -246,6 +242,13 @@ suspend fun sendGameEnd(winner: Connection, loser: Connection){
     send(loser, Json.encodeToString(dataLoser))
 }
 
+suspend fun sendCardEffectOrder(player: Connection, command: CommandEnum, list: MutableList<Int>){
+    val preData = SakuraCardCommand(command, -1)
+    val data = SakuraSendData(command, list)
+    send(player, Json.encodeToString(preData))
+    send(player, Json.encodeToString(data))
+}
+
 suspend fun sendCoverCardSelect(player: Connection, list: MutableList<Int>, reason: Int){
     val preData = SakuraCardCommand(COVER_CARD_SELECT, reason)
     val data = SakuraSendData(COVER_CARD_SELECT, list)
@@ -253,8 +256,8 @@ suspend fun sendCoverCardSelect(player: Connection, list: MutableList<Int>, reas
     send(player, Json.encodeToString(data))
 }
 
-suspend fun sendCardEffectSelect(player: Connection, card_number: Int){
-    val data = SakuraCardCommand(SELECT_CARD_EFFECT, card_number)
+suspend fun sendCardEffectSelect(player: Connection, card_number: Int, command: CommandEnum = SELECT_CARD_EFFECT){
+    val data = SakuraCardCommand(command, card_number)
     send(player, Json.encodeToString(data))
 }
 
@@ -311,6 +314,11 @@ suspend fun sendGetStratagem(mine: Connection, other: Connection, stratagem: Str
 suspend fun sendRequestBasicOperation(mine: Connection, card_number: Int){
     val data = SakuraCardCommand(REQUEST_BASIC_OPERATION, card_number)
     send(mine, Json.encodeToString(data))
+}
+
+suspend fun sendSimpleCommand(mine: Connection, command: CommandEnum){
+    val dataYour = SakuraCardCommand(command, -1)
+    send(mine, Json.encodeToString(dataYour))
 }
 
 suspend fun sendSimpleCommand(mine: Connection, other: Connection, command: CommandEnum){
@@ -576,6 +584,7 @@ suspend fun receiveFullPowerActionRequestMain(player: Connection): Pair<CommandE
                     val data = json.decodeFromString<SakuraCardCommand>(text)
                     if (data.command == ACTION_USE_CARD_HAND ||
                         data.command == ACTION_USE_CARD_SPECIAL ||
+                        data.command == ACTION_USE_CARD_COVER ||
                         data.command == ACTION_END_TURN
                     ){
                         return Pair(data.command, data.card)
@@ -638,6 +647,38 @@ suspend fun receiveActionRequestMain(player: Connection): Pair<CommandEnum, Int>
     }
 }
 
+suspend fun receiveCardEffectOrder(player: Connection, command: CommandEnum, list: MutableList<Int>): Int{
+    sendCardEffectOrder(player, command, list)
+    return receiveCardEffectOrderMain(player, command, list)
+}
+
+suspend fun receiveCardEffectOrderMain(player: Connection, command: CommandEnum, list: MutableList<Int>): Int{
+    val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
+
+    while (true) {
+        try {
+            val frame = player.session.incoming.receive()
+            if (frame is Frame.Text) {
+                val text = frame.readText()
+                try {
+                    val data = json.decodeFromString<SakuraCardCommand>(text)
+                    if (data.command == command){
+                        return data.card
+                    }
+                    else {
+                        continue
+                    }
+                }catch (e: Exception){
+                    continue
+                }
+            }
+        } catch (e: Exception) {
+            waitReconnect(player)
+            return receiveCoverCardSelectMain(player, list)
+        }
+    }
+}
+
 suspend fun receiveCoverCardSelect(player: Connection, list: MutableList<Int>, reason: Int): Int{
     sendCoverCardSelect(player, list, reason)
     return receiveCoverCardSelectMain(player, list)
@@ -670,8 +711,8 @@ suspend fun receiveCoverCardSelectMain(player: Connection, list: MutableList<Int
     }
 }
 
-suspend fun receiveCardEffectSelect(player: Connection, card_number: Int): CommandEnum{
-    sendCardEffectSelect(player, card_number)
+suspend fun receiveCardEffectSelect(player: Connection, card_number: Int, command: CommandEnum = SELECT_CARD_EFFECT): CommandEnum{
+    sendCardEffectSelect(player, card_number, command)
     return receiveCardEffectSelectMain(player, card_number)
 }
 
@@ -686,7 +727,7 @@ suspend fun receiveCardEffectSelectMain(player: Connection, card_number: Int): C
                 try {
                     val data = json.decodeFromString<SakuraCardCommand>(text)
                     when(data.command){
-                        SELECT_ONE, SELECT_TWO, SELECT_THREE, SELECT_FOUR, SELECT_NOT -> return data.command //will be added
+                        SELECT_ONE, SELECT_TWO, SELECT_THREE, SELECT_FOUR, SELECT_FIVE, SELECT_SIX, SELECT_SEVEN, SELECT_EIGHT, SELECT_NOT -> return data.command //will be added
                         else -> continue
                     }
                 }catch (e: Exception){

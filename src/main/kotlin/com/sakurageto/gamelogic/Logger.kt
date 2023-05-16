@@ -1,5 +1,7 @@
 package com.sakurageto.gamelogic
 
+import com.sakurageto.card.CardSet.toCardData
+import com.sakurageto.card.CardSet.toCardName
 import com.sakurageto.card.PlayerEnum
 
 class Logger {
@@ -43,6 +45,13 @@ class Logger {
     fun checkThisTurnDoAttack(player: PlayerEnum): Boolean{
         for(log in logQueue){
             if(log.player == player && log.text == LogText.ATTACK) return true
+        }
+        return false
+    }
+
+    fun checkThisTurnDoAttackNotSpecial(player: PlayerEnum): Boolean{
+        for(log in logQueue){
+            if(log.player == player && log.text == LogText.ATTACK && log.number2 != 2) return true
         }
         return false
     }

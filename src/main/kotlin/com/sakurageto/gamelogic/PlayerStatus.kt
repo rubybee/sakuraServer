@@ -1,10 +1,12 @@
 package com.sakurageto.gamelogic
 
 import com.sakurageto.card.*
+import com.sakurageto.card.CardSet.toCardData
 import com.sakurageto.card.CardSet.toCardName
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import com.sakurageto.protocol.SakuraSendData
+import java.lang.Exception
 import java.util.*
 import kotlin.collections.ArrayDeque
 import kotlin.collections.HashMap
@@ -25,6 +27,9 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var transformZone: EnumMap<CardName, Card> = EnumMap(CardName::class.java)
     var windGauge: Int? = null
     var thunderGauge: Int? = null
+    var justRunNoCondition: Boolean = false
+
+    var loseCounter = false
 
     var canNotGoForward: Boolean = false
     var didBasicOperation: Boolean = false
@@ -49,7 +54,7 @@ class PlayerStatus(val player_enum: PlayerEnum) {
                         if(data[index + 1] <= this.aura) data[index + 1]
                         else return false
                     } else{
-                        if(data[index + 1] <= enchantment_card[data[index]]!!.nap!!) data[index + 1]
+                        if(data[index + 1] <= enchantmentCard[data[index]]!!.nap!!) data[index + 1]
                         else return false
                     }
                 }
@@ -62,6 +67,11 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var freezeToken = 0
 
     var usingCard = ArrayDeque<Card>()
+
+    fun getCard(card_number: Int): Card = getCardFromUsed(card_number)?: getCardFromCover(card_number)?:
+    getCardFromSpecial(card_number)?: getCardFromHand(card_number)?: getCardFromDiscard(card_number)?:
+    getCardFromDeck(card_number)?: getCardFromAdditional(card_number)?: throw Exception("${card_number.toCardName()} not founded")
+
     fun getCardFromPlaying(card_number: Int): Card?{
         for(card in usingCard){
             if(card.card_number == card_number) return card
@@ -75,7 +85,11 @@ class PlayerStatus(val player_enum: PlayerEnum) {
         return hand[card_number]
     }
 
-    var enchantment_card: HashMap<Int, Card> = HashMap()
+    var enchantmentCard: HashMap<Int, Card> = HashMap()
+
+    fun getCardFromEnchantment(card_number: Int): Card?{
+        return enchantmentCard[card_number]
+    }
 
     var special_card_deck = HashMap<Int, Card>()
 
@@ -83,13 +97,15 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var sealInformation = HashMap<Int, Int>()
     var outOfGame = HashMap<Int, Card>()
 
+    fun checkAuraFull(): Boolean = aura + freezeToken >= maxAura
+
     fun getFullAuraDamage(): MutableList<Int>{
         val selectable = mutableListOf<Int>()
         if(this.aura > 0){
             selectable.add(LocationEnum.YOUR_AURA.real_number)
             selectable.add(this.aura)
         }
-        for(card in enchantment_card.values){
+        for(card in enchantmentCard.values){
             if(card.checkAuraReplaceable()){
                 selectable.add(card.card_number)
                 selectable.add(card.nap!!)
@@ -104,7 +120,7 @@ class PlayerStatus(val player_enum: PlayerEnum) {
         if(this.aura > 0){
             selectable.add(LocationEnum.YOUR_AURA.real_number)
         }
-        for(card in enchantment_card.values){
+        for(card in enchantmentCard.values){
             if(card.checkAuraReplaceable()){
                 totalAura += card.nap!!
                 selectable.add(card.card_number)
@@ -121,17 +137,28 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var normalCardDeck = ArrayDeque<Card>()
     var usedSpecialCard = HashMap<Int, Card>()
 
+    fun getCardFromUsed(index: Int): Card?{
+        return usedSpecialCard[index]
+    }
+
+    fun getCardFromDeck(card_number: Int): Card?{
+        for(card in normalCardDeck){
+            if(card.card_number == card_number) return card
+        }
+        return null
+    }
+
     fun getCardFromDeckTop(index: Int): Card?{
         if(normalCardDeck.size > index) return normalCardDeck[index]
         return null
     }
 
-    suspend fun usedCardReturn(game_status: GameStatus): MutableList<Int>{
-        val result = mutableListOf<Int>()
+    suspend fun usedCardReturn(game_status: GameStatus){
         for (cardNumber in usedSpecialCard.keys){
-            if (usedSpecialCard[cardNumber]!!.returnCheck(player_enum, game_status)) result.add(cardNumber)
+            if (usedSpecialCard[cardNumber]!!.returnCheck(player_enum, game_status)){
+                game_status.endPhaseEffect[cardNumber] = Pair(CardEffectLocation.RETURN_YOUR, null)
+            }
         }
-        return result
     }
 
     fun infiniteInstallationCheck(): Boolean{
@@ -205,15 +232,15 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var megamiCard: Card? = null
     var megamiCard2: Card? = null
 
-    var unselected_card: MutableList<CardName> = mutableListOf()
-    var unselected_specialcard: MutableList<CardName> = mutableListOf()
+    var unselectedCard: MutableList<CardName> = mutableListOf()
+    var unselectedSpecialCard: MutableList<CardName> = mutableListOf()
 
-    var additional_hand: EnumMap<CardName, Card> = EnumMap(CardName::class.java)
-    fun getCardFromAdditonal(card_name: CardName): Card?{
-        return additional_hand[card_name]
+    var additionalHand: EnumMap<CardName, Card> = EnumMap(CardName::class.java)
+    fun getCardFromAdditional(card_name: CardName): Card?{
+        return additionalHand[card_name]
     }
     fun getCardFromAdditional(card_number: Int): Card?{
-        return additional_hand[card_number.toCardName()]
+        return additionalHand[card_number.toCardName()]
     }
     var poisonBag: EnumMap<CardName, Card> = EnumMap(CardName::class.java)
 
@@ -338,30 +365,42 @@ class PlayerStatus(val player_enum: PlayerEnum) {
 
     fun deleteNormalUsedCard(card: MutableList<CardName>){
         for(name in card){
-            val now = unselected_card.indexOf(name)
+            val now = unselectedCard.indexOf(name)
             if(now != -1){
-                unselected_card.removeAt(now)
+                unselectedCard.removeAt(now)
             }
         }
     }
 
     fun deleteSpeicalUsedCard(card: MutableList<CardName>){
         for(name in card){
-            val now = unselected_card.indexOf(name)
+            val now = unselectedCard.indexOf(name)
             if(now != -1){
-                unselected_specialcard.removeAt(now)
+                unselectedSpecialCard.removeAt(now)
             }
         }
     }
 
-    fun insertCardNumber(location: LocationEnum, list: MutableList<Int>, condition: (Card) -> Boolean){
+    suspend fun insertCardNumber(location: LocationEnum, list: MutableList<Int>, condition: suspend (Card) -> Boolean){
         when(location){
-            LocationEnum.DISCARD -> for (card in discard) if(condition(card)) list.add(card.card_number)
+            LocationEnum.DISCARD_YOUR -> for (card in discard) if(condition(card)) list.add(card.card_number)
             LocationEnum.DECK -> for (card in normalCardDeck) if(condition(card)) list.add(card.card_number)
             LocationEnum.HAND -> for (card in hand.values) if(condition(card)) list.add(card.card_number)
-            LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD -> for (card in enchantment_card.values) if(condition(card)) list.add(card.card_number)
+            LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.ENCHANTMENT_ZONE, LocationEnum.OTHER_ENCHANTMENT_ZONE_CARD  -> {
+                for (card in enchantmentCard.values) if(condition(card)) list.add(card.card_number)
+            }
             LocationEnum.COVER_CARD -> for (card in cover_card) if(condition(card)) list.add(card.card_number)
-            LocationEnum.USED_CARD -> for (card in usedSpecialCard.values) if(condition(card)) list.add(card.card_number)
+            LocationEnum.YOUR_USED_CARD -> for (card in usedSpecialCard.values) if(condition(card)) list.add(card.card_number)
+            LocationEnum.ALL -> {
+                list.addAll(megami_1.getAllNormalCardName().map { it.toCardNumber(true) })
+                list.addAll(megami_2.getAllNormalCardName().map { it.toCardNumber(true) })
+                list.addAll(megami_1.getAllAdditionalCardName().filter
+                {it.toCardData().card_class == CardClass.NORMAL}.map
+                {it.toCardNumber(true)})
+                list.addAll(megami_2.getAllAdditionalCardName().filter
+                {it.toCardData().card_class == CardClass.NORMAL}.map
+                {it.toCardNumber(true)})
+            }
             else -> TODO()
         }
     }

@@ -95,10 +95,11 @@ class CardData(
     var cannotReactSpecial: Boolean = false
     var cannotReact: Boolean = false
     var chogek: Boolean = false
+    var inevitable: Boolean = false
 
     fun setAttack(distance_type: DistanceType, distance_cont: Pair<Int, Int>?, distance_uncont: MutableList<Int>?,
                   aura_damage: Int, life_damage: Int, cannotReactNormal: Boolean, cannotReactSpecial: Boolean,
-                  cannotReact: Boolean, chogek: Boolean){
+                  cannotReact: Boolean, chogek: Boolean, inevitable: Boolean = false){
         this.distance_type = distance_type
         if(distance_type == DistanceType.CONTINUOUS){
             this.distance_cont = Pair(distance_cont!!.first, distance_cont.second)
@@ -115,13 +116,14 @@ class CardData(
         this.cannotReactSpecial = cannotReactSpecial
         this.cannotReact = cannotReact
         this.chogek = chogek
+        this.inevitable = inevitable
     }
 
     fun setEnchantment(charge: Int){
         this.charge = charge
     }
 
-    fun setSpecial(cost: Int){
+    fun setSpecial(cost: Int?){
         this.cost = cost
     }
 

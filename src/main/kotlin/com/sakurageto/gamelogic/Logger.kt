@@ -51,7 +51,7 @@ class Logger {
 
     fun checkThisTurnDoAttackNotSpecial(player: PlayerEnum): Boolean{
         for(log in logQueue){
-            if(log.player == player && log.text == LogText.ATTACK && !(log.number1.toCardName().toCardData().isItSpecial())) return true
+            if(log.player == player && log.text == LogText.ATTACK && log.number2 != 2) return true
         }
         return false
     }

@@ -376,7 +376,7 @@ enum class LocationEnum(var real_number: Int){
     OTHER_DECK_TOP(15),
     YOUR_DECK_BELOW(16),
     OTHER_DECK_BELOW(17),
-    PLAYING_ZONE(18),
+    PLAYING_ZONE_YOUR(18),
     SPECIAL_CARD(19),
     YOUR_USED_CARD(20),
     OTHER_USED_CARD(32),
@@ -388,8 +388,8 @@ enum class LocationEnum(var real_number: Int){
     TRANSFORM(28),
     DISCARD_OTHER(32),
 
-    ALL(33);
-
+    ALL(33),
+    PLAYING_ZONE_OTHER(34);
 
     fun Opposite(): LocationEnum{
         return when(this){
@@ -410,6 +410,8 @@ enum class LocationEnum(var real_number: Int){
             OUT_OF_GAME -> OUT_OF_GAME
             YOUR_USED_CARD -> OTHER_USED_CARD
             OTHER_USED_CARD -> YOUR_USED_CARD
+            PLAYING_ZONE_YOUR -> PLAYING_ZONE_OTHER
+            PLAYING_ZONE_OTHER -> PLAYING_ZONE_YOUR
             else -> DISCARD_YOUR
         }
     }

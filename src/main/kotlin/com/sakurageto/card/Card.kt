@@ -82,8 +82,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT || text.timing_tag == TextEffectTimingTag.IN_DEPLOYMENT){
                    when(text.tag){
                        TextEffectTag.DO_NOT_NAP -> {
-                           text.effect!!(this.card_number, player, game_status, null)
-                           return 0
+                           return text.effect!!(this.card_number, player, game_status, null)!!
                        }
                        else -> {
                            continue

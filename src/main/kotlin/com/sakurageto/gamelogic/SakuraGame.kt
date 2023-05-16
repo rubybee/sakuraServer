@@ -134,7 +134,8 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
             }
         }
 
-        if(game_status.player1.megami_1 == MegamiEnum.SHINRA || game_status.player1.megami_2 == MegamiEnum.SHINRA){
+        if(game_status.player1.megami_1 == MegamiEnum.SHINRA || game_status.player1.megami_1 == MegamiEnum.SHINRA_A1 ||
+            game_status.player1.megami_2 == MegamiEnum.SHINRA || game_status.player1.megami_2 == MegamiEnum.SHINRA_A1){
             game_status.player1.stratagem = Stratagem.SHIN_SAN
             if(game_status.player1.megami_1 == MegamiEnum.SHINRA){
                 game_status.player1.megamiCard = Card.cardMakerByName(first_turn == PlayerEnum.PLAYER1, CardName.SHINRA_SHINRA, PlayerEnum.PLAYER1)
@@ -146,7 +147,8 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
             }
         }
 
-        if(game_status.player2.megami_1 == MegamiEnum.SHINRA || game_status.player2.megami_2 == MegamiEnum.SHINRA){
+        if(game_status.player2.megami_1 == MegamiEnum.SHINRA || game_status.player2.megami_1 == MegamiEnum.SHINRA_A1 ||
+            game_status.player2.megami_2 == MegamiEnum.SHINRA || game_status.player2.megami_2 == MegamiEnum.SHINRA_A1){
             game_status.player2.stratagem = Stratagem.SHIN_SAN
             if(game_status.player2.megami_1 == MegamiEnum.SHINRA){
                 game_status.player2.megamiCard = Card.cardMakerByName(first_turn == PlayerEnum.PLAYER2, CardName.SHINRA_SHINRA, PlayerEnum.PLAYER2)

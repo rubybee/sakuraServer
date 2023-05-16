@@ -1677,7 +1677,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
             if(cost == -1){
                 popCardFrom(player, card.card_number, location, true)
-                insertCardTo(player, card, LocationEnum.PLAYING_ZONE, true)
+                insertCardTo(player, card, LocationEnum.PLAYING_ZONE_YOUR, true)
                 gaugeIncreaseRequest(player, card)
                 sendUseCardMeesage(getSocket(player), getSocket(player.opposite()), react, card.card_number)
                 card.use(player, this, react_attack, napChange)
@@ -1688,7 +1688,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 flareToDust(player, cost, Arrow.NULL, player, card.player)
                 cleanAfterUseCost()
                 popCardFrom(player, card.card_number, location, true)
-                insertCardTo(player, card, LocationEnum.PLAYING_ZONE, true)
+                insertCardTo(player, card, LocationEnum.PLAYING_ZONE_YOUR, true)
                 gaugeIncreaseRequest(player, card)
                 sendUseCardMeesage(getSocket(player), getSocket(player.opposite()), react, card.card_number)
                 card.use(player, this, react_attack, napChange)
@@ -1732,7 +1732,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val nowAttack = nowPlayer.pre_attack_card!!
         nowPlayer.pre_attack_card = null
 
-        logger.insert(Log(player, LogText.ATTACK, nowAttack.card_number, nowAttack.card_number))
+        logger.insert(Log(player, LogText.ATTACK, nowAttack.card_number, when(nowAttack.card_class){
+            CardClass.SPECIAL -> 2
+            CardClass.NORMAL -> 1
+            CardClass.NULL -> 0
+        }))
 
         makeAttackComplete(nowSocket, otherSocket, card_number)
         sendAttackInformation(nowSocket, otherSocket, nowAttack.Information())
@@ -1809,7 +1813,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun movePlayingCard(player: PlayerEnum, place: LocationEnum?, card_number: Int){
-        val card = popCardFrom(player, card_number, LocationEnum.PLAYING_ZONE, true)?: return
+        val card = popCardFrom(player, card_number, LocationEnum.PLAYING_ZONE_YOUR, true)?: return
 
         if(place != null){
             if(card.card_data.card_class == CardClass.SPECIAL){
@@ -1945,9 +1949,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         for(nowCard in player1.enchantmentCard.values){
             val nap = nowCard.reduceNapNormal(PlayerEnum.PLAYER1, this)
-            if(nap >= 1){
-                cardToDust(PlayerEnum.PLAYER1, nap, nowCard)
-            }
+            cardToDust(PlayerEnum.PLAYER1, nap, nowCard)
             if(nowCard.isItDestruction()){
                 player1Card[nowCard.card_number] = true
             }
@@ -1955,9 +1957,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         for(nowCard in player2.enchantmentCard.values){
             val nap = nowCard.reduceNapNormal(PlayerEnum.PLAYER2, this)
-            if(nap >= 1){
-                cardToDust(PlayerEnum.PLAYER2, nap, nowCard)
-            }
+            cardToDust(PlayerEnum.PLAYER2, nap, nowCard)
             if(nowCard.isItDestruction()){
                 player2Card[nowCard.card_number] = true
             }
@@ -2917,7 +2917,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 nowPlayer.usedSpecialCard.remove(card_number)
                 return result
             }
-            LocationEnum.PLAYING_ZONE -> {
+            LocationEnum.PLAYING_ZONE_YOUR -> {
                 for(card in nowPlayer.usingCard) if (card.card_number == card_number) {
                     sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_PLAYING_YOUR)
                     nowPlayer.usingCard.remove(card)
@@ -2989,7 +2989,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 cardOwner.discard.addFirst(card)
                 sendAddCardZone(cardOwnerSocket, cardOwnerOppositeSocket, card.card_number, publicForOther, CommandEnum.DISCARD_CARD_YOUR, publicForYour)
             }
-            LocationEnum.PLAYING_ZONE -> {
+            LocationEnum.PLAYING_ZONE_YOUR -> {
                 nowPlayer.usingCard.addFirst(card)
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, publicForOther, CommandEnum.PLAYING_CARD_YOUR, publicForYour)
             }
@@ -3062,7 +3062,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             LocationEnum.DISCARD_YOUR -> getPlayer(player).getCardFromDiscard(card_number)
             LocationEnum.SPECIAL_CARD -> getPlayer(player).getCardFromSpecial(card_number)
             LocationEnum.YOUR_DECK_TOP -> getPlayer(player).getCardFromDeckTop(card_number)
-            LocationEnum.PLAYING_ZONE -> getPlayer(player).getCardFromPlaying(card_number)
+            LocationEnum.PLAYING_ZONE_YOUR -> getPlayer(player).getCardFromPlaying(card_number)
             LocationEnum.ADDITIONAL_CARD -> getPlayer(player).getCardFromAdditional(card_number)
             LocationEnum.YOUR_USED_CARD -> getPlayer(player).getCardFromUsed(card_number)
             LocationEnum.ENCHANTMENT_ZONE, LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD -> {

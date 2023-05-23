@@ -137,7 +137,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         if(game_status.player1.megami_1 == MegamiEnum.SHINRA || game_status.player1.megami_1 == MegamiEnum.SHINRA_A1 ||
             game_status.player1.megami_2 == MegamiEnum.SHINRA || game_status.player1.megami_2 == MegamiEnum.SHINRA_A1){
             game_status.player1.stratagem = Stratagem.SHIN_SAN
-            if(game_status.player1.megami_1 == MegamiEnum.SHINRA){
+            if(game_status.player1.megami_1 == MegamiEnum.SHINRA || game_status.player1.megami_1 == MegamiEnum.SHINRA_A1){
                 game_status.player1.megamiCard = Card.cardMakerByName(first_turn == PlayerEnum.PLAYER1, CardName.SHINRA_SHINRA, PlayerEnum.PLAYER1)
                 game_status.player1.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
             }
@@ -150,7 +150,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         if(game_status.player2.megami_1 == MegamiEnum.SHINRA || game_status.player2.megami_1 == MegamiEnum.SHINRA_A1 ||
             game_status.player2.megami_2 == MegamiEnum.SHINRA || game_status.player2.megami_2 == MegamiEnum.SHINRA_A1){
             game_status.player2.stratagem = Stratagem.SHIN_SAN
-            if(game_status.player2.megami_1 == MegamiEnum.SHINRA){
+            if(game_status.player2.megami_1 == MegamiEnum.SHINRA || game_status.player2.megami_1 == MegamiEnum.SHINRA_A1){
                 game_status.player2.megamiCard = Card.cardMakerByName(first_turn == PlayerEnum.PLAYER2, CardName.SHINRA_SHINRA, PlayerEnum.PLAYER2)
                 game_status.player2.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
             }
@@ -196,6 +196,16 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         if(game_status.player2.megami_1 == MegamiEnum.RAIRA || game_status.player2.megami_2 == MegamiEnum.RAIRA){
             game_status.getPlayer(PlayerEnum.PLAYER2).windGauge = 0
             game_status.getPlayer(PlayerEnum.PLAYER2).thunderGauge = 0
+        }
+
+        if(game_status.player1.megami_1 == MegamiEnum.HATSUMI || game_status.player1.megami_2 == MegamiEnum.HATSUMI){
+            game_status.getPlayer(PlayerEnum.PLAYER1).isThisTurnTailWind = true
+            game_status.getPlayer(PlayerEnum.PLAYER1).isNextTurnTailWind = true
+        }
+
+        if(game_status.player2.megami_1 == MegamiEnum.HATSUMI || game_status.player2.megami_2 == MegamiEnum.HATSUMI){
+            game_status.getPlayer(PlayerEnum.PLAYER2).isThisTurnTailWind = true
+            game_status.getPlayer(PlayerEnum.PLAYER2).isNextTurnTailWind = true
         }
         //additional board setting here
     }

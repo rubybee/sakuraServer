@@ -423,10 +423,10 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             }
             else -> {
                 while (true) {
-                    val receive_data =
+                    val receiveData =
                         receiveNapInformation(game_status.getSocket(player), nowNeedNap, this.card_number)
-                    val aura = receive_data.first
-                    val dust = receive_data.second
+                    val aura = receiveData.first
+                    val dust = receiveData.second
                     if (aura < 0 || dust < 0 || aura + dust != nowNeedNap || game_status.getPlayerAura(player) < aura || game_status.dust < dust) {
                         continue
                     }

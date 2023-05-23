@@ -208,6 +208,11 @@ enum class CommandEnum {
     SET_THUNDER_GAUGE_OTHER,
     SET_WIND_GUAGE_OTHER,
 
+    SET_TAIL_WIND_YOUR,
+    SET_TAIL_WIND_OTHER,
+    SET_HEAD_WIND_YOUR,
+    SET_HEAD_WIND_OTHER,
+
     REDUCE_THIS_TURN_DISTANCE,
     ADD_THIS_TURN_DISTANCE,
     REDUCE_THIS_TURN_SWELL_DISTANCE,
@@ -316,6 +321,10 @@ enum class CommandEnum {
             ADDITIONAL_YOUR -> return ADDITIONAL_OTHER
             SHOW_SPECIAL_YOUR -> return SHOW_SPECIAL_OTHER
             SHOW_SPECIAL_OTHER -> return SHOW_SPECIAL_YOUR
+            SET_TAIL_WIND_YOUR -> return SET_TAIL_WIND_OTHER
+            SET_TAIL_WIND_OTHER -> return SET_TAIL_WIND_YOUR
+            SET_HEAD_WIND_YOUR -> return SET_HEAD_WIND_OTHER
+            SET_HEAD_WIND_OTHER -> return SET_HEAD_WIND_YOUR
             else -> TODO()
         }
     }

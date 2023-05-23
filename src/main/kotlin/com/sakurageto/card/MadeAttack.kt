@@ -376,6 +376,45 @@ class MadeAttack(
         }
     }
 
+    fun deleteRange(range: Pair<Int, Int>){
+        when(editedDistanceType){
+            DistanceType.DISCONTINUOUS -> {
+                for(i in range.first..range.second){
+                    editedDistanceUncont!![i] = false
+                }
+            }
+            DistanceType.CONTINUOUS -> {
+                if(range.second >= editedDistanceCont!!.first) {
+                    if(range.first > editedDistanceCont!!.first){
+                        if(range.second >= editedDistanceCont!!.second){
+                            editedDistanceCont = editedDistanceCont!!.copy(second = range.first - 1)
+                        }
+                        else{
+                            editedDistanceType = DistanceType.DISCONTINUOUS
+                            editedDistanceUncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false)
+                            for(i in editedDistanceCont!!.first..editedDistanceCont!!.second){
+                                editedDistanceUncont!![i] = true
+                            }
+                            for(i in range.first..range.second){
+                                editedDistanceUncont!![i] = false
+                            }
+                        }
+                    }
+                    else{
+                        if(range.second >= editedDistanceCont!!.second){
+                            editedDistanceType = DistanceType.DISCONTINUOUS
+                            editedDistanceUncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false)
+                            editedDistanceCont = null
+                        }
+                        else{
+                            editedDistanceCont = editedDistanceCont!!.copy(first = range.second + 1)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     var effect: MutableList<Text>? = null
 
 

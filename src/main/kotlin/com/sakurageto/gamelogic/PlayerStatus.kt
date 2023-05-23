@@ -28,6 +28,8 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var windGauge: Int? = null
     var thunderGauge: Int? = null
     var justRunNoCondition: Boolean = false
+    var isThisTurnTailWind: Boolean? = null
+    var isNextTurnTailWind: Boolean? = null
 
     var loseCounter = false
 

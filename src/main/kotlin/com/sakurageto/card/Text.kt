@@ -36,6 +36,7 @@ enum class TextEffectTag {
     CHANGE_ARROW_BOTH,
 
     //just define what this effect do
+    DO_BASIC_OPERATION,
     THIS_CARD_NAP_CHANGE,
     ADD_END_PHASE_EFFECT,
     GET_ADDITIONAL_CARD,

@@ -1773,8 +1773,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             return
         }
 
-        if(nowAttack.isItValid){
-            if(nowAttack.editedInevitable || nowAttack.rangeCheck(getAdjustDistance(player), this, player, nowPlayer.rangeBuff)){
+        if(nowAttack.editedInevitable || nowAttack.rangeCheck(getAdjustDistance(player), this, player, nowPlayer.rangeBuff)){
+            if(otherPlayer.isNextTurnTailWind == true){
+                otherPlayer.isThisTurnTailWind = false
+            }
+            if(nowAttack.isItValid){
                 if(nowAttack.isItDamage){
                     if(nowAttack.beforeProcessDamageCheck(player, this, react_attack)){
                         val chosen = damageSelect(player.opposite(), damage)
@@ -2453,8 +2456,30 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             if(keys.size == 1){
                 val lastEffect = endPhaseEffect[keys[0]]
                 lastEffect!!.second!!.effect!!(keys[0], player, this, null)
+                endPhaseEffect.remove(keys[0])
             }
         }
+
+        if(player1.isNextTurnTailWind == true){
+            player1.isThisTurnTailWind = true
+            sendSimpleCommand(player1_socket, player2_socket, CommandEnum.SET_TAIL_WIND_YOUR)
+        }
+        if(player1.isNextTurnTailWind == false){
+            player1.isThisTurnTailWind = false
+            player1.isNextTurnTailWind = true
+            sendSimpleCommand(player1_socket, player2_socket, CommandEnum.SET_HEAD_WIND_YOUR)
+        }
+
+        if(player2.isNextTurnTailWind == true){
+            player2.isThisTurnTailWind = true
+            sendSimpleCommand(player2_socket, player1_socket, CommandEnum.SET_TAIL_WIND_YOUR)
+        }
+        if(player2.isNextTurnTailWind == false){
+            player2.isThisTurnTailWind = false
+            player2.isNextTurnTailWind = true
+            sendSimpleCommand(player2_socket, player1_socket, CommandEnum.SET_HEAD_WIND_YOUR)
+        }
+
 
         thisTurnSwellDistance = 2; thisTurnDistance = distanceToken
         player1.didBasicOperation = false; player2.didBasicOperation = false
@@ -2614,7 +2639,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             CommandEnum.ACTION_GO_BACKWARD -> {
                 !(nowPlayer.aura == 0 || distanceToken == 10) && basicOperationEnchantmentCheck(player, CommandEnum.ACTION_GO_BACKWARD)
             }
-            CommandEnum.ACTION_WIND_AROUND -> !(dust == 0 || nowPlayer.aura == nowPlayer.maxAura ||
+            CommandEnum.ACTION_WIND_AROUND -> !(dust == 0 || nowPlayer.aura + nowPlayer.freezeToken == nowPlayer.maxAura ||
                     checkAdditionalBasicOperation(player, TextEffectTag.CONDITION_ADD_DO_WIND_AROUND))
             CommandEnum.ACTION_INCUBATE -> (nowPlayer.aura != 0 || nowPlayer.freezeToken != 0) && basicOperationEnchantmentCheck(player, CommandEnum.ACTION_INCUBATE)
             CommandEnum.ACTION_BREAK_AWAY -> {

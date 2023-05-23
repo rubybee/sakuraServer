@@ -328,7 +328,20 @@ enum class CardName {
 
     SAINE_BETRAYAL,
     SAINE_FLOWING_WALL,
-    SAINE_JEOL_CHANG_JEOL_HWA;
+    SAINE_JEOL_CHANG_JEOL_HWA,
+
+    HATSUMI_WATER_BALL, //1700
+    HATSUMI_WATER_CURRENT,
+    HATSUMI_STRONG_ACID,
+    HATSUMI_TSUNAMI,
+    HATSUMI_JUN_BI_MAN_TAN,
+    HATSUMI_COMPASS,
+    HATSUMI_CALL_WAVE, //1706
+
+    HATSUMI_ISANA_HAIL,
+    HATSUMI_OYOGIBI_FIRE,
+    HATSUMI_KIRAHARI_LIGHTHOUSE,
+    HATSUMI_MIOBIKI_ROUTE;
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -972,6 +985,12 @@ enum class CardName {
                     YATSUHA_GHOST_STEP, YATSUHA_WILLING, YATSUHA_CONTRACT,
                     YATSUHA_CLINGY_FLOWER
                 )
+
+                HATSUMI -> listOf(
+                    HATSUMI_WATER_BALL, HATSUMI_WATER_CURRENT, HATSUMI_STRONG_ACID,
+                    HATSUMI_TSUNAMI, HATSUMI_JUN_BI_MAN_TAN, HATSUMI_COMPASS,
+                    HATSUMI_CALL_WAVE,
+                )
             }
         }
 
@@ -1068,6 +1087,11 @@ enum class CardName {
                     YATSUHA_TWO_LEAP_MIRROR_DIVINE, YATSUHA_FOUR_LEAP_SONG, YATSUHA_SIX_STAR_SEA,
                     YATSUHA_EIGHT_MIRROR_OTHER_SIDE
                 )
+
+                HATSUMI -> listOf(
+                    HATSUMI_ISANA_HAIL, HATSUMI_OYOGIBI_FIRE, HATSUMI_KIRAHARI_LIGHTHOUSE,
+                    HATSUMI_MIOBIKI_ROUTE
+                )
             }
         }
 
@@ -1116,6 +1140,7 @@ enum class CardName {
                 KURURU_A1 -> listOf(
                     KURURU_GRAND_GULLIVER
                 )
+                HATSUMI -> listOf()
             }
         }
 

@@ -69,8 +69,6 @@ enum class TextEffectTag {
     WHEN_USE_BEHAVIOR_END,
     WHEN_SPECIAL_RETURN_YOUR,
     WHEN_FULL_POWER_USED_YOUR,
-    WHEN_END_PHASE_YOUR,
-    WHEN_END_PHASE_YOUR_IN_DISCARD,
     WHEN_THIS_CARD_RETURN,
     WHEN_CHOOSE_AURA_DAMAGE,
     WHEN_TRANSFORM,
@@ -87,6 +85,8 @@ enum class TextEffectTag {
 
     //description when this effect use this is exist in real game
     WHEN_START_PHASE_YOUR,
+    WHEN_END_PHASE_YOUR,
+    WHEN_END_PHASE_YOUR_IN_DISCARD,
 
     //check effect when some process is running
     DO_NOT_GET_DAMAGE,
@@ -118,5 +118,7 @@ enum class TextEffectTag {
     AFTER_LIFE_DAMAGE_PLACE_CHANGE,
     AFTER_OTHER_ATTACK_COMPLETE,
     AFTER_ATTACK_EFFECT_INVALID_OTHER,
+    HATSUMI_LIGHTHOUSE,
+    AFTER_HATSUMI_LIGHTHOUSE,
     AFTER_DESTRUCTION_EFFECT_INVALID_OTHER;
 }

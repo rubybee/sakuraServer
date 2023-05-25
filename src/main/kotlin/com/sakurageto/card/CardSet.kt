@@ -5816,6 +5816,10 @@ object CardSet {
     private val junBiManTen = CardData(CardClass.NORMAL, CardName.HATSUMI_JUN_BI_MAN_TAN, MegamiEnum.HATSUMI, CardType.BEHAVIOR, SubType.FULL_POWER)
     private val compass = CardData(CardClass.NORMAL, CardName.HATSUMI_COMPASS, MegamiEnum.HATSUMI, CardType.ENCHANTMENT, SubType.NONE)
     private val callWave = CardData(CardClass.NORMAL, CardName.HATSUMI_CALL_WAVE, MegamiEnum.HATSUMI, CardType.ENCHANTMENT,SubType.NONE)
+    private val isanaHail = CardData(CardClass.SPECIAL, CardName.HATSUMI_ISANA_HAIL, MegamiEnum.HATSUMI, CardType.ATTACK, SubType.NONE)
+    private val oyogibiFire = CardData(CardClass.SPECIAL, CardName.HATSUMI_OYOGIBI_FIRE, MegamiEnum.HATSUMI, CardType.ATTACK, SubType.NONE)
+    private val kirahariLighthouse = CardData(CardClass.SPECIAL, CardName.HATSUMI_KIRAHARI_LIGHTHOUSE, MegamiEnum.HATSUMI, CardType.BEHAVIOR, SubType.NONE)
+    private val miobikiRoute = CardData(CardClass.SPECIAL, CardName.HATSUMI_MIOBIKI_ROUTE, MegamiEnum.HATSUMI, CardType.BEHAVIOR, SubType.NONE)
 
     private fun isTailWind(player: PlayerEnum, game_status: GameStatus) = game_status.getPlayer(player).isThisTurnTailWind == true
     private fun isHeadWind(player: PlayerEnum, game_status: GameStatus) = game_status.getPlayer(player).isThisTurnTailWind == false
@@ -6014,6 +6018,113 @@ object CardSet {
                     cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
                 )) ){
                 game_status.afterMakeAttack(card_number, player, null)
+            }
+            null
+        })
+        isanaHail.setSpecial(4)
+        isanaHail.setAttack(DistanceType.CONTINUOUS, Pair(3, 5), null, 3, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        isanaHail.addtext((Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE,
+                {conditionPlayer, conditionGameStatus, _ -> isTailWind(conditionPlayer, conditionGameStatus)})
+                {_, _, attack ->
+                    attack.lifePlusMinus(2);
+                })
+            null
+        }))
+        isanaHail.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
+            if(isHeadWind(player, game_status)){
+                game_status.dustToDistance(2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                game_status.movePlayingCard(player, LocationEnum.SPECIAL_CARD, card_number)
+            }
+            null
+        })
+        oyogibiFire.setSpecial(2)
+        oyogibiFire.setAttack(DistanceType.CONTINUOUS, Pair(5, 6), null, 2, 2,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        oyogibiFire.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_THIS_CARD_RETURN){ card_number, player, game_status, _ ->
+            while(true){
+                when(val command = game_status.requestBasicOperation(player, 1708)){
+                    CommandEnum.ACTION_GO_FORWARD, CommandEnum.ACTION_GO_BACKWARD, CommandEnum.ACTION_WIND_AROUND,
+                    CommandEnum.ACTION_INCUBATE, CommandEnum.ACTION_BREAK_AWAY, CommandEnum.ACTION_NAGA, CommandEnum.ACTION_YAKSHA,
+                    CommandEnum.ACTION_GARUDA -> {
+                        if(game_status.canDoBasicOperation(player, command)){
+                            game_status.doBasicOperation(player, command, 201708)
+                            break
+                        }
+                        else{
+                            continue
+                        }
+                    }
+                    CommandEnum.SELECT_NOT -> break
+                    else -> {}
+                }
+            }
+            null
+        })
+        oyogibiFire.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
+            game_status.addDistanceListener(player, Listener(player, card_number) {gameStatus, cardNumber, _, _, _, _ ->
+                if(game_status.startTurnDistance - game_status.getAdjustDistance(player) >= 2){
+                    gameStatus.returnSpecialCard(player, cardNumber)
+                    true
+                }
+                else{
+                    false
+                }
+            })
+            null
+        })
+        kirahariLighthouse.setSpecial(1)
+        kirahariLighthouse.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_SHRINK) {_, player, game_status, _ ->
+            if(!isHeadWind(player, game_status)){
+                game_status.setShrink(player)
+            }
+            null
+        })
+        kirahariLighthouse.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.CHANGE_SWELL_DISTANCE) {_, _, _, _ ->
+            1
+        })
+        kirahariLighthouse.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.HATSUMI_LIGHTHOUSE) {_, _, _, _ ->
+            1
+        })
+        kirahariLighthouse.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.AFTER_HATSUMI_LIGHTHOUSE) {card_number, player, game_status, _ ->
+            game_status.returnSpecialCard(player, card_number)
+            null
+        })
+        miobikiRoute.setSpecial(2)
+        miobikiRoute.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_SHRINK) {_, player, game_status, _ ->
+            if(isHeadWind(player, game_status)){
+                game_status.setShrink(player.opposite())
+                game_status.getCardFrom(player.opposite(), 0, LocationEnum.YOUR_DECK_TOP)?.let {showCard ->
+                    if(showCard.card_data.card_type == CardType.ATTACK){
+                        game_status.popCardFrom(player.opposite(), 0, LocationEnum.YOUR_DECK_TOP, true)?.let {popCard ->
+                            game_status.insertCardTo(player.opposite(), popCard, LocationEnum.DISCARD_YOUR, true)
+                        }
+                    }
+                    else{
+                        game_status.showSome(player.opposite(), CommandEnum.SHOW_DECK_TOP_YOUR, showCard.card_number)
+                    }
+                }
+            }
+            null
+        })
+        miobikiRoute.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_START_PHASE_YOUR){card_number, player, game_status, _ ->
+            if(isHeadWind(player, game_status)){
+                while(true){
+                    when(game_status.receiveCardEffectSelect(player, 1710)){
+                        CommandEnum.SELECT_ONE -> {
+                            game_status.getCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD)?.let {
+                                game_status.useCardFrom(player, it, LocationEnum.YOUR_USED_CARD, false, null,
+                                    isCost = true, isConsume = false)
+                            }
+                            break
+                        }
+                        CommandEnum.SELECT_NOT -> {
+                            break
+                        }
+                        else -> {}
+                    }
+                }
             }
             null
         })

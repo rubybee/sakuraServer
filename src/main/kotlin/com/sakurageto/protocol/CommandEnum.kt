@@ -164,6 +164,8 @@ enum class CommandEnum {
     SHOW_HAND_OTHER,
     SHOW_COVER_YOUR,
     SHOW_COVER_OTHER,
+    SHOW_DECK_TOP_YOUR,
+    SHOW_DECK_TOP_OTHER,
 
     SELECT_CARD_EFFECT,
     SELECT_NOT,
@@ -325,6 +327,8 @@ enum class CommandEnum {
             SET_TAIL_WIND_OTHER -> return SET_TAIL_WIND_YOUR
             SET_HEAD_WIND_YOUR -> return SET_HEAD_WIND_OTHER
             SET_HEAD_WIND_OTHER -> return SET_HEAD_WIND_YOUR
+            SHOW_DECK_TOP_YOUR -> return SHOW_DECK_TOP_OTHER
+            SHOW_DECK_TOP_OTHER -> return SHOW_DECK_TOP_YOUR
             else -> TODO()
         }
     }

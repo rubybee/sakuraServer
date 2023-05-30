@@ -26,6 +26,7 @@ enum class SpecialCardEnum {
 enum class CardClass {
     SPECIAL,
     NORMAL,
+    SOLDIER,
     NULL
 }
 
@@ -341,7 +342,27 @@ enum class CardName {
     HATSUMI_ISANA_HAIL,
     HATSUMI_OYOGIBI_FIRE,
     HATSUMI_KIRAHARI_LIGHTHOUSE,
-    HATSUMI_MIOBIKI_ROUTE;
+    HATSUMI_MIOBIKI_ROUTE,
+
+    MIZUKI_JIN_DU, //1800
+    MIZUKI_BAN_GONG,
+    MIZUKI_SHOOTING_DOWN,
+    MIZUKI_HO_LYEONG,
+    MIZUKI_BANG_BYEOG,
+    MIZUKI_OVERPOWERING_GO_FORWARD, //1805
+    MIZUKI_JEON_JANG,
+
+    MIZUKI_HACHIRYU_CHEONJUGAK,
+    MIZUKI_HIJAMARU_TRIPLET,
+    MIZUKI_TARTENASHI_DAESUMUN, //1809
+    MIZUKI_MIZUKI_BATTLE_CRY,
+
+    KODAMA_TU_SIN,
+
+    SOLDIER_SPEAR_1,
+    SOLDIER_SPEAR_2,
+    SOLDIER_SHIELD,
+    SOLDIER_HORSE;
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -991,6 +1012,12 @@ enum class CardName {
                     HATSUMI_TSUNAMI, HATSUMI_JUN_BI_MAN_TAN, HATSUMI_COMPASS,
                     HATSUMI_CALL_WAVE,
                 )
+                KODAMA -> listOf()
+                MIZUKI -> listOf(
+                    MIZUKI_JIN_DU, MIZUKI_BAN_GONG, MIZUKI_SHOOTING_DOWN,
+                    MIZUKI_HO_LYEONG, MIZUKI_BANG_BYEOG, MIZUKI_OVERPOWERING_GO_FORWARD,
+                    MIZUKI_JEON_JANG
+                )
             }
         }
 
@@ -1092,6 +1119,11 @@ enum class CardName {
                     HATSUMI_ISANA_HAIL, HATSUMI_OYOGIBI_FIRE, HATSUMI_KIRAHARI_LIGHTHOUSE,
                     HATSUMI_MIOBIKI_ROUTE
                 )
+                KODAMA -> listOf()
+                MIZUKI -> listOf(
+                    MIZUKI_HACHIRYU_CHEONJUGAK, MIZUKI_HIJAMARU_TRIPLET, MIZUKI_TARTENASHI_DAESUMUN,
+                    MIZUKI_MIZUKI_BATTLE_CRY
+                )
             }
         }
 
@@ -1141,6 +1173,10 @@ enum class CardName {
                     KURURU_GRAND_GULLIVER
                 )
                 HATSUMI -> listOf()
+                KODAMA -> listOf()
+                MIZUKI -> listOf(
+                    KODAMA_TU_SIN
+                )
             }
         }
 
@@ -1148,6 +1184,12 @@ enum class CardName {
             return listOf(
                 POISON_PARALYTIC, POISON_HALLUCINOGENIC, POISON_RELAXATION,
                 POISON_DEADLY_1, POISON_DEADLY_2
+            )
+        }
+
+        fun returnSoldierCardName(): List<CardName> {
+            return listOf(
+                SOLDIER_SPEAR_1, SOLDIER_SPEAR_2, SOLDIER_SHIELD, SOLDIER_SHIELD
             )
         }
     }

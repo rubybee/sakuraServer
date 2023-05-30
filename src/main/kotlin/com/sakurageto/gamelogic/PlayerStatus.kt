@@ -30,6 +30,11 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var justRunNoCondition: Boolean = false
     var isThisTurnTailWind: Boolean? = null
     var isNextTurnTailWind: Boolean? = null
+    var readySoldierZone= hashMapOf<Int, Card>()
+    fun getCardFromSoldier(card_number: Int) = readySoldierZone[card_number]
+    var notReadySoldierZone = hashMapOf<Int, Card>()
+    var thisTurnReact = false
+    var lastTurnReact = false
 
     var loseCounter = false
 
@@ -403,6 +408,7 @@ class PlayerStatus(val player_enum: PlayerEnum) {
                 {it.toCardData().card_class == CardClass.NORMAL}.map
                 {it.toCardNumber(true)})
             }
+            LocationEnum.NOT_READY_SOLDIER_ZONE -> list.addAll(notReadySoldierZone.keys)
             else -> TODO()
         }
     }

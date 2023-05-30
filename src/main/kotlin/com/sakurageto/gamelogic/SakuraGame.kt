@@ -207,6 +207,22 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
             game_status.getPlayer(PlayerEnum.PLAYER2).isThisTurnTailWind = true
             game_status.getPlayer(PlayerEnum.PLAYER2).isNextTurnTailWind = true
         }
+
+        if(game_status.player1.megami_1 == MegamiEnum.MIZUKI || game_status.player1.megami_2 == MegamiEnum.MIZUKI){
+            for(card_name in CardName.returnSoldierCardName()){
+                val turnCheck = first_turn == PlayerEnum.PLAYER1
+                val card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER1)
+                game_status.player1.notReadySoldierZone[card.card_number] = card
+            }
+        }
+
+        if(game_status.player2.megami_1 == MegamiEnum.MIZUKI || game_status.player2.megami_2 == MegamiEnum.MIZUKI){
+            for(card_name in CardName.returnSoldierCardName()){
+                val turnCheck = first_turn == PlayerEnum.PLAYER2
+                val card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER2)
+                game_status.player2.notReadySoldierZone[card.card_number] = card
+            }
+        }
         //additional board setting here
     }
 

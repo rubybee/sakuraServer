@@ -137,5 +137,4 @@ class CardData(
     fun isItSpecial(): Boolean{
         return this.card_class == CardClass.SPECIAL
     }
-
 }

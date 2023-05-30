@@ -23,8 +23,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     var nowPhase: Int = START_PHASE
 
     var startTurnDistance = 10
+    var thisTurnDistanceChange = false
 
     var thisTurnSwellDistance = 2
+
 
     suspend fun getAdjustSwellDistance(player: PlayerEnum): Int{
         var nowSwellDistance = thisTurnSwellDistance
@@ -57,12 +59,17 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun addThisTurnDistance(number: Int){
+        if(number == 0) return
         var value = number
         if(value > 0){
             thisTurnDistance += value
             sendSimpleCommand(player1_socket, player2_socket, CommandEnum.ADD_THIS_TURN_DISTANCE, value)
+            thisTurnDistanceChange = true
         }
         else{
+            if(thisTurnDistance != 0){
+                thisTurnDistanceChange = true
+            }
             if(value * -1 > thisTurnDistance){
                 value = -thisTurnDistance
             }
@@ -128,12 +135,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             PlayerEnum.PLAYER1 -> {
                 if(player1.artificialToken == null) return
                 if(on){
+                    thisTurnDistanceChange = true
                     player1.artificialToken = player1.artificialToken!! - number
                     player1ArtificialTokenOn += number
                     sendMoveToken(player1_socket, player2_socket, TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN_ON_TOKEN,
                         LocationEnum.MACHINE_YOUR, LocationEnum.DISTANCE, number, -1)
                 }
                 else{
+                    thisTurnDistanceChange = true
                     player1.artificialToken = player1.artificialToken!! - number
                     player1ArtificialTokenOut += number
                     sendMoveToken(player1_socket, player2_socket, TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN_OUT_TOKEN,
@@ -143,12 +152,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             PlayerEnum.PLAYER2 -> {
                 if(player2.artificialToken == null) return
                 if(on){
+                    thisTurnDistanceChange = true
                     player2.artificialToken = player2.artificialToken!! - number
                     player2ArtificialTokenOn += number
                     sendMoveToken(player2_socket, player1_socket, TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN_ON_TOKEN,
                         LocationEnum.MACHINE_YOUR, LocationEnum.DISTANCE, number, -1)
                 }
                 else{
+                    thisTurnDistanceChange = true
                     player2.artificialToken = player2.artificialToken!! - number
                     player2ArtificialTokenOut += number
                     sendMoveToken(player2_socket, player1_socket, TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN_OUT_TOKEN,
@@ -429,6 +440,23 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
+    private val player1TerminationListener: ArrayDeque<Listener> = ArrayDeque()
+    private val player2TerminationListener: ArrayDeque<Listener> = ArrayDeque()
+
+    fun getTerminationListener(player: PlayerEnum): ArrayDeque<Listener>{
+        return when(player){
+            PlayerEnum.PLAYER1 -> player1TerminationListener
+            PlayerEnum.PLAYER2 -> player2TerminationListener
+        }
+    }
+
+    fun addTerminationListener(player: PlayerEnum, listener: Listener) {
+        when (player) {
+            PlayerEnum.PLAYER1 -> player1TerminationListener.addLast(listener)
+            PlayerEnum.PLAYER2 -> player2TerminationListener.addLast(listener)
+        }
+    }
+
     suspend fun distanceListenerProcess(player: PlayerEnum){
         val distanceListener = getDistanceListener(player)
         if(!distanceListener.isEmpty()){
@@ -687,15 +715,16 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(getPlayerAura(player) < value) value = getPlayerAura(player)
         if(distanceToken + value > 10) value = 10 - distanceToken
 
-        getPlayer(player).aura -= value
-        distanceToken += value
-        thisTurnDistance += value
-
-        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
-            LocationEnum.YOUR_AURA, LocationEnum.DISTANCE, value, -1)
-
-        distanceListenerProcess(PlayerEnum.PLAYER1)
-        distanceListenerProcess(PlayerEnum.PLAYER2)
+        if(value != 0){
+            thisTurnDistanceChange = true
+            getPlayer(player).aura -= value
+            distanceToken += value
+            thisTurnDistance += value
+            sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
+                LocationEnum.YOUR_AURA, LocationEnum.DISTANCE, value, -1)
+            distanceListenerProcess(PlayerEnum.PLAYER1)
+            distanceListenerProcess(PlayerEnum.PLAYER2)
+        }
     }
 
     suspend fun auraToFlare(player_aura: PlayerEnum, player_flare: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum){
@@ -803,16 +832,19 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         if(distanceToken + value > 10) value = 10 - distanceToken
 
-        distanceToken += value
-        thisTurnDistance += value
+        if(value != 0){
+            thisTurnDistanceChange = true
+            distanceToken += value
+            thisTurnDistance += value
 
-        card.nap = card.nap!! - value
+            card.nap = card.nap!! - value
 
-        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
-            LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.DISTANCE, value, card.card_number)
+            sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
+                LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.DISTANCE, value, card.card_number)
 
-        distanceListenerProcess(PlayerEnum.PLAYER1)
-        distanceListenerProcess(PlayerEnum.PLAYER2)
+            distanceListenerProcess(PlayerEnum.PLAYER1)
+            distanceListenerProcess(PlayerEnum.PLAYER2)
+        }
     }
 
     suspend fun distanceToFlare(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum){
@@ -830,16 +862,19 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = distanceToken
         }
 
-        distanceToken -= value
-        thisTurnDistance -= value
+        if(value != 0){
+            thisTurnDistanceChange = true
+            distanceToken -= value
+            thisTurnDistance -= value
 
-        getPlayer(player).flare += value
+            getPlayer(player).flare += value
 
-        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
-            LocationEnum.DISTANCE, LocationEnum.YOUR_FLARE, value, -1)
+            sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
+                LocationEnum.DISTANCE, LocationEnum.YOUR_FLARE, value, -1)
 
-        distanceListenerProcess(PlayerEnum.PLAYER1)
-        distanceListenerProcess(PlayerEnum.PLAYER2)
+            distanceListenerProcess(PlayerEnum.PLAYER1)
+            distanceListenerProcess(PlayerEnum.PLAYER2)
+        }
     }
 
     suspend fun distanceToDust(number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum){
@@ -857,16 +892,20 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = distanceToken
         }
 
-        distanceToken -= value
-        thisTurnDistance -= value
+        if(value != 0){
+            thisTurnDistanceChange = true
+            distanceToken -= value
+            thisTurnDistance -= value
 
-        dust += value
+            dust += value
 
-        sendMoveToken(player1_socket, player2_socket, TokenEnum.SAKURA_TOKEN,
-            LocationEnum.DISTANCE, LocationEnum.DUST, value, -1)
+            sendMoveToken(player1_socket, player2_socket, TokenEnum.SAKURA_TOKEN,
+                LocationEnum.DISTANCE, LocationEnum.DUST, value, -1)
 
-        distanceListenerProcess(PlayerEnum.PLAYER1)
-        distanceListenerProcess(PlayerEnum.PLAYER2)
+            distanceListenerProcess(PlayerEnum.PLAYER1)
+            distanceListenerProcess(PlayerEnum.PLAYER2)
+        }
+
     }
 
     suspend fun distanceToAura(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum){
@@ -893,16 +932,19 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = distanceToken
         }
 
-        distanceToken -= value
-        thisTurnDistance -= value
+        if(value != 0){
+            thisTurnDistanceChange = true
+            distanceToken -= value
+            thisTurnDistance -= value
 
-        nowPlayer.aura += value
-        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
-            LocationEnum.DISTANCE, LocationEnum.YOUR_AURA, value, -1)
-        val afterFull = nowPlayer.checkAuraFull()
-        auraListenerProcess(player, beforeFull, afterFull)
-        distanceListenerProcess(PlayerEnum.PLAYER1)
-        distanceListenerProcess(PlayerEnum.PLAYER2)
+            nowPlayer.aura += value
+            sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
+                LocationEnum.DISTANCE, LocationEnum.YOUR_AURA, value, -1)
+            val afterFull = nowPlayer.checkAuraFull()
+            auraListenerProcess(player, beforeFull, afterFull)
+            distanceListenerProcess(PlayerEnum.PLAYER1)
+            distanceListenerProcess(PlayerEnum.PLAYER2)
+        }
     }
 
     suspend fun cardToDustCheck(player: PlayerEnum, number: Int, card: Card): Boolean{
@@ -1075,16 +1117,21 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = dust
         }
 
-        distanceToken += value
-        thisTurnDistance += value
+        if(value > 0){
+            thisTurnDistanceChange = true
+            distanceToken += value
+            thisTurnDistance += value
 
-        dust -= value
+            dust -= value
 
-        sendMoveToken(player1_socket, player2_socket, TokenEnum.SAKURA_TOKEN,
-            LocationEnum.DUST, LocationEnum.DISTANCE, value, -1)
+            sendMoveToken(player1_socket, player2_socket, TokenEnum.SAKURA_TOKEN,
+                LocationEnum.DUST, LocationEnum.DISTANCE, value, -1)
 
-        distanceListenerProcess(PlayerEnum.PLAYER1)
-        distanceListenerProcess(PlayerEnum.PLAYER2)
+            distanceListenerProcess(PlayerEnum.PLAYER1)
+            distanceListenerProcess(PlayerEnum.PLAYER2)
+        }
+
+
     }
 
     suspend fun dustToAura(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum){
@@ -1183,16 +1230,21 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(10 - distanceToken < number){
             value = 10 - distanceToken
         }
-        nowPlayer.flare -= value
 
-        distanceToken += value
-        thisTurnDistance += value
+        if(value > 0){
+            thisTurnDistanceChange = true
+            nowPlayer.flare -= value
 
-        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
-            LocationEnum.YOUR_FLARE, LocationEnum.DISTANCE, value, -1)
+            distanceToken += value
+            thisTurnDistance += value
 
-        distanceListenerProcess(PlayerEnum.PLAYER1)
-        distanceListenerProcess(PlayerEnum.PLAYER2)
+            sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
+                LocationEnum.YOUR_FLARE, LocationEnum.DISTANCE, value, -1)
+
+            distanceListenerProcess(PlayerEnum.PLAYER1)
+            distanceListenerProcess(PlayerEnum.PLAYER2)
+        }
+
     }
 
     suspend fun flareToDust(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum){
@@ -1721,6 +1773,40 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     /**
+     true means this card is termination card
+     false means this card is not termination card
+     */
+    suspend fun terminationListenerProcess(player: PlayerEnum, card: Card): Boolean{
+        if(card.card_data.sub_type == SubType.REACTION && logger.checkThisCardUseInSoldier(player, card.card_number)){
+            for(card in getPlayer(player).usedSpecialCard.values){
+                if(card.effectAllValidEffect(player, this, TextEffectTag.REMOVE_REACTIONS_TERMINATION) == 1){
+                    return false
+                }
+            }
+        }
+        card.card_data.effect?.let {
+            for(text in it){
+                if(text === CardSet.termination){
+                    val terminationListener = getTerminationListener(player)
+                    if(!terminationListener.isEmpty()){
+                        for(i in 1..terminationListener.size){
+                            if(terminationListener.isEmpty()) break
+                            val now = terminationListener.first()
+                            terminationListener.removeFirst()
+                            if(!(now.doAction(this, -1, -1,
+                                    booleanPara1 = false, booleanPara2 = false))){
+                                terminationListener.addLast(now)
+                            }
+                        }
+                    }
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    /**
      isCost means bi yong
      isConsume means so mo gap
      */
@@ -1729,14 +1815,18 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(getEndTurn(player) || endCurrentPhase){
             return false
         }
+
         val cost = card.canUse(player, this, react_attack, isCost, isConsume)
         if(cost != -2){
             if(isCost) card.effectText(player, this, react_attack, TextEffectTag.COST)
 
-            if(location == LocationEnum.COVER_CARD && react) logger.insert(Log(player, LogText.USE_CARD_IN_COVER_AND_REACT, card.card_number, card.card_number))
+            if(location == LocationEnum.READY_SOLDIER_ZONE) logger.insert(Log(player, LogText.USE_CARD_IN_SOLDIER, card.card_number, card.card_number))
+            else if(location == LocationEnum.COVER_CARD && react) logger.insert(Log(player, LogText.USE_CARD_IN_COVER_AND_REACT, card.card_number, card.card_number))
             else if(location == LocationEnum.COVER_CARD) logger.insert(Log(player, LogText.USE_CARD_IN_COVER, card.card_number, card.card_number))
             else if(react) logger.insert(Log(player, LogText.USE_CARD_REACT, card.card_number, card.card_number))
             else logger.insert(Log(player, LogText.USE_CARD, card.card_number, card.card_number))
+
+            val isTermination = terminationListenerProcess(player, card)
 
             if(cost == -1){
                 gaugeIncreaseRequest(player, card)
@@ -1752,13 +1842,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     popCardFrom(player, card.card_number, location, true)
                     insertCardTo(player, card, LocationEnum.PLAYING_ZONE_YOUR, true)
                     sendUseCardMeesage(getSocket(player), getSocket(player.opposite()), react, card.card_number)
-                    card.use(player, this, react_attack, napChange)
+                    card.use(player, this, react_attack, isTermination, napChange)
                 }
                 else{
                     popCardFrom(player, card.card_number, location, true)
                     insertCardTo(player, card, LocationEnum.DISCARD_YOUR, true)
                     for(otherUsedCard in getPlayer(player.opposite()).usedSpecialCard.values){
-                        lightHouseCheck += otherUsedCard.effectAllValidEffect(player.opposite(), this, TextEffectTag.AFTER_HATSUMI_LIGHTHOUSE)
+                        otherUsedCard.effectAllValidEffect(player.opposite(), this, TextEffectTag.AFTER_HATSUMI_LIGHTHOUSE)
                     }
                 }
                 return true
@@ -1771,7 +1861,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 popCardFrom(player, card.card_number, location, true)
                 insertCardTo(player, card, LocationEnum.PLAYING_ZONE_YOUR, true)
                 sendUseCardMeesage(getSocket(player), getSocket(player.opposite()), react, card.card_number)
-                card.use(player, this, react_attack, napChange)
+                card.use(player, this, react_attack, isTermination, napChange)
                 return true
             }
         }
@@ -1813,6 +1903,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         nowPlayer.pre_attack_card = null
 
         logger.insert(Log(player, LogText.ATTACK, nowAttack.card_number, when(nowAttack.card_class){
+            CardClass.SOLDIER -> 3
             CardClass.SPECIAL -> 2
             CardClass.NORMAL -> 1
             CardClass.NULL -> 0
@@ -1828,7 +1919,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     val card = otherPlayer.getCardFromHand(react.second)?: continue
                     if(reactCheck(player.opposite(), card, nowAttack)){
                         if(useCardFrom(player.opposite(), card, LocationEnum.HAND, true, nowAttack,
-                                isCost = true, isConsume = true)) break
+                                isCost = true, isConsume = true)) {
+                            otherPlayer.thisTurnReact = true
+                            break
+                        }
                     }
 
                 }
@@ -1836,7 +1930,20 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     val card = otherPlayer.getCardFromSpecial(react.second)?: continue
                     if(reactCheck(player.opposite(), card, nowAttack)){
                         if(useCardFrom(player.opposite(), card, LocationEnum.SPECIAL_CARD, true, nowAttack,
-                                isCost = true, isConsume = true)) break
+                                isCost = true, isConsume = true)) {
+                            otherPlayer.thisTurnReact = true
+                            break
+                        }
+                    }
+                }
+                else if(react.first == CommandEnum.REACT_USE_CARD_SOLDIER){
+                    val card = otherPlayer.getCardFromSoldier(react.second)?: continue
+                    if(reactCheck(player.opposite(), card, nowAttack)){
+                        if(useCardFrom(player.opposite(), card, LocationEnum.READY_SOLDIER_ZONE, true, nowAttack,
+                                isCost = true, isConsume = true)) {
+                            otherPlayer.thisTurnReact = true
+                            break
+                        }
                     }
                 }
                 else{
@@ -1925,8 +2032,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 CardClass.NORMAL -> {
                     insertCardTo(card.player, card, LocationEnum.DISCARD_YOUR, true)
                 }
-
-                CardClass.NULL -> TODO()
+                CardClass.NULL -> {
+                    insertCardTo(card.player, card, LocationEnum.NOT_READY_SOLDIER_ZONE, true)
+                }
+                CardClass.SOLDIER -> TODO()
             }
         }
     }
@@ -1971,6 +2080,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun afterDestruction(player: PlayerEnum, card_number: Int, location: LocationEnum){
         val card = popCardFrom(player, card_number, LocationEnum.ENCHANTMENT_ZONE, true)?: return
+        card.effectText(player, this, null, TextEffectTag.WHEN_THIS_CARD_GET_OUT_ENCHANTMENT)
         when(card.card_data.card_class){
             CardClass.SPECIAL -> {
                 card.addReturnListener(card.player, this)
@@ -1979,6 +2089,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
             CardClass.NORMAL -> {
                 insertCardTo(card.player, card, location, true)
+            }
+            CardClass.SOLDIER -> {
+                insertCardTo(card.player, card, LocationEnum.NOT_READY_SOLDIER_ZONE, true)
             }
             CardClass.NULL -> {
                 TODO()
@@ -2399,12 +2512,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         when(turnPlayer){
             PlayerEnum.PLAYER1 -> {
                 if(player1ArtificialTokenOn != 0) {
+                    thisTurnDistanceChange = true
                     sendMoveToken(player1_socket, player2_socket, TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN_ON_TOKEN, LocationEnum.DISTANCE,
                         LocationEnum.MACHINE_BURN_YOUR, player1ArtificialTokenOn, -1)
                     player1.artificialTokenBurn += player1ArtificialTokenOn
                     player1ArtificialTokenOn = 0
                 }
                 if(player1ArtificialTokenOut != 0) {
+                    thisTurnDistanceChange = true
                     sendMoveToken(player1_socket, player2_socket, TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN_OUT_TOKEN, LocationEnum.DISTANCE,
                         LocationEnum.MACHINE_BURN_YOUR, player1ArtificialTokenOut, -1)
                     player1.artificialTokenBurn += player1ArtificialTokenOut
@@ -2413,12 +2528,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
             PlayerEnum.PLAYER2 -> {
                 if(player2ArtificialTokenOn != 0) {
+                    thisTurnDistanceChange = true
                     sendMoveToken(player2_socket, player1_socket, TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN_ON_TOKEN, LocationEnum.DISTANCE,
                         LocationEnum.MACHINE_BURN_YOUR, player2ArtificialTokenOn, -1)
                     player2.artificialTokenBurn += player2ArtificialTokenOn
                     player2ArtificialTokenOn = 0
                 }
                 if(player2ArtificialTokenOut != 0) {
+                    thisTurnDistanceChange = true
                     sendMoveToken(player2_socket, player1_socket, TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN_OUT_TOKEN, LocationEnum.DISTANCE,
                         LocationEnum.MACHINE_BURN_YOUR, player2ArtificialTokenOut, -1)
                     player2.artificialTokenBurn += player2ArtificialTokenOut
@@ -2566,6 +2683,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         player1.canNotGoForward = false; player2.canNotGoForward = false
         player1.rangeBuff.clearBuff(); player2.rangeBuff.clearBuff(); player1.attackBuff.clearBuff(); player2.attackBuff.clearBuff()
         player1.otherBuff.clearBuff(); player2.otherBuff.clearBuff()
+        player1.lastTurnReact = player1.thisTurnReact; player2.lastTurnReact = player2.thisTurnReact
+        player1.thisTurnReact = false; player2.thisTurnReact = false
+        thisTurnDistanceChange = false
     }
 
     //0 = player don't want using card more || 1 = player card use success || 2 = cannot use because there are no installation card
@@ -2637,6 +2757,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
+    private fun checkFullPowerCanUse(player: PlayerEnum, card: Card): Boolean{
+        return if(card.card_data.sub_type == SubType.FULL_POWER){
+            getFullAction(player)
+        } else{
+            true
+        }
+    }
+
     suspend fun cardUseNormal(player: PlayerEnum, commandEnum: CommandEnum, card_number: Int): Boolean{
         if(card_number == -1){
             return false
@@ -2645,19 +2773,19 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         when(commandEnum){
             CommandEnum.ACTION_USE_CARD_HAND -> {
                 val card = getCardFrom(player, card_number, LocationEnum.HAND)?: return false
-                if(card.card_data.sub_type == SubType.FULL_POWER && !getPlayerFullAction(player)) return false
+                if(!checkFullPowerCanUse(player, card)) return false
                 if(useCardFrom(player, card, LocationEnum.HAND, false, null,
                         isCost = true, isConsume = true)) return true
             }
             CommandEnum.ACTION_USE_CARD_SPECIAL -> {
                 val card = getCardFrom(player, card_number, LocationEnum.SPECIAL_CARD)?: return false
-                if(card.card_data.sub_type == SubType.FULL_POWER && !getPlayerFullAction(player)) return false
+                if(!checkFullPowerCanUse(player, card)) return false
                 if(useCardFrom(player, card, LocationEnum.SPECIAL_CARD, false, null,
                         isCost = true, isConsume = true)) return true
             }
             CommandEnum.ACTION_USE_CARD_COVER -> {
                 val card = getCardFrom(player, card_number, LocationEnum.COVER_CARD)?: return false
-                if(card.card_data.sub_type == SubType.FULL_POWER && !getPlayerFullAction(player)) return false
+                if(!checkFullPowerCanUse(player, card)) return false
                 if(card.canUseAtCover()){
                     if(useCardFrom(player, card, LocationEnum.COVER_CARD, false, null,
                             isCost = true, isConsume = true)) return true
@@ -2793,6 +2921,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             if(thisTurnDistance < 0){
                 thisTurnDistance = 0
             }
+            else{
+                thisTurnDistanceChange = true
+            }
             nowPlayer.aura += 1
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.DISTANCE, LocationEnum.YOUR_AURA, 1, -1)
@@ -2814,6 +2945,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             val otherSocket = getSocket(player.opposite())
 
             sendDoBasicAction(nowSocket, otherSocket, CommandEnum.ACTION_GO_BACKWARD_YOUR, card)
+            thisTurnDistanceChange = true
             nowPlayer.aura -= 1
             distanceToken += 1
             thisTurnDistance += 1
@@ -2883,6 +3015,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             val otherSocket = getSocket(player.opposite())
 
             sendDoBasicAction(nowSocket, otherSocket, CommandEnum.ACTION_BREAK_AWAY_YOUR, card)
+            thisTurnDistanceChange = true
             dust -= 1
             distanceToken += 1
             thisTurnDistance += 1
@@ -3064,6 +3197,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 nowPlayer.poisonBag.remove(card_number.toCardName())
                 return result
             }
+            LocationEnum.NOT_READY_SOLDIER_ZONE -> {
+                val result = nowPlayer.notReadySoldierZone[card_number]?: return null
+                sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_NOT_READY_SOLDIER_ZONE_YOUR)
+                nowPlayer.notReadySoldierZone.remove(card_number)
+                return result
+            }
             else -> TODO()
         }
         return null
@@ -3085,6 +3224,18 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun insertCardTo(player: PlayerEnum, card: Card, location: LocationEnum, publicForOther: Boolean, publicForYour: Boolean = true){
+        if(card.card_data.card_class == CardClass.SOLDIER){
+            when(location){
+                LocationEnum.NOT_READY_SOLDIER_ZONE, LocationEnum.READY_SOLDIER_ZONE, LocationEnum.PLAYING_ZONE_YOUR,
+                LocationEnum.ENCHANTMENT_ZONE, LocationEnum.OUT_OF_GAME, LocationEnum.SEAL_ZONE -> {
+
+                }
+                else -> {
+                    insertCardTo(player, card, LocationEnum.NOT_READY_SOLDIER_ZONE, true)
+                    return
+                }
+            }
+        }
         val nowPlayer = getPlayer(player)
         val nowSocket = getSocket(player)
         val otherSocket = getSocket(player.opposite())
@@ -3140,7 +3291,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 sendAddCardZone(poisonOwnerSocket, poisonOwnerOppositeSocket, card.card_number, publicForOther, CommandEnum.POISON_BAG_YOUR, publicForYour)
             }
             LocationEnum.OUT_OF_GAME -> {
-                nowPlayer.outOfGame[card.card_number] = card
+                cardOwner.outOfGame[card.card_number] = card
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, publicForOther, CommandEnum.OUT_OF_GAME_YOUR, publicForYour)
             }
             LocationEnum.TRANSFORM -> {
@@ -3150,6 +3301,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             LocationEnum.ADDITIONAL_CARD -> {
                 nowPlayer.additionalHand[card.card_data.card_name] = card
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, publicForOther, CommandEnum.ADDITIONAL_YOUR, publicForYour)
+            }
+            LocationEnum.NOT_READY_SOLDIER_ZONE -> {
+                nowPlayer.notReadySoldierZone[card.card_number] = card
+                sendAddCardZone(nowSocket, otherSocket, card.card_number, publicForOther, CommandEnum.NOT_READY_SOLDIER_ZONE_YOUR, publicForYour)
+            }
+            LocationEnum.READY_SOLDIER_ZONE -> {
+                nowPlayer.readySoldierZone[card.card_number] = card
+                sendAddCardZone(nowSocket, otherSocket, card.card_number, publicForOther, CommandEnum.READY_SOLDIER_ZONE_YOUR, publicForYour)
             }
             else -> TODO()
         }

@@ -1,7 +1,5 @@
 package com.sakurageto.gamelogic
 
-import com.sakurageto.card.CardSet.toCardData
-import com.sakurageto.card.CardSet.toCardName
 import com.sakurageto.card.PlayerEnum
 
 class Logger {
@@ -30,6 +28,15 @@ class Logger {
                 if(log.text == LogText.USE_CARD_REACT && log.number1 == card_number) return false
                 else if(log.text == LogText.USE_CARD && log.number1 == card_number) return false
                 else if(log.text == LogText.USE_CARD_IN_COVER && log.number1 == card_number) return true
+            }
+        }
+        return false
+    }
+
+    fun checkThisCardUseInSoldier(player: PlayerEnum, card_number: Int): Boolean{
+        for (log in logQueue.asReversed()){
+            if(log.player == player && log.number1 == card_number){
+                return log.text == LogText.USE_CARD_IN_SOLDIER
             }
         }
         return false

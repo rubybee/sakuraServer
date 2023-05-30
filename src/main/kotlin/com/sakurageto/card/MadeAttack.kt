@@ -18,7 +18,8 @@ class MadeAttack(
     private val cannotReactSpecial: Boolean,
     private val cannotReact: Boolean,
     private val chogek: Boolean,
-    private val inevitable: Boolean = false
+    private val inevitable: Boolean = false,
+    val subType: SubType = SubType.NONE
 ) {
     var editedChogek = false
 
@@ -144,15 +145,15 @@ class MadeAttack(
     suspend fun canReactByThisCard(card: Card, game_status: GameStatus, player: PlayerEnum, continuousOtherBuff: OtherBuffQueue): Boolean{
         activeOtherBuff(game_status, player, continuousOtherBuff)
 
-        if(this.cannotReactSpecial){
+        if(this.editedCannotReactSpecial){
             if(card.card_data.card_class == CardClass.SPECIAL){
                 return false
             }
         }
-        else if(this.cannotReact){
+        else if(this.editedCannotReact){
             return false
         }
-        else if(this.cannotReactNormal){
+        else if(this.editedCannotReactNormal){
             if(card.card_data.card_class == CardClass.NORMAL){
                 return false
             }

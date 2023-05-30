@@ -10,16 +10,12 @@ import kotlin.collections.ArrayDeque
 import kotlin.collections.HashMap
 
 class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum, var special_card_state: SpecialCardEnum?) {
-    var vertical: Boolean
-    var flipped: Boolean
     var nap: Int? = null
+
+    var beforeCardData: CardData? = null
 
     var cardUseEndEffect = HashMap<Int, Text>()
 
-    init {
-        vertical = true
-        flipped = true
-    }
     companion object{
         fun cardMakerByName(start_turn: Boolean, card_name: CardName, player: PlayerEnum): Card{
             val data = card_name.toCardData()
@@ -213,7 +209,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         return true
     }
 
-    suspend fun makeAttack(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?): MadeAttack?{
+    suspend fun makeAttack(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, subType: SubType?): MadeAttack?{
         card_data.effect?.let {
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT && text.tag == TextEffectTag.NEXT_ATTACK_ENCHANTMENT){
@@ -238,7 +234,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         cannotReactSpecial = this.card_data.cannotReactSpecial,
                         cannotReact = this.card_data.cannotReact,
                         chogek = this.card_data.chogek,
-                        inevitable = this.card_data.inevitable
+                        inevitable = this.card_data.inevitable,
+                        subType = subType ?: this.card_data.sub_type
                     )
                 }
                 Umbrella.UNFOLD -> {
@@ -256,7 +253,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         cannotReactSpecial = this.card_data.cannotReactSpecial,
                         cannotReact = this.card_data.cannotReact,
                         chogek = this.card_data.chogek,
-                        inevitable = this.card_data.inevitable
+                        inevitable = this.card_data.inevitable,
+                        subType = subType ?: this.card_data.sub_type
                     )
                 }
                 null -> {
@@ -279,7 +277,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 cannotReactSpecial = this.card_data.cannotReactSpecial,
                 cannotReact = this.card_data.cannotReact,
                 chogek = this.card_data.chogek,
-                inevitable = this.card_data.inevitable
+                inevitable = this.card_data.inevitable,
+                subType = subType ?: this.card_data.sub_type
             )
         }
     }
@@ -326,7 +325,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         }
                     }
                 }
-                if(gameStatus.addPreAttackZone(player, this.makeAttack(player, gameStatus, react_attack)?.addTextAndReturn(gameStatus.getUmbrella(this.player), this.card_data)?:
+                if(gameStatus.addPreAttackZone(player, this.makeAttack(player, gameStatus, react_attack, this.card_data.sub_type)?.addTextAndReturn(gameStatus.getUmbrella(this.player), this.card_data)?:
                     MadeAttack(
                         card_name =  this.card_data.card_name,
                         card_number = this.card_number,
@@ -341,7 +340,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         cannotReactSpecial = false,
                         cannotReact = false,
                         chogek = false ,
-                        inevitable = this.card_data.inevitable
+                        inevitable = this.card_data.inevitable,
+                        subType = this.card_data.sub_type
                     ))){
                     return cost
                 }
@@ -446,7 +446,11 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
     }
 
-    suspend fun use(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, nap_change: Int = -1){
+    suspend fun use(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, isTermination: Boolean, nap_change: Int = -1){
+        if(isTermination){
+            game_status.setEndTurn(player, true)
+        }
+
         this.card_data.effect?.let {
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
@@ -456,7 +460,6 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                             text.effect!!(this.card_number, player, game_status, react_attack)
                         }
                         else -> {
-
                         }
                     }
                 }
@@ -486,21 +489,6 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 enchantmentUseNormal(player, game_status, react_attack, nap_change)
             }
             CardType.UNDEFINED -> {}
-        }
-
-        this.card_data.effect?.let {
-            for(text in it){
-                if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
-                    when(text.tag){
-                        TextEffectTag.TERMINATION -> {
-                            game_status.setEndTurn(player, true)
-                        }
-                        else -> {
-
-                        }
-                    }
-                }
-            }
         }
 
         game_status.afterCardUsed(this.card_number, player, this)

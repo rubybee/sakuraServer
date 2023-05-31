@@ -1820,11 +1820,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(cost != -2){
             if(isCost) card.effectText(player, this, react_attack, TextEffectTag.COST)
 
-            if(location == LocationEnum.READY_SOLDIER_ZONE) logger.insert(Log(player, LogText.USE_CARD_IN_SOLDIER, card.card_number, card.card_number))
-            else if(location == LocationEnum.COVER_CARD && react) logger.insert(Log(player, LogText.USE_CARD_IN_COVER_AND_REACT, card.card_number, card.card_number))
-            else if(location == LocationEnum.COVER_CARD) logger.insert(Log(player, LogText.USE_CARD_IN_COVER, card.card_number, card.card_number))
-            else if(react) logger.insert(Log(player, LogText.USE_CARD_REACT, card.card_number, card.card_number))
-            else logger.insert(Log(player, LogText.USE_CARD, card.card_number, card.card_number))
+            if(location == LocationEnum.READY_SOLDIER_ZONE) logger.insert(Log(player, LogText.USE_CARD_IN_SOLDIER, card.card_number, card.card_data.megami.real_number))
+            else if(location == LocationEnum.COVER_CARD && react) logger.insert(Log(player, LogText.USE_CARD_IN_COVER_AND_REACT, card.card_number, card.card_data.megami.real_number))
+            else if(location == LocationEnum.COVER_CARD) logger.insert(Log(player, LogText.USE_CARD_IN_COVER, card.card_number, card.card_data.megami.real_number))
+            else if(react) logger.insert(Log(player, LogText.USE_CARD_REACT, card.card_number, card.card_data.megami.real_number))
+            else logger.insert(Log(player, LogText.USE_CARD, card.card_number, card.card_data.megami.real_number))
 
             val isTermination = terminationListenerProcess(player, card)
 
@@ -2045,7 +2045,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         else{
             when(text.tag){
                 TextEffectTag.WHEN_USE_REACT_CARD_YOUR_END, TextEffectTag.WHEN_USE_BEHAVIOR_END,
-                TextEffectTag.WHEN_FULL_POWER_USED_YOUR -> {
+                TextEffectTag.WHEN_FULL_POWER_USED_YOUR, TextEffectTag.WHEN_AFTER_CARD_USE -> {
                     text.effect!!(card_number, player, this, null)
                 }
                 TextEffectTag.WHEN_THIS_CARD_REACTED -> {
@@ -2058,8 +2058,16 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
+    var cardForEffect: Card? = null
+
     suspend fun afterCardUsed(card_number: Int, player: PlayerEnum, thisCard: Card){
         movePlayingCard(player, null, card_number)
+
+        cardForEffect = thisCard
+        for(card in getPlayer(player).enchantmentCard.values){
+            card.effectAllValidEffect(player, this, TextEffectTag.WHEN_AFTER_CARD_USE)
+        }
+        cardForEffect = null
 
         val keys = thisCard.cardUseEndEffect.keys.toMutableList()
         if(keys.isNotEmpty()){
@@ -2570,6 +2578,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun startPhaseEffectProcess(turnPlayer: PlayerEnum){
+        //TODO("change this mechanism like endphaseeffectprocess(can choose order of effect)")
         removeArtificialToken()
         for(card in getPlayer(turnPlayer).enchantmentCard.values){
             card.effectAllValidEffect(turnPlayer, this, TextEffectTag.WHEN_START_PHASE_YOUR)

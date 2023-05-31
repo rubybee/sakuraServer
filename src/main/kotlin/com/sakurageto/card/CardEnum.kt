@@ -119,7 +119,7 @@ enum class CardName {
     OBORO_MIKAZRA,
 
     YUKIHI_YUKIHI,
-    YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE,
+    YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE, //600
     YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS,
     YUKIHI_PUSH_OUT_SLASH_PULL,
     YUKIHI_SWING_SLASH_STAB,
@@ -362,7 +362,12 @@ enum class CardName {
     SOLDIER_SPEAR_1,
     SOLDIER_SPEAR_2,
     SOLDIER_SHIELD,
-    SOLDIER_HORSE;
+    SOLDIER_HORSE,
+
+    YUKIHI_HELP_SLASH_THREAT, //611
+    YUKIHI_THREAD_SLASH_RAW_THREAD,
+    YUKIHI_FLUTTERING_COLLAR;
+
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -935,6 +940,12 @@ enum class CardName {
                     YUKIHI_PUSH_OUT_SLASH_PULL, YUKIHI_SWING_SLASH_STAB, YUKIHI_TURN_UMBRELLA,
                     YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN, YUKIHI_MAKE_CONNECTION
                 )
+                YUKIHI_A1 -> listOf(
+                    YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE, YUKIHI_HELP_SLASH_THREAT,
+                    YUKIHI_PUSH_OUT_SLASH_PULL, YUKIHI_THREAD_SLASH_RAW_THREAD,
+                    YUKIHI_TURN_UMBRELLA, YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN,
+                    YUKIHI_MAKE_CONNECTION
+                )
                 SHINRA -> listOf(
                     SHINRA_IBLON, SHINRA_BANLON,
                     SHINRA_KIBEN, SHINRA_INYONG, SHINRA_SEONDONG,
@@ -1060,6 +1071,10 @@ enum class CardName {
                 YUKIHI -> listOf(
                     YUKIHI_FLUTTERING_SNOWFLAKE, YUKIHI_SWAYING_LAMPLIGHT, YUKIHI_CLINGY_MIND, YUKIHI_SWIRLING_GESTURE
                 )
+                YUKIHI_A1 -> listOf(
+                    YUKIHI_FLUTTERING_SNOWFLAKE, YUKIHI_FLUTTERING_COLLAR,
+                    YUKIHI_CLINGY_MIND, YUKIHI_SWIRLING_GESTURE
+                )
                 SHINRA -> listOf(
                     SHINRA_WANJEON_NONPA, SHINRA_DASIG_IHAE, SHINRA_CHEONJI_BANBAG, SHINRA_SAMRA_BAN_SHO
                 )
@@ -1144,6 +1159,7 @@ enum class CardName {
                     OBORO_LAST_CRYSTAL
                 )
                 YUKIHI -> listOf()
+                YUKIHI_A1 -> listOf()
                 SHINRA -> listOf()
                 HAGANE -> listOf()
                 CHIKAGE -> listOf()

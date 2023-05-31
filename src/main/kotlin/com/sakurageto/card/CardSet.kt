@@ -1687,10 +1687,16 @@ object CardSet {
                                     madeAttack.run { addRange(Pair(1, 3)); addRange(Pair(5, 7))}
                                 }
                                 CardName.YUKIHI_FLUTTERING_SNOWFLAKE -> {
-                                    madeAttack.run { addRange(Pair(1, 2)); addRange(Pair(4, 6))}
+                                    madeAttack.run { addRange(Pair(1, 3)); addRange(Pair(4, 7))}
                                 }
                                 CardName.YUKIHI_SWAYING_LAMPLIGHT -> {
-                                    madeAttack.run { addRange(Pair(1, 3)); addRange(Pair(5, 7))}
+                                    madeAttack.run { addRange(Pair(1, 1)); addRange(Pair(5, 7))}
+                                }
+                                CardName.YUKIHI_HELP_SLASH_THREAT -> {
+                                    madeAttack.run { addRange(Pair(2, 3)); addRange(Pair(4, 6))}
+                                }
+                                CardName.YUKIHI_THREAD_SLASH_RAW_THREAD -> {
+                                    madeAttack.run { addRange(Pair(1, 5)); addRange(Pair(3, 9))}
                                 }
                                 else -> {}
                             }
@@ -1710,11 +1716,18 @@ object CardSet {
                                     madeAttack.run { addRange(Pair(0, 1)); addRange(Pair(3, 5))}
                                 }
                                 CardName.YUKIHI_FLUTTERING_SNOWFLAKE -> {
-                                    madeAttack.run { addRange(Pair(0, 0)); addRange(Pair(2, 4))}
+                                    madeAttack.run { addRange(Pair(0, 0)); addRange(Pair(2, 5))}
                                 }
                                 CardName.YUKIHI_SWAYING_LAMPLIGHT -> {
                                     madeAttack.run { addRange(Pair(0, 0)); addRange(Pair(3, 5))}
                                 }
+                                CardName.YUKIHI_HELP_SLASH_THREAT -> {
+                                    madeAttack.run { addRange(Pair(0, 1)); addRange(Pair(2, 4))}
+                                }
+                                CardName.YUKIHI_THREAD_SLASH_RAW_THREAD -> {
+                                    madeAttack.run { addRange(Pair(0, 3)); addRange(Pair(1, 7))}
+                                }
+
                                 else -> {}
                             }
                         }
@@ -1738,6 +1751,12 @@ object CardSet {
                                 CardName.YUKIHI_SWAYING_LAMPLIGHT -> {
                                     madeAttack.run { addRange(Pair(0, 0)); addRange(Pair(4, 6))}
                                 }
+                                CardName.YUKIHI_HELP_SLASH_THREAT -> {
+                                    madeAttack.run { addRange(Pair(1, 2)); addRange(Pair(3, 5))}
+                                }
+                                CardName.YUKIHI_THREAD_SLASH_RAW_THREAD -> {
+                                    madeAttack.run { addRange(Pair(0, 4)); addRange(Pair(2, 8))}
+                                }
                                 else -> {}
                             }
                         }
@@ -1755,6 +1774,19 @@ object CardSet {
         })
     }
 
+    private val shinra = CardData(CardClass.SPECIAL, CardName.SHINRA_SHINRA, MegamiEnum.SHINRA, CardType.BEHAVIOR, SubType.NONE)
+    private val iblon = CardData(CardClass.NORMAL, CardName.SHINRA_IBLON, MegamiEnum.SHINRA, CardType.ATTACK, SubType.NONE)
+    private val banlon = CardData(CardClass.NORMAL, CardName.SHINRA_BANLON, MegamiEnum.SHINRA, CardType.ATTACK, SubType.REACTION)
+    private val kiben = CardData(CardClass.NORMAL, CardName.SHINRA_KIBEN, MegamiEnum.SHINRA, CardType.ATTACK, SubType.FULL_POWER)
+    private val inyong = CardData(CardClass.NORMAL, CardName.SHINRA_INYONG, MegamiEnum.SHINRA, CardType.BEHAVIOR, SubType.NONE)
+    private val seondong = CardData(CardClass.NORMAL, CardName.SHINRA_SEONDONG, MegamiEnum.SHINRA, CardType.BEHAVIOR, SubType.REACTION)
+    private val jangdam = CardData(CardClass.NORMAL, CardName.SHINRA_JANGDAM, MegamiEnum.SHINRA, CardType.ENCHANTMENT, SubType.NONE)
+    private val nonpa = CardData(CardClass.NORMAL, CardName.SHINRA_NONPA, MegamiEnum.SHINRA, CardType.ENCHANTMENT, SubType.NONE)
+    private val wanjeonNonpa = CardData(CardClass.SPECIAL, CardName.SHINRA_WANJEON_NONPA, MegamiEnum.SHINRA, CardType.BEHAVIOR, SubType.NONE)
+    private val dasicIhae = CardData(CardClass.SPECIAL, CardName.SHINRA_DASIG_IHAE, MegamiEnum.SHINRA, CardType.BEHAVIOR, SubType.NONE)
+    private val cheonjiBanBag = CardData(CardClass.SPECIAL, CardName.SHINRA_CHEONJI_BANBAG, MegamiEnum.SHINRA, CardType.ENCHANTMENT, SubType.FULL_POWER)
+    private val samraBanSho = CardData(CardClass.SPECIAL, CardName.SHINRA_SAMRA_BAN_SHO, MegamiEnum.SHINRA, CardType.ENCHANTMENT, SubType.NONE)
+
     private suspend fun setStratagemByUser(game_status: GameStatus, player: PlayerEnum){
         while(true){
             val nowCommand = game_status.receiveCardEffectSelect(player, SHINRA_SHINRA_CARD_NUMBER)
@@ -1769,19 +1801,6 @@ object CardSet {
             }
         }
     }
-
-    private val shinra = CardData(CardClass.SPECIAL, CardName.SHINRA_SHINRA, MegamiEnum.SHINRA, CardType.BEHAVIOR, SubType.NONE)
-    private val iblon = CardData(CardClass.NORMAL, CardName.SHINRA_IBLON, MegamiEnum.SHINRA, CardType.ATTACK, SubType.NONE)
-    private val banlon = CardData(CardClass.NORMAL, CardName.SHINRA_BANLON, MegamiEnum.SHINRA, CardType.ATTACK, SubType.REACTION)
-    private val kiben = CardData(CardClass.NORMAL, CardName.SHINRA_KIBEN, MegamiEnum.SHINRA, CardType.ATTACK, SubType.FULL_POWER)
-    private val inyong = CardData(CardClass.NORMAL, CardName.SHINRA_INYONG, MegamiEnum.SHINRA, CardType.BEHAVIOR, SubType.NONE)
-    private val seondong = CardData(CardClass.NORMAL, CardName.SHINRA_SEONDONG, MegamiEnum.SHINRA, CardType.BEHAVIOR, SubType.REACTION)
-    private val jangdam = CardData(CardClass.NORMAL, CardName.SHINRA_JANGDAM, MegamiEnum.SHINRA, CardType.ENCHANTMENT, SubType.NONE)
-    private val nonpa = CardData(CardClass.NORMAL, CardName.SHINRA_NONPA, MegamiEnum.SHINRA, CardType.ENCHANTMENT, SubType.NONE)
-    private val wanjeonNonpa = CardData(CardClass.SPECIAL, CardName.SHINRA_WANJEON_NONPA, MegamiEnum.SHINRA, CardType.BEHAVIOR, SubType.NONE)
-    private val dasicIhae = CardData(CardClass.SPECIAL, CardName.SHINRA_DASIG_IHAE, MegamiEnum.SHINRA, CardType.BEHAVIOR, SubType.NONE)
-    private val cheonjiBanBag = CardData(CardClass.SPECIAL, CardName.SHINRA_CHEONJI_BANBAG, MegamiEnum.SHINRA, CardType.ENCHANTMENT, SubType.FULL_POWER)
-    private val samraBanSho = CardData(CardClass.SPECIAL, CardName.SHINRA_SAMRA_BAN_SHO, MegamiEnum.SHINRA, CardType.ENCHANTMENT, SubType.NONE)
 
     private fun shinraCardInit(){
         shinra.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_END_PHASE_YOUR) { card_number, player, game_status, _ ->
@@ -2081,6 +2100,18 @@ object CardSet {
         })
     }
 
+    private val centrifugalAttack = CardData(CardClass.NORMAL, CardName.HAGANE_CENTRIFUGAL_ATTACK, MegamiEnum.HAGANE, CardType.ATTACK, SubType.NONE)
+    private val fourWindedEarthquake = CardData(CardClass.NORMAL, CardName.HAGANE_FOUR_WINDED_EARTHQUAKE, MegamiEnum.HAGANE, CardType.ATTACK, SubType.NONE)
+    private val groundBreaking = CardData(CardClass.NORMAL, CardName.HAGANE_GROUND_BREAKING, MegamiEnum.HAGANE, CardType.ATTACK, SubType.FULL_POWER)
+    private val hyperRecoil = CardData(CardClass.NORMAL, CardName.HAGANE_HYPER_RECOIL, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
+    private val wonMuRuyn = CardData(CardClass.NORMAL, CardName.HAGANE_WON_MU_RUYN, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
+    private val ringABell = CardData(CardClass.NORMAL, CardName.HAGANE_RING_A_BELL, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
+    private val gravitationField = CardData(CardClass.NORMAL, CardName.HAGANE_GRAVITATION_FIELD, MegamiEnum.HAGANE, CardType.ENCHANTMENT, SubType.NONE)
+    private val grandSkyHoleCrash = CardData(CardClass.SPECIAL, CardName.HAGANE_GRAND_SKY_HOLE_CRASH, MegamiEnum.HAGANE, CardType.ATTACK, SubType.NONE)
+    private val grandBellMegalobel = CardData(CardClass.SPECIAL, CardName.HAGANE_GRAND_BELL_MEGALOBEL, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
+    private val grandGravitationAttract = CardData(CardClass.SPECIAL, CardName.HAGANE_GRAND_GRAVITATION_ATTRACT, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
+    private val grandMountainRespect = CardData(CardClass.SPECIAL, CardName.HAGANE_GRAND_MOUNTAIN_RESPECT, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
+
     private fun centrifugal(player: PlayerEnum, game_status: GameStatus): Boolean{
         return game_status.startTurnDistance + 1 < game_status.thisTurnDistance && !game_status.logger.checkThisTurnDoAttack(player)
     }
@@ -2110,19 +2141,6 @@ object CardSet {
             return false
         }
     }
-
-    private val centrifugalAttack = CardData(CardClass.NORMAL, CardName.HAGANE_CENTRIFUGAL_ATTACK, MegamiEnum.HAGANE, CardType.ATTACK, SubType.NONE)
-    private val fourWindedEarthquake = CardData(CardClass.NORMAL, CardName.HAGANE_FOUR_WINDED_EARTHQUAKE, MegamiEnum.HAGANE, CardType.ATTACK, SubType.NONE)
-    private val groundBreaking = CardData(CardClass.NORMAL, CardName.HAGANE_GROUND_BREAKING, MegamiEnum.HAGANE, CardType.ATTACK, SubType.FULL_POWER)
-    private val hyperRecoil = CardData(CardClass.NORMAL, CardName.HAGANE_HYPER_RECOIL, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
-    private val wonMuRuyn = CardData(CardClass.NORMAL, CardName.HAGANE_WON_MU_RUYN, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
-    private val ringABell = CardData(CardClass.NORMAL, CardName.HAGANE_RING_A_BELL, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
-    private val gravitationField = CardData(CardClass.NORMAL, CardName.HAGANE_GRAVITATION_FIELD, MegamiEnum.HAGANE, CardType.ENCHANTMENT, SubType.NONE)
-    private val grandSkyHoleCrash = CardData(CardClass.SPECIAL, CardName.HAGANE_GRAND_SKY_HOLE_CRASH, MegamiEnum.HAGANE, CardType.ATTACK, SubType.NONE)
-    private val grandBellMegalobel = CardData(CardClass.SPECIAL, CardName.HAGANE_GRAND_BELL_MEGALOBEL, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
-    private val grandGravitationAttract = CardData(CardClass.SPECIAL, CardName.HAGANE_GRAND_GRAVITATION_ATTRACT, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
-    private val grandMountainRespect = CardData(CardClass.SPECIAL, CardName.HAGANE_GRAND_MOUNTAIN_RESPECT, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
-
 
     private fun haganeCardInit(){
         centrifugalAttack.setAttack(DistanceType.CONTINUOUS, Pair(2, 6), null, 5, 3,
@@ -6552,6 +6570,107 @@ object CardSet {
         })
     }
 
+    private val helpOrThreat = CardData(CardClass.NORMAL, CardName.YUKIHI_HELP_SLASH_THREAT, MegamiEnum.YUKIHI, CardType.ATTACK, SubType.NONE)
+    private val threadOrRawThread = CardData(CardClass.NORMAL, CardName.YUKIHI_THREAD_SLASH_RAW_THREAD, MegamiEnum.YUKIHI, CardType.ATTACK, SubType.NONE)
+    private val flutteringCollar = CardData(CardClass.SPECIAL, CardName.YUKIHI_FLUTTERING_COLLAR, MegamiEnum.YUKIHI, CardType.ENCHANTMENT, SubType.NONE)
+    private val textForFlutteringCollar = Text(TextEffectTimingTag.USING, TextEffectTag.WHEN_AFTER_CARD_USE) {card_number, player, game_status, _->
+        game_status.addConcentration(player)
+        game_status.getCardFrom(player, card_number, LocationEnum.ENCHANTMENT_ZONE)?.let {
+            game_status.dustToCard(player, 3, it)
+        }
+        null
+    }
+
+    private fun yukihiA1CardInit(){
+        helpOrThreat.umbrellaMark = true
+        helpOrThreat.setAttackFold(DistanceType.CONTINUOUS, Pair(3, 5), null, 2, 1)
+        helpOrThreat.setAttackUnfold(DistanceType.CONTINUOUS, Pair(1, 2), null, 1, 2)
+        helpOrThreat.addTextFold(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ ->
+                var token = 0
+                for(card in game_status.getPlayer(player).enchantmentCard.values){
+                    card.nap?.let {
+                        token += it
+                    }
+                }
+                token >= 4
+            }, {_, _, madeAttack ->
+                madeAttack.lifePlusMinus(1)
+            }))
+            null
+        })
+        helpOrThreat.addTextUnfold(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ ->
+                var token = 0
+                for(card in game_status.getPlayer(player).enchantmentCard.values){
+                    card.nap?.let {
+                        token += it
+                    }
+                }
+                token >= 4
+            }, {_, _, madeAttack ->
+                madeAttack.auraPlusMinus(1)
+            }))
+            null
+        })
+        threadOrRawThread.umbrellaMark = true
+        threadOrRawThread.setAttackFold(DistanceType.CONTINUOUS, Pair(2, 8), null, 1, 1)
+        threadOrRawThread.setAttackUnfold(DistanceType.CONTINUOUS, Pair(0, 4), null, 0, 0)
+        threadOrRawThread.addTextFold(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnRangeBuff(player, RangeBuff(card_number,1, RangeBufTag.PLUS, {_, _, attack -> (attack.megami != MegamiEnum.YUKIHI)},
+                { _, _, attack -> attack.apply {
+                    plusMinusRange(1, true); plusMinusRange(1, false)
+                }
+                }))
+            null
+        })
+        threadOrRawThread.addTextFold(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) {card_number, player, game_status, _->
+            game_status.movePlayingCard(player, LocationEnum.YOUR_DECK_BELOW, card_number)
+            null
+        })
+        threadOrRawThread.addTextUnfold(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            if(game_status.logger.checkThisTurnUseCard(player) { card -> card != card_number }){
+                game_status.selectCardFrom(player, player, listOf(LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 611, 1){
+                    card -> card.card_data.sub_type != SubType.FULL_POWER && card.card_data.megami != MegamiEnum.YUKIHI
+                }?.let { selected ->
+                    game_status.getCardFrom(player, selected[0], LocationEnum.DISCARD_YOUR)?.let { card ->
+                        game_status.useCardFrom(player, card, LocationEnum.DISCARD_YOUR, false, null,
+                            isCost = true, isConsume = true
+                        )
+                    }
+                }
+            }
+            null
+        })
+        flutteringCollar.setSpecial(4)
+        flutteringCollar.setEnchantment(1)
+        flutteringCollar.addTextFold(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_AFTER_CARD_USE) ret@{card_number, player, game_status, card->
+            if(game_status.turnPlayer == player){
+                val usedCard = game_status.cardForEffect?: return@ret null
+                if(usedCard.card_data.megami != MegamiEnum.YUKIHI && game_status.logger.countCardUseCount(player, usedCard.card_number) == 1){
+                    if(game_status.logger.checkThisTurnUseCardCondition(player){ cardNumber, megamiNumber ->
+                            val megami = MegamiEnum.fromInt(megamiNumber)
+                            if(megami == MegamiEnum.YUKIHI) 2
+                            else if(cardNumber == usedCard.card_number) 1
+                            else 0
+                    }){
+                        usedCard.cardUseEndEffect[card_number] = textForFlutteringCollar
+                    }
+                }
+            }
+            null
+        })
+        flutteringCollar.addTextUnfold(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_START_PHASE_YOUR) {card_number, player, game_status, _->
+            if(game_status.addPreAttackZone(player, MadeAttack(CardName.YUKIHI_FLUTTERING_COLLAR, card_number, CardClass.NULL,
+                    DistanceType.CONTINUOUS, 2,  2, Pair(0, 5), null, MegamiEnum.YUKIHI,
+                    cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
+                )) ){
+                game_status.afterMakeAttack(card_number, player, null)
+            }
+            null
+        })
+    }
+
     fun init(){
         yurinaCardInit()
         saineCardInit()
@@ -6581,6 +6700,7 @@ object CardSet {
         saineA2CardInit()
         hatsumiCardInit()
         mizukiCardInit()
+        yukihiA1CardInit()
 
         hashMapInit()
         hashMapTest()

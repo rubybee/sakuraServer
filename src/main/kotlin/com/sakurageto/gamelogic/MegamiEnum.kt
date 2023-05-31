@@ -17,6 +17,7 @@ enum class MegamiEnum(var real_number: Int) {
     OBORO(50),
     OBORO_A1(51),
     YUKIHI(60),
+    YUKIHI_A1(61),
     SHINRA(70),
     SHINRA_A1(71),
     HAGANE(80),

@@ -13,6 +13,8 @@ class Log(val player: PlayerEnum, val text: LogText, val number1: Int, val numbe
         return card_name.toCardNumber(true) == number1 || card_name.toCardNumber(false) == number1
     }
 
+    fun isTextUseCard() = this.text == LogText.USE_CARD || this.text == LogText.USE_CARD_IN_SOLDIER ||
+            this.text == LogText.USE_CARD_REACT || this.text == LogText.USE_CARD_IN_COVER || this.text == LogText.USE_CARD_IN_COVER_AND_REACT
 }
 
 enum class LogText{

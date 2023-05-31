@@ -9,7 +9,8 @@ import java.util.*
 import kotlin.collections.ArrayDeque
 import kotlin.collections.HashMap
 
-class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum, var special_card_state: SpecialCardEnum?) {
+class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum,
+           var special_card_state: SpecialCardEnum?){
     var nap: Int? = null
 
     var beforeCardData: CardData? = null
@@ -665,15 +666,46 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
 
     suspend fun effectAllValidEffect(player: PlayerEnum, game_status: GameStatus, effectTag: TextEffectTag): Int{
         var now = 0
-        card_data.effect?.let {
-            for(text in it){
-                if(usedEffectUsable(text) || enchantmentUsable(text)){
-                    if(text.tag == effectTag) text.effect!!(this.card_number, player, game_status, null)?.let { result ->
-                        now += result
+        if(this.card_data.umbrellaMark) {
+            when (game_status.getUmbrella(this.player)) {
+                Umbrella.FOLD -> {
+                    card_data.effectFold?.let {
+                        for(text in it){
+                            if(usedEffectUsable(text) || enchantmentUsable(text)){
+                                if(text.tag == effectTag) text.effect!!(this.card_number, player, game_status, null)?.let { result ->
+                                    now += result
+                                }
+                            }
+                        }
+                    }
+                }
+                Umbrella.UNFOLD -> {
+                    card_data.effectUnfold?.let {
+                        for(text in it){
+                            if(usedEffectUsable(text) || enchantmentUsable(text)){
+                                if(text.tag == effectTag) text.effect!!(this.card_number, player, game_status, null)?.let { result ->
+                                    now += result
+                                }
+                            }
+                        }
+                    }
+                }
+                null -> {
+                }
+            }
+        }
+        else{
+            card_data.effect?.let {
+                for(text in it){
+                    if(usedEffectUsable(text) || enchantmentUsable(text)){
+                        if(text.tag == effectTag) text.effect!!(this.card_number, player, game_status, null)?.let { result ->
+                            now += result
+                        }
                     }
                 }
             }
         }
+
         return now
     }
 

@@ -63,6 +63,39 @@ class Logger {
         return false
     }
 
+    fun checkThisTurnUseCardCondition(player: PlayerEnum, filter: (Int, Int) -> Int): Boolean{
+        for(log in logQueue){
+            if(log.player == player && log.isTextUseCard()){
+                when(filter(log.number1, log.number2)){
+                    0 -> return false
+                    1 -> return true
+                    2 -> continue
+                }
+
+            }
+        }
+        return true
+    }
+
+    fun checkThisTurnUseCard(player: PlayerEnum, filter: (Int) -> Boolean): Boolean{
+        for(log in logQueue){
+            if(log.player == player && log.isTextUseCard() && filter(log.number1)){
+                return true
+            }
+        }
+        return false
+    }
+
+    fun countCardUseCount(player: PlayerEnum, card_number: Int): Int{
+        var count = 0
+        for(log in logQueue){
+            if(log.player == player && log.isTextUseCard() && log.number1 == card_number){
+                count += 1
+            }
+        }
+        return count
+    }
+
     fun checkThisCardUsed(player: PlayerEnum, card_number: Int): Boolean{
         for(log in logQueue.asReversed()){
             if(log.player == player && log.number1 == card_number) return true

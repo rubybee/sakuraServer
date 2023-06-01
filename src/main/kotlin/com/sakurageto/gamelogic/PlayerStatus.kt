@@ -35,6 +35,8 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var notReadySoldierZone = hashMapOf<Int, Card>()
     var thisTurnReact = false
     var lastTurnReact = false
+    var transformNumber = 0
+    var asuraUsed = false
 
     var loseCounter = false
 
@@ -101,7 +103,7 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var special_card_deck = HashMap<Int, Card>()
 
     var sealZone = HashMap<Int, Card>()
-    var sealInformation = HashMap<Int, Int>()
+    var sealInformation = HashMap<Int, MutableList<Int>>()
     var outOfGame = HashMap<Int, Card>()
 
     fun checkAuraFull(): Boolean = aura + freezeToken >= maxAura

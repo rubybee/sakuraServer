@@ -2736,6 +2736,42 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
+    fun getQuickChangeCard(player: PlayerEnum): MutableList<Card>?{
+        fun getQuickChangeCard(quickChange: Int): MutableList<Card>{
+            val result = mutableListOf<Card>()
+            player1.sealInformation[quickChange]?.let {
+                for(cardNumber in it){
+                    player1.sealZone[cardNumber]?.let { transform ->
+                        result.add(transform)
+                    }?: player2.sealZone[cardNumber]?.let { transform ->
+                        result.add(transform)
+                    }
+                }
+            }
+            player2.sealInformation[quickChange]?.let {
+                for(cardNumber in it){
+                    player1.sealZone[cardNumber]?.let { transform ->
+                        result.add(transform)
+                    }?: player2.sealZone[cardNumber]?.let { transform ->
+                        result.add(transform)
+                    }
+                }
+            }
+            return result
+        }
+
+        for(card in getPlayer(player).enchantmentCard.values){
+            card.card_data.effect?.let {
+                for (text in it){
+                    if(text.tag == TextEffectTag.ACTIVE_TRANSFORM_BELOW_THIS_CARD){
+                        return getQuickChangeCard(card.card_number)
+                    }
+                }
+            }
+        }
+        return null
+    }
+
     suspend fun deckReconstruct(player: PlayerEnum, damage: Boolean){
         val nowPlayer = getPlayer(player)
 
@@ -2753,6 +2789,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             processDamage(player, CommandEnum.CHOOSE_LIFE, Pair(999, 1), true, null, null)
         }
         Card.cardReconstructInsert(nowPlayer.discard, nowPlayer.cover_card, nowPlayer.normalCardDeck)
+
+        //TODO("change this mechanism like endphaseeffectprocess(can choose order of effect)")
         val reconstructListener = getImmediateReconstructListener(player)
         if(!reconstructListener.isEmpty()){
             for(i in 1..reconstructListener.size){
@@ -2762,6 +2800,16 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 if(!(now.doAction(this, -1, -1, false, false))){
                     reconstructListener.addLast(now)
                 }
+            }
+        }
+
+        for(card in getPlayer(player.opposite()).transformZone.values){
+            card.effectAllValidEffect(player, this, TextEffectTag.WHEN_DECK_RECONSTRUCT_OTHER)
+        }
+
+        getQuickChangeCard(player.opposite())?.let {transformList ->
+            for(transform in transformList){
+                transform.effectAllValidEffect(player, this, TextEffectTag.WHEN_DECK_RECONSTRUCT_OTHER)
             }
         }
     }
@@ -2841,14 +2889,33 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return false
     }
 
+    fun transformBasicOperationCheck(player: PlayerEnum, card_name: CardName) = getQuickChangeCard(player)?.let ret@{
+        for(transform in it){
+            if(transform.card_data.card_name == card_name){
+                return@ret true
+            }
+        }
+        false
+    }?: false
+
     suspend fun canDoBasicOperation(player: PlayerEnum, command: CommandEnum): Boolean{
         val nowPlayer = getPlayer(player)
         if(nowPlayer.end_turn || endCurrentPhase){
             return false
         }
-        for(card in nowPlayer.transformZone.values){
-            if(card.effectAllValidEffect(player, this, TextEffectTag.FORBID_BASIC_OPERATION) != 0) return false
+        for(transformCard in nowPlayer.transformZone.values){
+            if(transformCard.effectAllValidEffect(player, this, TextEffectTag.FORBID_BASIC_OPERATION) != 0) return false
         }
+
+        if(getQuickChangeCard(player)?.let ret@{
+            for(transformCard in it){
+                if(transformCard.effectAllValidEffect(player, this, TextEffectTag.FORBID_BASIC_OPERATION) != 0) return false
+            }
+                return false
+        }?: false){
+            return true
+        }
+
         return when(command){
             CommandEnum.ACTION_GO_FORWARD ->
                 !(nowPlayer.aura + nowPlayer.freezeToken == nowPlayer.maxAura || distanceToken == 0 || thisTurnDistance <= getAdjustSwellDistance(player))
@@ -2863,13 +2930,16 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 !(dust == 0 || getAdjustDistance(player) > getAdjustSwellDistance(player) || distanceToken == 10) && basicOperationEnchantmentCheck(player, CommandEnum.ACTION_BREAK_AWAY)
             }
             CommandEnum.ACTION_YAKSHA -> {
-                getPlayer(player).transformZone[CardName.FORM_YAKSHA] != null
+                getPlayer(player).transformZone[CardName.FORM_YAKSHA] != null || transformBasicOperationCheck(player, CardName.FORM_YAKSHA)
             }
             CommandEnum.ACTION_NAGA -> {
-                getPlayer(player).transformZone[CardName.FORM_NAGA] != null
+                getPlayer(player).transformZone[CardName.FORM_NAGA] != null || transformBasicOperationCheck(player, CardName.FORM_NAGA)
             }
             CommandEnum.ACTION_GARUDA -> {
-                getPlayer(player).transformZone[CardName.FORM_GARUDA] != null
+                getPlayer(player).transformZone[CardName.FORM_GARUDA] != null || transformBasicOperationCheck(player, CardName.FORM_GARUDA)
+            }
+            CommandEnum.ACTION_ASURA -> {
+                getPlayer(player).transformZone[CardName.FORM_ASURA] != null || transformBasicOperationCheck(player, CardName.FORM_ASURA)
             }
             else -> false
         }
@@ -2917,7 +2987,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    suspend fun doGoForward(player: PlayerEnum, card: Int){
+    private suspend fun doGoForward(player: PlayerEnum, card: Int){
         if(canDoBasicOperation(player, CommandEnum.ACTION_GO_FORWARD)){
             val nowSocket = getSocket(player)
             val otherSocket = getSocket(player.opposite())
@@ -2946,7 +3016,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     //this 5 function must call after check when select
-    suspend fun doGoBackward(player: PlayerEnum, card: Int){
+    private suspend fun doGoBackward(player: PlayerEnum, card: Int){
         if(canDoBasicOperation(player, CommandEnum.ACTION_GO_BACKWARD)){
             val nowPlayer = getPlayer(player)
 
@@ -2966,7 +3036,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     //this 5 function must call after check when select
-    suspend fun doWindAround(player: PlayerEnum, card: Int){
+    private suspend fun doWindAround(player: PlayerEnum, card: Int){
         if(canDoBasicOperation(player, CommandEnum.ACTION_WIND_AROUND)){
             var additionalCheck = 0
             for(usedCard in getPlayer(player).usedSpecialCard.values){
@@ -2995,7 +3065,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     //this 5 function must call after check when select
-    suspend fun doIncubate(player: PlayerEnum, card: Int){
+    private suspend fun doIncubate(player: PlayerEnum, card: Int){
         if(canDoBasicOperation(player, CommandEnum.ACTION_INCUBATE)){
             val nowPlayer = getPlayer(player)
 
@@ -3018,7 +3088,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     //this 5 function must call after check when select
-    suspend fun doBreakAway(player: PlayerEnum, card: Int){
+    private suspend fun doBreakAway(player: PlayerEnum, card: Int){
         if(canDoBasicOperation(player, CommandEnum.ACTION_BREAK_AWAY)){
             val nowSocket = getSocket(player)
             val otherSocket = getSocket(player.opposite())
@@ -3113,6 +3183,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun selectCardFrom(player: PlayerEnum, cardList: MutableList<Int>, reason: CommandEnum, card_number: Int,
         listSize: Int): MutableList<Int>{
+        if(cardList.size <= listSize) return cardList
         while (true){
             val set = mutableSetOf<Int>()
             val list = receiveSelectCard(getSocket(player), cardList, reason, card_number) ?: continue
@@ -3121,8 +3192,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    suspend fun popCardFrom(player: PlayerEnum, card_number: Int, location: LocationEnum, public: Boolean): Card?{
+    suspend fun popCardFrom(player: PlayerEnum, card_number: Int, location: LocationEnum, public: Boolean,
+                            discardCheck: Boolean = true): Card?{
         val nowPlayer = getPlayer(player)
+        val otherPlayer = getPlayer(player.opposite())
         val nowSocket = getSocket(player)
         val otherSocket = getSocket(player.opposite())
         when(location){
@@ -3134,11 +3207,31 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             LocationEnum.DISCARD_YOUR -> for(card in nowPlayer.discard) if (card.card_number == card_number) {
                 sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_DISCARD_YOUR)
                 nowPlayer.discard.remove(card)
+                if(discardCheck){
+                    for(transformCard in otherPlayer.transformZone.values){
+                        transformCard.effectAllValidEffect(player.opposite(), this, TextEffectTag.WHEN_DISCARD_NUMBER_CHANGE_OTHER)
+                    }
+                    getQuickChangeCard(player.opposite())?.let {
+                        for (transformCard in it){
+                            transformCard.effectAllValidEffect(player.opposite(), this, TextEffectTag.WHEN_DISCARD_NUMBER_CHANGE_OTHER)
+                        }
+                    }
+                }
                 return card
             }
-            LocationEnum.DISCARD_OTHER -> for(card in getPlayer(player.opposite()).discard) if (card.card_number == card_number){
+            LocationEnum.DISCARD_OTHER -> for(card in otherPlayer.discard) if (card.card_number == card_number){
                 sendPopCardZone(otherSocket, nowSocket, card_number, public, CommandEnum.POP_DISCARD_YOUR)
-                getPlayer(player.opposite()).discard.remove(card)
+                otherPlayer.discard.remove(card)
+                if(discardCheck){
+                    for(transformCard in nowPlayer.transformZone.values){
+                        transformCard.effectAllValidEffect(player, this, TextEffectTag.WHEN_DISCARD_NUMBER_CHANGE_OTHER)
+                    }
+                    getQuickChangeCard(player)?.let {
+                        for (transformCard in it){
+                            transformCard.effectAllValidEffect(player, this, TextEffectTag.WHEN_DISCARD_NUMBER_CHANGE_OTHER)
+                        }
+                    }
+                }
                 return card
             }
             LocationEnum.DECK -> for(card in nowPlayer.normalCardDeck) if (card.card_number == card_number) {
@@ -3232,7 +3325,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    suspend fun insertCardTo(player: PlayerEnum, card: Card, location: LocationEnum, publicForOther: Boolean, publicForYour: Boolean = true){
+    suspend fun insertCardTo(player: PlayerEnum, card: Card, location: LocationEnum, publicForOther: Boolean,
+                             publicForYour: Boolean = true, discardCheck: Boolean = true){
         if(card.card_data.card_class == CardClass.SOLDIER){
             when(location){
                 LocationEnum.NOT_READY_SOLDIER_ZONE, LocationEnum.READY_SOLDIER_ZONE, LocationEnum.PLAYING_ZONE_YOUR,
@@ -3262,6 +3356,16 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
             LocationEnum.DISCARD_YOUR -> {
                 cardOwner.discard.addFirst(card)
+                if(discardCheck){
+                    for(transformCard in getPlayer(player.opposite()).transformZone.values){
+                        transformCard.effectAllValidEffect(player, this, TextEffectTag.WHEN_DISCARD_NUMBER_CHANGE_OTHER)
+                    }
+                    getQuickChangeCard(player.opposite())?.let {
+                        for (transformCard in it){
+                            transformCard.effectAllValidEffect(player.opposite(), this, TextEffectTag.WHEN_DISCARD_NUMBER_CHANGE_OTHER)
+                        }
+                    }
+                }
                 sendAddCardZone(cardOwnerSocket, cardOwnerOppositeSocket, card.card_number, publicForOther, CommandEnum.DISCARD_CARD_YOUR, publicForYour)
             }
             LocationEnum.PLAYING_ZONE_YOUR -> {

@@ -1,5 +1,6 @@
 package com.sakurageto.card
 
+import com.sakurageto.card.CardSet.toCardName
 import com.sakurageto.gamelogic.*
 import com.sakurageto.gamelogic.GameStatus.Companion.START_PHASE
 import com.sakurageto.protocol.CommandEnum
@@ -1982,36 +1983,39 @@ object CardSet {
         })
         nonpa.setEnchantment(4)
         nonpa.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.SEAL_CARD) {card_number, player, game_status, _ ->
-            while (true){
-                val list = game_status.selectCardFrom(player.opposite(), player, listOf(LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 706)
-                {true}?: break
-                if (list.size == 1){
-                    game_status.popCardFrom(player.opposite(), list[0], LocationEnum.DISCARD_YOUR, true)?.let {
-                        game_status.getPlayer(player).sealInformation[it.card_number] = card_number
-                        game_status.insertCardTo(player, it, LocationEnum.SEAL_ZONE, true)
+            game_status.selectCardFrom(player.opposite(), player, listOf(LocationEnum.DISCARD_YOUR),
+                CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 706, 1)
+            {true}?.let {selected ->
+                val nowPlayer = game_status.getPlayer(player)
+                game_status.popCardFrom(player.opposite(), selected[0], LocationEnum.DISCARD_YOUR, true)?.let {
+                    nowPlayer.sealInformation[card_number]?.add(it.card_number) ?: run {
+                        nowPlayer.sealInformation[card_number] = mutableListOf(it.card_number)
                     }
-                    break
+                    game_status.insertCardTo(player, it, LocationEnum.SEAL_ZONE, true)
                 }
             }
             null
         })
         nonpa.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.SEAL_CARD) {card_number, player, game_status, _ ->
-            val player1 = game_status.getPlayer(player)
-            val player2 = game_status.getPlayer(player.opposite())
-            for(sealCardNumber in player1.sealZone.keys){
-                if(player1.sealInformation[sealCardNumber] == card_number){
-                    game_status.popCardFrom(player, sealCardNumber, LocationEnum.SEAL_ZONE, true)?.let {
+            val nowPlayer = game_status.getPlayer(player)
+            val otherPlayer = game_status.getPlayer(player)
+            nowPlayer.sealInformation[card_number]?.let { sealedList ->
+                for(sealedCardNumber in sealedList){
+                    game_status.popCardFrom(player, sealedCardNumber, LocationEnum.SEAL_ZONE, true)?.let {
                         game_status.insertCardTo(it.player, it, LocationEnum.DISCARD_YOUR, true)
                     }
                 }
             }
-            for(sealCardNumber in player2.sealZone.keys){
-                if(player2.sealInformation[sealCardNumber] == card_number){
-                    game_status.popCardFrom(player.opposite(), sealCardNumber, LocationEnum.SEAL_ZONE, true)?.let {
+            nowPlayer.sealInformation.remove(card_number)
+
+            otherPlayer.sealInformation[card_number]?.let { sealedList ->
+                for(sealedCardNumber in sealedList){
+                    game_status.popCardFrom(player.opposite(), sealedCardNumber, LocationEnum.SEAL_ZONE, true)?.let {
                         game_status.insertCardTo(it.player, it, LocationEnum.DISCARD_YOUR, true)
                     }
                 }
             }
+            otherPlayer.sealInformation.remove(card_number)
             null
         })
         wanjeonNonpa.setSpecial(2)
@@ -2022,7 +2026,9 @@ object CardSet {
                     {true}?: break
                     if (list.size == 1){
                         game_status.popCardFrom(player.opposite(), list[0], LocationEnum.DISCARD_YOUR, true)?.let {
-                            game_status.getPlayer(player).sealInformation[it.card_number] = card_number
+                            game_status.getPlayer(player).sealInformation[card_number]?.add(it.card_number) ?: run {
+                                game_status.getPlayer(player).sealInformation[card_number] = mutableListOf(it.card_number)
+                            }
                             game_status.insertCardTo(player, it, LocationEnum.SEAL_ZONE, true)
                         }
                         break
@@ -2955,8 +2961,9 @@ object CardSet {
         industria.setSpecial(1)
         industria.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.SEAL_CARD) ret@{card_number, player, game_status, _ ->
             if(game_status.getCardOwner(card_number) == player){
-                for(card in game_status.getPlayer(player).sealInformation.values){
-                    if(card == card_number) return@ret null
+                val nowPlayer = game_status.getPlayer(player)
+                if(card_number in nowPlayer.sealInformation){
+                    return@ret null
                 }
                 while (true){
                     val list = game_status.selectCardFrom(player, player, listOf(LocationEnum.HAND, LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1009
@@ -2964,10 +2971,13 @@ object CardSet {
                     if (list.size == 1){
                         game_status.popCardFrom(player, list[0], LocationEnum.DISCARD_YOUR, true)?.let {
                             game_status.insertCardTo(player, it, LocationEnum.SEAL_ZONE, true)
-                            game_status.getPlayer(player).sealInformation[it.card_number] = card_number
+                            nowPlayer.sealInformation[card_number]?.add(it.card_number) ?: run {
+                                nowPlayer.sealInformation[card_number] = mutableListOf(it.card_number)
+                            }
                         }?: game_status.popCardFrom(player, list[0], LocationEnum.HAND, true)?.let {
-                            game_status.insertCardTo(player, it, LocationEnum.SEAL_ZONE, true)
-                            game_status.getPlayer(player).sealInformation[it.card_number] = card_number
+                            nowPlayer.sealInformation[card_number]?.add(it.card_number) ?: run {
+                                nowPlayer.sealInformation[card_number] = mutableListOf(it.card_number)
+                            }
                         }?: continue
                         break
                     }
@@ -2986,12 +2996,7 @@ object CardSet {
                 game_status.moveAdditionalCard(player, getCard.card_data.card_name, LocationEnum.YOUR_DECK_BELOW)
             }
             val ownerPlayer = game_status.getPlayer(game_status.getCardOwner(card_number))
-            var duplicateCardData: CardData? = null
-            for(card in ownerPlayer.sealZone.keys){
-                if(ownerPlayer.sealInformation[card] == card_number){
-                    duplicateCardData = ownerPlayer.sealZone[card]!!.card_data
-                }
-            }
+            var duplicateCardData: CardData? = ownerPlayer.sealZone[ownerPlayer.sealInformation[card_number]?.get(0)]?.card_data
             if(duplicateCardData != null){
                 for(card in ownerPlayer.hand.values + ownerPlayer.normalCardDeck + ownerPlayer.discard + ownerPlayer.cover_card
                         + ownerPlayer.readySoldierZone.values + ownerPlayer.notReadySoldierZone.values
@@ -3155,18 +3160,42 @@ object CardSet {
 
     private fun combustCondition(game_status: GameStatus, player: PlayerEnum): Boolean = game_status.getPlayer(player).artificialToken != 0
 
-    private fun makeTransformListOrigin(player: PlayerEnum, game_status: GameStatus): MutableList<Int>{
+    private fun makeTransformList(player: PlayerEnum, game_status: GameStatus): MutableList<Int>{
         val cardList = mutableListOf<Int>()
-        game_status.getPlayer(player).additionalHand[CardName.FORM_YAKSHA]?.let {
+        val nowPlayer = game_status.getPlayer(player)
+        nowPlayer.additionalHand[CardName.FORM_YAKSHA]?.let {
             cardList.add(it.card_number)
         }
-        game_status.getPlayer(player).additionalHand[CardName.FORM_NAGA]?.let {
+        nowPlayer.additionalHand[CardName.FORM_KINNARI]?.let {
             cardList.add(it.card_number)
         }
-        game_status.getPlayer(player).additionalHand[CardName.FORM_GARUDA]?.let {
+        nowPlayer.additionalHand[CardName.FORM_ASURA]?.let {
+            cardList.add(it.card_number)
+        }
+        nowPlayer.additionalHand[CardName.FORM_DEVA]?.let {
+            cardList.add(it.card_number)
+        }
+        nowPlayer.additionalHand[CardName.FORM_NAGA]?.let {
+            cardList.add(it.card_number)
+        }
+        nowPlayer.additionalHand[CardName.FORM_GARUDA]?.let {
             cardList.add(it.card_number)
         }
         return cardList
+    }
+
+    private suspend fun transform(player: PlayerEnum, game_status: GameStatus){
+        val cardList = makeTransformList(player, game_status)
+        game_status.getPlayer(player).transformNumber += 1
+        if(cardList.size != 0){
+            game_status.logger.insert(Log(player, LogText.TRANSFORM, -1, -1))
+            val get = game_status.selectCardFrom(player, cardList, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1110, 1)[0]
+            game_status.getCardFrom(player, get, LocationEnum.ADDITIONAL_CARD)?.let {
+                game_status.moveAdditionalCard(player, get.toCardName(), LocationEnum.TRANSFORM)
+                it.special_card_state = SpecialCardEnum.PLAYED
+                it.effectText(player, game_status, null, TextEffectTag.WHEN_TRANSFORM)
+            }
+        }
     }
 
     private fun thallyaCardInit(){
@@ -3320,15 +3349,7 @@ object CardSet {
         juliaBlackbox.setSpecial(2)
         juliaBlackbox.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.TRANSFORM) {card_number, player, game_status, _ ->
             if((game_status.getPlayer(player).artificialToken?: 0) == 0){
-                val cardList = makeTransformListOrigin(player, game_status)
-                if(cardList.size != 0){
-                    val get = game_status.selectCardFrom(player, cardList, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1110, 1)[0]
-                    game_status.getCardFrom(player, get, LocationEnum.ADDITIONAL_CARD)?.let {
-                        game_status.moveAdditionalCard(player, get.toCardName(), LocationEnum.TRANSFORM)
-                        it.special_card_state = SpecialCardEnum.PLAYED
-                        it.effectText(player, game_status, null, TextEffectTag.WHEN_TRANSFORM)
-                    }
-                }
+                transform(player, game_status)
             }
             else{
                 game_status.movePlayingCard(player, LocationEnum.SPECIAL_CARD, card_number)
@@ -4601,7 +4622,7 @@ object CardSet {
                 game_status.popCardFrom(player, list[0], LocationEnum.HAND, false)?.let {
                     game_status.insertCardTo(player, it, LocationEnum.COVER_CARD, false)
                 }
-                game_status.doWindAround(player, 201416)
+                game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND, 201416)
                 break
             }
             null
@@ -5059,9 +5080,9 @@ object CardSet {
             null
         })
         absoluteZero.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
-            game_status.doWindAround(player, 201504)
+            game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND, 201504)
             if(game_status.getPlayer(player.opposite()).freezeToken >= 3){
-                game_status.doWindAround(player, 201504)
+                game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND, 201504)
             }
             null
         })
@@ -6671,6 +6692,137 @@ object CardSet {
         })
     }
 
+    private val quickChange = CardData(CardClass.NORMAL, CardName.THALLYA_QUICK_CHANGE, MegamiEnum.THALLYA, CardType.ENCHANTMENT, SubType.NONE)
+    private val blackboxNeo = CardData(CardClass.SPECIAL, CardName.THALLYA_BLACKBOX_NEO, MegamiEnum.THALLYA, CardType.BEHAVIOR, SubType.NONE)
+    private val omnisBlaster = CardData(CardClass.SPECIAL, CardName.THALLYA_OMNIS_BLASTER, MegamiEnum.THALLYA, CardType.ATTACK, SubType.NONE)
+    private val formKinnari = CardData(CardClass.SPECIAL, CardName.FORM_KINNARI, MegamiEnum.THALLYA, CardType.UNDEFINED, SubType.NONE)
+    private val formAsura = CardData(CardClass.SPECIAL, CardName.FORM_ASURA, MegamiEnum.THALLYA, CardType.UNDEFINED, SubType.NONE)
+    private val formDeva = CardData(CardClass.SPECIAL, CardName.FORM_DEVA, MegamiEnum.THALLYA, CardType.UNDEFINED, SubType.NONE)
+
+    private fun thallyaA1CardInit(){
+        quickChange.setEnchantment(3)
+        quickChange.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_SAKURA_TOKEN) { _, player, game_status, _ ->
+            game_status.restoreArtificialToken(player, 1)
+            null
+        })
+        quickChange.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.SEAL_CARD) { card_number, player, game_status, _ ->
+            val cardList = makeTransformList(player, game_status)
+            if(cardList.size != 0){
+                val get = game_status.selectCardFrom(player, cardList, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1114, 1)[0]
+                game_status.getCardFrom(player, get, LocationEnum.ADDITIONAL_CARD)?.let {
+                    game_status.moveAdditionalCard(player, get.toCardName(), LocationEnum.SEAL_ZONE)
+                    val nowPlayer = game_status.getPlayer(player)
+                    nowPlayer.sealInformation[card_number]?.add(it.card_number) ?: run {
+                        nowPlayer.sealInformation[card_number] = mutableListOf(it.card_number)
+                    }
+                    it.special_card_state = SpecialCardEnum.PLAYED
+                }
+            }
+            null
+        })
+        quickChange.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.ACTIVE_TRANSFORM_BELOW_THIS_CARD, null))
+        quickChange.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.SEAL_CARD) {card_number, player, game_status, _ ->
+            val nowPlayer = game_status.getPlayer(player)
+            val otherPlayer = game_status.getPlayer(player)
+            nowPlayer.sealInformation[card_number]?.let { sealedList ->
+                for(sealedCardNumber in sealedList){
+                    game_status.popCardFrom(player, sealedCardNumber, LocationEnum.SEAL_ZONE, true)?.let {
+                        game_status.insertCardTo(it.player, it, LocationEnum.DISCARD_YOUR, true)
+                    }
+                }
+            }
+            nowPlayer.sealInformation.remove(card_number)
+
+            otherPlayer.sealInformation[card_number]?.let { sealedList ->
+                for(sealedCardNumber in sealedList){
+                    game_status.popCardFrom(player.opposite(), sealedCardNumber, LocationEnum.SEAL_ZONE, true)?.let {
+                        game_status.insertCardTo(it.player, it, LocationEnum.DISCARD_YOUR, true)
+                    }
+                }
+            }
+            otherPlayer.sealInformation.remove(card_number)
+            null
+        })
+        blackboxNeo.setSpecial(1)
+        blackboxNeo.addtext(termination)
+        blackboxNeo.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) ret@{card_number, player, game_status, _ ->
+            game_status.restoreArtificialToken(player, 1)
+            if(game_status.getPlayer(player).artificialTokenBurn == 0){
+                game_status.getCardFrom(player, card_number, LocationEnum.PLAYING_ZONE_YOUR)?.let{
+                    game_status.dustToCard(player, 1, it, LocationEnum.PLAYING_ZONE_YOUR)
+                    if(it.nap == 2){
+                        game_status.cardToDust(player, 2, it, LocationEnum.PLAYING_ZONE_YOUR)
+                        transform(player, game_status)
+                    }
+                }
+            }
+            null
+        })
+        blackboxNeo.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.RETURN){_, player, game_status, _ ->
+            if((game_status.getPlayer(player).artificialToken ?: 0) <= 3 || game_status.logger.checkThisTurnTransform(player)) 1
+            else 0
+        })
+        omnisBlaster.setSpecial(null)
+        omnisBlaster.setAttack(DistanceType.CONTINUOUS, Pair(3, 10), null, 1000, 1000,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        omnisBlaster.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.INSERT_IMMEDIATE, {_, _, _ ->
+                true
+            }, {nowPlayer, gameStatus, madeAttack ->
+                madeAttack.run {
+                    editedAuraDamage = gameStatus.getPlayer(nowPlayer).transformNumber
+                    editedLifeDamage = gameStatus.getPlayer(nowPlayer).transformNumber
+                }
+            }))
+            null
+        })
+        omnisBlaster.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.COST_X) {_, player, game_status, _->
+            game_status.getPlayer(player).transformNumber
+        })
+        formKinnari.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_TRANSFORM) {_, player, game_status, _ ->
+            for(i in 1..game_status.getPlayer(player.opposite()).normalCardDeck.size){
+                game_status.popCardFrom(player.opposite(), 1, LocationEnum.YOUR_DECK_TOP, false)?.let {
+                    game_status.insertCardTo(player.opposite(), it, LocationEnum.COVER_CARD, false)
+                }
+            }
+            null
+        })
+        formKinnari.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_DECK_RECONSTRUCT_OTHER) {card_number, player, game_status, _ ->
+            if(game_status.addPreAttackZone(player, MadeAttack(CardName.FORM_KINNARI, card_number, CardClass.NULL,
+                    DistanceType.DISCONTINUOUS, 2,  2, null,
+                    arrayOf(false, false, true, false, true, false, true, false, false, false, false), MegamiEnum.THALLYA,
+                    cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
+                )) ){
+                game_status.afterMakeAttack(card_number, player, null)
+            }
+            null
+        })
+        formAsura.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_TRANSFORM) {_, player, game_status, _ ->
+            for(i in 1..2){
+                game_status.selectCardFrom(player.opposite(), player.opposite(), listOf(LocationEnum.COVER_CARD),
+                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1118, 1){true}?.let {selected ->
+                    game_status.popCardFrom(player, selected[0], LocationEnum.COVER_CARD, true)?.let { card ->
+                        game_status.insertCardTo(player, card, LocationEnum.DISCARD_YOUR, true)
+                    }
+                }?: break
+            }
+            null
+        })
+        formDeva.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_TRANSFORM) {_, player, game_status, _ ->
+            game_status.restoreArtificialToken(player, 2)
+            game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND, 201119)
+            game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND, 201119)
+            null
+        })
+        formDeva.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_DISCARD_NUMBER_CHANGE_OTHER) {_, player, game_status, _ ->
+            val otherPlayer = game_status.getPlayer(player.opposite())
+            if(otherPlayer.normalCardDeck.size != 0 && otherPlayer.normalCardDeck.size % 2 == 0){
+                game_status.getConcentration(player)
+            }
+            null
+        })
+    }
+
     fun init(){
         yurinaCardInit()
         saineCardInit()
@@ -6701,6 +6853,7 @@ object CardSet {
         hatsumiCardInit()
         mizukiCardInit()
         yukihiA1CardInit()
+        thallyaA1CardInit()
 
         hashMapInit()
         hashMapTest()

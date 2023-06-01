@@ -366,7 +366,15 @@ enum class CardName {
 
     YUKIHI_HELP_SLASH_THREAT, //611
     YUKIHI_THREAD_SLASH_RAW_THREAD,
-    YUKIHI_FLUTTERING_COLLAR;
+    YUKIHI_FLUTTERING_COLLAR,
+
+    THALLYA_QUICK_CHANGE, //1114
+    THALLYA_BLACKBOX_NEO,
+    THALLYA_OMNIS_BLASTER,
+
+    FORM_KINNARI,
+    FORM_ASURA, //1118
+    FORM_DEVA;
 
 
     fun toCardNumber(firstTurn: Boolean): Int{
@@ -987,6 +995,11 @@ enum class CardName {
                     THALLYA_STEAM_CANNON, THALLYA_STUNT, THALLYA_ROARING,
                     THALLYA_TURBO_SWITCH
                 )
+                THALLYA_A1 -> listOf(
+                    THALLYA_BURNING_STEAM, THALLYA_WAVING_EDGE, THALLYA_SHIELD_CHARGE,
+                    THALLYA_STEAM_CANNON, THALLYA_QUICK_CHANGE, THALLYA_ROARING,
+                    THALLYA_TURBO_SWITCH
+                )
                 RAIRA -> listOf(
                     RAIRA_BEAST_NAIL, RAIRA_STORM_SURGE_ATTACK, RAIRA_REINCARNATION_NAIL,
                     RAIRA_WIND_RUN, RAIRA_WISDOM_OF_STORM_SURGE, RAIRA_HOWLING,
@@ -1105,6 +1118,10 @@ enum class CardName {
                     THALLYA_ALPHA_EDGE, THALLYA_OMEGA_BURST, THALLYA_THALLYA_MASTERPIECE,
                     THALLYA_JULIA_BLACKBOX,
                 )
+                THALLYA_A1 -> listOf(
+                    THALLYA_BLACKBOX_NEO, THALLYA_OMNIS_BLASTER, THALLYA_THALLYA_MASTERPIECE,
+                    THALLYA_JULIA_BLACKBOX,
+                )
                 RAIRA -> listOf(
                     RAIRA_THUNDER_WIND_PUNCH, RAIRA_SUMMON_THUNDER, RAIRA_WIND_CONSEQUENCE_BALL,
                     RAIRA_CIRCULAR_CIRCUIT
@@ -1169,6 +1186,9 @@ enum class CardName {
                 )
                 THALLYA -> listOf(
                     FORM_YAKSHA, FORM_NAGA, FORM_GARUDA
+                )
+                THALLYA_A1 -> listOf(
+                    FORM_KINNARI, FORM_ASURA, FORM_DEVA, FORM_NAGA
                 )
                 RAIRA -> listOf(
                     RAIRA_WIND_ATTACK, RAIRA_WIND_ZEN_KAI, RAIRA_WIND_CELESTIAL_SPHERE

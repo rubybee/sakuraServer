@@ -19,6 +19,7 @@ class Log(val player: PlayerEnum, val text: LogText, val number1: Int, val numbe
 
 enum class LogText{
     ATTACK,
+    TRANSFORM,
     USE_CARD_IN_COVER_AND_REACT,
     USE_CARD_IN_COVER,
     USE_CARD_IN_SOLDIER,

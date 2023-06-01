@@ -117,4 +117,11 @@ class Logger {
         }
         return number
     }
+
+    fun checkThisTurnTransform(player: PlayerEnum): Boolean{
+        for(log in logQueue){
+            if(log.player == player && log.text == LogText.TRANSFORM) return true
+        }
+        return false
+    }
 }

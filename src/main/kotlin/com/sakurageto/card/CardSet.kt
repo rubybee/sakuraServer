@@ -1,6 +1,5 @@
 package com.sakurageto.card
 
-import com.sakurageto.card.CardSet.toCardName
 import com.sakurageto.gamelogic.*
 import com.sakurageto.gamelogic.GameStatus.Companion.START_PHASE
 import com.sakurageto.protocol.CommandEnum
@@ -1962,15 +1961,22 @@ object CardSet {
                     if (game_status.getPlayer(player.opposite()).hand.size <= 1){
                         game_status.setShrink(player.opposite())
                         game_status.drawCard(player.opposite(), 3)
-                        while (true){
-                            val list = game_status.selectCardFrom(player.opposite(), player.opposite(), listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 705, 2)
-                            {true}?: break
-                            for (cardNumber in list){
-                                game_status.popCardFrom(player.opposite(), cardNumber, LocationEnum.HAND, true)?.let {
+                        game_status.selectCardFrom(player.opposite(), player.opposite(), listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 705, 2)
+                        {true}?.let { selected ->
+                            if(selected.size == 1){
+                                game_status.popCardFrom(player.opposite(), selected[0], LocationEnum.HAND, true)?.let {
                                     game_status.insertCardTo(player.opposite(), it, LocationEnum.DISCARD_YOUR, true)
                                 }
                             }
-                            break
+                            else{
+                                game_status.popCardFrom(player.opposite(), selected[0], LocationEnum.HAND, true,
+                                    discardCheck = false)?.let {
+                                    game_status.insertCardTo(player.opposite(), it, LocationEnum.DISCARD_YOUR, true)
+                                }
+                                game_status.popCardFrom(player.opposite(), selected[1], LocationEnum.HAND, true)?.let {
+                                    game_status.insertCardTo(player.opposite(), it, LocationEnum.DISCARD_YOUR, true)
+                                }
+                            }
                         }
                     }
                     if(!game_status.getPlayer(player).justRunNoCondition){
@@ -6699,6 +6705,11 @@ object CardSet {
     private val formAsura = CardData(CardClass.SPECIAL, CardName.FORM_ASURA, MegamiEnum.THALLYA, CardType.UNDEFINED, SubType.NONE)
     private val formDeva = CardData(CardClass.SPECIAL, CardName.FORM_DEVA, MegamiEnum.THALLYA, CardType.UNDEFINED, SubType.NONE)
 
+    val attackAsuraText = Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MAKE_SHRINK) {_, player, game_status, _ ->
+        game_status.setShrink(player)
+        null
+    }
+
     private fun thallyaA1CardInit(){
         quickChange.setEnchantment(3)
         quickChange.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_SAKURA_TOKEN) { _, player, game_status, _ ->
@@ -6817,8 +6828,191 @@ object CardSet {
         formDeva.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_DISCARD_NUMBER_CHANGE_OTHER) {_, player, game_status, _ ->
             val otherPlayer = game_status.getPlayer(player.opposite())
             if(otherPlayer.normalCardDeck.size != 0 && otherPlayer.normalCardDeck.size % 2 == 0){
-                game_status.getConcentration(player)
+                game_status.addConcentration(player)
             }
+            null
+        })
+    }
+
+    private val storm = CardData(CardClass.NORMAL, CardName.RAIRA_STORM, MegamiEnum.RAIRA, CardType.ATTACK, SubType.NONE)
+    private val furiousStorm = CardData(CardClass.NORMAL, CardName.RAIRA_FURIOUS_STORM, MegamiEnum.RAIRA, CardType.ENCHANTMENT, SubType.FULL_POWER)
+    private val jinPungJeCheonUi = CardData(CardClass.SPECIAL, CardName.RAIRA_JIN_PUNG_JE_CHEON_UI, MegamiEnum.RAIRA, CardType.BEHAVIOR, SubType.NONE)
+
+    /**
+     user can select stromforce effect not use or use
+     */
+    private suspend fun stormForce(player: PlayerEnum, game_status: GameStatus){
+        val nowPlayer = game_status.getPlayer(player)
+        while(true){
+            when(game_status.receiveCardEffectSelect(player, 1214, CommandEnum.SELECT_CARD_EFFECT)){
+                CommandEnum.SELECT_ONE -> {
+                    if((game_status.getPlayer(player).windGauge ?: 0) >= 1){
+                        while(true){
+                            val nowCommand = game_status.receiveCardEffectSelect(player, 1216)
+                            if(selectDustToDistance(nowCommand, game_status, player, game_status.getCardOwner(1216))) break
+                        }
+                        game_status.setGauge(player, false, nowPlayer.windGauge!! - 1)
+                        break
+                    }
+                    else{
+                        continue
+                    }
+                }
+                CommandEnum.SELECT_TWO -> {
+                    if((game_status.getPlayer(player).windGauge ?: 0) >= 2){
+                        game_status.drawCard(player, 1)
+                        game_status.selectCardFrom(player, player, listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1214, 1
+                        ) { card -> card.card_data.canCover }?.let { selected ->
+                            game_status.popCardFrom(player, selected[0], LocationEnum.HAND, false)?.let {
+                                game_status.insertCardTo(player, it, LocationEnum.COVER_CARD, false)
+                            }
+                        }
+                        game_status.setGauge(player, false, nowPlayer.windGauge!! - 2)
+                        break
+                    }
+                    else{
+                        continue
+                    }
+                }
+                CommandEnum.SELECT_THREE -> {
+                    if((game_status.getPlayer(player).windGauge ?: 0) >= 3){
+                        game_status.addConcentration(player)
+                        if(game_status.getPlayer(player.opposite()).concentration != 0){
+                            game_status.setConcentration(player.opposite(), game_status.getPlayer(player.opposite()).concentration - 1)
+                        }
+                        game_status.setGauge(player, false, nowPlayer.windGauge!! - 3)
+                        break
+                    }
+                    else{
+                        continue
+                    }
+                }
+                CommandEnum.SELECT_FOUR -> {
+                    if((game_status.getPlayer(player).thunderGauge ?: 0) >= 1){
+                        game_status.addThisTurnAttackBuff(player, Buff(1214, 1, BufTag.PLUS_MINUS,
+                            {_, _, _ -> true},
+                            {_, _, attack ->
+                                attack.auraPlusMinus(1);
+                            }))
+                        game_status.setGauge(player, true, nowPlayer.thunderGauge!! - 1)
+                        break
+                    }
+                    else{
+                        continue
+                    }
+                }
+                CommandEnum.SELECT_FIVE -> {
+                    if((game_status.getPlayer(player).thunderGauge ?: 0) >= 2){
+                        if(game_status.addPreAttackZone(player, MadeAttack(CardName.RAIRA_JIN_PUNG_JE_CHEON_UI, 1216, CardClass.NULL,
+                                DistanceType.CONTINUOUS, 1,  1, Pair(0, 4), null, MegamiEnum.RAIRA,
+                                cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
+                            )) ){
+                            game_status.afterMakeAttack(1216, player, null)
+                        }
+                        game_status.setGauge(player, true, nowPlayer.thunderGauge!! - 2)
+                        break
+                    }
+                    else{
+                        continue
+                    }
+                }
+                CommandEnum.SELECT_SIX -> {
+                    if((game_status.getPlayer(player).thunderGauge ?: 0) >= 3){
+                        game_status.addThisTurnAttackBuff(player, Buff(1216, 1, BufTag.PLUS_MINUS,
+                            {_, _, attack -> attack.editedAuraDamage != 999},
+                            {_, _, attack ->
+                                attack.lifePlusMinus(1);
+                            }))
+                        game_status.setGauge(player, true, nowPlayer.thunderGauge!! - 3)
+                        break
+                    }
+                    else{
+                        continue
+                    }
+                }
+                CommandEnum.SELECT_NOT -> {
+                    break
+                }
+                else -> {}
+            }
+        }
+    }
+
+
+    private fun rairaA1CardInit(){
+        storm.setAttack(DistanceType.CONTINUOUS, Pair(2, 3), null, 2, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        storm.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.STORM_FORCE) {_, player, game_status, _ ->
+            stormForce(player, game_status)
+            null
+        })
+        furiousStorm.setEnchantment(0)
+        furiousStorm.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_SAKURA_TOKEN) { card_number, player, game_status, _ ->
+            for(i in 1..3){
+                while(true){
+                    when(game_status.receiveCardEffectSelect(player, 1215)){
+                        CommandEnum.SELECT_ONE -> {
+                            game_status.gaugeIncreaseRequest(player, 1215)
+                            break
+                        }
+                        CommandEnum.SELECT_TWO -> {
+                            game_status.getPlayer(player).getCardFromPlaying(card_number)?.let {
+                                game_status.dustToCard(player, 1, it)
+                            }
+                            break
+                        }
+                        else -> {}
+                    }
+                }
+            }
+            null
+        })
+        furiousStorm.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_END_PHASE_YOUR){card_number, player, game_status, _ ->
+            if(game_status.addPreAttackZone(player, MadeAttack(CardName.RAIRA_FURIOUS_STORM, card_number, CardClass.NULL,
+                    DistanceType.CONTINUOUS, 1,  1, Pair(0, 4), null, MegamiEnum.RAIRA,
+                    cannotReactNormal = false, cannotReactSpecial = false, cannotReact = true, chogek = false
+                )) ){
+                game_status.afterMakeAttack(card_number, player, null)
+            }
+            null
+        })
+        furiousStorm.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_END_PHASE_OTHER){card_number, player, game_status, _ ->
+            if(game_status.addPreAttackZone(player, MadeAttack(CardName.RAIRA_FURIOUS_STORM, card_number, CardClass.NULL,
+                    DistanceType.CONTINUOUS, 1,  1, Pair(0, 4), null, MegamiEnum.RAIRA,
+                    cannotReactNormal = false, cannotReactSpecial = false, cannotReact = true, chogek = false
+                )) ){
+                game_status.afterMakeAttack(card_number, player, null)
+            }
+            null
+        })
+        furiousStorm.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT_OTHER){card_number, player, game_status, _ ->
+            game_status.addThisTurnAttackBuff(player.opposite(), Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE,
+                { buff_player, buff_game_status, buff_attack -> buff_game_status.logger.isThisAttackFirst(buff_player, buff_attack.card_number)
+                }, { _, _, madeAttack ->
+                madeAttack.lifePlusMinus(-1)
+            }))
+            null
+        })
+        jinPungJeCheonUi.setSpecial(2)
+        jinPungJeCheonUi.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CHANGE_RAIRA_GAUGE) {_, player, game_status, _->
+            game_status.gaugeIncrease(player, true)
+            game_status.gaugeIncrease(player, false)
+            game_status.getPlayer(player).notCharge = true
+            null
+        })
+        jinPungJeCheonUi.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_SHRINK) {_, player, game_status, _->
+            game_status.setShrink(player.opposite())
+            null
+        })
+        jinPungJeCheonUi.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_MAIN_PHASE_YOUR) {_, player, game_status, _->
+            if(!game_status.getPlayer(player).full_action){
+                stormForce(player, game_status)
+                stormForce(player, game_status)
+            }
+            null
+        })
+        jinPungJeCheonUi.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_THIS_CARD_REACTED) {_, player, game_status, _->
+            game_status.getPlayer(player).notCharge = false
             null
         })
     }
@@ -6854,6 +7048,7 @@ object CardSet {
         mizukiCardInit()
         yukihiA1CardInit()
         thallyaA1CardInit()
+        rairaA1CardInit()
 
         hashMapInit()
         hashMapTest()

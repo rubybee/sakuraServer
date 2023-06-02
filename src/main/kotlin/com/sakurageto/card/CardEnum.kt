@@ -212,7 +212,7 @@ enum class CardName {
     FORM_NAGA,
     FORM_GARUDA,
 
-    RAIRA_BEAST_NAIL,
+    RAIRA_BEAST_NAIL, //1200
     RAIRA_STORM_SURGE_ATTACK,
     RAIRA_REINCARNATION_NAIL,
     RAIRA_WIND_RUN,
@@ -374,8 +374,11 @@ enum class CardName {
 
     FORM_KINNARI,
     FORM_ASURA, //1118
-    FORM_DEVA;
+    FORM_DEVA,
 
+    RAIRA_STORM, //1214
+    RAIRA_FURIOUS_STORM,
+    RAIRA_JIN_PUNG_JE_CHEON_UI;
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -1005,6 +1008,11 @@ enum class CardName {
                     RAIRA_WIND_RUN, RAIRA_WISDOM_OF_STORM_SURGE, RAIRA_HOWLING,
                     RAIRA_WIND_KICK
                 )
+                RAIRA_A1 -> listOf(
+                    RAIRA_BEAST_NAIL, RAIRA_STORM, RAIRA_REINCARNATION_NAIL,
+                    RAIRA_WIND_RUN, RAIRA_WISDOM_OF_STORM_SURGE, RAIRA_FURIOUS_STORM,
+                    RAIRA_WIND_KICK
+                )
                 UTSURO -> listOf(
                     UTSURO_WON_WOL, UTSURO_BLACK_WAVE, UTSURO_HARVEST,
                     UTSURO_PRESSURE, UTSURO_SHADOW_WING, UTSURO_SHADOW_WALL,
@@ -1126,6 +1134,10 @@ enum class CardName {
                     RAIRA_THUNDER_WIND_PUNCH, RAIRA_SUMMON_THUNDER, RAIRA_WIND_CONSEQUENCE_BALL,
                     RAIRA_CIRCULAR_CIRCUIT
                 )
+                RAIRA_A1 -> listOf(
+                    RAIRA_THUNDER_WIND_PUNCH, RAIRA_SUMMON_THUNDER, RAIRA_JIN_PUNG_JE_CHEON_UI,
+                    RAIRA_CIRCULAR_CIRCUIT
+                )
                 UTSURO -> listOf(
                     UTSURO_HOE_MYEOL, UTSURO_HEO_WI, UTSURO_JONG_MAL,
                     UTSURO_MA_SIG
@@ -1193,6 +1205,7 @@ enum class CardName {
                 RAIRA -> listOf(
                     RAIRA_WIND_ATTACK, RAIRA_WIND_ZEN_KAI, RAIRA_WIND_CELESTIAL_SPHERE
                 )
+                RAIRA_A1 -> listOf()
                 UTSURO -> listOf()
                 UTSURO_A1 -> listOf(
                     UTSURO_MANG_A, UTSURO_ANNIHILATION_SHADOW,
@@ -1245,6 +1258,7 @@ enum class Arrow {
 }
 
 enum class CardEffectLocation {
+    ENCHANTMENT_OTHER,
     ENCHANTMENT_YOUR,
     DISCARD_YOUR,
     RETURN_YOUR,

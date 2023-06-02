@@ -124,4 +124,20 @@ class Logger {
         }
         return false
     }
+
+    fun isThisAttackFirst(player: PlayerEnum, card_number: Int): Boolean{
+        var check = true
+        for(log in logQueue){
+            if(log.player == player && log.text == LogText.ATTACK){
+                if(log.number1 != card_number) return false
+                else{
+                    if(check) check = false
+                    else return false
+                }
+            }
+        }
+        return true
+    }
+
+
 }

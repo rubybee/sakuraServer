@@ -63,7 +63,7 @@ enum class TextEffectTag {
     CHANGE_THIS_TURN_SWELL_DISTANCE,
     GAME_END,
     END_CURRENT_PHASE,
-    ADD_TEXT_TO_REACT_ATTACK,
+    STORM_FORCE,
 
     //description when this effect use
     WHEN_USE_BEHAVIOR_END,
@@ -90,6 +90,8 @@ enum class TextEffectTag {
     //description when this effect use this is exist in real game
     WHEN_START_PHASE_YOUR,
     WHEN_END_PHASE_YOUR,
+    WHEN_END_PHASE_OTHER,
+    WHEN_MAIN_PHASE_YOUR,
     WHEN_END_PHASE_YOUR_IN_DISCARD,
 
     //check effect when some process is running

@@ -1829,7 +1829,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             val isTermination = terminationListenerProcess(player, card)
 
             if(cost == -1){
-                gaugeIncreaseRequest(player, card)
+                if(!getPlayer(player).notCharge){
+                    gaugeIncreaseRequest(player, card)
+                }
 
                 var lightHouseCheck = 0
                 if(turnPlayer == player && card.card_data.card_type != CardType.ATTACK){
@@ -1857,7 +1859,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 card.special_card_state = SpecialCardEnum.PLAYING
                 flareToDust(player, cost, Arrow.NULL, player, card.player)
                 cleanAfterUseCost()
-                gaugeIncreaseRequest(player, card)
+                if(!getPlayer(player).notCharge){
+                    gaugeIncreaseRequest(player, card)
+                }
                 popCardFrom(player, card.card_number, location, true)
                 insertCardTo(player, card, LocationEnum.PLAYING_ZONE_YOUR, true)
                 sendUseCardMeesage(getSocket(player), getSocket(player.opposite()), react, card.card_number)
@@ -2597,13 +2601,17 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 }
             }
         }
-        //TODO("BY RULE 8-2-2")
+
+        for(card in getPlayer(turnPlayer).enchantmentCard.values){
+            card.effectAllValidEffect(turnPlayer, this, TextEffectTag.WHEN_MAIN_PHASE_YOUR)
+        }
     }
 
     val endPhaseEffect = HashMap<Int, Pair<CardEffectLocation, Text?>>()
 
     suspend fun endPhaseEffectProcess(player: PlayerEnum){
         val nowPlayer = getPlayer(player)
+        val otherPlayer = getPlayer(player)
 
         nowPlayer.usedCardReturn(this)
         for(card in nowPlayer.enchantmentCard.values){
@@ -2617,6 +2625,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
         nowPlayer.megamiCard?.addValidEffect(CardEffectLocation.MEGAMI_1_YOUR, TextEffectTag.WHEN_END_PHASE_YOUR, endPhaseEffect)
         nowPlayer.megamiCard2?.addValidEffect(CardEffectLocation.MEGAMI_2_YOUR, TextEffectTag.WHEN_END_PHASE_YOUR, endPhaseEffect)
+
+        for(card in otherPlayer.enchantmentCard.values){
+            card.addValidEffect(CardEffectLocation.ENCHANTMENT_OTHER, TextEffectTag.WHEN_END_PHASE_OTHER, endPhaseEffect)
+        }
 
         val keys = endPhaseEffect.keys.toMutableList()
         if(keys.isNotEmpty()){
@@ -2634,29 +2646,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     }
                     endPhaseEffect.remove(selected)
                     keys.remove(selected)
-                }
-                for(card_number in keys){
-                    when(endPhaseEffect[card_number]!!.first){
-                        CardEffectLocation.ENCHANTMENT_YOUR -> {
-                            if(getCardFrom(player, card_number, LocationEnum.ENCHANTMENT_ZONE) == null){
-                                endPhaseEffect.remove(card_number)
-                                keys.remove(card_number)
-                            }
-                        }
-                        CardEffectLocation.DISCARD_YOUR -> {
-                            if(getCardFrom(player, card_number, LocationEnum.DISCARD_YOUR) == null){
-                                endPhaseEffect.remove(card_number)
-                                keys.remove(card_number)
-                            }
-                        }
-                        CardEffectLocation.RETURN_YOUR, CardEffectLocation.USED_YOUR -> {
-                            if(getCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD) == null){
-                                endPhaseEffect.remove(card_number)
-                                keys.remove(card_number)
-                            }
-                        }
-                        else -> {}
-                    }
                 }
             }
             if(keys.size == 1){
@@ -2695,6 +2684,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         player1.lastTurnReact = player1.thisTurnReact; player2.lastTurnReact = player2.thisTurnReact
         player1.thisTurnReact = false; player2.thisTurnReact = false
         thisTurnDistanceChange = false
+        player1.asuraUsed = false; player2.asuraUsed = false
     }
 
     //0 = player don't want using card more || 1 = player card use success || 2 = cannot use because there are no installation card
@@ -2939,7 +2929,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 getPlayer(player).transformZone[CardName.FORM_GARUDA] != null || transformBasicOperationCheck(player, CardName.FORM_GARUDA)
             }
             CommandEnum.ACTION_ASURA -> {
-                getPlayer(player).transformZone[CardName.FORM_ASURA] != null || transformBasicOperationCheck(player, CardName.FORM_ASURA)
+                (getPlayer(player).transformZone[CardName.FORM_ASURA] != null || transformBasicOperationCheck(player, CardName.FORM_ASURA))
+                        && !getPlayer(player).asuraUsed
             }
             else -> false
         }
@@ -2956,18 +2947,31 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             CommandEnum.ACTION_YAKSHA -> doYaksha(player, card)
             CommandEnum.ACTION_NAGA -> doNaga(player, card)
             CommandEnum.ACTION_GARUDA -> doGaruda(player, card)
+            CommandEnum.ACTION_ASURA -> doAsura(player, card)
             else -> {}
         }
     }
 
+    private suspend fun doAsura(player: PlayerEnum, card: Int){
+        sendDoBasicAction(getSocket(player), getSocket(player.opposite()), CommandEnum.ACTION_ASURA, card)
+        if(addPreAttackZone(player, MadeAttack(CardName.FORM_ASURA, 1118, CardClass.NULL,
+                DistanceType.DISCONTINUOUS, 3,  2, null,
+                distance_uncont = arrayOf(false, false, false, true, false, true, false, false, false, false, false)
+                ,MegamiEnum.THALLYA, cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
+            ).addTextAndReturn(CardSet.attackAsuraText)) ){
+            afterMakeAttack(1118, player, null)
+        }
+        getPlayer(player).asuraUsed = true
+    }
+
     private suspend fun doYaksha(player: PlayerEnum, card: Int){
         sendDoBasicAction(getSocket(player), getSocket(player.opposite()), CommandEnum.ACTION_YAKSHA, card)
-        if(addPreAttackZone(player, MadeAttack(CardName.FORM_YAKSHA, CardName.FORM_YAKSHA.toCardNumber(true), CardClass.NORMAL,
+        if(addPreAttackZone(player, MadeAttack(CardName.FORM_YAKSHA, 1111, CardClass.NULL,
                 DistanceType.DISCONTINUOUS, 1,  1, null,
                 distance_uncont = arrayOf(false, false, true, false, true, false, true, false, true, false, false)
                 ,MegamiEnum.THALLYA, cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
             ).addTextAndReturn(CardSet.attackYakshaText)) ){
-            afterMakeAttack(CardName.FORM_YAKSHA.toCardNumber(true), player, null)
+            afterMakeAttack(1111, player, null)
         }
     }
 

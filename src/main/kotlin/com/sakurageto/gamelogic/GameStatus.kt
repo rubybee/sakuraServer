@@ -69,12 +69,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         else{
             if(thisTurnDistance != 0){
                 thisTurnDistanceChange = true
+                if(value * -1 > thisTurnDistance){
+                    value = -thisTurnDistance
+                }
+                thisTurnDistance += value
+                sendSimpleCommand(player1_socket, player2_socket, CommandEnum.REDUCE_THIS_TURN_DISTANCE, value * -1)
             }
-            if(value * -1 > thisTurnDistance){
-                value = -thisTurnDistance
-            }
-            thisTurnDistance += value
-            sendSimpleCommand(player1_socket, player2_socket, CommandEnum.REDUCE_THIS_TURN_DISTANCE, value * -1)
         }
         distanceListenerProcess(PlayerEnum.PLAYER1)
         distanceListenerProcess(PlayerEnum.PLAYER2)
@@ -1754,7 +1754,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val nowPlayer = getPlayer(player)
         if(nowPlayer.thunderGauge != null && card.card_data.megami != MegamiEnum.RAIRA && card.card_data.megami != MegamiEnum.NONE){
             while(true){
-                when(receiveCardEffectSelect(player, CardName.RAIRA_BEAST_NAIL.toCardNumber(true))){
+                when(receiveCardEffectSelect(player, 1200)){
                     CommandEnum.SELECT_ONE -> {
                         gaugeIncrease(player, true)
                     }
@@ -2953,7 +2953,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     private suspend fun doAsura(player: PlayerEnum, card: Int){
-        sendDoBasicAction(getSocket(player), getSocket(player.opposite()), CommandEnum.ACTION_ASURA, card)
+        sendDoBasicAction(getSocket(player), getSocket(player.opposite()), CommandEnum.ACTION_ASURA_YOUR, card)
         if(addPreAttackZone(player, MadeAttack(CardName.FORM_ASURA, 1118, CardClass.NULL,
                 DistanceType.DISCONTINUOUS, 3,  2, null,
                 distance_uncont = arrayOf(false, false, false, true, false, true, false, false, false, false, false)
@@ -2965,7 +2965,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     private suspend fun doYaksha(player: PlayerEnum, card: Int){
-        sendDoBasicAction(getSocket(player), getSocket(player.opposite()), CommandEnum.ACTION_YAKSHA, card)
+        sendDoBasicAction(getSocket(player), getSocket(player.opposite()), CommandEnum.ACTION_YAKSHA_YOUR, card)
         if(addPreAttackZone(player, MadeAttack(CardName.FORM_YAKSHA, 1111, CardClass.NULL,
                 DistanceType.DISCONTINUOUS, 1,  1, null,
                 distance_uncont = arrayOf(false, false, true, false, true, false, true, false, true, false, false)
@@ -2976,14 +2976,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     private suspend fun doNaga(player: PlayerEnum, card: Int){
-        sendDoBasicAction(getSocket(player), getSocket(player.opposite()), CommandEnum.ACTION_NAGA, card)
+        sendDoBasicAction(getSocket(player), getSocket(player.opposite()), CommandEnum.ACTION_NAGA_YOUR, card)
         popCardFrom(player.opposite(), -1, LocationEnum.YOUR_DECK_TOP, true)?.let {
             insertCardTo(player.opposite(), it, LocationEnum.DISCARD_YOUR, true)
         }
     }
 
     private suspend fun doGaruda(player: PlayerEnum, card: Int){
-        sendDoBasicAction(getSocket(player), getSocket(player.opposite()), CommandEnum.ACTION_GARUDA, card)
+        sendDoBasicAction(getSocket(player), getSocket(player.opposite()), CommandEnum.ACTION_GARUDA_YOUR, card)
         if(getAdjustDistance(player) <= 7){
             dustToDistance(1, Arrow.ONE_DIRECTION, player, player)
             distanceListenerProcess(PlayerEnum.PLAYER1)

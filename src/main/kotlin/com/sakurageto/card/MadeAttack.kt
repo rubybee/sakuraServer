@@ -555,11 +555,11 @@ class MadeAttack(
         effect?.let {
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.AFTER_ATTACK){
-                    if(this.effect == null){
-                        this.effect = mutableListOf()
+                    if(madeAttack.effect == null){
+                        madeAttack.effect = mutableListOf()
                     }
                     else{
-                        this.effect!!.add(text)
+                        madeAttack.effect!!.add(text)
                     }
                 }
             }

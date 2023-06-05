@@ -87,8 +87,10 @@ suspend fun sendPopCardZone(mine: Connection, other: Connection, card_number: In
 }
 
 suspend fun sendAddCardZone(mine: Connection, other: Connection, card_number: Int, publicForOther: Boolean, command: CommandEnum, publicForYour: Boolean = true){
-    val dataYour = if(publicForYour)SakuraCardCommand(command, card_number) else SakuraCardCommand(command, if(CardSet.isPoison(card_number)) 1 else 0)
-    val dataOther = if(publicForOther) SakuraCardCommand(command.Opposite(), card_number) else SakuraCardCommand(command.Opposite(), if(CardSet.isPoison(card_number)) 1 else 0)
+    val dataYour = if(publicForYour)SakuraCardCommand(command, card_number)
+    else SakuraCardCommand(command, if(CardSet.isPoison(card_number)) 1 else if(CardSet.isSolder(card_number)) 2 else 0)
+    val dataOther = if(publicForOther) SakuraCardCommand(command.Opposite(), card_number)
+    else SakuraCardCommand(command.Opposite(), if(CardSet.isPoison(card_number)) 1 else if(CardSet.isSolder(card_number)) 2 else 0)
     send(mine, Json.encodeToString(dataYour))
     send(other, Json.encodeToString(dataOther))
 }

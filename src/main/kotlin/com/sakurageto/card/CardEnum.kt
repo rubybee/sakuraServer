@@ -331,13 +331,14 @@ enum class CardName {
     SAINE_FLOWING_WALL,
     SAINE_JEOL_CHANG_JEOL_HWA,
 
-    HATSUMI_WATER_BALL, //1700
+    //1700
+    HATSUMI_WATER_BALL,
     HATSUMI_WATER_CURRENT,
     HATSUMI_STRONG_ACID,
     HATSUMI_TSUNAMI,
     HATSUMI_JUN_BI_MAN_TAN,
     HATSUMI_COMPASS,
-    HATSUMI_CALL_WAVE, //1706
+    HATSUMI_CALL_WAVE,
 
     HATSUMI_ISANA_HAIL,
     HATSUMI_OYOGIBI_FIRE,
@@ -483,6 +484,9 @@ enum class CardName {
             put(YUKIHI_SWAYING_LAMPLIGHT, 608)
             put(YUKIHI_CLINGY_MIND, 609)
             put(YUKIHI_SWIRLING_GESTURE, 610)
+            put(YUKIHI_HELP_SLASH_THREAT, 611)
+            put(YUKIHI_THREAD_SLASH_RAW_THREAD, 612)
+            put(YUKIHI_FLUTTERING_COLLAR, 613)
 
             put(SHINRA_SHINRA, CardSet.SHINRA_SHINRA_CARD_NUMBER)
             put(SHINRA_IBLON, 700)
@@ -567,6 +571,12 @@ enum class CardName {
             put(FORM_YAKSHA, 1111)
             put(FORM_NAGA, 1112)
             put(FORM_GARUDA, 1113)
+            put(THALLYA_QUICK_CHANGE, 1114)
+            put(THALLYA_BLACKBOX_NEO, 1115)
+            put(THALLYA_OMNIS_BLASTER, 1116)
+            put(FORM_KINNARI, 1117)
+            put(FORM_ASURA, 1118)
+            put(FORM_DEVA, 1119)
 
             put(RAIRA_BEAST_NAIL, 1200)
             put(RAIRA_STORM_SURGE_ATTACK, 1201)
@@ -582,6 +592,9 @@ enum class CardName {
             put(RAIRA_WIND_ATTACK, 1211)
             put(RAIRA_WIND_ZEN_KAI, 1212)
             put(RAIRA_WIND_CELESTIAL_SPHERE, 1213)
+            put(RAIRA_STORM, 1214)
+            put(RAIRA_FURIOUS_STORM, 1215)
+            put(RAIRA_JIN_PUNG_JE_CHEON_UI, 1216)
 
             put(UTSURO_WON_WOL, 1300)
             put(UTSURO_BLACK_WAVE, 1301)
@@ -644,6 +657,35 @@ enum class CardName {
             put(YATSUHA_FOUR_LEAP_SONG, 1608)
             put(YATSUHA_SIX_STAR_SEA, 1609)
             put(YATSUHA_EIGHT_MIRROR_OTHER_SIDE, 1610)
+
+            put(HATSUMI_WATER_BALL, 1700)
+            put(HATSUMI_WATER_CURRENT, 1701)
+            put(HATSUMI_STRONG_ACID, 1702)
+            put(HATSUMI_TSUNAMI, 1703)
+            put(HATSUMI_JUN_BI_MAN_TAN, 1704)
+            put(HATSUMI_COMPASS, 1705)
+            put(HATSUMI_CALL_WAVE, 1706)
+            put(HATSUMI_ISANA_HAIL, 1707)
+            put(HATSUMI_OYOGIBI_FIRE, 1708)
+            put(HATSUMI_KIRAHARI_LIGHTHOUSE, 1709)
+            put(HATSUMI_MIOBIKI_ROUTE, 1710)
+
+            put(MIZUKI_JIN_DU, 1800)
+            put(MIZUKI_BAN_GONG, 1801)
+            put(MIZUKI_SHOOTING_DOWN, 1802)
+            put(MIZUKI_HO_LYEONG, 1803)
+            put(MIZUKI_BANG_BYEOG, 1804)
+            put(MIZUKI_OVERPOWERING_GO_FORWARD, 1805)
+            put(MIZUKI_JEON_JANG, 1806)
+            put(MIZUKI_HACHIRYU_CHEONJUGAK, 1807)
+            put(MIZUKI_HIJAMARU_TRIPLET, 1808)
+            put(MIZUKI_TARTENASHI_DAESUMUN, 1809)
+            put(MIZUKI_MIZUKI_BATTLE_CRY, 1810)
+            put(KODAMA_TU_SIN, 1811)
+            put(SOLDIER_SPEAR_1, 1812)
+            put(SOLDIER_SPEAR_2, 1813)
+            put(SOLDIER_SHIELD, 1814)
+            put(SOLDIER_HORSE, 1815)
         }
         private val cardNameHashmapSecond = EnumMap<CardName, Int>(CardName::class.java).apply {
             //for second turn player 10000~19999
@@ -739,6 +781,9 @@ enum class CardName {
             put(YUKIHI_SWAYING_LAMPLIGHT, 10608)
             put(YUKIHI_CLINGY_MIND, 10609)
             put(YUKIHI_SWIRLING_GESTURE, 10610)
+            put(YUKIHI_HELP_SLASH_THREAT, 10611)
+            put(YUKIHI_THREAD_SLASH_RAW_THREAD, 10612)
+            put(YUKIHI_FLUTTERING_COLLAR, 10613)
 
             put(SHINRA_SHINRA, CardSet.SHINRA_SHINRA_CARD_NUMBER)
             put(SHINRA_IBLON, 10700)
@@ -821,6 +866,12 @@ enum class CardName {
             put(FORM_YAKSHA, 11111)
             put(FORM_NAGA, 11112)
             put(FORM_GARUDA, 11113)
+            put(THALLYA_QUICK_CHANGE, 11114)
+            put(THALLYA_BLACKBOX_NEO, 11115)
+            put(THALLYA_OMNIS_BLASTER, 11116)
+            put(FORM_KINNARI, 11117)
+            put(FORM_ASURA, 11118)
+            put(FORM_DEVA, 11119)
 
             put(RAIRA_BEAST_NAIL, 11200)
             put(RAIRA_STORM_SURGE_ATTACK, 11201)
@@ -836,6 +887,9 @@ enum class CardName {
             put(RAIRA_WIND_ATTACK, 11211)
             put(RAIRA_WIND_ZEN_KAI, 11212)
             put(RAIRA_WIND_CELESTIAL_SPHERE, 11213)
+            put(RAIRA_STORM, 11214)
+            put(RAIRA_FURIOUS_STORM, 11215)
+            put(RAIRA_JIN_PUNG_JE_CHEON_UI, 11216)
 
             put(UTSURO_WON_WOL, 11300)
             put(UTSURO_BLACK_WAVE, 11301)
@@ -897,6 +951,35 @@ enum class CardName {
             put(YATSUHA_FOUR_LEAP_SONG, 11608)
             put(YATSUHA_SIX_STAR_SEA, 11609)
             put(YATSUHA_EIGHT_MIRROR_OTHER_SIDE, 11610)
+
+            put(HATSUMI_WATER_BALL, 11700)
+            put(HATSUMI_WATER_CURRENT, 11701)
+            put(HATSUMI_STRONG_ACID, 11702)
+            put(HATSUMI_TSUNAMI, 11703)
+            put(HATSUMI_JUN_BI_MAN_TAN, 11704)
+            put(HATSUMI_COMPASS, 11705)
+            put(HATSUMI_CALL_WAVE, 11706)
+            put(HATSUMI_ISANA_HAIL, 11707)
+            put(HATSUMI_OYOGIBI_FIRE, 11708)
+            put(HATSUMI_KIRAHARI_LIGHTHOUSE, 11709)
+            put(HATSUMI_MIOBIKI_ROUTE, 11710)
+
+            put(MIZUKI_JIN_DU, 11800)
+            put(MIZUKI_BAN_GONG, 11801)
+            put(MIZUKI_SHOOTING_DOWN, 11802)
+            put(MIZUKI_HO_LYEONG, 11803)
+            put(MIZUKI_BANG_BYEOG, 11804)
+            put(MIZUKI_OVERPOWERING_GO_FORWARD, 11805)
+            put(MIZUKI_JEON_JANG, 11806)
+            put(MIZUKI_HACHIRYU_CHEONJUGAK, 11807)
+            put(MIZUKI_HIJAMARU_TRIPLET, 11808)
+            put(MIZUKI_TARTENASHI_DAESUMUN, 11809)
+            put(MIZUKI_MIZUKI_BATTLE_CRY, 11810)
+            put(KODAMA_TU_SIN, 11811)
+            put(SOLDIER_SPEAR_1, 11812)
+            put(SOLDIER_SPEAR_2, 11813)
+            put(SOLDIER_SHIELD, 11814)
+            put(SOLDIER_HORSE, 11815)
         }
 
         fun returnNormalCardNameByMegami(megami_name: MegamiEnum):List<CardName>{

@@ -28,8 +28,8 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var windGauge: Int? = null
     var thunderGauge: Int? = null
     var justRunNoCondition: Boolean = false
-    var isThisTurnTailWind: Boolean? = null
-    var isNextTurnTailWind: Boolean? = null
+    var isThisTurnTailWind: Boolean = true
+    var isNextTurnTailWind: Boolean = true
     var readySoldierZone= hashMapOf<Int, Card>()
     fun getCardFromSoldier(card_number: Int) = readySoldierZone[card_number]
     var notReadySoldierZone = hashMapOf<Int, Card>()

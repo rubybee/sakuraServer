@@ -6323,7 +6323,7 @@ object CardSet {
     private val shootingDown = CardData(CardClass.NORMAL, CardName.MIZUKI_SHOOTING_DOWN, MegamiEnum.KODAMA, CardType.ATTACK, SubType.REACTION)
     private val hoLyeong = CardData(CardClass.NORMAL, CardName.MIZUKI_HO_LYEONG, MegamiEnum.MIZUKI, CardType.BEHAVIOR, SubType.NONE)
     private val bangByeog = CardData(CardClass.NORMAL, CardName.MIZUKI_BANG_BYEOG, MegamiEnum.MIZUKI, CardType.BEHAVIOR, SubType.REACTION)
-    private val overpoweringGoForward = CardData(CardClass.NORMAL, CardName.MIZUKI_OVERPOWERING_GO_FORWARD, MegamiEnum.MIZUKI, CardType.ATTACK, SubType.FULL_POWER)
+    private val overpoweringGoForward = CardData(CardClass.NORMAL, CardName.MIZUKI_OVERPOWERING_GO_FORWARD, MegamiEnum.MIZUKI, CardType.BEHAVIOR, SubType.FULL_POWER)
     private val jeonJang = CardData(CardClass.NORMAL, CardName.MIZUKI_JEON_JANG, MegamiEnum.MIZUKI, CardType.ENCHANTMENT, SubType.NONE)
     private val hachiryuCheonjugak = CardData(CardClass.SPECIAL, CardName.MIZUKI_HACHIRYU_CHEONJUGAK, MegamiEnum.MIZUKI, CardType.ENCHANTMENT, SubType.REACTION)
     private val hijamaruTriplet = CardData(CardClass.SPECIAL, CardName.MIZUKI_HIJAMARU_TRIPLET, MegamiEnum.MIZUKI, CardType.ATTACK, SubType.NONE)
@@ -6333,7 +6333,7 @@ object CardSet {
     private val tusin = CardData(CardClass.NORMAL, CardName.KODAMA_TU_SIN, MegamiEnum.KODAMA, CardType.ATTACK, SubType.NONE)
     private val spearSoldier1 = CardData(CardClass.SOLDIER, CardName.SOLDIER_SPEAR_1, MegamiEnum.NONE, CardType.ATTACK, SubType.NONE)
     private val spearSoldier2 = CardData(CardClass.SOLDIER, CardName.SOLDIER_SPEAR_2, MegamiEnum.NONE, CardType.ATTACK, SubType.NONE)
-    private val shieldSoldier = CardData(CardClass.SOLDIER, CardName.SOLDIER_SHIELD, MegamiEnum.NONE, CardType.BEHAVIOR, SubType.NONE)
+    private val shieldSoldier = CardData(CardClass.SOLDIER, CardName.SOLDIER_SHIELD, MegamiEnum.NONE, CardType.BEHAVIOR, SubType.REACTION)
     private val horseSoldier = CardData(CardClass.SOLDIER, CardName.SOLDIER_HORSE, MegamiEnum.NONE, CardType.ENCHANTMENT, SubType.NONE)
 
 
@@ -6507,7 +6507,7 @@ object CardSet {
             }
             null
         })
-        overpoweringGoForward.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.REACT_ATTACK_INVALID){card_number, player, game_status, reactedAttack->
+        overpoweringGoForward.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.DO_BASIC_OPERATION){card_number, player, game_status, reactedAttack->
             for(i in 1..3){
                 while(true){
                     when(game_status.receiveCardEffectSelect(player, 1805)){
@@ -6896,7 +6896,8 @@ object CardSet {
             nowPlayer.sealInformation[card_number]?.let { sealedList ->
                 for(sealedCardNumber in sealedList){
                     game_status.popCardFrom(player, sealedCardNumber, LocationEnum.SEAL_ZONE, true)?.let {
-                        game_status.insertCardTo(it.player, it, LocationEnum.DISCARD_YOUR, true)
+                        it.special_card_state = SpecialCardEnum.UNUSED
+                        game_status.insertCardTo(it.player, it, LocationEnum.ADDITIONAL_CARD, true)
                     }
                 }
             }
@@ -6905,7 +6906,8 @@ object CardSet {
             otherPlayer.sealInformation[card_number]?.let { sealedList ->
                 for(sealedCardNumber in sealedList){
                     game_status.popCardFrom(player.opposite(), sealedCardNumber, LocationEnum.SEAL_ZONE, true)?.let {
-                        game_status.insertCardTo(it.player, it, LocationEnum.DISCARD_YOUR, true)
+                        it.special_card_state = SpecialCardEnum.UNUSED
+                        game_status.insertCardTo(it.player, it, LocationEnum.ADDITIONAL_CARD, true)
                     }
                 }
             }
@@ -6970,8 +6972,8 @@ object CardSet {
             for(i in 1..2){
                 game_status.selectCardFrom(player.opposite(), player.opposite(), listOf(LocationEnum.COVER_CARD),
                     CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1118, 1){true}?.let {selected ->
-                    game_status.popCardFrom(player, selected[0], LocationEnum.COVER_CARD, true)?.let { card ->
-                        game_status.insertCardTo(player, card, LocationEnum.DISCARD_YOUR, true)
+                    game_status.popCardFrom(player.opposite(), selected[0], LocationEnum.COVER_CARD, true)?.let { card ->
+                        game_status.insertCardTo(player.opposite(), card, LocationEnum.DISCARD_YOUR, true)
                     }
                 }?: break
             }

@@ -540,18 +540,16 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     }
 
     suspend fun returnCheck(player: PlayerEnum, game_status: GameStatus): Boolean{
-        return this.card_data.effect?.let {
-            var check = false
+        this.card_data.effect?.let {
             for (text in it){
                 if(text.timing_tag == TextEffectTimingTag.USED && text.tag == TextEffectTag.RETURN){
                     if(text.effect!!(this.card_number, player, game_status, null) == 1) {
-                        check = true
-                        break
+                        return true
                     }
                 }
             }
-            check
-        }?: false
+            return false
+        }?: return false
     }
 
     suspend fun addReturnListener(player: PlayerEnum, game_status: GameStatus){

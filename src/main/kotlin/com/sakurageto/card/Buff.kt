@@ -72,6 +72,7 @@ class AttackBuffQueue() {
             attackBuff[index].removeFirst()
             if(now.condition(player, game_status, madeAttack)){
                 tempQueue.add(now)
+                attackBuff[index].addLast(now)
             }
             else{
                 receiveQueue.attackBuff[index].add(now)
@@ -141,6 +142,7 @@ class RangeBuffQueue() {
             rangeBuff[index].removeFirst()
             if(now.condition(player, game_status, madeAttack)){
                 tempQueue.add(now)
+                rangeBuff[index].addLast(now)
             }
             else{
                 receiveQueue.rangeBuff[index].add(now)
@@ -198,6 +200,7 @@ class OtherBuffQueue() {
             otherBuff[index].removeFirst()
             if(now.condition(player, game_status, madeAttack)){
                 tempQueue.add(now)
+                otherBuff[index].addLast(now)
             }
             else{
                 receiveQueue.otherBuff[index].add(now)

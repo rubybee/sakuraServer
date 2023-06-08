@@ -108,7 +108,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val nowPlayer = getPlayer(player)
         nowPlayer.artificialToken?.let {
             var value = number
-            if(nowPlayer.artificialTokenBurn < value) value = it
+            if(nowPlayer.artificialTokenBurn < value) value = nowPlayer.artificialTokenBurn
             nowPlayer.artificialToken = it + value
             nowPlayer.artificialTokenBurn -= value
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN,
@@ -1965,9 +1965,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
 
         if(nowAttack.editedInevitable || nowAttack.rangeCheck(getAdjustDistance(player), this, player, nowPlayer.rangeBuff)){
-            if(otherPlayer.isNextTurnTailWind == true){
-                otherPlayer.isThisTurnTailWind = false
-            }
+            otherPlayer.isNextTurnTailWind = false
             if(nowAttack.isItValid){
                 if(nowAttack.isItDamage){
                     if(nowAttack.beforeProcessDamageCheck(player, this, react_attack)){
@@ -2587,6 +2585,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         for(card in getPlayer(turnPlayer).enchantmentCard.values){
             card.effectAllValidEffect(turnPlayer, this, TextEffectTag.WHEN_START_PHASE_YOUR)
         }
+        for(card in getPlayer(turnPlayer).usedSpecialCard.values){
+            card.effectAllValidEffect(turnPlayer, this, TextEffectTag.WHEN_START_PHASE_YOUR)
+        }
     }
 
     suspend fun mainPhaseEffectProcess(turnPlayer: PlayerEnum){
@@ -2611,7 +2612,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun endPhaseEffectProcess(player: PlayerEnum){
         val nowPlayer = getPlayer(player)
-        val otherPlayer = getPlayer(player)
+        val otherPlayer = getPlayer(player.opposite())
 
         nowPlayer.usedCardReturn(this)
         for(card in nowPlayer.enchantmentCard.values){
@@ -2650,26 +2651,33 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
             if(keys.size == 1){
                 val lastEffect = endPhaseEffect[keys[0]]
-                lastEffect!!.second!!.effect!!(keys[0], player, this, null)
+                when(lastEffect!!.first){
+                    CardEffectLocation.RETURN_YOUR -> {
+                        returnSpecialCard(player, keys[0])
+                    }
+                    else -> {
+                        lastEffect.second!!.effect!!(keys[0], player, this, null)
+                    }
+                }
                 endPhaseEffect.remove(keys[0])
             }
         }
 
-        if(player1.isNextTurnTailWind == true){
+        if(player1.isNextTurnTailWind){
             player1.isThisTurnTailWind = true
             sendSimpleCommand(player1_socket, player2_socket, CommandEnum.SET_TAIL_WIND_YOUR)
         }
-        if(player1.isNextTurnTailWind == false){
+        else{
             player1.isThisTurnTailWind = false
             player1.isNextTurnTailWind = true
             sendSimpleCommand(player1_socket, player2_socket, CommandEnum.SET_HEAD_WIND_YOUR)
         }
 
-        if(player2.isNextTurnTailWind == true){
+        if(player2.isNextTurnTailWind){
             player2.isThisTurnTailWind = true
             sendSimpleCommand(player2_socket, player1_socket, CommandEnum.SET_TAIL_WIND_YOUR)
         }
-        if(player2.isNextTurnTailWind == false){
+        else{
             player2.isThisTurnTailWind = false
             player2.isNextTurnTailWind = true
             sendSimpleCommand(player2_socket, player1_socket, CommandEnum.SET_HEAD_WIND_YOUR)
@@ -2726,7 +2734,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    fun getQuickChangeCard(player: PlayerEnum): MutableList<Card>?{
+    private fun getQuickChangeCard(player: PlayerEnum): MutableList<Card>?{
         fun getQuickChangeCard(quickChange: Int): MutableList<Card>{
             val result = mutableListOf<Card>()
             player1.sealInformation[quickChange]?.let {
@@ -2747,6 +2755,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     }
                 }
             }
+            println("quickchange: ${result[0]}")
             return result
         }
 
@@ -2794,12 +2803,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
 
         for(card in getPlayer(player.opposite()).transformZone.values){
-            card.effectAllValidEffect(player, this, TextEffectTag.WHEN_DECK_RECONSTRUCT_OTHER)
+            card.effectAllValidEffect(player.opposite(), this, TextEffectTag.WHEN_DECK_RECONSTRUCT_OTHER)
         }
 
         getQuickChangeCard(player.opposite())?.let {transformList ->
             for(transform in transformList){
-                transform.effectAllValidEffect(player, this, TextEffectTag.WHEN_DECK_RECONSTRUCT_OTHER)
+                transform.effectAllValidEffect(player.opposite(), this, TextEffectTag.WHEN_DECK_RECONSTRUCT_OTHER)
             }
         }
     }
@@ -2899,11 +2908,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         if(getQuickChangeCard(player)?.let ret@{
             for(transformCard in it){
-                if(transformCard.effectAllValidEffect(player, this, TextEffectTag.FORBID_BASIC_OPERATION) != 0) return false
+                if(transformCard.effectAllValidEffect(player, this, TextEffectTag.FORBID_BASIC_OPERATION) != 0) return true
             }
-                return false
+                null
         }?: false){
-            return true
+            return false
         }
 
         return when(command){

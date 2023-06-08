@@ -1321,7 +1321,7 @@ enum class CardName {
 
         fun returnSoldierCardName(): List<CardName> {
             return listOf(
-                SOLDIER_SPEAR_1, SOLDIER_SPEAR_2, SOLDIER_SHIELD, SOLDIER_SHIELD
+                SOLDIER_SPEAR_1, SOLDIER_SPEAR_2, SOLDIER_SHIELD, SOLDIER_HORSE
             )
         }
     }

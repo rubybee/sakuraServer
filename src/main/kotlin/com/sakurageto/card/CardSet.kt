@@ -4,6 +4,7 @@ import com.sakurageto.gamelogic.*
 import com.sakurageto.gamelogic.GameStatus.Companion.START_PHASE
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
+import com.sakurageto.protocol.sendSimpleCommand
 import java.util.EnumMap
 import kotlin.collections.HashMap
 import kotlin.math.abs
@@ -7012,6 +7013,7 @@ object CardSet {
                             if(selectDustToDistance(nowCommand, game_status, player, game_status.getCardOwner(1216))) break
                         }
                         game_status.setGauge(player, false, nowPlayer.windGauge!! - 1)
+                        sendSimpleCommand(game_status.getSocket(player.opposite()), CommandEnum.SELECT_WIND_ONE)
                         break
                     }
                     else{
@@ -7028,6 +7030,7 @@ object CardSet {
                             }
                         }
                         game_status.setGauge(player, false, nowPlayer.windGauge!! - 2)
+                        sendSimpleCommand(game_status.getSocket(player.opposite()), CommandEnum.SELECT_WIND_TWO)
                         break
                     }
                     else{
@@ -7041,6 +7044,7 @@ object CardSet {
                             game_status.setConcentration(player.opposite(), game_status.getPlayer(player.opposite()).concentration - 1)
                         }
                         game_status.setGauge(player, false, nowPlayer.windGauge!! - 3)
+                        sendSimpleCommand(game_status.getSocket(player.opposite()), CommandEnum.SELECT_WIND_THREE)
                         break
                     }
                     else{
@@ -7055,6 +7059,7 @@ object CardSet {
                                 attack.auraPlusMinus(1);
                             }))
                         game_status.setGauge(player, true, nowPlayer.thunderGauge!! - 1)
+                        sendSimpleCommand(game_status.getSocket(player.opposite()), CommandEnum.SELECT_THUNDER_ONE)
                         break
                     }
                     else{
@@ -7070,6 +7075,7 @@ object CardSet {
                             game_status.afterMakeAttack(1216, player, null)
                         }
                         game_status.setGauge(player, true, nowPlayer.thunderGauge!! - 2)
+                        sendSimpleCommand(game_status.getSocket(player.opposite()), CommandEnum.SELECT_THUNDER_TWO)
                         break
                     }
                     else{
@@ -7084,6 +7090,7 @@ object CardSet {
                                 attack.lifePlusMinus(1);
                             }))
                         game_status.setGauge(player, true, nowPlayer.thunderGauge!! - 3)
+                        sendSimpleCommand(game_status.getSocket(player.opposite()), CommandEnum.SELECT_THUNDER_THREE)
                         break
                     }
                     else{

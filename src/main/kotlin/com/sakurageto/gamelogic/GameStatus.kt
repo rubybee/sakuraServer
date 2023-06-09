@@ -2002,6 +2002,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         for(card in getPlayer(player.opposite()).usedSpecialCard.values){
             card.effectAllValidEffect(player.opposite(), this, TextEffectTag.AFTER_OTHER_ATTACK_COMPLETE)
         }
+
+        for(card in getPlayer(player.opposite()).enchantmentCard.values){
+            card.effectAllValidEffect(player.opposite(), this, TextEffectTag.AFTER_OTHER_ATTACK_COMPLETE)
+        }
     }
 
     suspend fun movePlayingCard(player: PlayerEnum, place: LocationEnum?, card_number: Int){
@@ -3316,6 +3320,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 val result = nowPlayer.notReadySoldierZone[card_number]?: return null
                 sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_NOT_READY_SOLDIER_ZONE_YOUR)
                 nowPlayer.notReadySoldierZone.remove(card_number)
+                return result
+            }
+            LocationEnum.READY_SOLDIER_ZONE -> {
+                val result = nowPlayer.readySoldierZone[card_number]?: return null
+                sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_READY_SOLDIER_ZONE_YOUR)
+                nowPlayer.readySoldierZone.remove(card_number)
                 return result
             }
             else -> TODO()

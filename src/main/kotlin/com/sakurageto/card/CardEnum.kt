@@ -379,7 +379,21 @@ enum class CardName {
 
     RAIRA_STORM, //1214
     RAIRA_FURIOUS_STORM,
-    RAIRA_JIN_PUNG_JE_CHEON_UI;
+    RAIRA_JIN_PUNG_JE_CHEON_UI,
+
+    MEGUMI_GONG_SUM,
+    MEGUMI_TA_CHEOG,
+    MEGUMI_SHELL_ATTACK,
+    MEGUMI_POLE_THRUST,
+    MEGUMI_REED,
+    MEGUMI_BALSAM,
+    MEGUMI_WILD_ROSE,
+
+    MEGUMI_ROOT_OF_CAUSALITY,
+    MEGUMI_BRANCH_OF_POSSIBILITY,
+    MEGUMI_FRUIT_OF_END,
+    MEGUMI_MEGUMI_PALM;
+
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -1133,6 +1147,11 @@ enum class CardName {
                     MIZUKI_HO_LYEONG, MIZUKI_BANG_BYEOG, MIZUKI_OVERPOWERING_GO_FORWARD,
                     MIZUKI_JEON_JANG
                 )
+                MEGUMI -> listOf(
+                    MEGUMI_GONG_SUM, MEGUMI_TA_CHEOG, MEGUMI_SHELL_ATTACK,
+                    MEGUMI_POLE_THRUST, MEGUMI_REED, MEGUMI_BALSAM,
+                    MEGUMI_WILD_ROSE
+                )
             }
         }
 
@@ -1251,6 +1270,10 @@ enum class CardName {
                     MIZUKI_HACHIRYU_CHEONJUGAK, MIZUKI_HIJAMARU_TRIPLET, MIZUKI_TARTENASHI_DAESUMUN,
                     MIZUKI_MIZUKI_BATTLE_CRY
                 )
+                MEGUMI -> listOf(
+                    MEGUMI_ROOT_OF_CAUSALITY, MEGUMI_BRANCH_OF_POSSIBILITY, MEGUMI_FRUIT_OF_END,
+                    MEGUMI_MEGUMI_PALM
+                )
             }
         }
 
@@ -1309,6 +1332,7 @@ enum class CardName {
                 MIZUKI -> listOf(
                     KODAMA_TU_SIN
                 )
+                MEGUMI -> listOf()
             }
         }
 

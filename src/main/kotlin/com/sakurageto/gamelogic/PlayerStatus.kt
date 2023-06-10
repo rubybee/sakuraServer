@@ -38,6 +38,9 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var transformNumber = 0
     var asuraUsed = false
     var notCharge = false
+    var readySeed: Int = 0
+    var notReadySeed: Int? = null
+    var nextEnchantmentGrowing = 0
 
     var loseCounter = false
 
@@ -64,7 +67,7 @@ class PlayerStatus(val player_enum: PlayerEnum) {
                         if(data[index + 1] <= this.aura) data[index + 1]
                         else return false
                     } else{
-                        if(data[index + 1] <= enchantmentCard[data[index]]!!.nap!!) data[index + 1]
+                        if(data[index + 1] <= enchantmentCard[data[index]]!!.getNap()!!) data[index + 1]
                         else return false
                     }
                 }
@@ -118,7 +121,7 @@ class PlayerStatus(val player_enum: PlayerEnum) {
         for(card in enchantmentCard.values){
             if(card.checkAuraReplaceable()){
                 selectable.add(card.card_number)
-                selectable.add(card.nap!!)
+                selectable.add(card.getNap()!!)
             }
         }
         return selectable
@@ -132,7 +135,7 @@ class PlayerStatus(val player_enum: PlayerEnum) {
         }
         for(card in enchantmentCard.values){
             if(card.checkAuraReplaceable()){
-                totalAura += card.nap!!
+                totalAura += card.getNap()!!
                 selectable.add(card.card_number)
             }
         }

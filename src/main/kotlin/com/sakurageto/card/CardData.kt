@@ -27,6 +27,9 @@ class CardData(
     var lifeDamageUnfold: Int? = null
     var auraDamageUnfold: Int? = null
 
+    //for megumi
+    var growing: Int = 0
+
     fun setAttackFold(distance_type: DistanceType, distance_cont: Pair<Int, Int>?, distance_uncont: MutableList<Int>?,
                   aura_damage: Int, life_damage: Int){
         this.distanceTypeFold = distance_type

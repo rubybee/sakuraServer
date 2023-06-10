@@ -121,6 +121,8 @@ enum class CommandEnum {
     DRAW_CARD_YOUR,
     DRAW_CARD_OTHER,
     SELECT_NAP,
+    SELECT_SPROUT,
+    SELECT_GROWING,
     START_START_PHASE_YOUR,
     START_START_PHASE_OTHER,
     START_MAIN_PHASE_YOUR,
@@ -373,7 +375,8 @@ enum class TokenEnum(var real_number: Int){
     OTHER_ARTIFICIAL_SAKURA_TOKEN(4),
     OTHER_ARTIFICIAL_SAKURA_TOKEN_ON_TOKEN(5),
     OTHER_ARTIFICIAL_SAKURA_TOKEN_OUT_TOKEN(6),
-    FREEZE_TOKEN(7);
+    FREEZE_TOKEN(7),
+    SEED_TOKEN(8);
 
     fun opposite(): TokenEnum{
         return when(this){
@@ -385,6 +388,7 @@ enum class TokenEnum(var real_number: Int){
             OTHER_ARTIFICIAL_SAKURA_TOKEN_ON_TOKEN -> YOUR_ARTIFICIAL_SAKURA_TOKEN_ON_TOKEN
             OTHER_ARTIFICIAL_SAKURA_TOKEN_OUT_TOKEN -> YOUR_ARTIFICIAL_SAKURA_TOKEN_OUT_TOKEN
             FREEZE_TOKEN -> FREEZE_TOKEN
+            SEED_TOKEN -> SEED_TOKEN
         }
     }
 
@@ -435,7 +439,12 @@ enum class LocationEnum(var real_number: Int){
     ALL(33),
     PLAYING_ZONE_OTHER(34),
     READY_SOLDIER_ZONE(35),
-    NOT_READY_SOLDIER_ZONE(36);
+    NOT_READY_SOLDIER_ZONE(36),
+
+    READY_DIRT_ZONE_YOUR(37),
+    READY_DIRT_ZONE_OTHER(38),
+    NOT_READY_DIRT_ZONE_YOUR(39),
+    NOT_READY_DIRT_ZONE_OTHER(40);
 
     fun Opposite(): LocationEnum{
         return when(this){
@@ -458,6 +467,10 @@ enum class LocationEnum(var real_number: Int){
             OTHER_USED_CARD -> YOUR_USED_CARD
             PLAYING_ZONE_YOUR -> PLAYING_ZONE_OTHER
             PLAYING_ZONE_OTHER -> PLAYING_ZONE_YOUR
+            READY_DIRT_ZONE_YOUR -> READY_DIRT_ZONE_OTHER
+            READY_DIRT_ZONE_OTHER -> READY_DIRT_ZONE_YOUR
+            NOT_READY_DIRT_ZONE_YOUR -> NOT_READY_DIRT_ZONE_OTHER
+            NOT_READY_DIRT_ZONE_OTHER -> NOT_READY_DIRT_ZONE_YOUR
             else -> DISCARD_YOUR
         }
     }

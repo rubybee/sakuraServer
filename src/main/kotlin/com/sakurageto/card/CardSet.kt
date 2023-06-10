@@ -2209,7 +2209,7 @@ object CardSet {
                         {card -> card.card_data.card_type == CardType.ENCHANTMENT}?: break
                         if (list.size == 1){
                             val card = game_status.getCardFrom(player.opposite(), list[0], LocationEnum.ENCHANTMENT_ZONE)?: continue
-                            game_status.cardToDust(player.opposite(), card.nap, card)
+                            game_status.cardToDust(player.opposite(), card.getNap(), card)
                             game_status.enchantmentDestruction(player.opposite(), card)
                             break
                         }
@@ -2611,7 +2611,7 @@ object CardSet {
                                                                                          _, _, damage ->
                 if(damage){
                     gameStatus.popCardFrom(player, cardNumber, LocationEnum.ENCHANTMENT_ZONE, true)?.let {
-                        gameStatus.cardToDust(player, it.nap, it)
+                        gameStatus.cardToDust(player, it.getNap(), it)
                         gameStatus.insertCardTo(it.player, it, LocationEnum.SPECIAL_CARD, true)
                     }
                     true
@@ -2770,6 +2770,8 @@ object CardSet {
             distanceUncontUnfold = card_data.distanceUncontUnfold
             lifeDamageUnfold = card_data.lifeDamageUnfold
             auraDamageUnfold = card_data.auraDamageUnfold
+
+            growing = card_data.growing
 
             distance_type = card_data.distance_type
             distance_cont = card_data.distance_cont
@@ -3890,7 +3892,7 @@ object CardSet {
                 if(cardList.size == 1){
                     game_status.getCardFrom(player.opposite(), cardList[0], LocationEnum.ENCHANTMENT_ZONE)?.let {
                         game_status.cardToDust(player.opposite(), 2, it)
-                        if(it.nap == 0){
+                        if(it.isItDestruction()){
                             game_status.enchantmentDestruction(player.opposite(), it)
                         }
                     }?: continue
@@ -3983,7 +3985,7 @@ object CardSet {
         jongMal.setEnchantment(3)
         jongMal.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_GET_DAMAGE_BY_ATTACK){card_number, player, game_status, _ ->
             game_status.getCardFrom(player, card_number, LocationEnum.ENCHANTMENT_ZONE)?.let { card ->
-                game_status.cardToDust(player, card.nap, card)
+                game_status.cardToDust(player, card.getNap(), card)
                 game_status.enchantmentDestruction(player, card)
             }
             null
@@ -4642,10 +4644,10 @@ object CardSet {
                         }
                         game_status.getCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD)?.let {
                             game_status.auraToCard(player, 1, it, LocationEnum.YOUR_USED_CARD)
-                            if(it.nap == 5){
+                            if(it.getNap() == 5){
                                 if(checkCardName(card_number, CardName.HONOKA_HAND_FLOWER)){
                                     game_status.getCardFrom(player, CardName.HONOKA_A_NEW_OPENING, LocationEnum.ADDITIONAL_CARD)?.let { additionalCard ->
-                                        game_status.cardToFlare(player, it.nap, it, LocationEnum.YOUR_USED_CARD)
+                                        game_status.cardToFlare(player, it.getNap(), it, LocationEnum.YOUR_USED_CARD)
                                         game_status.popCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD, true)
                                         game_status.insertCardTo(player, it, LocationEnum.ADDITIONAL_CARD, true)
                                         additionalCard.special_card_state = SpecialCardEnum.PLAYED
@@ -4663,10 +4665,10 @@ object CardSet {
                         }
                         game_status.getCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD)?.let {
                             game_status.dustToCard(player, 1, it, LocationEnum.YOUR_USED_CARD)
-                            if(it.nap == 5){
+                            if(it.getNap() == 5){
                                 if(checkCardName(card_number, CardName.HONOKA_HAND_FLOWER)){
                                     game_status.getCardFrom(player, CardName.HONOKA_A_NEW_OPENING, LocationEnum.ADDITIONAL_CARD)?.let { additionalCard ->
-                                        game_status.cardToFlare(player, it.nap, it, LocationEnum.YOUR_USED_CARD)
+                                        game_status.cardToFlare(player, it.getNap() , it, LocationEnum.YOUR_USED_CARD)
                                         game_status.popCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD, true)
                                         game_status.insertCardTo(player, it, LocationEnum.ADDITIONAL_CARD, true)
                                         additionalCard.special_card_state = SpecialCardEnum.PLAYED
@@ -5008,8 +5010,8 @@ object CardSet {
         for(card in nowPlayer.enchantmentCard.values.filter {
             card -> !(card.card_data.isItSpecial())
         }){
-            if((card.nap ?: 0) >= 1){
-                game_status.cardToDust(player, card.nap, card)
+            if((card.getNap()  ?: 0) >= 1){
+                game_status.cardToDust(player, card.getNap() , card)
             }
             game_status.popCardFrom(player, card.card_number, LocationEnum.ENCHANTMENT_ZONE, true)?.let {
                 game_status.insertCardTo(player, card, LocationEnum.OUT_OF_GAME, true)
@@ -5562,10 +5564,10 @@ object CardSet {
                 {card -> card.card_data.card_class != CardClass.SPECIAL}?: break
                 if (list.size == 1){
                     game_status.getCardFrom(player, list[0], LocationEnum.ENCHANTMENT_ZONE)?.also {
-                        game_status.cardToDust(player, it.nap, it)
+                        game_status.cardToDust(player, it.getNap() , it)
                         game_status.enchantmentDestruction(player, it)
                     }?: game_status.getCardFrom(player.opposite(), list[0], LocationEnum.ENCHANTMENT_ZONE)?.also {
-                        game_status.cardToDust(player.opposite(), it.nap, it)
+                        game_status.cardToDust(player.opposite(), it.getNap() , it)
                         game_status.enchantmentDestruction(player.opposite(), it)
                     }
 
@@ -5914,7 +5916,7 @@ object CardSet {
                 if(selectedByYour[0].toCardName() == selectedByOther[0].toCardName()){
                     game_status.getCardFrom(player, card_number, LocationEnum.PLAYING_ZONE_YOUR)?.let{
                         game_status.dustToCard(player, 1, it, LocationEnum.PLAYING_ZONE_YOUR)
-                        if(it.nap == 2){
+                        if(it.getNap() == 2){
                             game_status.cardToDust(player, 2, it, LocationEnum.PLAYING_ZONE_YOUR)
                             greatDiscovery(player, game_status)
                             game_status.movePlayingCard(player, LocationEnum.OUT_OF_GAME, card_number)
@@ -6359,6 +6361,8 @@ object CardSet {
             lifeDamageUnfold = cardData.lifeDamageUnfold
             auraDamageUnfold = cardData.auraDamageUnfold
 
+            growing = cardData.growing
+
             distance_type = cardData.distance_type
             distance_cont = cardData.distance_cont
             distance_uncont = cardData.distance_uncont
@@ -6405,6 +6409,8 @@ object CardSet {
             distanceUncontUnfold = cardData.distanceUncontUnfold
             lifeDamageUnfold = cardData.lifeDamageUnfold
             auraDamageUnfold = cardData.auraDamageUnfold
+
+            growing = cardData.growing
 
             distance_type = cardData.distance_type
             distance_cont = cardData.distance_cont
@@ -6775,7 +6781,7 @@ object CardSet {
             game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ ->
                 var token = 0
                 for(card in game_status.getPlayer(player).enchantmentCard.values){
-                    card.nap?.let {
+                    card.getNap()?.let {
                         token += it
                     }
                 }
@@ -6789,7 +6795,7 @@ object CardSet {
             game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ ->
                 var token = 0
                 for(card in game_status.getPlayer(player).enchantmentCard.values){
-                    card.nap?.let {
+                    card.getNap()?.let {
                         token += it
                     }
                 }
@@ -6922,7 +6928,7 @@ object CardSet {
             if(game_status.getPlayer(player).artificialTokenBurn == 0){
                 game_status.getCardFrom(player, card_number, LocationEnum.PLAYING_ZONE_YOUR)?.let{
                     game_status.dustToCard(player, 1, it, LocationEnum.PLAYING_ZONE_YOUR)
-                    if(it.nap == 2){
+                    if(it.getNap() == 2){
                         game_status.cardToDust(player, 2, it, LocationEnum.PLAYING_ZONE_YOUR)
                         transform(player, game_status)
                     }

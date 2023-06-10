@@ -220,6 +220,14 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
                 game_status.player2.notReadySoldierZone[card.card_number] = card
             }
         }
+
+        if(game_status.player1.megami_1 == MegamiEnum.MEGUMI || game_status.player1.megami_2 == MegamiEnum.MEGUMI){
+            game_status.player1.notReadySeed = 5
+        }
+
+        if(game_status.player2.megami_1 == MegamiEnum.MEGUMI || game_status.player2.megami_2 == MegamiEnum.MEGUMI){
+            game_status.player2.notReadySeed = 5
+        }
         //additional board setting here
     }
 

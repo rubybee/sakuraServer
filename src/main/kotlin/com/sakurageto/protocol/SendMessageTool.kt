@@ -467,13 +467,13 @@ suspend fun receiveChooseDamage(player: Connection): CommandEnum {
     }
 }
 
-suspend fun receiveNapInformation(player: Connection, total: Int, card_number: Int): Pair<Int, Int> {
-    player.session.send(Json.encodeToString(SakuraCardCommand(SELECT_NAP, card_number)))
-    player.session.send(Json.encodeToString(SakuraSendData(SELECT_NAP, mutableListOf(total))))
-    return receiveNapInformationMain(player, total, card_number)
+suspend fun receiveNapInformation(player: Connection, total: Int, card_number: Int, command: CommandEnum): Pair<Int, Int> {
+    player.session.send(Json.encodeToString(SakuraCardCommand(command, card_number)))
+    player.session.send(Json.encodeToString(SakuraSendData(command, mutableListOf(total))))
+    return receiveNapInformationMain(player, total, card_number, command)
 }
 
-suspend fun receiveNapInformationMain(player: Connection, total: Int, card_number: Int): Pair<Int, Int> {
+suspend fun receiveNapInformationMain(player: Connection, total: Int, card_number: Int, command: CommandEnum): Pair<Int, Int> {
     val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
 
     while (true){
@@ -483,7 +483,7 @@ suspend fun receiveNapInformationMain(player: Connection, total: Int, card_numbe
                 val text = frame.readText()
                 try {
                     val data = json.decodeFromString<SakuraSendData>(text)
-                    if (data.command == SELECT_NAP){
+                    if (data.command == command){
                         data.data?.let {
                             if(it.size >= 2){
                                 return(Pair(it[0], it[1]))
@@ -499,7 +499,7 @@ suspend fun receiveNapInformationMain(player: Connection, total: Int, card_numbe
             }
         } catch (e: Exception){
             waitReconnect(player)
-            return receiveNapInformationMain(player, total, card_number)
+            return receiveNapInformationMain(player, total, card_number, command)
         }
     }
 }

@@ -2,6 +2,7 @@ package com.sakurageto.card
 
 import com.sakurageto.card.CardSet.toCardData
 import com.sakurageto.gamelogic.GameStatus
+import com.sakurageto.gamelogic.MegamiEnum
 import com.sakurageto.gamelogic.Umbrella
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.receiveNapInformation
@@ -11,7 +12,39 @@ import kotlin.collections.HashMap
 
 class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum,
            var special_card_state: SpecialCardEnum?){
-    var nap: Int? = null
+    private var nap: Int? = null
+    private var seedToken: Int? = null
+
+    fun getNap() = nap
+
+    fun reduceNap(number: Int): Pair<Int, Int>{
+        var value = number
+        if((nap?: 0) < number){
+            value = nap?: 0
+        }
+        val sakuraToken = (nap?: 0) - (seedToken?: 0)
+
+        nap = (nap?: 0) - value
+        if(sakuraToken >= value){
+            return Pair(value, 0)
+        }
+        else{
+            seedToken = (seedToken?: 0) - value + sakuraToken
+            return Pair(sakuraToken, value - sakuraToken)
+        }
+    }
+
+    fun addNap(number: Int, seed: Boolean = false) {
+        nap = nap?.let {
+            it + number
+        }?: number
+
+        if(seed){
+            seedToken = seedToken?.let {
+                it + number
+            }?: number
+        }
+    }
 
     var beforeCardData: CardData? = null
 
@@ -403,7 +436,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     }
 
     suspend fun enchantmentUseNormal(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, nap_change: Int = -1) {
-
+        val nowPlayer = game_status.getPlayer(player)
 
         for(card in game_status.getPlayer(player.opposite()).enchantmentCard.values){
             card.effectAllValidEffect(player.opposite(), game_status, TextEffectTag.WHEN_DEPLOYMENT_OTHER)
@@ -415,7 +448,26 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
 
         if(nowNeedNap < 0) nowNeedNap = 0
-        game_status.getPlayer(player).napBuff = 0
+        nowPlayer.napBuff = 0
+        nowPlayer.notReadySeed?.let {
+            if (it > 0){
+                game_status.notReadyToReadySeed(player, 1)
+            }
+        }
+        if(nowNeedNap != 0 && nowPlayer.readySeed > 0){
+            while(true){
+                val sproutData =
+                    receiveNapInformation(game_status.getSocket(player), nowNeedNap, this.card_number, CommandEnum.SELECT_SPROUT)
+                val sprout = sproutData.first
+                if(sprout > nowNeedNap || sprout > nowPlayer.readySeed || sprout < 0) {
+                    continue
+                }
+                game_status.readySeedToCard(player, sprout, this)
+                nowNeedNap -= sprout
+                break
+            }
+        }
+
         when {
             nowNeedNap == 0 -> {}
             nowNeedNap > game_status.getPlayerAura(player) + game_status.dust -> {
@@ -424,10 +476,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             }
             else -> {
                 while (true) {
-                    val receiveData =
-                        receiveNapInformation(game_status.getSocket(player), nowNeedNap, this.card_number)
-                    val aura = receiveData.first
-                    val dust = receiveData.second
+                    val (aura, dust)  =
+                        receiveNapInformation(game_status.getSocket(player), nowNeedNap, this.card_number, CommandEnum.SELECT_NAP)
                     if (aura < 0 || dust < 0 || aura + dust != nowNeedNap || game_status.getPlayerAura(player) < aura || game_status.dust < dust) {
                         continue
                     }
@@ -435,6 +485,24 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                     game_status.dustToCard(player, dust, this)
                     break
                 }
+            }
+        }
+
+        var nowGrowing = card_data.growing
+        if(card_data.megami != MegamiEnum.MEGUMI){
+            nowGrowing += nowPlayer.nextEnchantmentGrowing
+            nowPlayer.nextEnchantmentGrowing = 0
+        }
+        if(nowGrowing > 0){
+            while(true){
+                val growingData =
+                    receiveNapInformation(game_status.getSocket(player), nowNeedNap, this.card_number, CommandEnum.SELECT_GROWING)
+                val growing = growingData.first
+                if(growing > nowGrowing || growing > nowPlayer.readySeed || growing < 0) {
+                    continue
+                }
+                game_status.readySeedToCard(player, growing, this)
+                break
             }
         }
 

@@ -381,7 +381,7 @@ enum class CardName {
     RAIRA_FURIOUS_STORM,
     RAIRA_JIN_PUNG_JE_CHEON_UI,
 
-    MEGUMI_GONG_SUM,
+    MEGUMI_GONG_SUM, //1900
     MEGUMI_TA_CHEOG,
     MEGUMI_SHELL_ATTACK,
     MEGUMI_POLE_THRUST,
@@ -1365,12 +1365,12 @@ enum class Arrow {
 }
 
 enum class CardEffectLocation {
+    ARTIFICIAL_TOKEN,
     ENCHANTMENT_OTHER,
     ENCHANTMENT_YOUR,
     DISCARD_YOUR,
     RETURN_YOUR,
     USED_YOUR,
-    MEGAMI_1_YOUR,
-    MEGAMI_2_YOUR,
+    MEGAMI_YOUR,
     TEMP
 }

@@ -475,8 +475,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(place == 9) cardToDistance(player, number, card)
         else if(place == 0) cardToAura(player, number, card)
         else if(place == 2) cardToFlare(player, number, card)
-        else{
-            TODO("부여패에서 다른곳으로 보내느 카드 추가시 이곳에서 추가해야 됨")
+        else if(place > 100){
+            cardToCard(player, number, card, getPlayer(player).enchantmentCard[place]!!)
         }
     }
 
@@ -865,6 +865,31 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
+    /**
+    It is assumed that both the destination and destination are the same player's enhancement card.
+    it will be Needed to receive who are both players if some effect that need both player added
+     */
+    suspend fun cardToCard(player: PlayerEnum, number: Int, fromCard: Card, toCard: Card){
+        if(!(fromCard.checkCanMoveToken(player, this)) || number <= 0 || fromCard.isItDestruction()) return
+        var value = number
+
+        if(value > (fromCard.getNap()?: 0)) value = fromCard.getNap()?: 0
+
+        val (sakura, seed) = fromCard.reduceNap(value)
+
+        if(sakura != 0){
+            toCard.addNap(sakura)
+            sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
+                LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, sakura, fromCard.card_number, toCard.card_number)
+        }
+
+        if(seed != 0){
+            toCard.addNap(seed, true)
+            sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SEED_TOKEN,
+                LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, seed, fromCard.card_number, toCard.card_number)
+        }
+    }
+
     suspend fun distanceToFlare(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum){
         if(number <= 0) return
 
@@ -922,6 +947,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
             distanceListenerProcess(PlayerEnum.PLAYER1)
             distanceListenerProcess(PlayerEnum.PLAYER2)
+
+            for(card in getPlayer(user.opposite()).enchantmentCard.values){
+                card.effectAllValidEffect(user.opposite(), this, TextEffectTag.WHEN_OTHER_PLAYER_CHANGE_DISTANCE_TOKEN)
+            }
+
+            getPlayer(user).isMoveDistanceToken = true
         }
 
     }
@@ -962,13 +993,33 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             auraListenerProcess(player, beforeFull, afterFull)
             distanceListenerProcess(PlayerEnum.PLAYER1)
             distanceListenerProcess(PlayerEnum.PLAYER2)
+
+            for(card in getPlayer(user.opposite()).enchantmentCard.values){
+                card.effectAllValidEffect(user.opposite(), this, TextEffectTag.WHEN_OTHER_PLAYER_CHANGE_DISTANCE_TOKEN)
+            }
+            getPlayer(user).isMoveDistanceToken = true
         }
     }
 
-    suspend fun cardToDustCheck(player: PlayerEnum, number: Int, card: Card): Boolean{
+    suspend fun cardToDustCheck(player: PlayerEnum, number: Int, card: Card, startPhaseProcess: Boolean): Boolean{
         val locationList = ArrayDeque<Int>()
 
-        // TODO(other enchantment card check)
+        if(startPhaseProcess){
+            val nowPlayer = getPlayer(player)
+            for(enchantment in nowPlayer.enchantmentCard.values){
+                if(card === enchantment){
+                    continue
+                }
+                enchantment.card_data.effect?.let {
+                    for (text in it){
+                        if(text.tag == TextEffectTag.OTHER_CARD_NAP_LOCATION_HERE){
+                            locationList.addLast(text.effect!!(card.card_number, player, this, null)!!)
+                        }
+                        break
+                    }
+                }
+            }
+        }
 
         card.card_data.effect?.let {
             for (text in it){
@@ -985,16 +1036,22 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 moveTokenCardToSome(player, locationList[0], number, card)
                 false
             }
-
             else -> {
-                TODO("유저에게 리스트 전송, 그 중 숫자 받고 moveTokenCardToSome() call")
-                //false
+                while(true){
+                    val receiveData = receiveSelectCard(getSocket(turnPlayer), locationList, CommandEnum.SELECT_NAP_LOCATION, -1)
+                    if(receiveData == null || receiveData.size != 1){
+                        continue
+                    }
+                    moveTokenCardToSome(player, receiveData[0], number, card)
+                    break
+                }
+                false
             }
         }
     }
 
     //must check card is destruction
-    suspend fun cardToDust(player: PlayerEnum, number: Int?, card: Card, location: LocationEnum = LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD){
+    suspend fun cardToDust(player: PlayerEnum, number: Int?, card: Card, startPhaseProcess: Boolean, location: LocationEnum = LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD){
         if(!(card.checkCanMoveToken(player, this)) || number == null || number <= 0 || card.isItDestruction()) return
         val nowPlayer = getPlayer(player)
 
@@ -1005,7 +1062,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.NOT_READY_DIRT_ZONE_YOUR, seed, card.card_number)
         }
 
-        if(cardToDustCheck(player, sakura, card)){
+        if(cardToDustCheck(player, sakura, card, startPhaseProcess)){
             dust += sakura
 
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
@@ -1485,11 +1542,18 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = 10 - nowPlayer.life
         }
 
-        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
-            LocationEnum.DISTANCE, LocationEnum.YOUR_LIFE, value, -1)
+        if(value > 0){
+            sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
+                LocationEnum.DISTANCE, LocationEnum.YOUR_LIFE, value, -1)
 
-        distanceListenerProcess(PlayerEnum.PLAYER1)
-        distanceListenerProcess(PlayerEnum.PLAYER2)
+            distanceListenerProcess(PlayerEnum.PLAYER1)
+            distanceListenerProcess(PlayerEnum.PLAYER2)
+
+            for(card in getPlayer(user.opposite()).enchantmentCard.values){
+                card.effectAllValidEffect(user.opposite(), this, TextEffectTag.WHEN_OTHER_PLAYER_CHANGE_DISTANCE_TOKEN)
+            }
+            getPlayer(user).isMoveDistanceToken = true
+        }
     }
 
     suspend fun lifeToDistance(player: PlayerEnum, number: Int, damage: Boolean, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum){
@@ -2143,7 +2207,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
         }
 
-        cardToDust(card.player, card.getNap(), card)
+        cardToDust(card.player, card.getNap(), card, false)
     }
 
     suspend fun enchantmentDestruction(player: PlayerEnum, card: Card){
@@ -2187,7 +2251,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         for(nowCard in player1.enchantmentCard.values){
             val nap = nowCard.reduceNapNormal(PlayerEnum.PLAYER1, this)
-            cardToDust(PlayerEnum.PLAYER1, nap, nowCard)
+            cardToDust(PlayerEnum.PLAYER1, nap, nowCard, true)
             if(nowCard.isItDestruction()){
                 player1Card[nowCard.card_number] = true
             }
@@ -2195,7 +2259,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         for(nowCard in player2.enchantmentCard.values){
             val nap = nowCard.reduceNapNormal(PlayerEnum.PLAYER2, this)
-            cardToDust(PlayerEnum.PLAYER2, nap, nowCard)
+            cardToDust(PlayerEnum.PLAYER2, nap, nowCard, true)
             if(nowCard.isItDestruction()){
                 player2Card[nowCard.card_number] = true
             }
@@ -2371,7 +2435,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 }
                 else{
                     if(replace == null){
-                        cardToDust(player, data[index + 1], nowPlayer.enchantmentCard[data[index]]!!)
+                        cardToDust(player, data[index + 1], nowPlayer.enchantmentCard[data[index]]!!, false)
                     }
                     else{
                         moveTokenByInt(player, LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD.real_number,
@@ -2479,7 +2543,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     }
                     else{
                         if(auraReplace == null){
-                            cardToDust(player, damage.first, nowPlayer.enchantmentCard[selectable[0]]!!)
+                            cardToDust(player, damage.first, nowPlayer.enchantmentCard[selectable[0]]!!, false)
                         }
                         else{
                             moveTokenByInt(player, LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD.real_number,
@@ -2612,17 +2676,77 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun startPhaseEffectProcess(turnPlayer: PlayerEnum){
-        //TODO("change this mechanism like endphaseeffectprocess(can choose order of effect)")
-        removeArtificialToken()
+        when(turnPlayer){
+            PlayerEnum.PLAYER1 -> {
+                if(player1ArtificialTokenOn != 0 || player1ArtificialTokenOut != 0) {
+                    startPhaseEffect[0] = Pair(CardEffectLocation.ARTIFICIAL_TOKEN, null)
+                }
+            }
+            PlayerEnum.PLAYER2 -> {
+                if(player2ArtificialTokenOn != 0 || player2ArtificialTokenOut != 0) {
+                    startPhaseEffect[0] = Pair(CardEffectLocation.ARTIFICIAL_TOKEN, null)
+                }
+            }
+        }
+
+        for(card in getPlayer(turnPlayer.opposite()).enchantmentCard.values){
+            card.effectAllValidEffect(turnPlayer.opposite(), this, TextEffectTag.WHEN_START_PHASE_OTHER)
+        }
         for(card in getPlayer(turnPlayer).enchantmentCard.values){
             card.effectAllValidEffect(turnPlayer, this, TextEffectTag.WHEN_START_PHASE_YOUR)
         }
         for(card in getPlayer(turnPlayer).usedSpecialCard.values){
             card.effectAllValidEffect(turnPlayer, this, TextEffectTag.WHEN_START_PHASE_YOUR)
         }
+
+        val keys = startPhaseEffect.keys.toMutableList()
+        if(keys.isNotEmpty()){
+            while(keys.size >= 2){
+                val selected = receiveCardEffectOrder(getSocket(turnPlayer), CommandEnum.SELECT_START_PHASE_EFFECT_ORDER, keys)
+                if(selected in keys){
+                    val result = startPhaseEffect[selected]
+                    when(result!!.first){
+                        CardEffectLocation.ENCHANTMENT_YOUR, CardEffectLocation.USED_YOUR -> {
+                            result.second!!.effect!!(selected, turnPlayer, this, null)
+                        }
+                        CardEffectLocation.ENCHANTMENT_OTHER -> {
+                            result.second!!.effect!!(selected, turnPlayer.opposite(), this, null)
+                        }
+                        CardEffectLocation.ARTIFICIAL_TOKEN -> {
+                            removeArtificialToken()
+                        }
+                        else -> TODO()
+                    }
+                    startPhaseEffect.remove(selected)
+                    keys.remove(selected)
+                }
+//                TODO("If there is an effect of canceling the effect in the start phase(immediate return due to life changes)," +
+//                        " a check may be required, not now")
+//                for(key in keys){
+//                    val (place, effect) = startPhaseEffect[key]!!
+//                }
+            }
+            if(keys.size == 1){
+                val lastEffect = startPhaseEffect[keys[0]]
+                when(lastEffect!!.first){
+                    CardEffectLocation.ENCHANTMENT_YOUR, CardEffectLocation.USED_YOUR -> {
+                        lastEffect.second!!.effect!!(keys[0], turnPlayer, this, null)
+                    }
+                    CardEffectLocation.ENCHANTMENT_OTHER -> {
+                        lastEffect.second!!.effect!!(keys[0], turnPlayer.opposite(), this, null)
+                    }
+                    CardEffectLocation.ARTIFICIAL_TOKEN -> {
+                        removeArtificialToken()
+                    }
+                    else -> TODO()
+                }
+                endPhaseEffect.remove(keys[0])
+            }
+        }
     }
 
     suspend fun mainPhaseEffectProcess(turnPlayer: PlayerEnum){
+        //TODO("change this mechanism like endphaseeffectprocess(can choose order of effect)")
         val mainPhaseListener = getMainPhaseListener(turnPlayer)
         if(!(mainPhaseListener.isEmpty())){
             for(i in 1..mainPhaseListener.size){
@@ -2638,9 +2762,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         for(card in getPlayer(turnPlayer).enchantmentCard.values){
             card.effectAllValidEffect(turnPlayer, this, TextEffectTag.WHEN_MAIN_PHASE_YOUR)
         }
+
+        for(card in getPlayer(turnPlayer.opposite()).enchantmentCard.values){
+            card.effectAllValidEffect(turnPlayer, this, TextEffectTag.WHEN_MAIN_PHASE_OTHER)
+        }
     }
 
     val endPhaseEffect = HashMap<Int, Pair<CardEffectLocation, Text?>>()
+    val startPhaseEffect = HashMap<Int, Pair<CardEffectLocation, Text?>>()
 
     suspend fun endPhaseEffectProcess(player: PlayerEnum){
         val nowPlayer = getPlayer(player)
@@ -2648,19 +2777,19 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         nowPlayer.usedCardReturn(this)
         for(card in nowPlayer.enchantmentCard.values){
-            card.addValidEffect(CardEffectLocation.ENCHANTMENT_YOUR, TextEffectTag.WHEN_END_PHASE_YOUR, endPhaseEffect)
+            card.effectAllValidEffect(player, this, TextEffectTag.WHEN_END_PHASE_YOUR)
         }
         for(card in nowPlayer.usedSpecialCard.values){
-            card.addValidEffect(CardEffectLocation.USED_YOUR, TextEffectTag.WHEN_END_PHASE_YOUR, endPhaseEffect)
+            card.effectAllValidEffect(player, this, TextEffectTag.WHEN_END_PHASE_YOUR)
         }
         for(card in nowPlayer.discard){
-            card.addValidEffect(CardEffectLocation.DISCARD_YOUR, TextEffectTag.WHEN_END_PHASE_YOUR_IN_DISCARD, endPhaseEffect)
+            card.effectAllValidEffect(player, this, TextEffectTag.WHEN_END_PHASE_YOUR_IN_DISCARD)
         }
-        nowPlayer.megamiCard?.addValidEffect(CardEffectLocation.MEGAMI_1_YOUR, TextEffectTag.WHEN_END_PHASE_YOUR, endPhaseEffect)
-        nowPlayer.megamiCard2?.addValidEffect(CardEffectLocation.MEGAMI_2_YOUR, TextEffectTag.WHEN_END_PHASE_YOUR, endPhaseEffect)
+        nowPlayer.megamiCard?.effectAllValidEffect(player, this, TextEffectTag.WHEN_END_PHASE_YOUR)
+        nowPlayer.megamiCard2?.effectAllValidEffect(player, this, TextEffectTag.WHEN_END_PHASE_YOUR)
 
         for(card in otherPlayer.enchantmentCard.values){
-            card.addValidEffect(CardEffectLocation.ENCHANTMENT_OTHER, TextEffectTag.WHEN_END_PHASE_OTHER, endPhaseEffect)
+            card.effectAllValidEffect(player.opposite(), this, TextEffectTag.WHEN_END_PHASE_OTHER)
         }
 
         val keys = endPhaseEffect.keys.toMutableList()
@@ -2672,6 +2801,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     when(result!!.first){
                         CardEffectLocation.RETURN_YOUR -> {
                             returnSpecialCard(player, selected)
+                        }
+                        CardEffectLocation.ENCHANTMENT_OTHER -> {
+                            result.second!!.effect!!(selected, player.opposite(), this, null)
                         }
                         else -> {
                             result.second!!.effect!!(selected, player, this, null)
@@ -2686,6 +2818,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 when(lastEffect!!.first){
                     CardEffectLocation.RETURN_YOUR -> {
                         returnSpecialCard(player, keys[0])
+                    }
+                    CardEffectLocation.ENCHANTMENT_OTHER -> {
+                        lastEffect.second!!.effect!!(keys[0], player.opposite(), this, null)
                     }
                     else -> {
                         lastEffect.second!!.effect!!(keys[0], player, this, null)
@@ -2725,6 +2860,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         player1.thisTurnReact = false; player2.thisTurnReact = false
         thisTurnDistanceChange = false
         player1.asuraUsed = false; player2.asuraUsed = false
+        player1.isNextBasicOperationInvalid = false; player2.isNextBasicOperationInvalid = false
+        player1.isMoveDistanceToken = false; player2.isMoveDistanceToken = false
     }
 
     //0 = player don't want using card more || 1 = player card use success || 2 = cannot use because there are no installation card
@@ -2978,7 +3115,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun doBasicOperation(player: PlayerEnum, command: CommandEnum, card: Int){
-        getPlayer(player).didBasicOperation = true
+        val nowPlayer = getPlayer(player)
+        nowPlayer.didBasicOperation = true
+        if(nowPlayer.isNextBasicOperationInvalid){
+            nowPlayer.isNextBasicOperationInvalid = false
+            return
+        }
         when(command){
             CommandEnum.ACTION_GO_FORWARD -> doGoForward(player, card)
             CommandEnum.ACTION_GO_BACKWARD -> doGoBackward(player, card)
@@ -3652,6 +3794,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
         }
         return count
+    }
+
+    fun getTotalSeedNumber(player: PlayerEnum): Int{
+        var result = 0
+        for(card in getPlayer(player).enchantmentCard.values){
+            result += card.getSeedToken()
+        }
+        return result
     }
 
     //megami special function

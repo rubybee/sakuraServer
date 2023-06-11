@@ -120,13 +120,16 @@ suspend fun sendRequestReact(mine: Connection){
     send(mine, Json.encodeToString(data))
 }
 
-suspend fun sendMoveToken(mine: Connection, other: Connection, what: TokenEnum, from: LocationEnum, to: LocationEnum, number: Int, card_number: Int){
+/**
+ card_number2 only used for two card is needed (only for card to card)
+ */
+suspend fun sendMoveToken(mine: Connection, other: Connection, what: TokenEnum, from: LocationEnum, to: LocationEnum, number: Int, card_number: Int, card_number2: Int = -1){
     if(number <= 0) return
     val preData = SakuraCardCommand(MOVE_TOKEN, card_number)
     send(mine, Json.encodeToString(preData))
     send(other, Json.encodeToString(preData))
-    val dataYour = SakuraSendData(MOVE_TOKEN, mutableListOf(what.real_number, from.real_number, to.real_number, number, card_number))
-    val dataOther = SakuraSendData(MOVE_TOKEN, mutableListOf(what.opposite().real_number, from.Opposite().real_number, to.Opposite().real_number, number, card_number))
+    val dataYour = SakuraSendData(MOVE_TOKEN, mutableListOf(what.real_number, from.real_number, to.real_number, number, card_number, card_number2))
+    val dataOther = SakuraSendData(MOVE_TOKEN, mutableListOf(what.opposite().real_number, from.Opposite().real_number, to.Opposite().real_number, number, card_number, card_number2))
     send(mine, Json.encodeToString(dataYour))
     send(other, Json.encodeToString(dataOther))
 }
@@ -847,3 +850,4 @@ suspend fun receiveBasicOperationMain(player: Connection): CommandEnum{
         }
     }
 }
+

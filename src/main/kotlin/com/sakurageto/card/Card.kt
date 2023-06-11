@@ -13,23 +13,24 @@ import kotlin.collections.HashMap
 class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum,
            var special_card_state: SpecialCardEnum?){
     private var nap: Int? = null
-    private var seedToken: Int? = null
+    private var seedToken: Int = 0
 
     fun getNap() = nap
+    fun getSeedToken() = seedToken
 
     fun reduceNap(number: Int): Pair<Int, Int>{
         var value = number
         if((nap?: 0) < number){
             value = nap?: 0
         }
-        val sakuraToken = (nap?: 0) - (seedToken?: 0)
+        val sakuraToken = (nap?: 0) - seedToken
 
         nap = (nap?: 0) - value
         if(sakuraToken >= value){
             return Pair(value, 0)
         }
         else{
-            seedToken = (seedToken?: 0) - value + sakuraToken
+            seedToken = seedToken - value + sakuraToken
             return Pair(sakuraToken, value - sakuraToken)
         }
     }
@@ -40,9 +41,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }?: number
 
         if(seed){
-            seedToken = seedToken?.let {
-                it + number
-            }?: number
+            seedToken += number
         }
     }
 
@@ -566,7 +565,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     fun chasmCheck(): Boolean{
         this.card_data.effect?.let {
             for(text in it){
-                if(text.tag == TextEffectTag.CHASM) return true
+                if(text === CardSet.chasm) return true
             }
         }
         return false

@@ -64,6 +64,7 @@ enum class TextEffectTag {
     GAME_END,
     END_CURRENT_PHASE,
     STORM_FORCE,
+    NEXT_BASIC_OPERATION_INVALID,
 
     //description when this effect use
     WHEN_USE_BEHAVIOR_END,
@@ -84,17 +85,21 @@ enum class TextEffectTag {
     WHEN_AFTER_CARD_USE,
     WHEN_DECK_RECONSTRUCT_OTHER,
     WHEN_DISCARD_NUMBER_CHANGE_OTHER,
+    WHEN_OTHER_PLAYER_CHANGE_DISTANCE_TOKEN,
 
     CONDITION_ADD_DO_WIND_AROUND,
 
     //description when this effect use this is exist in real game
     WHEN_START_PHASE_YOUR,
+    WHEN_START_PHASE_OTHER,
     WHEN_END_PHASE_YOUR,
     WHEN_END_PHASE_OTHER,
     WHEN_MAIN_PHASE_YOUR,
+    WHEN_MAIN_PHASE_OTHER,
     WHEN_END_PHASE_YOUR_IN_DISCARD,
 
     //check effect when some process is running
+    OTHER_CARD_NAP_LOCATION_HERE,
     DO_NOT_GET_DAMAGE,
     DO_NOT_MOVE_TOKEN,
     FORBID_BASIC_OPERATION,
@@ -129,6 +134,7 @@ enum class TextEffectTag {
     ACTIVE_TRANSFORM_BELOW_THIS_CARD,
 
     HATSUMI_LIGHTHOUSE,
+    ADD_GROWING,
     REMOVE_REACTIONS_TERMINATION,
     MIZUKI_BATTLE_CRY;
 }

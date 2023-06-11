@@ -41,6 +41,8 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var readySeed: Int = 0
     var notReadySeed: Int? = null
     var nextEnchantmentGrowing = 0
+    var isNextBasicOperationInvalid = false
+    var isMoveDistanceToken = false
 
     var loseCounter = false
 

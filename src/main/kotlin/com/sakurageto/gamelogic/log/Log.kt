@@ -1,7 +1,6 @@
-package com.sakurageto.gamelogic
+package com.sakurageto.gamelogic.log
 
 import com.sakurageto.card.CardName
-import com.sakurageto.card.CardSet
 import com.sakurageto.card.PlayerEnum
 
 //number1, number2 used to express location and card number

@@ -2,6 +2,10 @@ package com.sakurageto.card
 
 import com.sakurageto.gamelogic.*
 import com.sakurageto.gamelogic.GameStatus.Companion.START_PHASE
+import com.sakurageto.gamelogic.log.Log
+import com.sakurageto.gamelogic.log.LogText
+import com.sakurageto.gamelogic.storyboard.Act
+import com.sakurageto.gamelogic.storyboard.StoryBoard
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import com.sakurageto.protocol.sendSimpleCommand
@@ -7535,6 +7539,98 @@ object CardSet {
         })
     }
 
+    private val saljin = CardData(CardClass.IDEA, CardName.IDEA_SAL_JIN, MegamiEnum.KANAWE, CardType.UNDEFINED, SubType.NONE) //9000
+
+    private suspend fun nextAct(player: PlayerEnum, game_status: GameStatus, nextAct: Int){
+        val nowPlayer = game_status.getPlayer(player)
+        nowPlayer.nowAct = StoryBoard.getActByNumber(nextAct)
+        when(nowPlayer.nowAct?.actColor){
+            Act.COLOR_RED -> {
+                game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false, null, null)
+            }
+            Act.COLOR_PURPLE -> {
+                while(true){
+                    when(val command = game_status.requestBasicOperation(player, 9000)){
+                        CommandEnum.ACTION_GO_FORWARD, CommandEnum.ACTION_GO_BACKWARD, CommandEnum.ACTION_WIND_AROUND,
+                        CommandEnum.ACTION_INCUBATE, CommandEnum.ACTION_BREAK_AWAY, CommandEnum.ACTION_NAGA, CommandEnum.ACTION_YAKSHA,
+                        CommandEnum.ACTION_GARUDA, CommandEnum.ACTION_ASURA -> {
+                            if(game_status.canDoBasicOperation(player, command)){
+                                game_status.doBasicOperation(player, command, 209000)
+                                break
+                            }
+                            else{
+                                continue
+                            }
+                        }
+                        CommandEnum.SELECT_NOT -> break
+                        else -> {}
+                    }
+                }
+            }
+            Act.COLOR_GREEN -> {
+                game_status.selectCardFrom(player, player, listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 9000, 1
+                ) { true }?.let {selected ->
+                    game_status.popCardFrom(player, selected[0], LocationEnum.COVER_CARD, false)?.let {
+                        game_status.insertCardTo(player, it, LocationEnum.YOUR_DECK_BELOW, false)
+                    }
+                }
+            }
+            Act.COLOR_END -> {
+                game_status.gameEnd(player, null)
+            }
+            else -> {}
+        }
+    }
+
+    private suspend fun completeIdea(card_number: Int, player: PlayerEnum, game_status: GameStatus){
+        game_status.popCardFrom(player, card_number, LocationEnum.IDEA_YOUR, true)?.let {card ->
+            game_status.cardToDust(player, card.getNap(), card, false, LocationEnum.IDEA_YOUR)
+            game_status.insertCardTo(player, card, LocationEnum.END_IDEA_YOUR, true)
+        }
+        val chosenAct = game_status.selectAct(player)
+        if(chosenAct != -1){
+            nextAct(player, game_status, chosenAct)
+        }
+    }
+
+    private suspend fun ideaProcess(card_number: Int, player: PlayerEnum, game_status: GameStatus, maxStage: Int){
+        game_status.processIdeaStage(player)
+        if(game_status.getPlayer(player).ideaCardStage == maxStage){
+            completeIdea(card_number, player, game_status)
+        }
+    }
+
+    private fun kanaweIdeaInit(){
+        saljin.addtext(Text(TextEffectTimingTag.IDEA_CONDITION, TextEffectTag.IDEA){_, _, game_status, _ ->
+            if(game_status.logger.checkSaljin(false)){
+                1
+            }
+            else {
+                0
+            }
+        })
+        saljin.addtext(Text(TextEffectTimingTag.IDEA_CONDITION_FLIP, TextEffectTag.IDEA){_, _, game_status, _ ->
+            if(game_status.logger.checkSaljin(true)){
+                1
+            }
+            else {
+                0
+            }
+        })
+        saljin.addtext(Text(TextEffectTimingTag.IDEA_PROCESS, TextEffectTag.IDEA){card_number, player, game_status, _ ->
+            ideaProcess(card_number, player, game_status, 2)
+            null
+        })
+        saljin.addtext(Text(TextEffectTimingTag.IDEA_PROCESS_FLIP, TextEffectTag.IDEA){card_number, player, game_status, _ ->
+            ideaProcess(card_number, player, game_status, 1)
+            null
+        })
+    }
+
+    private fun kanaweCardInit(){
+
+    }
+
     fun init(){
         yurinaCardInit()
         saineCardInit()
@@ -7568,6 +7664,8 @@ object CardSet {
         thallyaA1CardInit()
         rairaA1CardInit()
         megumiCardInit()
+        kanaweIdeaInit()
+        kanaweCardInit()
 
         hashMapInit()
         hashMapTest()

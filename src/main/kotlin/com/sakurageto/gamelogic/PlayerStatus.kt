@@ -3,6 +3,7 @@ package com.sakurageto.gamelogic
 import com.sakurageto.card.*
 import com.sakurageto.card.CardSet.toCardData
 import com.sakurageto.card.CardSet.toCardName
+import com.sakurageto.gamelogic.storyboard.Act
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import com.sakurageto.protocol.SakuraSendData
@@ -19,37 +20,56 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var max_hand = 2
     var maxAura = 5
     var aura = 3
+    var freezeToken = 0
+    fun checkAuraFull(): Boolean = aura + freezeToken >= maxAura
 
+
+    //for megami(must be present)
     var umbrella: Umbrella? = null
+
     var stratagem: Stratagem? = null
+
     var artificialToken: Int? = null
     var artificialTokenBurn: Int = 0
     var transformZone: EnumMap<CardName, Card> = EnumMap(CardName::class.java)
+
     var windGauge: Int? = null
     var thunderGauge: Int? = null
-    var justRunNoCondition: Boolean = false
+
     var isThisTurnTailWind: Boolean = true
     var isNextTurnTailWind: Boolean = true
+
     var readySoldierZone= hashMapOf<Int, Card>()
     fun getCardFromSoldier(card_number: Int) = readySoldierZone[card_number]
     var notReadySoldierZone = hashMapOf<Int, Card>()
+    var notReadySeed: Int? = null
+
+    var nowAct: Act? = null
+    var ideaProcess: Boolean = false
+    var ideaCard: Card? = null
+    var isIdeaCardFlipped: Boolean = false
+    var ideaCardStage = 0
+    var endIdeaCards = HashMap<Int, Card>()
+    //for megami(must be present)
+
+
+    //for some card(some day refactor may be needed)
     var thisTurnReact = false
     var lastTurnReact = false
     var transformNumber = 0
     var asuraUsed = false
     var notCharge = false
     var readySeed: Int = 0
-    var notReadySeed: Int? = null
     var nextEnchantmentGrowing = 0
+    var justRunNoCondition: Boolean = false
     var isNextBasicOperationInvalid = false
     var isMoveDistanceToken = false
-
     var loseCounter = false
-
     var canNotGoForward: Boolean = false
     var didBasicOperation: Boolean = false
-
     var napBuff = 0
+    //for some card(some day refactor may be needed)
+
 
     fun auraDamagePossible(data: MutableList<Int>?, damage: Int, possibleList: MutableList<Int>): Boolean{
         var totalAura = 0
@@ -78,8 +98,6 @@ class PlayerStatus(val player_enum: PlayerEnum) {
         if(totalAura == damage) return true
         return false
     }
-
-    var freezeToken = 0
 
     var usingCard = ArrayDeque<Card>()
 
@@ -111,8 +129,6 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var sealZone = HashMap<Int, Card>()
     var sealInformation = HashMap<Int, MutableList<Int>>()
     var outOfGame = HashMap<Int, Card>()
-
-    fun checkAuraFull(): Boolean = aura + freezeToken >= maxAura
 
     fun getFullAuraDamage(): MutableList<Int>{
         val selectable = mutableListOf<Int>()

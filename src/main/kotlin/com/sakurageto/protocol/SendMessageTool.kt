@@ -281,7 +281,7 @@ suspend fun sendPreCardSelect(player: Connection, reason: CommandEnum, card_numb
     send(player, Json.encodeToString(data))
 }
 
-suspend fun sendCardSelect(player: Connection, list: MutableList<Int>, reason: CommandEnum){
+suspend fun sendSimpleSakuraData(player: Connection, list: MutableList<Int>, reason: CommandEnum){
     val data = SakuraSendData(reason, list)
     send(player, Json.encodeToString(data))
 }
@@ -785,7 +785,7 @@ suspend fun receiveAuraDamageSelectMain(player: Connection, place_list: MutableL
 
 suspend fun receiveSelectCard(player: Connection, card_list: MutableList<Int>, reason: CommandEnum, card_number: Int): MutableList<Int>?{
     sendPreCardSelect(player, reason, card_number)
-    sendCardSelect(player, card_list, reason)
+    sendSimpleSakuraData(player, card_list, reason)
     return receiveSelectCardMain(player, card_list, reason, card_number)
 }
 
@@ -811,7 +811,7 @@ suspend fun receiveSelectCardMain(player: Connection, card_list: MutableList<Int
                         }
                         if(flag) return data.data
                         sendPreCardSelect(player, reason, card_number)
-                        sendCardSelect(player, card_list, reason)
+                        sendSimpleSakuraData(player, card_list, reason)
                     }
                 }catch (e: Exception){
                     continue
@@ -847,6 +847,38 @@ suspend fun receiveBasicOperationMain(player: Connection): CommandEnum{
         } catch (e: Exception) {
             waitReconnect(player)
             return receiveBasicOperationMain(player)
+        }
+    }
+}
+
+suspend fun receiveSelectAct(player: Connection, act_list: MutableList<Int>): Int{
+    sendSimpleCommand(player, SELECT_ACT)
+    sendSimpleSakuraData(player, act_list, SELECT_ACT)
+    return receiveSelectActMain(player, act_list, SELECT_ACT)
+}
+
+suspend fun receiveSelectActMain(player: Connection, act_list: MutableList<Int>, reason: CommandEnum): Int{
+    val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
+
+    while (true) {
+        try {
+            val frame = player.session.incoming.receive()
+            if (frame is Frame.Text) {
+                val text = frame.readText()
+                try {
+                    val data = json.decodeFromString<SakuraCardCommand>(text)
+                    if(data.command == reason){
+                        if(data.card in act_list) return data.card
+                        sendSimpleCommand(player, SELECT_ACT)
+                        sendSimpleSakuraData(player, act_list, SELECT_ACT)
+                    }
+                }catch (e: Exception){
+                    continue
+                }
+            }
+        } catch (e: Exception){
+            waitReconnect(player)
+            return receiveSelectActMain(player, act_list, SELECT_ACT)
         }
     }
 }

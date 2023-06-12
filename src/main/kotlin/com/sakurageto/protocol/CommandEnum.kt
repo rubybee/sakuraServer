@@ -64,6 +64,10 @@ enum class CommandEnum {
     POP_NOT_READY_SOLDIER_ZONE_OTHER,
     POP_READY_SOLDIER_ZONE_YOUR,
     POP_READY_SOLDIER_ZONE_OTHER,
+    POP_IDEA_YOUR,
+    POP_IDEA_OTHER,
+    POP_END_IDEA_YOUR,
+    POP_END_IDEA_OTHER,
 
     POISON_BAG_YOUR,
     POISON_BAG_OTHER,
@@ -81,6 +85,8 @@ enum class CommandEnum {
     OUT_OF_GAME_YOUR,
     TRANSFORM_YOUR,
     ADDITIONAL_YOUR,
+    IDEA_YOUR,
+    END_IDEA_YOUR,
     SPECIAL_OTHER,
     DISCARD_CARD_OTHER,
     USED_CARD_OTHER,
@@ -93,6 +99,8 @@ enum class CommandEnum {
     OUT_OF_GAME_OTHER,
     TRANSFORM_OTHER,
     ADDITIONAL_OTHER,
+    IDEA_OTHER,
+    END_IDEA_OTHER,
 
 
     MAKE_ATTACK_COMPLETE_YOUR,
@@ -239,6 +247,9 @@ enum class CommandEnum {
     SET_HEAD_WIND_YOUR,
     SET_HEAD_WIND_OTHER,
 
+    SET_IDEA_STAGE_YOUR,
+    SET_IDEA_STAGE_OTHER,
+
     REDUCE_THIS_TURN_DISTANCE,
     ADD_THIS_TURN_DISTANCE,
     REDUCE_THIS_TURN_SWELL_DISTANCE,
@@ -247,6 +258,7 @@ enum class CommandEnum {
     SELECT_ARROW_DIRECTION,
     SHOW_SPECIAL_YOUR,
     SHOW_SPECIAL_OTHER,
+    SELECT_ACT,
 
     SELECT_NAP_LOCATION;
 
@@ -365,6 +377,16 @@ enum class CommandEnum {
             POP_NOT_READY_SOLDIER_ZONE_OTHER -> return POP_NOT_READY_SOLDIER_ZONE_YOUR
             POP_READY_SOLDIER_ZONE_YOUR -> return POP_READY_SOLDIER_ZONE_OTHER
             POP_READY_SOLDIER_ZONE_OTHER -> return POP_READY_SOLDIER_ZONE_YOUR
+            SET_IDEA_STAGE_YOUR -> return SET_IDEA_STAGE_OTHER
+            SET_IDEA_STAGE_OTHER -> return SET_IDEA_STAGE_YOUR
+            IDEA_YOUR -> return IDEA_OTHER
+            IDEA_OTHER -> return IDEA_YOUR
+            END_IDEA_YOUR -> return END_IDEA_OTHER
+            END_IDEA_OTHER -> return END_IDEA_YOUR
+            POP_IDEA_YOUR -> return POP_IDEA_OTHER
+            POP_IDEA_OTHER -> return POP_IDEA_YOUR
+            POP_END_IDEA_YOUR -> return POP_END_IDEA_OTHER
+            POP_END_IDEA_OTHER -> return POP_END_IDEA_YOUR
             else -> TODO()
         }
     }
@@ -447,7 +469,12 @@ enum class LocationEnum(var real_number: Int){
     READY_DIRT_ZONE_YOUR(37),
     READY_DIRT_ZONE_OTHER(38),
     NOT_READY_DIRT_ZONE_YOUR(39),
-    NOT_READY_DIRT_ZONE_OTHER(40);
+    NOT_READY_DIRT_ZONE_OTHER(40),
+
+    IDEA_YOUR(41),
+    IDEA_OTHER(42),
+    END_IDEA_YOUR(43),
+    END_IDEA_OTHER(44);
 
     fun Opposite(): LocationEnum{
         return when(this){
@@ -474,6 +501,10 @@ enum class LocationEnum(var real_number: Int){
             READY_DIRT_ZONE_OTHER -> READY_DIRT_ZONE_YOUR
             NOT_READY_DIRT_ZONE_YOUR -> NOT_READY_DIRT_ZONE_OTHER
             NOT_READY_DIRT_ZONE_OTHER -> NOT_READY_DIRT_ZONE_YOUR
+            IDEA_YOUR -> IDEA_OTHER
+            IDEA_OTHER -> IDEA_YOUR
+            END_IDEA_YOUR -> END_IDEA_OTHER
+            END_IDEA_OTHER -> END_IDEA_YOUR
             else -> DISCARD_YOUR
         }
     }

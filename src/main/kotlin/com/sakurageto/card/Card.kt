@@ -842,4 +842,40 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             }
         }
     }
+
+    suspend fun ideaProcess(player: PlayerEnum, game_status: GameStatus, flipped: Boolean, keys: MutableList<Int>?){
+        suspend fun checkIdeaCondition(player: PlayerEnum, game_status: GameStatus, flipped: Boolean): Boolean{
+            val tag = if(flipped) TextEffectTimingTag.IDEA_CONDITION_FLIP else TextEffectTimingTag.IDEA_CONDITION
+            card_data.effect?.let {
+                for(text in it){
+                    if(text.timing_tag == tag) {
+                        return text.effect!!(card_number, player, game_status, null) == 1
+                    }
+                }
+            }
+            return false
+        }
+
+        fun ideaRun(player: PlayerEnum, game_status: GameStatus, flipped: Boolean, keys: MutableList<Int>?){
+            val tag = if(flipped) TextEffectTimingTag.IDEA_PROCESS_FLIP else TextEffectTimingTag.IDEA_PROCESS
+            card_data.effect?.let {
+                for(text in it){
+                    if(text.timing_tag == tag) {
+                        when(player){
+                            PlayerEnum.PLAYER1 -> game_status.endPhaseEffect[card_number] = Pair(CardEffectLocation.IDEA_PLAYER1, text)
+                            PlayerEnum.PLAYER2 -> game_status.endPhaseEffect[card_number] = Pair(CardEffectLocation.IDEA_PLAYER2, text)
+                        }
+                        keys?.add(card_number)
+                        return
+                    }
+                }
+            }
+        }
+
+        val nowPlayer = game_status.getPlayer(player)
+        if(checkIdeaCondition(player, game_status, flipped)){
+            nowPlayer.ideaProcess = true
+            ideaRun(player, game_status, flipped, keys)
+        }
+    }
 }

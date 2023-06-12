@@ -15,6 +15,10 @@ enum class TextEffectTimingTag {
     USED,
     USING,
     AFTER_ATTACK,
+    IDEA_CONDITION_FLIP,
+    IDEA_CONDITION,
+    IDEA_PROCESS,
+    IDEA_PROCESS_FLIP,
 }
 
 enum class TextEffectTag {
@@ -36,6 +40,7 @@ enum class TextEffectTag {
     CHANGE_ARROW_BOTH,
 
     //just define what this effect do
+    IDEA,
     DO_BASIC_OPERATION,
     THIS_CARD_NAP_CHANGE,
     ADD_END_PHASE_EFFECT,

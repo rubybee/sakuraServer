@@ -36,7 +36,8 @@ enum class MegamiEnum(var real_number: Int) {
     YATSUHA(160),
     HATSUMI(170),
     MIZUKI(180),
-    MEGUMI(190);
+    MEGUMI(190),
+    KANAWE(200);
 
 
     fun getAllNormalCardName(): List<CardName>{

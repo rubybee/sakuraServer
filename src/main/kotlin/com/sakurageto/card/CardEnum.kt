@@ -27,6 +27,7 @@ enum class CardClass {
     SPECIAL,
     NORMAL,
     SOLDIER,
+    IDEA,
     NULL
 }
 
@@ -392,7 +393,27 @@ enum class CardName {
     MEGUMI_ROOT_OF_CAUSALITY,
     MEGUMI_BRANCH_OF_POSSIBILITY,
     MEGUMI_FRUIT_OF_END,
-    MEGUMI_MEGUMI_PALM;
+    MEGUMI_MEGUMI_PALM,
+
+    KANAWE_IMAGE,
+    KANAWE_SCREENPLAY,
+    KANAWE_PRODUCTION,
+    KANAWE_PUBLISH,
+    KANAWE_AFTERGLOW,
+    KANAWE_IMPROMPTU,
+    KANAWE_SEAL,
+
+    KANAWE_VAGUE_STORY,
+    KANAWE_INFINITE_STARLIGHT,
+    KANAWE_BEND_OVER_THIS_NIGHT,
+    KANAWE_DISTANT_SKY,
+
+    IDEA_SAL_JIN, //9000
+    IDEA_SAKURA_WAVE,
+    IDEA_WHISTLE,
+    IDEA_MYEONG_JEON,
+    IDEA_EMPHASIZING,
+    IDEA_POSITIONING;
 
 
     fun toCardNumber(firstTurn: Boolean): Int{
@@ -1152,6 +1173,13 @@ enum class CardName {
                     MEGUMI_POLE_THRUST, MEGUMI_REED, MEGUMI_BALSAM,
                     MEGUMI_WILD_ROSE
                 )
+                KANAWE -> listOf(
+                    KANAWE_IMAGE, KANAWE_SCREENPLAY, KANAWE_PRODUCTION,
+                    KANAWE_PUBLISH, KANAWE_AFTERGLOW, KANAWE_IMPROMPTU,
+                    KANAWE_SEAL
+
+
+                )
             }
         }
 
@@ -1274,6 +1302,10 @@ enum class CardName {
                     MEGUMI_ROOT_OF_CAUSALITY, MEGUMI_BRANCH_OF_POSSIBILITY, MEGUMI_FRUIT_OF_END,
                     MEGUMI_MEGUMI_PALM
                 )
+                KANAWE -> listOf(
+                    KANAWE_VAGUE_STORY, KANAWE_INFINITE_STARLIGHT, KANAWE_BEND_OVER_THIS_NIGHT,
+                    KANAWE_DISTANT_SKY
+                )
             }
         }
 
@@ -1333,6 +1365,10 @@ enum class CardName {
                     KODAMA_TU_SIN
                 )
                 MEGUMI -> listOf()
+                KANAWE -> listOf(
+                    IDEA_SAL_JIN, IDEA_SAKURA_WAVE, IDEA_WHISTLE,
+                    IDEA_MYEONG_JEON, IDEA_EMPHASIZING, IDEA_POSITIONING
+                )
             }
         }
 
@@ -1372,5 +1408,7 @@ enum class CardEffectLocation {
     RETURN_YOUR,
     USED_YOUR,
     MEGAMI_YOUR,
-    TEMP
+    TEMP,
+    IDEA_PLAYER1,
+    IDEA_PLAYER2;
 }

@@ -7537,9 +7537,18 @@ object CardSet {
             }))
             null
         })
+        megumiPalm.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.WHEN_THIS_CARD_GET_OUT_ENCHANTMENT)
+        { card_number, player, game_status, _ ->
+            game_status.removeThisTurnAttackBuff(player, BufTag.PLUS_MINUS, card_number)
+            null
+        })
     }
 
     private val saljin = CardData(CardClass.IDEA, CardName.IDEA_SAL_JIN, MegamiEnum.KANAWE, CardType.UNDEFINED, SubType.NONE) //9000
+
+
+    private val emphasizing = CardData(CardClass.IDEA, CardName.IDEA_EMPHASIZING, MegamiEnum.KANAWE, CardType.UNDEFINED, SubType.NONE)
+    private val positioning = CardData(CardClass.IDEA, CardName.IDEA_POSITIONING, MegamiEnum.KANAWE, CardType.UNDEFINED, SubType.NONE)
 
     private suspend fun nextAct(player: PlayerEnum, game_status: GameStatus, nextAct: Int){
         val nowPlayer = game_status.getPlayer(player)
@@ -7622,6 +7631,55 @@ object CardSet {
             null
         })
         saljin.addtext(Text(TextEffectTimingTag.IDEA_PROCESS_FLIP, TextEffectTag.IDEA){card_number, player, game_status, _ ->
+            ideaProcess(card_number, player, game_status, 1)
+            null
+        })
+        emphasizing.addtext(Text(TextEffectTimingTag.IDEA_CONDITION, TextEffectTag.IDEA){ _, player, game_status, _ ->
+            if(game_status.logger.checkThisTurnUseFullPower() && !(game_status.logger.checkThisTurnIdea(player))){
+                1
+            }
+            else {
+                0
+            }
+        })
+        emphasizing.addtext(Text(TextEffectTimingTag.IDEA_CONDITION_FLIP, TextEffectTag.IDEA){ _, player, game_status, _ ->
+            if(game_status.logger.checkThisTurnUseFullPower() && !(game_status.logger.checkThisTurnIdea(player))){
+                1
+            }
+            else {
+                0
+            }
+        })
+        emphasizing.addtext(Text(TextEffectTimingTag.IDEA_PROCESS, TextEffectTag.IDEA){ card_number, player, game_status, _ ->
+            ideaProcess(card_number, player, game_status, 1)
+            null
+        })
+        emphasizing.addtext(Text(TextEffectTimingTag.IDEA_PROCESS_FLIP, TextEffectTag.IDEA){ card_number, player, game_status, _ ->
+            ideaProcess(card_number, player, game_status, 2)
+            null
+        })
+        positioning.addtext(Text(TextEffectTimingTag.IDEA_CONDITION, TextEffectTag.IDEA){_, _, game_status, _ ->
+            val nowDistance = game_status.getAdjustDistance(null)
+            if(abs(game_status.startTurnDistance - nowDistance) >= 2 && nowDistance <= 8){
+                1
+            }
+            else {
+                0
+            }
+        })
+        emphasizing.addtext(Text(TextEffectTimingTag.IDEA_CONDITION_FLIP, TextEffectTag.IDEA){ _, _, game_status, _ ->
+            if(abs(game_status.startTurnDistance - game_status.getAdjustDistance(null)) >= 5){
+                1
+            }
+            else {
+                0
+            }
+        })
+        emphasizing.addtext(Text(TextEffectTimingTag.IDEA_PROCESS, TextEffectTag.IDEA){ card_number, player, game_status, _ ->
+            ideaProcess(card_number, player, game_status, 2)
+            null
+        })
+        emphasizing.addtext(Text(TextEffectTimingTag.IDEA_PROCESS_FLIP, TextEffectTag.IDEA){ card_number, player, game_status, _ ->
             ideaProcess(card_number, player, game_status, 1)
             null
         })

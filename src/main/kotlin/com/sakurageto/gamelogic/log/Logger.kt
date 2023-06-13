@@ -98,7 +98,7 @@ class Logger {
 
     fun checkThisCardUsed(player: PlayerEnum, card_number: Int): Boolean{
         for(log in logQueue.asReversed()){
-            if(log.player == player && log.number1 == card_number) return true
+            if(log.player == player && log.isTextUseCard() && log.number1 == card_number) return true
         }
         return false
     }
@@ -150,6 +150,19 @@ class Logger {
         } else {
             count >= 2
         }
+    }
 
+    fun checkThisTurnUseFullPower(): Boolean{
+        for(log in logQueue){
+            if(log.isTextUseCard() && log.boolean) return true
+        }
+        return false
+    }
+
+    fun checkThisTurnIdea(player: PlayerEnum): Boolean{
+        for(log in logQueue){
+            if(log.player == player && log.text == LogText.IDEA) return true
+        }
+        return false
     }
 }

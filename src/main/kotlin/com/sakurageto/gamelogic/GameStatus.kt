@@ -1732,6 +1732,21 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
+    fun removeThisTurnAttackBuff(player: PlayerEnum, effectTag: BufTag, card_number: Int){
+        val nowPlayer = getPlayer(player)
+
+        when(effectTag){
+            BufTag.CARD_CHANGE, BufTag.INSERT, BufTag.CHANGE_EACH,
+            BufTag.MULTIPLE, BufTag.DIVIDE, BufTag.PLUS_MINUS -> {
+                nowPlayer.attackBuff.removeAttackBuff(effectTag, card_number)
+            }
+            BufTag.CARD_CHANGE_IMMEDIATE, BufTag.INSERT_IMMEDIATE, BufTag.CHANGE_EACH_IMMEDIATE,
+            BufTag.MULTIPLE_IMMEDIATE, BufTag.DIVIDE_IMMEDIATE, BufTag.PLUS_MINUS_IMMEDIATE -> {
+                getPlayerTempAttackBuff(player).removeAttackBuff(effectTag, card_number)
+            }
+        }
+    }
+
     fun addThisTurnRangeBuff(player: PlayerEnum, effect: RangeBuff){
         val nowPlayer = getPlayer(player)
         val nowTempRangeBuff = getPlayerTempRangeBuff(player)
@@ -1918,11 +1933,20 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(cost != -2){
             if(isCost) card.effectText(player, this, react_attack, TextEffectTag.COST)
 
-            if(location == LocationEnum.READY_SOLDIER_ZONE) logger.insert(Log(player, LogText.USE_CARD_IN_SOLDIER, card.card_number, card.card_data.megami.real_number))
-            else if(location == LocationEnum.COVER_CARD && react) logger.insert(Log(player, LogText.USE_CARD_IN_COVER_AND_REACT, card.card_number, card.card_data.megami.real_number))
-            else if(location == LocationEnum.COVER_CARD) logger.insert(Log(player, LogText.USE_CARD_IN_COVER, card.card_number, card.card_data.megami.real_number))
-            else if(react) logger.insert(Log(player, LogText.USE_CARD_REACT, card.card_number, card.card_data.megami.real_number))
-            else logger.insert(Log(player, LogText.USE_CARD, card.card_number, card.card_data.megami.real_number))
+            if(location == LocationEnum.READY_SOLDIER_ZONE) logger.insert(Log(player, LogText.USE_CARD_IN_SOLDIER,
+                card.card_number, card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER))
+
+            else if(location == LocationEnum.COVER_CARD && react) logger.insert(Log(player, LogText.USE_CARD_IN_COVER_AND_REACT,
+                card.card_number, card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER))
+
+            else if(location == LocationEnum.COVER_CARD) logger.insert(Log(player, LogText.USE_CARD_IN_COVER, card.card_number,
+                card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER))
+
+            else if(react) logger.insert(Log(player, LogText.USE_CARD_REACT, card.card_number,
+                card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER))
+
+            else logger.insert(Log(player, LogText.USE_CARD, card.card_number,
+                card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER))
 
             val isTermination = terminationListenerProcess(player, card)
 

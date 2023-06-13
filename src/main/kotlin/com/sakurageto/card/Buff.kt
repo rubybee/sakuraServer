@@ -46,6 +46,29 @@ class AttackBuffQueue() {
         }
     }
 
+    private fun ArrayDeque<Buff>.removeByNumber(card_number: Int){
+        this.removeIf {
+            it.cardNumber == card_number
+        }
+    }
+
+    fun removeAttackBuff(tag: BufTag, card_number: Int) {
+        when (tag) {
+            CARD_CHANGE -> attackBuff[0].removeByNumber(card_number)
+            INSERT -> attackBuff[1].removeByNumber(card_number)
+            CHANGE_EACH -> attackBuff[2].removeByNumber(card_number)
+            MULTIPLE -> attackBuff[3].removeByNumber(card_number)
+            DIVIDE -> attackBuff[4].removeByNumber(card_number)
+            PLUS_MINUS -> attackBuff[5].removeByNumber(card_number)
+            CARD_CHANGE_IMMEDIATE -> attackBuff[0].removeByNumber(card_number)
+            INSERT_IMMEDIATE -> attackBuff[1].removeByNumber(card_number)
+            CHANGE_EACH_IMMEDIATE -> attackBuff[2].removeByNumber(card_number)
+            MULTIPLE_IMMEDIATE -> attackBuff[3].removeByNumber(card_number)
+            DIVIDE_IMMEDIATE -> attackBuff[4].removeByNumber(card_number)
+            PLUS_MINUS_IMMEDIATE -> attackBuff[5].removeByNumber(card_number)
+        }
+    }
+
     fun clearBuff(){
         for (queue in attackBuff){
             queue.clear()

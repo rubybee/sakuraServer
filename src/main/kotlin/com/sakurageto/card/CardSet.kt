@@ -968,13 +968,13 @@ object CardSet {
     }
 
     private suspend fun selectDustToDistance(nowCommand: CommandEnum, game_status: GameStatus,
-                                             user: PlayerEnum, owner: PlayerEnum): Boolean{
+                                             user: PlayerEnum, owner: PlayerEnum, card_number: Int): Boolean{
         if(nowCommand == CommandEnum.SELECT_ONE){
-            game_status.dustToDistance(1, Arrow.NULL, user, owner)
+            game_status.dustToDistance(1, Arrow.BOTH_DIRECTION, user, owner, card_number)
             return true
         }
         else if(nowCommand == CommandEnum.SELECT_TWO){
-            game_status.distanceToDust(1, Arrow.NULL, user, owner)
+            game_status.distanceToDust(1, Arrow.BOTH_DIRECTION, user, owner, card_number)
             return true
         }
         return false
@@ -1084,7 +1084,8 @@ object CardSet {
             null
         })
         jjockbae.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
-            game_status.dustToAura(player, 5, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.dustToAura(player, 5, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
+
             null
         })
         jjockbae.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
@@ -1144,7 +1145,7 @@ object CardSet {
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         moogechoo.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
             if(palSang(player, game_status)){
-                game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
             }
             null
         })
@@ -1155,7 +1156,7 @@ object CardSet {
         ganpa.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
             while(true){
                 val nowCommand = game_status.receiveCardEffectSelect(player, 203)
-                if(selectDustToDistance(nowCommand, game_status, player, game_status.getCardOwner(card_number))) break
+                if(selectDustToDistance(nowCommand, game_status, player, game_status.getCardOwner(card_number), card_number)) break
             }
             null
         })
@@ -1183,7 +1184,7 @@ object CardSet {
             null
         })
         choongemjung.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-            game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
             null
         })
         mooembuck.setEnchantment(5)
@@ -1225,7 +1226,8 @@ object CardSet {
             null
         })
         hangmunggongjin.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
-            game_status.auraToDistance(player.opposite(), 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.auraToDistance(player.opposite(), 2,
+                Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
             null
         })
         emmooshoebing.setSpecial(2)
@@ -1288,7 +1290,8 @@ object CardSet {
         magnumcanon.setAttack(DistanceType.CONTINUOUS, Pair(5, 8), null, 3, 2,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         magnumcanon.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-            game_status.lifeToDust(player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.lifeToDust(player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number),
+                card_number)
             null
         })
         fullburst.setAttack(DistanceType.CONTINUOUS, Pair(5, 9), null, 3, 1,
@@ -1306,7 +1309,7 @@ object CardSet {
             null
         })
         backstep.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-            game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
             null
         })
         backdraft.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_SHRINK) {_, player, game_status, _ ->
@@ -1364,7 +1367,7 @@ object CardSet {
         burmilionfield.setSpecial(2)
         burmilionfield.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.DRAW_CARD) {card_number, player, game_status, _->
             if(yeonwha(player, game_status)){
-                game_status.dustToDistance(2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                game_status.dustToDistance(2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
             }
             null
         })
@@ -1413,7 +1416,7 @@ object CardSet {
         })
         runningrabit.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _->
             if(game_status.getAdjustDistance(player) <= 3){
-                game_status.dustToDistance(2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                game_status.dustToDistance(2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
             }
             null
         })
@@ -1425,11 +1428,13 @@ object CardSet {
             while(true){
                 val nowCommand = game_status.receiveCardEffectSelect(player, 403)
                 if(nowCommand == CommandEnum.SELECT_ONE){
-                    game_status.flareToAura(player, player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                    game_status.flareToAura(player, player, 1, Arrow.ONE_DIRECTION, player,
+                        game_status.getCardOwner(card_number), card_number)
                     break
                 }
                 else if(nowCommand == CommandEnum.SELECT_TWO){
-                    game_status.auraToDistance(player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                    game_status.auraToDistance(player, 1, Arrow.ONE_DIRECTION, player,
+                        game_status.getCardOwner(card_number), card_number)
                     break
                 }
             }
@@ -1457,16 +1462,17 @@ object CardSet {
             null
         })
         flipfan.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _->
-            game_status.dustToAura(player, 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.dustToAura(player, 2, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
         windstage.setEnchantment(2)
         windstage.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-            game_status.distanceToAura(player, 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.distanceToAura(player, 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
             null
         })
         windstage.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-            game_status.auraToDistance(player, 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.auraToDistance(player, 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
             null
         })
         sunstage.setEnchantment(2)
@@ -1579,7 +1585,8 @@ object CardSet {
         })
         ninjawalk.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.INSTALLATION, null))
         ninjawalk.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-            game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
         ninjawalk.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) {card_number, player, game_status, _ ->
@@ -1593,11 +1600,13 @@ object CardSet {
             while(true){
                 val nowCommand = game_status.receiveCardEffectSelect(player, 504)
                 if(nowCommand == CommandEnum.SELECT_ONE){
-                    game_status.distanceToAura(player.opposite(), 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                    game_status.distanceToAura(player.opposite(), 1, Arrow.ONE_DIRECTION, player,
+                        game_status.getCardOwner(card_number), card_number)
                     break
                 }
                 else if(nowCommand == CommandEnum.SELECT_TWO){
-                    game_status.auraToFlare(player.opposite(), player.opposite(), 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                    game_status.auraToFlare(player.opposite(), player.opposite(), 1, Arrow.ONE_DIRECTION, player,
+                        game_status.getCardOwner(card_number), card_number)
                     break
                 }
             }
@@ -1679,7 +1688,8 @@ object CardSet {
         mikazra.setAttack(DistanceType.CONTINUOUS, Pair(3, 7), null, 1, 1,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         mikazra.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-            game_status.dustToFlare(player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.dustToFlare(player, 1, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
         mikazra.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.RETURN){_, player, game_status, _ ->
@@ -1739,12 +1749,12 @@ object CardSet {
         pushOut.addTextFold(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _->
             while(true){
                 val nowCommand = game_status.receiveCardEffectSelect(player, 602)
-                if(selectDustToDistance(nowCommand, game_status, player, game_status.getCardOwner(card_number))) break
+                if(selectDustToDistance(nowCommand, game_status, player, game_status.getCardOwner(card_number), card_number)) break
             }
             null
         })
         pushOut.addTextUnfold(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _->
-            game_status.distanceToDust(2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.distanceToDust(2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
             null
         })
         swing.umbrellaMark = true
@@ -1755,7 +1765,9 @@ object CardSet {
                 val nowCommand = game_status.receiveCardEffectSelect(player, 604)
                 if(nowCommand == CommandEnum.SELECT_ONE){
                     game_status.showSome(player, CommandEnum.SHOW_HAND_YOUR, card_number)
-                    game_status.dustToAura(player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                    game_status.dustToAura(player, 1, Arrow.ONE_DIRECTION, player,
+                        game_status.getCardOwner(card_number), card_number)
+                    game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
                     break
                 }
                 else if(nowCommand == CommandEnum.SELECT_TWO){
@@ -1767,31 +1779,33 @@ object CardSet {
         })
         backwardStep.umbrellaMark = true
         backwardStep.addTextFold(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
-            game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
             null
         })
         backwardStep.addTextUnfold(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
-            game_status.distanceToDust(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.distanceToDust(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
             null
         })
         makeConnection.setEnchantment(2)
         makeConnection.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
             if(game_status.getUmbrella(player) == Umbrella.UNFOLD) {
                 game_status.dustToDistance(1,
-                    Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                    Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
             }
             else {
-                game_status.distanceToDust(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                game_status.distanceToDust(1, Arrow.ONE_DIRECTION, player,
+                    game_status.getCardOwner(card_number), card_number)
             }
             null
         })
         makeConnection.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
             if(game_status.getUmbrella(player) == Umbrella.UNFOLD) {
                 game_status.distanceToDust(1,
-                    Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                    Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
             }
             else {
-                game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player,
+                    game_status.getCardOwner(card_number), card_number)
             }
             null
         })
@@ -1913,7 +1927,8 @@ object CardSet {
         swirlingGesture.setSpecial(1)
         swirlingGesture.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
             game_status.changeUmbrella(player)
-            game_status.dustToAura(player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.dustToAura(player, 1, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
     }
@@ -2079,13 +2094,15 @@ object CardSet {
         seondong.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.RUN_STRATAGEM) {card_number, player, game_status, _->
             when(game_status.getStratagem(player)){
                 Stratagem.SHIN_SAN -> {
-                    game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                    game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player,
+                        game_status.getCardOwner(card_number), card_number)
                     if(!game_status.getPlayer(player).justRunNoCondition){
                         setStratagemByUser(game_status, player)
                     }
                 }
                 Stratagem.GUE_MO -> {
-                    game_status.distanceToAura(player.opposite(), 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                    game_status.distanceToAura(player.opposite(), 1, Arrow.ONE_DIRECTION, player,
+                        game_status.getCardOwner(card_number), card_number)
                     if(!game_status.getPlayer(player).justRunNoCondition){
                         setStratagemByUser(game_status, player)
                     }
@@ -2193,7 +2210,7 @@ object CardSet {
             null
         })
         dasicIhae.setSpecial(2)
-        dasicIhae.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.RUN_STRATAGEM) {_, player, game_status, _->
+        dasicIhae.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.RUN_STRATAGEM) {card_number, player, game_status, _->
             when(game_status.getStratagem(player)){
                 Stratagem.SHIN_SAN -> {
                     game_status.selectCardFrom(player, player, listOf(LocationEnum.DISCARD_YOUR, LocationEnum.YOUR_USED_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 708, 1)
@@ -2222,7 +2239,7 @@ object CardSet {
                         {card -> card.card_data.card_type == CardType.ENCHANTMENT}?: break
                         if (list.size == 1){
                             val card = game_status.getCardFrom(player.opposite(), list[0], LocationEnum.ENCHANTMENT_ZONE)?: continue
-                            game_status.cardToDust(player.opposite(), card.getNap(), card, false)
+                            game_status.cardToDust(player.opposite(), card.getNap(), card, false, card_number)
                             game_status.enchantmentDestruction(player.opposite(), card)
                             break
                         }
@@ -2248,11 +2265,14 @@ object CardSet {
         samraBanSho.setSpecial(6)
         samraBanSho.setEnchantment(6)
         samraBanSho.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
-            game_status.dustToLife(player, 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.dustToLife(player, 2, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
-        samraBanSho.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_ENCHANTMENT_DESTRUCTION_YOUR){ _, player, game_status, _ ->
-            game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false, null, null)
+        samraBanSho.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_ENCHANTMENT_DESTRUCTION_YOUR){ card_number, player, game_status, _ ->
+            game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false,
+                null, null, card_number)
+            game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
             null
         })
         samraBanSho.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MOVE_SAKURA_TOKEN){_, player, game_status, _ ->
@@ -2359,10 +2379,12 @@ object CardSet {
         })
         hyperRecoil.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
             if(game_status.getAdjustDistance(player) >= 5){
-                game_status.distanceToFlare(player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                game_status.distanceToFlare(player, 1, Arrow.ONE_DIRECTION, player,
+                    game_status.getCardOwner(card_number), card_number)
             }
             else{
-                game_status.flareToDistance(player.opposite(), 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                game_status.flareToDistance(player.opposite(), 1, Arrow.ONE_DIRECTION, player,
+                    game_status.getCardOwner(card_number), card_number)
             }
             null
         })
@@ -2376,7 +2398,8 @@ object CardSet {
         })
         wonMuRuyn.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
             if(game_status.getPlayerFlare(player.opposite()) >= 3){
-                game_status.flareToAura(player.opposite(), player, 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                game_status.flareToAura(player.opposite(), player, 2, Arrow.ONE_DIRECTION, player,
+                    game_status.getCardOwner(card_number), card_number)
             }
             null
         })
@@ -2416,10 +2439,12 @@ object CardSet {
         gravitationField.setEnchantment(2)
         gravitationField.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
             if(game_status.getFullAction(player)){
-                game_status.distanceToAura(player, 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                game_status.distanceToAura(player, 2, Arrow.ONE_DIRECTION, player,
+                    game_status.getCardOwner(card_number), card_number)
             }
             else{
-                game_status.distanceToAura(player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                game_status.distanceToAura(player, 1, Arrow.ONE_DIRECTION, player,
+                    game_status.getCardOwner(card_number), card_number)
             }
             null
         })
@@ -2444,13 +2469,15 @@ object CardSet {
         grandBellMegalobel.setSpecial(2)
         grandBellMegalobel.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
             if(checkAllSpecialCardUsed(player, game_status, card_number)){
-                game_status.dustToLife(player, 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                game_status.dustToLife(player, 2, Arrow.ONE_DIRECTION, player,
+                    game_status.getCardOwner(card_number), card_number)
             }
             null
         })
         grandGravitationAttract.setSpecial(5)
         grandGravitationAttract.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
-            game_status.distanceToFlare(player, 3, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.distanceToFlare(player, 3, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
         grandGravitationAttract.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.RETURN){card_number, player, game_status, _ ->
@@ -2541,8 +2568,10 @@ object CardSet {
         toZuChu.setAttack(DistanceType.CONTINUOUS, Pair(1, 3), null, 1, 999,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         toZuChu.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-            game_status.auraToDistance(player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
-            game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.auraToDistance(player, 1, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
+            game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             game_status.getPlayer(player.opposite()).canNotGoForward = true
             null
         })
@@ -2624,7 +2653,8 @@ object CardSet {
                                                                                          _, _, damage ->
                 if(damage){
                     gameStatus.popCardFrom(player, cardNumber, LocationEnum.ENCHANTMENT_ZONE, true)?.let {
-                        gameStatus.cardToDust(player, it.getNap(), it, false)
+                        gameStatus.cardToDust(player, it.getNap(), it, false, cardNumber)
+                        gameStatus.logger.insert(Log(player, LogText.END_EFFECT, cardNumber, -1))
                         gameStatus.insertCardTo(it.player, it, LocationEnum.SPECIAL_CARD, true)
                     }
                     true
@@ -2670,7 +2700,8 @@ object CardSet {
             null
         })
         poisonHallucinogenic.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-            game_status.flareToDust(player, 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.flareToDust(player, 2, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
         poisonHallucinogenic.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CARD_DISCARD_PLACE_CHANGE) {card_number, player, game_status, _ ->
@@ -2689,11 +2720,13 @@ object CardSet {
             null
         })
         poisonDeadly1.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-            game_status.auraToDust(player, 3, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.auraToDust(player, 3, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
         poisonDeadly2.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-            game_status.auraToDust(player, 3, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.auraToDust(player, 3, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
         poisonDeadly1.canCover = false
@@ -2725,7 +2758,8 @@ object CardSet {
                 when(game_status.receiveCardEffectSelect(player, 1008)){
                     CommandEnum.SELECT_ONE -> {
                         if(game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false,
-                                null, null) != -1){
+                                null, null, card_number) != -1){
+                            game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
                             game_status.deckReconstruct(player, false)
                         }
                         break
@@ -2830,11 +2864,12 @@ object CardSet {
     }
 
     private fun kururuCardInit(){
-        elekittel.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.DAMAGE) {_, player, game_status, _ ->
+        elekittel.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.DAMAGE) {card_number, player, game_status, _ ->
             val kikou = getKikou(player, game_status)
             if(kikou.behavior >= 3 && kikou.reaction >= 2) {
                 game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false,
-                    null, null)
+                    null, null, card_number)
+                game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
             }
             null
         })
@@ -2874,15 +2909,16 @@ object CardSet {
             }
             null
         })
-        tornado.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.DAMAGE) {_, player, game_status, _ ->
+        tornado.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.DAMAGE) {card_number, player, game_status, _ ->
             val kikou = getKikou(player, game_status)
             if(kikou.attack >= 2) {
                 game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_AURA, Pair(5, 999), false,
-                null, null)
+                null, null, card_number)
+                game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
             }
             if(kikou.enchantment >= 2){
                 game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false,
-                null, null)
+                null, null, card_number)
             }
             null
         })
@@ -3053,7 +3089,7 @@ object CardSet {
             val kikou = getKikou(player, game_status)
             if(kikou.attack >= 1 && kikou.reaction >= 1) {
                 game_status.getCardFrom(player, card_number, LocationEnum.PLAYING_ZONE_YOUR)?.let {
-                    game_status.dustToCard(player, 4, it)
+                    game_status.dustToCard(player, 4, it, card_number)
                 }
             }
             null
@@ -3070,7 +3106,8 @@ object CardSet {
         })
         drainDevil.setSpecial(2)
         drainDevil.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _->
-            game_status.auraToAura(player.opposite(), player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.auraToAura(player.opposite(), player, 1, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
         drainDevil.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_SPECIAL_RETURN_YOUR) { card_number, player, game_status, _ ->
@@ -3415,7 +3452,8 @@ object CardSet {
             null
         })
         stunt.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
-            game_status.auraToFlare(player, player,2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.auraToFlare(player, player,2, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
         roaring.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CHANGE_CONCENTRATION){_, player, game_status, _ ->
@@ -3495,10 +3533,14 @@ object CardSet {
                 while(true){
                     when(game_status.receiveCardEffectSelect(player, 1109)){
                         CommandEnum.SELECT_ONE -> {
-                            game_status.dustToDistance(1, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                            game_status.dustToDistance(1, Arrow.BOTH_DIRECTION, player,
+                                game_status.getCardOwner(card_number), card_number)
+                            game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
                         }
                         CommandEnum.SELECT_TWO -> {
-                            game_status.distanceToDust(1, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                            game_status.distanceToDust(1, Arrow.BOTH_DIRECTION, player,
+                                game_status.getCardOwner(card_number), card_number)
+                            game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
                         }
                         CommandEnum.SELECT_NOT -> {
                         }
@@ -3534,7 +3576,9 @@ object CardSet {
         formNaga.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_TRANSFORM) {card_number, player, game_status, _ ->
             val otherFlare = game_status.getPlayer(player.opposite()).flare
             if(otherFlare >= 3){
-                game_status.flareToDust(player.opposite(), otherFlare - 2, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                game_status.flareToDust(player.opposite(), otherFlare - 2, Arrow.BOTH_DIRECTION, player,
+                    game_status.getCardOwner(card_number), card_number)
+                game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
             }
             null
         })
@@ -3599,7 +3643,8 @@ object CardSet {
         })
         windRun.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _->
             if(game_status.getAdjustDistance(player) >= 3){
-                game_status.distanceToDust(2, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                game_status.distanceToDust(2, Arrow.BOTH_DIRECTION, player,
+                    game_status.getCardOwner(card_number), card_number)
             }
             null
         })
@@ -3657,10 +3702,12 @@ object CardSet {
             while(true){
                 when(game_status.receiveCardEffectSelect(player, 1206)){
                    CommandEnum.SELECT_ONE -> {
-                       game_status.dustToDistance(3, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                       game_status.dustToDistance(3, Arrow.BOTH_DIRECTION, player,
+                           game_status.getCardOwner(card_number), card_number)
                    }
                     CommandEnum.SELECT_TWO -> {
-                        game_status.distanceToDust(3, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                        game_status.distanceToDust(3, Arrow.BOTH_DIRECTION, player,
+                            game_status.getCardOwner(card_number), card_number)
                     }
                     else -> {
                         continue
@@ -3719,9 +3766,11 @@ object CardSet {
                     CommandEnum.SELECT_ONE -> {
                         while(true){
                             val nowCommand = game_status.receiveCardEffectSelect(player, 1211)
-                            if(selectDustToDistance(nowCommand, game_status, player, game_status.getCardOwner(card_number))) break
+                            if(selectDustToDistance(nowCommand, game_status, player,
+                                    game_status.getCardOwner(card_number), card_number)) break
                         }
                         game_status.gaugeIncreaseRequest(player, 1212)
+                        game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
                     }
                     CommandEnum.SELECT_NOT -> {}
                     else -> {
@@ -3756,34 +3805,44 @@ object CardSet {
             while(true){
                 when(game_status.receiveCardEffectSelect(player, 1213)){
                     CommandEnum.SELECT_ONE -> {
-                        game_status.distanceToDust(1, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                        game_status.distanceToDust(1, Arrow.BOTH_DIRECTION, player,
+                            game_status.getCardOwner(card_number), card_number)
                     }
                     CommandEnum.SELECT_TWO -> {
-                        game_status.distanceToDust(2, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                        game_status.distanceToDust(2, Arrow.BOTH_DIRECTION, player,
+                            game_status.getCardOwner(card_number), card_number)
                     }
                     CommandEnum.SELECT_THREE -> {
-                        game_status.distanceToDust(3, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                        game_status.distanceToDust(3, Arrow.BOTH_DIRECTION, player,
+                            game_status.getCardOwner(card_number), card_number)
                     }
                     CommandEnum.SELECT_FOUR -> {
-                        game_status.distanceToDust(4, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                        game_status.distanceToDust(4, Arrow.BOTH_DIRECTION, player,
+                            game_status.getCardOwner(card_number), card_number)
                     }
                     CommandEnum.SELECT_FIVE -> {
-                        game_status.distanceToDust(5, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                        game_status.distanceToDust(5, Arrow.BOTH_DIRECTION, player,
+                            game_status.getCardOwner(card_number), card_number)
                     }
                     CommandEnum.SELECT_SIX -> {
-                        game_status.dustToDistance(1, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                        game_status.dustToDistance(1, Arrow.BOTH_DIRECTION, player,
+                            game_status.getCardOwner(card_number), card_number)
                     }
                     CommandEnum.SELECT_SEVEN -> {
-                        game_status.dustToDistance(2, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                        game_status.dustToDistance(2, Arrow.BOTH_DIRECTION, player,
+                            game_status.getCardOwner(card_number), card_number)
                     }
                     CommandEnum.SELECT_EIGHT -> {
-                        game_status.dustToDistance(3, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                        game_status.dustToDistance(3, Arrow.BOTH_DIRECTION, player,
+                            game_status.getCardOwner(card_number), card_number)
                     }
                     CommandEnum.SELECT_NINE -> {
-                        game_status.dustToDistance(4, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                        game_status.dustToDistance(4, Arrow.BOTH_DIRECTION, player,
+                            game_status.getCardOwner(card_number), card_number)
                     }
                     CommandEnum.SELECT_TEN -> {
-                        game_status.dustToDistance(5, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                        game_status.dustToDistance(5, Arrow.BOTH_DIRECTION, player,
+                            game_status.getCardOwner(card_number), card_number)
                     }
                     CommandEnum.SELECT_NOT -> {}
                     else -> {
@@ -3815,11 +3874,15 @@ object CardSet {
         while(true){
             when(game_status.receiveCardEffectSelect(player.opposite(), 1310)){
                 CommandEnum.SELECT_ONE -> {
-                    game_status.auraToDust(player.opposite(), 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                    game_status.auraToDust(player.opposite(), 1, Arrow.ONE_DIRECTION, player,
+                        game_status.getCardOwner(card_number), card_number)
+                    game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
                     break
                 }
                 CommandEnum.SELECT_TWO -> {
-                    game_status.flareToDust(player.opposite(), 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                    game_status.flareToDust(player.opposite(), 2, Arrow.ONE_DIRECTION, player,
+                        game_status.getCardOwner(card_number), card_number)
+                    game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
                     break
                 }
                 else -> {
@@ -3876,9 +3939,13 @@ object CardSet {
                 }
             }
         }
-        game_status.lifeToDust(player, moveLife, Arrow.NULL, player, game_status.getCardOwner(card_number))
-        game_status.flareToDust(player, moveFlare, Arrow.NULL, player, game_status.getCardOwner(card_number))
-        game_status.auraToDust(player, moveAura, Arrow.NULL, player, game_status.getCardOwner(card_number))
+        game_status.lifeToDust(player, moveLife, Arrow.NULL, player,
+            game_status.getCardOwner(card_number), card_number)
+        game_status.flareToDust(player, moveFlare, Arrow.NULL, player,
+            game_status.getCardOwner(card_number), card_number)
+        game_status.auraToDust(player, moveAura, Arrow.NULL, player,
+            game_status.getCardOwner(card_number), card_number)
+        game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
         return canMove
     }
 
@@ -3931,7 +3998,7 @@ object CardSet {
                 ) { true }?: return@ret null
                 if(cardList.size == 1){
                     game_status.getCardFrom(player.opposite(), cardList[0], LocationEnum.ENCHANTMENT_ZONE)?.let {
-                        game_status.cardToDust(player.opposite(), 2, it, false)
+                        game_status.cardToDust(player.opposite(), 2, it, false, card_number)
                         if(it.isItDestruction()){
                             game_status.enchantmentDestruction(player.opposite(), it)
                         }
@@ -3974,13 +4041,16 @@ object CardSet {
         })
         yueHoeJu.setEnchantment(2)
         yueHoeJu.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-            game_status.auraToDust(player.opposite(), 3, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.auraToDust(player.opposite(), 3, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
         yueHoeJu.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
             if(hoejin(game_status)){
-                game_status.dustToAura(player.opposite(), 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
-                game_status.lifeToDust(player.opposite(), 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                game_status.dustToAura(player.opposite(), 2, Arrow.ONE_DIRECTION, player,
+                    game_status.getCardOwner(card_number), card_number)
+                game_status.lifeToDust(player.opposite(), 1, Arrow.ONE_DIRECTION, player,
+                    game_status.getCardOwner(card_number), card_number)
             }
             null
         })
@@ -3993,7 +4063,9 @@ object CardSet {
             null
         })
         hoeMyeol.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-            game_status.lifeToDust(player.opposite(), 3, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.lifeToDust(player.opposite(), 3, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number
+            )
             game_status.movePlayingCard(player, LocationEnum.OUT_OF_GAME, card_number)
             null
         })
@@ -4025,7 +4097,8 @@ object CardSet {
         jongMal.setEnchantment(3)
         jongMal.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_GET_DAMAGE_BY_ATTACK){card_number, player, game_status, _ ->
             game_status.getCardFrom(player, card_number, LocationEnum.ENCHANTMENT_ZONE)?.let { card ->
-                game_status.cardToDust(player, card.getNap(), card, false)
+                game_status.cardToDust(player, card.getNap(), card, false, card_number)
+                game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
                 game_status.enchantmentDestruction(player, card)
             }
             null
@@ -4096,10 +4169,12 @@ object CardSet {
     private fun saineA1CardInit(){
         soundOfIce.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, react_attack ->
             if(react_attack == null){
-                game_status.auraToDust(player.opposite(), 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                game_status.auraToDust(player.opposite(), 1, Arrow.ONE_DIRECTION, player,
+                    game_status.getCardOwner(card_number), card_number)
             }
             else{
-                game_status.auraToDust(player.opposite(), 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                game_status.auraToDust(player.opposite(), 2, Arrow.ONE_DIRECTION, player,
+                    game_status.getCardOwner(card_number), card_number)
             }
             null
         })
@@ -4205,7 +4280,8 @@ object CardSet {
         }))
         satSui.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
             if (game_status.getPlayer(player).hand.size == 0) {
-                game_status.auraToDust(player.opposite(), 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                game_status.auraToDust(player.opposite(), 2, Arrow.ONE_DIRECTION, player,
+                    game_status.getCardOwner(card_number), card_number)
             }
             null
         })
@@ -4292,7 +4368,9 @@ object CardSet {
         })
         soundOfSun.setEnchantment(2)
         soundOfSun.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_USE_REACT_CARD_YOUR_END) {card_number, player, game_status, _ ->
-            game_status.dustToAura(player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.dustToAura(player, 1, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
+            game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
             null
         })
         soundOfSun.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.DO_NOT_MOVE_TOKEN) {_, player, game_status, _ ->
@@ -4451,7 +4529,8 @@ object CardSet {
         guardianSik.setAttack(DistanceType.CONTINUOUS, Pair(2, 3), null, 2, 1,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         guardianSik.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-            game_status.dustToAura(player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.dustToAura(player, 1, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
         guardianSik.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
@@ -4471,7 +4550,8 @@ object CardSet {
         assaultSik.setAttack(DistanceType.CONTINUOUS, Pair(5, 5), null, 3, 2,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = true, chogek = false)
         assaultSik.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-            game_status.dustToLife(player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.dustToLife(player, 1, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
         assaultSik.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
@@ -4491,7 +4571,8 @@ object CardSet {
         divineOuka.setAttack(DistanceType.CONTINUOUS, Pair(1, 4), null, 4, 3,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = true, chogek = false)
         divineOuka.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-            game_status.dustToAura(player, 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.dustToAura(player, 2, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
         sakuraBlizzard.setAttack(DistanceType.CONTINUOUS, Pair(3, 5), null, 2, 1,
@@ -4500,11 +4581,13 @@ object CardSet {
             while(true){
                 when(game_status.receiveCardEffectSelect(player.opposite(), 1404)){
                     CommandEnum.SELECT_ONE -> {
-                        game_status.distanceToAura(player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                        game_status.distanceToAura(player, 1, Arrow.ONE_DIRECTION, player,
+                            game_status.getCardOwner(card_number), card_number)
                         break
                     }
                     CommandEnum.SELECT_TWO -> {
-                        game_status.auraToDistance(player.opposite(), 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                        game_status.auraToDistance(player.opposite(), 1, Arrow.ONE_DIRECTION, player,
+                            game_status.getCardOwner(card_number), card_number)
                         break
                     }
                     else -> {
@@ -4575,11 +4658,13 @@ object CardSet {
             while (true){
                 when(game_status.receiveCardEffectSelect(player, 1406)){
                     CommandEnum.SELECT_ONE -> {
-                        game_status.dustToDistance(2, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                        game_status.dustToDistance(2, Arrow.BOTH_DIRECTION, player,
+                            game_status.getCardOwner(card_number), card_number)
                         break
                     }
                     CommandEnum.SELECT_TWO -> {
-                        game_status.distanceToDust(2, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                        game_status.distanceToDust(2, Arrow.BOTH_DIRECTION, player,
+                            game_status.getCardOwner(card_number), card_number)
                         break
                     }
                     else -> {
@@ -4599,8 +4684,11 @@ object CardSet {
             null
         })
         regeneration.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
-            game_status.dustToAura(player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
-            game_status.dustToFlare(player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.dustToAura(player, 1, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
+            game_status.dustToFlare(player, 1, Arrow.ONE_DIRECTION,
+                player, game_status.getCardOwner(card_number), card_number
+            )
             null
         })
         regeneration.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
@@ -4702,11 +4790,12 @@ object CardSet {
                             continue
                         }
                         game_status.getCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD)?.let {
-                            game_status.auraToCard(player, 1, it, LocationEnum.YOUR_USED_CARD)
+                            game_status.auraToCard(player, 1, it, card_number, LocationEnum.YOUR_USED_CARD)
+                            //TODO("maybe end_effect log needed?")
                             if(it.getNap() == 5){
                                 if(checkCardName(card_number, CardName.HONOKA_HAND_FLOWER)){
                                     game_status.getCardFrom(player, CardName.HONOKA_A_NEW_OPENING, LocationEnum.ADDITIONAL_CARD)?.let { additionalCard ->
-                                        game_status.cardToFlare(player, it.getNap(), it, LocationEnum.YOUR_USED_CARD)
+                                        game_status.cardToFlare(player, it.getNap(), it, card_number, LocationEnum.YOUR_USED_CARD)
                                         game_status.popCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD, true)
                                         game_status.insertCardTo(player, it, LocationEnum.ADDITIONAL_CARD, true)
                                         additionalCard.special_card_state = SpecialCardEnum.PLAYED
@@ -4723,11 +4812,12 @@ object CardSet {
                             continue
                         }
                         game_status.getCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD)?.let {
-                            game_status.dustToCard(player, 1, it, LocationEnum.YOUR_USED_CARD)
+                            game_status.dustToCard(player, 1, it, card_number, LocationEnum.YOUR_USED_CARD)
+                            //TODO("maybe end_effect log needed?")
                             if(it.getNap() == 5){
                                 if(checkCardName(card_number, CardName.HONOKA_HAND_FLOWER)){
                                     game_status.getCardFrom(player, CardName.HONOKA_A_NEW_OPENING, LocationEnum.ADDITIONAL_CARD)?.let { additionalCard ->
-                                        game_status.cardToFlare(player, it.getNap() , it, LocationEnum.YOUR_USED_CARD)
+                                        game_status.cardToFlare(player, it.getNap() , it, card_number, LocationEnum.YOUR_USED_CARD)
                                         game_status.popCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD, true)
                                         game_status.insertCardTo(player, it, LocationEnum.ADDITIONAL_CARD, true)
                                         additionalCard.special_card_state = SpecialCardEnum.PLAYED
@@ -4906,8 +4996,10 @@ object CardSet {
         })
         branchOfDivine.setSpecial(0)
         branchOfDivine.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-            game_status.outToAura(player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
-            game_status.outToFlare(player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.outToAura(player, 1, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
+            game_status.outToFlare(player, 1, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
         branchOfDivine.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {card_number, player, game_status, _ ->
@@ -4932,7 +5024,9 @@ object CardSet {
                 while(true){
                     when(game_status.receiveCardEffectSelect(player, 514)){
                         CommandEnum.SELECT_ONE -> {
-                            game_status.lifeToDust(player, nowPlayer.life, Arrow.NULL, player, game_status.getCardOwner(card_number), true)
+                            game_status.lifeToDust(player, nowPlayer.life, Arrow.NULL, player,
+                                game_status.getCardOwner(card_number), card_number, true)
+                            game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
                             val useSuccess = game_status.getCardFrom(player, card_number, LocationEnum.SPECIAL_CARD)?.let {
                                 game_status.useCardFrom(player, it, LocationEnum.SPECIAL_CARD, false, null,
                                     isCost = true, isConsume = true
@@ -4964,7 +5058,8 @@ object CardSet {
             null
         })
         lastCrystal.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
-            game_status.dustToLife(player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.dustToLife(player, 1, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
     }
@@ -4997,7 +5092,8 @@ object CardSet {
         struggle.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
             while(true){
                 val nowCommand = game_status.receiveCardEffectSelect(player, 912)
-                if(selectDustToDistance(nowCommand, game_status, player, game_status.getCardOwner(card_number))) break
+                if(selectDustToDistance(nowCommand, game_status, player,
+                        game_status.getCardOwner(card_number), card_number)) break
             }
             null
         })
@@ -5063,13 +5159,14 @@ object CardSet {
             card -> !(card.card_data.isItSpecial())
         }){
             if((card.getNap()  ?: 0) >= 1){
-                game_status.cardToDust(player, card.getNap(), card, false)
+                game_status.cardToDust(player, card.getNap(), card, false, Log.DEMISE)
             }
             game_status.popCardFrom(player, card.card_number, LocationEnum.ENCHANTMENT_ZONE, true)?.let {
                 game_status.insertCardTo(player, card, LocationEnum.OUT_OF_GAME, true)
             }
         }
 
+        game_status.logger.insert(Log(player, LogText.END_EFFECT, Log.DEMISE, -1))
         game_status.moveAdditionalCard(player, CardName.UTSURO_ANNIHILATION_SHADOW, LocationEnum.DISCARD_YOUR)
         game_status.moveAdditionalCard(player, CardName.UTSURO_SILENT_WALK, LocationEnum.DISCARD_YOUR)
         game_status.moveAdditionalCard(player, CardName.UTSURO_DE_MISE, LocationEnum.DISCARD_YOUR)
@@ -5081,7 +5178,8 @@ object CardSet {
         biteDust.setAttack(DistanceType.CONTINUOUS, Pair(3, 6), null, 2, 0,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false, inevitable = false)
         biteDust.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.WHEN_CHOOSE_LIFE_DAMAGE) {card_number, player, game_status, _ ->
-            game_status.flareToDust(player.opposite(), 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.flareToDust(player.opposite(), 2, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
         deviceKururusik.setSpecial(2)
@@ -5223,14 +5321,17 @@ object CardSet {
             while(true){
                 val nowCommand = game_status.receiveCardEffectSelect(player, 1501)
                 if(nowCommand == CommandEnum.SELECT_ONE){
-                    game_status.dustToDistance(2, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                    game_status.dustToDistance(2, Arrow.BOTH_DIRECTION, player,
+                        game_status.getCardOwner(card_number), card_number)
                     break
                 }
                 else if(nowCommand == CommandEnum.SELECT_TWO){
-                    game_status.distanceToDust(2, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                    game_status.distanceToDust(2, Arrow.BOTH_DIRECTION, player,
+                        game_status.getCardOwner(card_number), card_number)
                     break
                 }
             }
+            game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
             null
         })
         bladeDance.setAttack(DistanceType.CONTINUOUS, Pair(4, 5), null, 2, 1,
@@ -5248,7 +5349,8 @@ object CardSet {
         snowRide.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _->
             while(true){
                 val nowCommand = game_status.receiveCardEffectSelect(player, 1502)
-                if(selectDustToDistance(nowCommand, game_status, player, game_status.getCardOwner(card_number))){
+                if(selectDustToDistance(nowCommand, game_status, player,
+                        game_status.getCardOwner(card_number), card_number)){
                     break
                 }
             }
@@ -5256,7 +5358,8 @@ object CardSet {
                 while(true){
                     when(game_status.receiveCardEffectSelect(player, 1503)){
                         CommandEnum.SELECT_ONE -> {
-                            game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                            game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player,
+                                game_status.getCardOwner(card_number), card_number)
                             break
                         }
                         CommandEnum.SELECT_NOT -> {
@@ -5348,7 +5451,8 @@ object CardSet {
                 }))
             }
             else{
-                game_status.distanceToAura(player.opposite(), 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                game_status.distanceToAura(player.opposite(), 1, Arrow.ONE_DIRECTION, player,
+                    game_status.getCardOwner(card_number), card_number)
             }
             null
         })
@@ -5389,7 +5493,8 @@ object CardSet {
         porucharto.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_SAKURA_TOKEN) { card_number, player, game_status, _ ->
             while(true){
                 val nowCommand = game_status.receiveCardEffectSelect(player, 1509)
-                if(selectDustToDistance(nowCommand, game_status, player, game_status.getCardOwner(card_number))) break
+                if(selectDustToDistance(nowCommand, game_status, player,
+                        game_status.getCardOwner(card_number), card_number)) break
             }
             null
         })
@@ -5427,7 +5532,8 @@ object CardSet {
     private val contract = CardData(CardClass.NORMAL, CardName.YATSUHA_CONTRACT, MegamiEnum.YATSUHA, CardType.BEHAVIOR, SubType.NONE)
     private val clingyFlower = CardData(CardClass.NORMAL, CardName.YATSUHA_CLINGY_FLOWER, MegamiEnum.YATSUHA, CardType.ENCHANTMENT, SubType.NONE)
     private val clingyFlowerText = Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MAKE_SHRINK) {card_number, player, game_status, _ ->
-        game_status.auraToAura(player, player.opposite(), 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+        game_status.auraToAura(player, player.opposite(), 2, Arrow.ONE_DIRECTION, player,
+            game_status.getCardOwner(card_number), card_number)
         null
     }
     private val twoLeapMirrorDivine = CardData(CardClass.SPECIAL, CardName.YATSUHA_TWO_LEAP_MIRROR_DIVINE, MegamiEnum.YATSUHA, CardType.BEHAVIOR, SubType.REACTION)
@@ -5445,7 +5551,8 @@ object CardSet {
         starNail.setAttack(DistanceType.CONTINUOUS, Pair(3, 4), null, 3, 2,
             cannotReactNormal = true, cannotReactSpecial = false, cannotReact = false, chogek = false)
         starNail.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-            game_status.auraToFlare(player, player.opposite(), 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.auraToFlare(player, player.opposite(), 1, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
         darknessGill.setAttack(DistanceType.CONTINUOUS, Pair(4, 4), null, 3, 1,
@@ -5465,7 +5572,8 @@ object CardSet {
         mirrorDevil.setAttack(DistanceType.CONTINUOUS, Pair(2, 3), null, 5, 3,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         mirrorDevil.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-            game_status.lifeToDust(player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.lifeToDust(player, 1, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
         ghostStep.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CHANGE_CONCENTRATION) {_, player, game_status, _ ->
@@ -5499,11 +5607,13 @@ object CardSet {
                         while (true){
                             when(game_status.receiveCardEffectSelect(player, 1605)){
                                 CommandEnum.SELECT_ONE -> {
-                                    game_status.auraToFlare(player, player, 1, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                                    game_status.auraToFlare(player, player, 1, Arrow.BOTH_DIRECTION, player,
+                                        game_status.getCardOwner(card_number), card_number)
                                     break
                                 }
                                 CommandEnum.SELECT_TWO -> {
-                                    game_status.flareToAura(player, player, 1, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                                    game_status.flareToAura(player, player, 1, Arrow.BOTH_DIRECTION, player,
+                                        game_status.getCardOwner(card_number), card_number)
                                     break
                                 }
                                 else -> {
@@ -5517,11 +5627,15 @@ object CardSet {
                         while (true){
                             when(game_status.receiveCardEffectSelect(player, 1606)){
                                 CommandEnum.SELECT_ONE -> {
-                                    game_status.auraToFlare(player.opposite(), player.opposite(), 1, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                                    game_status.auraToFlare(player.opposite(), player.opposite(), 1,
+                                        Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number),
+                                        card_number)
                                     break
                                 }
                                 CommandEnum.SELECT_TWO -> {
-                                    game_status.flareToAura(player.opposite(), player.opposite(), 1, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                                    game_status.flareToAura(player.opposite(), player.opposite(), 1,
+                                        Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number),
+                                        card_number)
                                     break
                                 }
                                 else -> {
@@ -5535,11 +5649,13 @@ object CardSet {
                         while (true){
                             when(game_status.receiveCardEffectSelect(player, 1605)){
                                 CommandEnum.SELECT_ONE -> {
-                                    game_status.auraToFlare(player, player, 1, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                                    game_status.auraToFlare(player, player, 1, Arrow.BOTH_DIRECTION, player,
+                                        game_status.getCardOwner(card_number), card_number)
                                     break
                                 }
                                 CommandEnum.SELECT_TWO -> {
-                                    game_status.flareToAura(player, player, 1, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                                    game_status.flareToAura(player, player, 1, Arrow.BOTH_DIRECTION, player,
+                                        game_status.getCardOwner(card_number), card_number)
                                     break
                                 }
                                 else -> {
@@ -5550,11 +5666,15 @@ object CardSet {
                         while (true){
                             when(game_status.receiveCardEffectSelect(player, 1606)){
                                 CommandEnum.SELECT_ONE -> {
-                                    game_status.auraToFlare(player.opposite(), player.opposite(), 1, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                                    game_status.auraToFlare(player.opposite(), player.opposite(), 1,
+                                        Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number),
+                                        card_number)
                                     break
                                 }
                                 CommandEnum.SELECT_TWO -> {
-                                    game_status.flareToAura(player.opposite(), player.opposite(), 1, Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number))
+                                    game_status.flareToAura(player.opposite(), player.opposite(), 1,
+                                        Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number),
+                                        card_number)
                                     break
                                 }
                                 else -> {
@@ -5572,13 +5692,16 @@ object CardSet {
             null
         })
         contract.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-            game_status.flareToAura(player.opposite(), player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.flareToAura(player.opposite(), player, 1, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
         contract.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.ADD_END_PHASE_EFFECT) {card_number, player, game_status, _ ->
             game_status.endPhaseEffect[card_number] = Pair(CardEffectLocation.TEMP, Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {in_card_number, in_player, in_game_status, _ ->
                 if(in_game_status.getPlayerFlare(in_player) >= in_game_status.getPlayerFlare(in_player.opposite())){
-                    in_game_status.auraToFlare(in_player, in_player.opposite(), 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(in_card_number))
+                    in_game_status.auraToFlare(in_player, in_player.opposite(), 1, Arrow.ONE_DIRECTION, player,
+                        game_status.getCardOwner(in_card_number), in_card_number)
+                    game_status.logger.insert(Log(player, LogText.END_EFFECT, in_card_number, -1))
                 }
                 null
             })
@@ -5626,20 +5749,19 @@ object CardSet {
             }
             null
         })
-        fourLeapSong.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) ret@{_, player, game_status, _->
+        fourLeapSong.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) ret@{card_number, player, game_status, _->
             while (true){
                 val list = game_status.selectCardFrom(player, player, listOf(LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.OTHER_ENCHANTMENT_ZONE_CARD),
                     CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1608)
                 {card -> card.card_data.card_class != CardClass.SPECIAL}?: break
                 if (list.size == 1){
                     game_status.getCardFrom(player, list[0], LocationEnum.ENCHANTMENT_ZONE)?.also {
-                        game_status.cardToDust(player, it.getNap() , it, false)
+                        game_status.cardToDust(player, it.getNap() , it, false, card_number)
                         game_status.enchantmentDestruction(player, it)
                     }?: game_status.getCardFrom(player.opposite(), list[0], LocationEnum.ENCHANTMENT_ZONE)?.also {
-                        game_status.cardToDust(player.opposite(), it.getNap() , it, false)
+                        game_status.cardToDust(player.opposite(), it.getNap() , it, false, card_number)
                         game_status.enchantmentDestruction(player.opposite(), it)
                     }
-
                     if(game_status.endCurrentPhase){
                         break
                     }
@@ -5711,7 +5833,9 @@ object CardSet {
                 when(game_status.getStratagem(player)){
                     Stratagem.SHIN_SAN -> {
                         if(game_status.getPlayer(player.opposite()).normalCardDeck.size >= 3){
-                            game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false, null, null)
+                            game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1),
+                                false, null, null, card_number)
+                            game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
                         }
                         if(!game_status.getPlayer(player).justRunNoCondition){
                             setStratagemByUser(game_status, player)
@@ -5719,7 +5843,9 @@ object CardSet {
                     }
                     Stratagem.GUE_MO -> {
                         if(game_status.getPlayer(player.opposite()).normalCardDeck.size <= 3){
-                            game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_AURA, Pair(2, 999), false, null, null)
+                            game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_AURA, Pair(2, 999),
+                                false, null, null, card_number)
+                            game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
                         }
                         if(!game_status.getPlayer(player).justRunNoCondition){
                             setStratagemByUser(game_status, player)
@@ -5858,13 +5984,15 @@ object CardSet {
         }
     }
 
-    private suspend fun analyzeYour(player: PlayerEnum, game_status: GameStatus){
+    private suspend fun analyzeYour(player: PlayerEnum, game_status: GameStatus, card_number: Int){
         val list = game_status.selectCardFrom(player, player, listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1014, 1
         ) { true }?: return
         game_status.popCardFrom(player, list[0], LocationEnum.COVER_CARD, true)?.let{
             game_status.insertCardTo(player, it, LocationEnum.DISCARD_YOUR, true)
             if(it.card_data.card_type == CardType.ATTACK){
-                game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false, null, null)
+                game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false,
+                    null, null, card_number)
+                game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
             }
             else{
                 analyzeWhenNotAttack(player, game_status)
@@ -5872,13 +6000,15 @@ object CardSet {
         }
     }
 
-    private suspend fun analyzeOther(player: PlayerEnum, game_status: GameStatus){
+    private suspend fun analyzeOther(player: PlayerEnum, game_status: GameStatus, card_number: Int){
         game_status.popCardFrom(player.opposite(),
             game_status.getPlayer(player.opposite()).cover_card.random(Random(System.currentTimeMillis())).card_number,
             LocationEnum.COVER_CARD, true)?.let{
             game_status.insertCardTo(player.opposite(), it, LocationEnum.DISCARD_YOUR, true)
             if(it.card_data.card_type == CardType.ATTACK){
-                game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false, null, null)
+                game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false,
+                    null, null, card_number)
+                game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
             }
             else{
                 analyzeWhenNotAttack(player, game_status)
@@ -5917,27 +6047,27 @@ object CardSet {
     }
 
     private fun kururuA1CardInit(){
-        analyze.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {_, player, game_status, _ ->
+        analyze.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {card_number, player, game_status, _ ->
             val kikou = getKikou(player, game_status)
             if(kikou.behavior >= 1 && kikou.attack >= 1 && kikou.reaction >= 1) {
                 val otherSize = game_status.getPlayer(player.opposite()).cover_card.size
                 val yourSize = game_status.getPlayer(player).cover_card.size
                 if(yourSize != 0 || otherSize != 0){
                     if(yourSize == 0){
-                        analyzeOther(player, game_status)
+                        analyzeOther(player, game_status, card_number)
                     }
                     else if(otherSize == 0){
-                        analyzeYour(player, game_status)
+                        analyzeYour(player, game_status, card_number)
                     }
                     else{
                         while(true){
                             when(game_status.receiveCardEffectSelect(player, 1014)){
                                 CommandEnum.SELECT_ONE -> {
-                                    analyzeYour(player, game_status)
+                                    analyzeYour(player, game_status, card_number)
                                     break
                                 }
                                 CommandEnum.SELECT_TWO -> {
-                                    analyzeOther(player, game_status)
+                                    analyzeOther(player, game_status, card_number)
                                     break
                                 }
                                 else -> {
@@ -5984,9 +6114,11 @@ object CardSet {
                 }
                 if(selectedByYour[0].toCardName() == selectedByOther[0].toCardName()){
                     game_status.getCardFrom(player, card_number, LocationEnum.PLAYING_ZONE_YOUR)?.let{
-                        game_status.dustToCard(player, 1, it, LocationEnum.PLAYING_ZONE_YOUR)
+                        game_status.dustToCard(player, 1, it,
+                            Log.IGNORE, LocationEnum.PLAYING_ZONE_YOUR)
                         if(it.getNap() == 2){
-                            game_status.cardToDust(player, 2, it, false, LocationEnum.PLAYING_ZONE_YOUR)
+                            game_status.cardToDust(player, 2, it, false,
+                                Log.IGNORE, LocationEnum.PLAYING_ZONE_YOUR)
                             greatDiscovery(player, game_status)
                             game_status.movePlayingCard(player, LocationEnum.OUT_OF_GAME, card_number)
                             game_status.setEndTurn(player, true)
@@ -6020,7 +6152,9 @@ object CardSet {
     private val betrayer = CardData(CardClass.NORMAL, CardName.SAINE_BETRAYAL, MegamiEnum.SAINE, CardType.ATTACK, SubType.NONE)
     private val flowingWall = CardData(CardClass.NORMAL, CardName.SAINE_FLOWING_WALL, MegamiEnum.SAINE, CardType.ENCHANTMENT, SubType.NONE)
     private val flowingWallText = Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
-        game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_AURA, Pair(2, 999), false, null, null)
+        game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_AURA, Pair(2, 999), false,
+            null, null, card_number)
+        game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
         game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ ->
             true
         }, {_, _, attack ->
@@ -6132,11 +6266,13 @@ object CardSet {
                 while (true){
                     when(game_status.receiveCardEffectSelect(player, 1700)){
                         CommandEnum.SELECT_ONE -> {
-                            game_status.dustToDistance(2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                            game_status.dustToDistance(2, Arrow.ONE_DIRECTION, player,
+                                game_status.getCardOwner(card_number), card_number)
                             break
                         }
                         CommandEnum.SELECT_TWO -> {
-                            game_status.distanceToDust(2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                            game_status.distanceToDust(2, Arrow.ONE_DIRECTION, player,
+                                game_status.getCardOwner(card_number), card_number)
                             break
                         }
                         else -> {
@@ -6194,16 +6330,19 @@ object CardSet {
         tsunami.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
             if(game_status.getAdjustDistance(player) <= 4){
                 if(isHeadWind(player, game_status)){
-                    game_status.flareToDistance(player.opposite(), 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                    game_status.flareToDistance(player.opposite(), 1, Arrow.ONE_DIRECTION, player,
+                        game_status.getCardOwner(card_number), card_number)
                 }
                 else{
-                    game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number) )
+                    game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player,
+                        game_status.getCardOwner(card_number), card_number)
                 }
             }
             null
         })
         junBiManTen.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
-            game_status.dustToAura(player, 3, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.dustToAura(player, 3, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
         junBiManTen.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD){_, player, game_status, _ ->
@@ -6240,7 +6379,8 @@ object CardSet {
             null
         })
         compass.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-            game_status.dustToAura(player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.dustToAura(player, 1, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
             null
         })
         callWave.setEnchantment(1)
@@ -6312,7 +6452,8 @@ object CardSet {
         }))
         isanaHail.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
             if(isHeadWind(player, game_status)){
-                game_status.dustToDistance(2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                game_status.dustToDistance(2, Arrow.ONE_DIRECTION, player,
+                    game_status.getCardOwner(card_number), card_number)
                 game_status.movePlayingCard(player, LocationEnum.SPECIAL_CARD, card_number)
             }
             null
@@ -6848,7 +6989,7 @@ object CardSet {
             when(game_status.receiveCardEffectSelect(player, 613)){
                 CommandEnum.SELECT_ONE -> {
                     game_status.getCardFrom(player, card_number, LocationEnum.ENCHANTMENT_ZONE)?.let {
-                        game_status.dustToCard(player, 3, it)
+                        game_status.dustToCard(player, 3, it, card_number)
                     }
                     break
                 }
@@ -7010,9 +7151,10 @@ object CardSet {
             game_status.restoreArtificialToken(player, 1)
             if(game_status.getPlayer(player).artificialTokenBurn == 0){
                 game_status.getCardFrom(player, card_number, LocationEnum.PLAYING_ZONE_YOUR)?.let{
-                    game_status.dustToCard(player, 1, it, LocationEnum.PLAYING_ZONE_YOUR)
+                    game_status.dustToCard(player, 1, it, Log.IGNORE, LocationEnum.PLAYING_ZONE_YOUR)
                     if(it.getNap() == 2){
-                        game_status.cardToDust(player, 2, it, false, LocationEnum.PLAYING_ZONE_YOUR)
+                        game_status.cardToDust(player, 2, it, false,
+                            Log.IGNORE, LocationEnum.PLAYING_ZONE_YOUR)
                         transform(player, game_status)
                     }
                 }
@@ -7108,7 +7250,11 @@ object CardSet {
                     if((game_status.getPlayer(player).windGauge ?: 0) >= 1){
                         while(true){
                             val nowCommand = game_status.receiveCardEffectSelect(player, 1216)
-                            if(selectDustToDistance(nowCommand, game_status, player, game_status.getCardOwner(1216))) break
+                            if(selectDustToDistance(nowCommand, game_status, player,
+                                    PlayerEnum.PLAYER1, Log.STORM_FORCE)) {
+                                game_status.logger.insert(Log(player, LogText.END_EFFECT, Log.STORM_FORCE, -1))
+                                break
+                            }
                         }
                         game_status.setGauge(player, false, nowPlayer.windGauge!! - 1)
                         sendSimpleCommand(game_status.getSocket(player.opposite()), CommandEnum.SELECT_WIND_ONE)
@@ -7166,7 +7312,8 @@ object CardSet {
                 }
                 CommandEnum.SELECT_FIVE -> {
                     if((game_status.getPlayer(player).thunderGauge ?: 0) >= 2){
-                        if(game_status.addPreAttackZone(player, MadeAttack(CardName.RAIRA_JIN_PUNG_JE_CHEON_UI, 1216, CardClass.NULL,
+                        if(game_status.addPreAttackZone(player, MadeAttack(CardName.RAIRA_JIN_PUNG_JE_CHEON_UI,
+                                Log.STORM_FORCE, CardClass.NULL,
                                 DistanceType.CONTINUOUS, 1,  1, Pair(0, 4), null, MegamiEnum.RAIRA,
                                 cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
                             )) ){
@@ -7222,7 +7369,7 @@ object CardSet {
                         }
                         CommandEnum.SELECT_TWO -> {
                             game_status.getPlayer(player).getCardFromPlaying(card_number)?.let {
-                                game_status.dustToCard(player, 1, it)
+                                game_status.dustToCard(player, 1, it, card_number)
                             }
                             break
                         }
@@ -7341,7 +7488,8 @@ object CardSet {
             game_status.afterMakeAttack(card_number, player, null)
         }
         val card = game_status.getPlayer(player).enchantmentCard[card_number]
-        game_status.cardToDust(player, card!!.getNap(), card, false)
+        game_status.cardToDust(player, card!!.getNap(), card, false, card_number)
+        game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
         null
     }
 
@@ -7398,7 +7546,8 @@ object CardSet {
         reed.setEnchantment(1)
         reed.growing = 1
         reed.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-            game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+            game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number),
+                card_number)
             null
         })
         reed.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CHANGE_SWELL_DISTANCE) {card_number, player, game_status, _ ->
@@ -7464,7 +7613,9 @@ object CardSet {
         })
         wildRose.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_OTHER_PLAYER_CHANGE_DISTANCE_TOKEN) { card_number, player, game_status, _ ->
             if(!(game_status.getPlayer(player).isMoveDistanceToken)){
-                game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number))
+                game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number),
+                    card_number)
+                game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
             }
             null
         })
@@ -7545,8 +7696,9 @@ object CardSet {
     }
 
     private val saljin = CardData(CardClass.IDEA, CardName.IDEA_SAL_JIN, MegamiEnum.KANAWE, CardType.UNDEFINED, SubType.NONE) //9000
-
-
+    private val sakuraWave = CardData(CardClass.IDEA, CardName.IDEA_SAKURA_WAVE, MegamiEnum.KANAWE, CardType.UNDEFINED, SubType.NONE)
+    private val whistle = CardData(CardClass.IDEA, CardName.IDEA_WHISTLE, MegamiEnum.KANAWE, CardType.UNDEFINED, SubType.NONE)
+    private val myeongjeon = CardData(CardClass.IDEA, CardName.IDEA_MYEONG_JEON, MegamiEnum.KANAWE, CardType.UNDEFINED, SubType.NONE)
     private val emphasizing = CardData(CardClass.IDEA, CardName.IDEA_EMPHASIZING, MegamiEnum.KANAWE, CardType.UNDEFINED, SubType.NONE)
     private val positioning = CardData(CardClass.IDEA, CardName.IDEA_POSITIONING, MegamiEnum.KANAWE, CardType.UNDEFINED, SubType.NONE)
 
@@ -7555,7 +7707,9 @@ object CardSet {
         nowPlayer.nowAct = StoryBoard.getActByNumber(nextAct)
         when(nowPlayer.nowAct?.actColor){
             Act.COLOR_RED -> {
-                game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false, null, null)
+                game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false,
+                    null, null, Log.ACT_DAMAGE)
+                game_status.logger.insert(Log(player, LogText.END_EFFECT, Log.ACT_DAMAGE, -1))
             }
             Act.COLOR_PURPLE -> {
                 while(true){
@@ -7593,7 +7747,9 @@ object CardSet {
 
     private suspend fun completeIdea(card_number: Int, player: PlayerEnum, game_status: GameStatus){
         game_status.popCardFrom(player, card_number, LocationEnum.IDEA_YOUR, true)?.let {card ->
-            game_status.cardToDust(player, card.getNap(), card, false, LocationEnum.IDEA_YOUR)
+            game_status.cardToDust(player, card.getNap(), card, false,
+                Log.END_IDEA, LocationEnum.IDEA_YOUR)
+            game_status.logger.insert(Log(player, LogText.END_EFFECT, Log.END_IDEA, -1))
             game_status.insertCardTo(player, card, LocationEnum.END_IDEA_YOUR, true)
         }
         val chosenAct = game_status.selectAct(player)
@@ -7634,6 +7790,78 @@ object CardSet {
             ideaProcess(card_number, player, game_status, 1)
             null
         })
+        sakuraWave.addtext(Text(TextEffectTimingTag.IDEA_CONDITION, TextEffectTag.IDEA){_, _, game_status, _ ->
+            if(game_status.logger.checkSakuraWave()){
+                1
+            }
+            else {
+                0
+            }
+        })
+        sakuraWave.addtext(Text(TextEffectTimingTag.IDEA_CONDITION_FLIP, TextEffectTag.IDEA){_, _, game_status, _ ->
+            if(game_status.logger.checkSakuraWaveFlipped()){
+                1
+            }
+            else {
+                0
+            }
+        })
+        sakuraWave.addtext(Text(TextEffectTimingTag.IDEA_PROCESS, TextEffectTag.IDEA){card_number, player, game_status, _ ->
+            ideaProcess(card_number, player, game_status, 1)
+            null
+        })
+        sakuraWave.addtext(Text(TextEffectTimingTag.IDEA_PROCESS_FLIP, TextEffectTag.IDEA){card_number, player, game_status, _ ->
+            ideaProcess(card_number, player, game_status, 1)
+            null
+        })
+        whistle.addtext(Text(TextEffectTimingTag.IDEA_CONDITION, TextEffectTag.IDEA){ _, player, game_status, _ ->
+            if(game_status.logger.checkWhistle(false)){
+                1
+            }
+            else {
+                0
+            }
+        })
+        whistle.addtext(Text(TextEffectTimingTag.IDEA_CONDITION_FLIP, TextEffectTag.IDEA){ _, player, game_status, _ ->
+            if(game_status.logger.checkWhistle(true)){
+                1
+            }
+            else {
+                0
+            }
+        })
+        whistle.addtext(Text(TextEffectTimingTag.IDEA_PROCESS, TextEffectTag.IDEA){ card_number, player, game_status, _ ->
+            ideaProcess(card_number, player, game_status, 2)
+            null
+        })
+        whistle.addtext(Text(TextEffectTimingTag.IDEA_PROCESS_FLIP, TextEffectTag.IDEA){ card_number, player, game_status, _ ->
+            ideaProcess(card_number, player, game_status, 1)
+            null
+        })
+        myeongjeon.addtext(Text(TextEffectTimingTag.IDEA_CONDITION, TextEffectTag.IDEA){ _, player, game_status, _ ->
+            if(game_status.logger.checkMyeongJeon(false)){
+                1
+            }
+            else {
+                0
+            }
+        })
+        myeongjeon.addtext(Text(TextEffectTimingTag.IDEA_CONDITION_FLIP, TextEffectTag.IDEA){ _, player, game_status, _ ->
+            if(game_status.logger.checkMyeongJeon(true)){
+                1
+            }
+            else {
+                0
+            }
+        })
+        myeongjeon.addtext(Text(TextEffectTimingTag.IDEA_PROCESS, TextEffectTag.IDEA){ card_number, player, game_status, _ ->
+            ideaProcess(card_number, player, game_status, 2)
+            null
+        })
+        myeongjeon.addtext(Text(TextEffectTimingTag.IDEA_PROCESS_FLIP, TextEffectTag.IDEA){ card_number, player, game_status, _ ->
+            ideaProcess(card_number, player, game_status, 1)
+            null
+        })
         emphasizing.addtext(Text(TextEffectTimingTag.IDEA_CONDITION, TextEffectTag.IDEA){ _, player, game_status, _ ->
             if(game_status.logger.checkThisTurnUseFullPower() && !(game_status.logger.checkThisTurnIdea(player))){
                 1
@@ -7667,7 +7895,7 @@ object CardSet {
                 0
             }
         })
-        emphasizing.addtext(Text(TextEffectTimingTag.IDEA_CONDITION_FLIP, TextEffectTag.IDEA){ _, _, game_status, _ ->
+        positioning.addtext(Text(TextEffectTimingTag.IDEA_CONDITION_FLIP, TextEffectTag.IDEA){ _, _, game_status, _ ->
             if(abs(game_status.startTurnDistance - game_status.getAdjustDistance(null)) >= 5){
                 1
             }
@@ -7675,18 +7903,49 @@ object CardSet {
                 0
             }
         })
-        emphasizing.addtext(Text(TextEffectTimingTag.IDEA_PROCESS, TextEffectTag.IDEA){ card_number, player, game_status, _ ->
+        positioning.addtext(Text(TextEffectTimingTag.IDEA_PROCESS, TextEffectTag.IDEA){ card_number, player, game_status, _ ->
             ideaProcess(card_number, player, game_status, 2)
             null
         })
-        emphasizing.addtext(Text(TextEffectTimingTag.IDEA_PROCESS_FLIP, TextEffectTag.IDEA){ card_number, player, game_status, _ ->
+        positioning.addtext(Text(TextEffectTimingTag.IDEA_PROCESS_FLIP, TextEffectTag.IDEA){ card_number, player, game_status, _ ->
             ideaProcess(card_number, player, game_status, 1)
             null
         })
     }
 
-    private fun kanaweCardInit(){
+    private val image = CardData(CardClass.NORMAL, CardName.KANAWE_IMAGE, MegamiEnum.KANAWE, CardType.ATTACK, SubType.NONE) //9000
 
+    private fun getActValue(player: PlayerEnum, game_status: GameStatus) = game_status.getPlayer(player).nowAct?.actValue ?: 0
+
+    private fun kanaweCardInit(){
+        image.setAttack(DistanceType.CONTINUOUS, Pair(0, 10), null, 999, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        image.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.INSERT_IMMEDIATE, {_, _, _ ->
+                true
+            }, {nowPlayer, gameStatus, madeAttack ->
+                madeAttack.apply {
+                    val now = getActValue(nowPlayer, gameStatus)
+                    if (now % 2 == 0){
+                        madeAttack.editedAuraDamage = now / 2
+                    }
+                    else{
+                        madeAttack.editedAuraDamage = (now + 1) / 2
+                    }
+                }
+            }))
+            null
+        })
+        image.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
+            if(getActValue(player, game_status) % 2 == 0){
+                while(true){
+                    val nowCommand = game_status.receiveCardEffectSelect(player, 2000)
+                    if(selectDustToDistance(nowCommand, game_status, player,
+                            game_status.getCardOwner(card_number), card_number)) break
+                }
+            }
+            null
+        })
     }
 
     fun init(){

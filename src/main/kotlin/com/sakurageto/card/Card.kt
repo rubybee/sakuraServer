@@ -4,6 +4,8 @@ import com.sakurageto.card.CardSet.toCardData
 import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.MegamiEnum
 import com.sakurageto.gamelogic.Umbrella
+import com.sakurageto.gamelogic.log.Log
+import com.sakurageto.gamelogic.log.LogText
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.receiveNapInformation
 import java.util.*
@@ -470,8 +472,9 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         when {
             nowNeedNap == 0 -> {}
             nowNeedNap > game_status.getPlayerAura(player) + game_status.dust -> {
-                game_status.dustToCard(player, game_status.dust, this)
-                game_status.auraToCard(player, game_status.getPlayerAura(player), this)
+                game_status.dustToCard(player, game_status.dust, this, Log.NORMAL_NAP_COST)
+                game_status.auraToCard(player, game_status.getPlayerAura(player), this, Log.NORMAL_NAP_COST)
+                game_status.logger.insert(Log(player, LogText.END_EFFECT, Log.NORMAL_NAP_COST, -1))
             }
             else -> {
                 while (true) {
@@ -480,11 +483,13 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                     if (aura < 0 || dust < 0 || aura + dust != nowNeedNap || game_status.getPlayerAura(player) < aura || game_status.dust < dust) {
                         continue
                     }
-                    game_status.auraToCard(player, aura, this)
-                    game_status.dustToCard(player, dust, this)
+                    game_status.auraToCard(player, aura, this, Log.NORMAL_NAP_COST)
+                    game_status.dustToCard(player, dust, this, Log.NORMAL_NAP_COST)
+                    game_status.logger.insert(Log(player, LogText.END_EFFECT, Log.NORMAL_NAP_COST, -1))
                     break
                 }
             }
+
         }
 
         var nowGrowing = card_data.growing

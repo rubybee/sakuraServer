@@ -1,6 +1,8 @@
 package com.sakurageto.gamelogic.log
 
 import com.sakurageto.card.PlayerEnum
+import com.sakurageto.protocol.LocationEnum
+import kotlin.math.max
 
 class Logger {
     private val logQueue = ArrayDeque<Log>()
@@ -152,6 +154,126 @@ class Logger {
         }
     }
 
+    fun checkSakuraWave(): Boolean{
+        val store = HashMap<Int, Int>()
+        for(log in logQueue){
+            if(log.text == LogText.MOVE_TOKEN){
+                when(log.number1){
+                    Log.IGNORE -> {}
+                    Log.BASIC_OPERATION -> {
+                        if(log.number2 >= 3){
+                            return true
+                        }
+                    }
+                    else -> {
+                        if(log.destination != LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD){
+                            store[log.number1] = store[log.number1]?.let {
+                                it + log.number2
+                            }?: run {
+                                log.number2
+                            }
+                        }
+                    }
+                }
+            }
+            else if(log.text == LogText.END_EFFECT){
+                if((store[log.number1]?: 0) >= 3){
+                    return true
+                }
+                store.remove(log.number1)
+            }
+        }
+        return false
+    }
+
+    fun checkSakuraWaveFlipped(): Boolean{
+        val store = HashMap<Int, Int>()
+        for(log in logQueue){
+            if(log.text == LogText.MOVE_TOKEN){
+                when(log.number1){
+                    Log.IGNORE -> {}
+                    Log.BASIC_OPERATION -> {
+                        if(log.number2 >= 5){
+                            return true
+                        }
+                    }
+                    else -> {
+                        store[log.number1] = store[log.number1]?.let {
+                            it + log.number2
+                        }?: run {
+                            log.number2
+                        }
+                    }
+                }
+            }
+            else if(log.text == LogText.END_EFFECT){
+                if((store[log.number1]?: 0) >= 5){
+                    return true
+                }
+                store.remove(log.number1)
+            }
+        }
+        return false
+    }
+
+    fun checkWhistle(flipped: Boolean): Boolean{
+        val value = if(flipped) 2 else 1
+        val storeFrom = HashMap<Int, Int>()
+        val storeTo = HashMap<Int, Int>()
+        for(log in logQueue){
+            if(log.text == LogText.MOVE_TOKEN){
+                when(log.number1){
+                    Log.IGNORE, Log.BASIC_OPERATION -> {}
+                    else -> {
+                        if(log.resource == LocationEnum.YOUR_LIFE){
+                            storeFrom[log.number1] = storeFrom[log.number1]?.let{
+                                it + log.number2
+                            }?: run {
+                                log.number2
+                            }
+                        }
+                        else if(log.destination == LocationEnum.YOUR_LIFE){
+                            storeTo[log.number1] = storeTo[log.number1]?.let{
+                                it + log.number2
+                            }?: run {
+                                log.number2
+                            }
+                        }
+                    }
+                }
+            }
+            else if(log.text == LogText.END_EFFECT){
+                if((storeFrom[log.number1]?: 0) >= value){
+                    return true
+                }
+                storeFrom.remove(log.number1)
+
+                if((storeTo[log.number1]?: 0) >= value){
+                    return true
+                }
+                storeTo.remove(log.number1)
+            }
+        }
+        return false
+    }
+
+    fun checkMyeongJeon(flipped: Boolean): Boolean{
+        val value = if(flipped) 2 else 1
+        var count = 0
+        for(log in logQueue){
+            if(log.text == LogText.MOVE_TOKEN){
+                if(log.boolean){
+                    count += 1
+                    if(count >= value){
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+
     fun checkThisTurnUseFullPower(): Boolean{
         for(log in logQueue){
             if(log.isTextUseCard() && log.boolean) return true
@@ -165,4 +287,6 @@ class Logger {
         }
         return false
     }
+
+
 }

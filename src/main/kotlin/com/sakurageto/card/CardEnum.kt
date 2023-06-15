@@ -395,7 +395,7 @@ enum class CardName {
     MEGUMI_FRUIT_OF_END,
     MEGUMI_MEGUMI_PALM,
 
-    KANAWE_IMAGE,
+    KANAWE_IMAGE, //2000
     KANAWE_SCREENPLAY,
     KANAWE_PRODUCTION,
     KANAWE_PUBLISH,
@@ -1177,8 +1177,6 @@ enum class CardName {
                     KANAWE_IMAGE, KANAWE_SCREENPLAY, KANAWE_PRODUCTION,
                     KANAWE_PUBLISH, KANAWE_AFTERGLOW, KANAWE_IMPROMPTU,
                     KANAWE_SEAL
-
-
                 )
             }
         }

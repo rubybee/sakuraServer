@@ -2074,6 +2074,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
      */
     suspend fun useCardFrom(player: PlayerEnum, card: Card, location: LocationEnum, react: Boolean, react_attack: MadeAttack?,
                             isCost: Boolean, isConsume: Boolean, napChange: Int = -1): Boolean{
+        val nowPlayer = getPlayer(player)
+
         if(getEndTurn(player) || endCurrentPhase){
             return false
         }
@@ -2081,21 +2083,46 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val cost = card.canUse(player, this, react_attack, isCost, isConsume)
         if(cost != -2){
             if(isCost) card.effectText(player, this, react_attack, TextEffectTag.COST)
-
-            if(location == LocationEnum.READY_SOLDIER_ZONE) logger.insert(Log(player, LogText.USE_CARD_IN_SOLDIER,
-                card.card_number, card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER))
-
-            else if(location == LocationEnum.COVER_CARD && react) logger.insert(Log(player, LogText.USE_CARD_IN_COVER_AND_REACT,
-                card.card_number, card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER))
-
-            else if(location == LocationEnum.COVER_CARD) logger.insert(Log(player, LogText.USE_CARD_IN_COVER, card.card_number,
-                card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER))
-
-            else if(react) logger.insert(Log(player, LogText.USE_CARD_REACT, card.card_number,
-                card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER))
-
-            else logger.insert(Log(player, LogText.USE_CARD, card.card_number,
-                card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER))
+            if(location == LocationEnum.READY_SOLDIER_ZONE) {
+                logger.insert(
+                    Log(
+                        player, LogText.USE_CARD_IN_SOLDIER, card.card_number,
+                        card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER
+                    )
+                )
+            }
+            else if(location == LocationEnum.COVER_CARD && react) {
+                logger.insert(
+                    Log(
+                        player, LogText.USE_CARD_IN_COVER_AND_REACT, card.card_number,
+                        card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER
+                    )
+                )
+            }
+            else if(location == LocationEnum.COVER_CARD) {
+                logger.insert(
+                    Log(
+                        player, LogText.USE_CARD_IN_COVER, card.card_number,
+                        card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER
+                    )
+                )
+            }
+            else if(react) {
+                logger.insert(
+                    Log(
+                        player, LogText.USE_CARD_REACT, card.card_number,
+                        card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER
+                    )
+                )
+            }
+            else {
+                logger.insert(
+                    Log(
+                        player, LogText.USE_CARD, card.card_number,
+                        card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER
+                    )
+                )
+            }
 
             val isTermination = terminationListenerProcess(player, card)
 
@@ -2890,6 +2917,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         for(card in getPlayer(turnPlayer.opposite()).enchantmentCard.values){
             card.effectAllValidEffect(turnPlayer.opposite(), this, TextEffectTag.WHEN_START_PHASE_OTHER)
         }
+        for(card in getPlayer(turnPlayer.opposite()).usedSpecialCard.values){
+            card.effectAllValidEffect(turnPlayer.opposite(), this, TextEffectTag.WHEN_START_PHASE_OTHER)
+        }
         for(card in getPlayer(turnPlayer).enchantmentCard.values){
             card.effectAllValidEffect(turnPlayer, this, TextEffectTag.WHEN_START_PHASE_YOUR)
         }
@@ -2985,8 +3015,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
         nowPlayer.megamiCard?.effectAllValidEffect(player, this, TextEffectTag.WHEN_END_PHASE_YOUR)
         nowPlayer.megamiCard2?.effectAllValidEffect(player, this, TextEffectTag.WHEN_END_PHASE_YOUR)
-        player1.ideaCard?.ideaProcess(PlayerEnum.PLAYER1, this, player1.isIdeaCardFlipped, null)
-        player2.ideaCard?.ideaProcess(PlayerEnum.PLAYER2, this, player2.isIdeaCardFlipped, null)
+        if(player1.canIdeaProcess){
+            player1.ideaCard?.ideaProcess(PlayerEnum.PLAYER1, this, player1.isIdeaCardFlipped, null)
+        }
+        if(player2.canIdeaProcess){
+            player2.ideaCard?.ideaProcess(PlayerEnum.PLAYER2, this, player2.isIdeaCardFlipped, null)
+        }
 
         for(card in otherPlayer.enchantmentCard.values){
             card.effectAllValidEffect(player.opposite(), this, TextEffectTag.WHEN_END_PHASE_OTHER)
@@ -3019,10 +3053,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     keys.remove(selected)
                 }
 
-                if(!(player1.ideaProcess)){
+                if(!(player1.ideaProcess) && player1.canIdeaProcess){
                     player1.ideaCard?.ideaProcess(PlayerEnum.PLAYER1, this, player1.isIdeaCardFlipped, keys)
                 }
-                if(!(player2.ideaProcess)){
+                if(!(player2.ideaProcess && player2.canIdeaProcess)){
                     player2.ideaCard?.ideaProcess(PlayerEnum.PLAYER1, this, player2.isIdeaCardFlipped, keys)
                 }
             }
@@ -3046,10 +3080,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     }
                 }
                 endPhaseEffect.remove(keys[0])
-                if(!(player1.ideaProcess)){
+                if(!(player1.ideaProcess) && player1.canIdeaProcess){
                     player1.ideaCard?.ideaProcess(PlayerEnum.PLAYER1, this, player1.isIdeaCardFlipped, keys)
                 }
-                if(!(player2.ideaProcess)){
+                if(!(player2.ideaProcess) && player2.canIdeaProcess){
                     player2.ideaCard?.ideaProcess(PlayerEnum.PLAYER1, this, player2.isIdeaCardFlipped, keys)
                 }
             }
@@ -3103,7 +3137,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         player1.asuraUsed = false; player2.asuraUsed = false
         player1.isNextBasicOperationInvalid = false; player2.isNextBasicOperationInvalid = false
         player1.isMoveDistanceToken = false; player2.isMoveDistanceToken = false
+        player1.beforeTurnIdeaProcess = player1.ideaProcess; player2.beforeTurnIdeaProcess = player2.ideaProcess
         player1.ideaProcess = false; player2.ideaProcess = false
+        player1.canIdeaProcess = true; player2.canIdeaProcess = true
     }
 
     //0 = player don't want using card more || 1 = player card use success || 2 = cannot use because there are no installation card
@@ -3592,6 +3628,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
+    suspend fun selectCardFrom(player: PlayerEnum, cardList: MutableList<Int>, reason: CommandEnum, card_number: Int): MutableList<Int>{
+        while (true){
+            val set = mutableSetOf<Int>()
+            val list = receiveSelectCard(getSocket(player), cardList, reason, card_number) ?: continue
+            return list
+        }
+    }
+
     suspend fun popCardFrom(player: PlayerEnum, card_number: Int, location: LocationEnum, public: Boolean,
                             discardCheck: Boolean = true): Card?{
         val nowPlayer = getPlayer(player)
@@ -3647,7 +3691,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     return result
                 }
             }
-            LocationEnum.OTHER_HAND -> {
+            LocationEnum.HAND_OTHER -> {
                 if(card_number in getPlayer(player.opposite()).hand){
                     sendPopCardZone(otherSocket, nowSocket, card_number, public, CommandEnum.POP_HAND_YOUR)
                     val result = getPlayer(player.opposite()).hand[card_number]
@@ -3888,6 +3932,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             LocationEnum.OTHER_ENCHANTMENT_ZONE_CARD -> {
                 getPlayer(player.opposite()).getCardFromEnchantment(card_number)
             }
+            LocationEnum.END_IDEA_YOUR -> {
+                getPlayer(player).endIdeaCards[card_number]
+            }
             else -> TODO()
         }
     }
@@ -4053,6 +4100,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(list == null || list.size == 0) return -1
 
         return receiveSelectAct(getSocket(player), list)
+    }
+
+    suspend fun sendCommand(player1: PlayerEnum, player2: PlayerEnum, command: CommandEnum){
+        sendSimpleCommand(getSocket(player1), getSocket(player2), command)
     }
 
     //megami special function

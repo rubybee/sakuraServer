@@ -6,6 +6,7 @@ import com.sakurageto.gamelogic.MegamiEnum
 import com.sakurageto.gamelogic.Umbrella
 import com.sakurageto.gamelogic.log.Log
 import com.sakurageto.gamelogic.log.LogText
+import com.sakurageto.gamelogic.storyboard.Act
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.receiveNapInformation
 import java.util.*
@@ -329,8 +330,13 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
 
         var cost: Int
+        val nowPlayer = gameStatus.getPlayer(player)
 
         if(card_data.card_class == CardClass.SPECIAL){
+            if(nowPlayer.canNotUseCardName1?.second == card_data.card_name
+                || nowPlayer.canNotUseCardName2?.second == card_data.card_name){
+                return -2
+            }
             if(isCost && isConsume){
                 this.thisCardCostBuff(player, gameStatus)
                 gameStatus.addAllCardCostBuff()
@@ -346,6 +352,14 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             }
         }
         else{
+            if(card_data.card_class == CardClass.NORMAL){
+                if(gameStatus.getPlayer(player.opposite()).nowAct?.actColor == Act.COLOR_RED){
+                    if(nowPlayer.canNotUseCardName1?.second == card_data.card_name
+                        || nowPlayer.canNotUseCardName2?.second == card_data.card_name){
+                        return -2
+                    }
+                }
+            }
             cost = -1
         }
 

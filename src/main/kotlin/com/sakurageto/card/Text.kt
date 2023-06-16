@@ -40,6 +40,7 @@ enum class TextEffectTag {
     CHANGE_ARROW_BOTH,
 
     //just define what this effect do
+    EFFECT_ACT,
     IDEA,
     DO_BASIC_OPERATION,
     THIS_CARD_NAP_CHANGE,
@@ -91,6 +92,7 @@ enum class TextEffectTag {
     WHEN_DECK_RECONSTRUCT_OTHER,
     WHEN_DISCARD_NUMBER_CHANGE_OTHER,
     WHEN_OTHER_PLAYER_CHANGE_DISTANCE_TOKEN,
+    WHEN_ACT_CHANGE,
 
     CONDITION_ADD_DO_WIND_AROUND,
 

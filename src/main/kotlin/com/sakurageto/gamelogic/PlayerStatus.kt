@@ -46,10 +46,14 @@ class PlayerStatus(val player_enum: PlayerEnum) {
 
     var nowAct: Act? = null
     var ideaProcess: Boolean = false
+    var beforeTurnIdeaProcess: Boolean = false
     var ideaCard: Card? = null
     var isIdeaCardFlipped: Boolean = false
     var ideaCardStage = 0
     var endIdeaCards = HashMap<Int, Card>()
+    var canIdeaProcess: Boolean = true
+    var canNotUseCardName1: Pair<Int, CardName>? = null
+    var canNotUseCardName2: Pair<Int, CardName>? = null
     //for megami(must be present)
 
 
@@ -433,6 +437,16 @@ class PlayerStatus(val player_enum: PlayerEnum) {
                 {it.toCardNumber(true)})
             }
             LocationEnum.NOT_READY_SOLDIER_ZONE -> list.addAll(notReadySoldierZone.keys)
+            LocationEnum.NOT_SELECTED_NORMAL -> {
+                unselectedCard.forEach{
+                    list.add(it.toCardNumber(true))
+                }
+            }
+            LocationEnum.NOT_SELECTED_SPECIAL -> {
+                unselectedSpecialCard.forEach{
+                    list.add(it.toCardNumber(true))
+                }
+            }
             else -> TODO()
         }
     }

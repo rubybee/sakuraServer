@@ -1,5 +1,6 @@
 package com.sakurageto.card
 
+import com.sakurageto.card.CardSet.toCardName
 import com.sakurageto.gamelogic.*
 import com.sakurageto.gamelogic.GameStatus.Companion.START_PHASE
 import com.sakurageto.gamelogic.log.Log
@@ -1675,7 +1676,7 @@ object CardSet {
                 if(selected.size == 1){
                     val selectNumber = selected[0]
                     val card = game_status.getCardFrom(player, selectNumber, LocationEnum.COVER_CARD)?: continue
-                    game_status.useCardFrom(player, card, LocationEnum.COVER_CARD, true, react_attack,
+                    game_status.useCardFrom(player, card, LocationEnum.COVER_CARD, false, react_attack,
                         isCost = true, isConsume = true)
                     break
                 }
@@ -2075,7 +2076,7 @@ object CardSet {
                     while(true){
                         val nowCommand = game_status.receiveCardEffectSelect(player, 703)
                         if(nowCommand == CommandEnum.SELECT_ONE){
-                            game_status.useCardFrom(player, card, LocationEnum.OTHER_HAND, false, null,
+                            game_status.useCardFrom(player, card, LocationEnum.HAND_OTHER, false, null,
                                 isCost = true, isConsume = true)
                             break
                         }
@@ -4976,9 +4977,7 @@ object CardSet {
         shuriken.setAttack(DistanceType.CONTINUOUS, Pair(3, 5), null, 2, 1,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         shuriken.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_END_PHASE_YOUR_IN_DISCARD) { card_number, _, game_status, _ ->
-            if(game_status.getPlayer(PlayerEnum.PLAYER1).cover_card.size + game_status.getPlayer(PlayerEnum.PLAYER2).cover_card.size >= 5){
-                game_status.endPhaseEffect[card_number] = Pair(CardEffectLocation.DISCARD_YOUR, shurikenText)
-            }
+            game_status.endPhaseEffect[card_number] = Pair(CardEffectLocation.DISCARD_YOUR, shurikenText)
             null
         })
         ambush.setAttack(DistanceType.CONTINUOUS, Pair(1, 3), null, 4, 3,
@@ -5158,10 +5157,11 @@ object CardSet {
         for(card in nowPlayer.enchantmentCard.values.filter {
             card -> !(card.card_data.isItSpecial())
         }){
-            if((card.getNap()  ?: 0) >= 1){
+            if((card.getNap() ?: 0) >= 1){
                 game_status.cardToDust(player, card.getNap(), card, false, Log.DEMISE)
             }
             game_status.popCardFrom(player, card.card_number, LocationEnum.ENCHANTMENT_ZONE, true)?.let {
+                card.effectText(player, game_status, null, TextEffectTag.WHEN_THIS_CARD_GET_OUT_ENCHANTMENT)
                 game_status.insertCardTo(player, card, LocationEnum.OUT_OF_GAME, true)
             }
         }
@@ -6874,7 +6874,7 @@ object CardSet {
             }
             null
         })
-        mizukiBattleCry.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.WHEN_THIS_CARD_GET_OUT_ENCHANTMENT)
+        mizukiBattleCry.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_THIS_CARD_GET_OUT_ENCHANTMENT)
         ret@{ _, player, game_status, _ ->
             for(card in game_status.getPlayer(player).enchantmentCard.values){
                 card.card_data.effect?.let{
@@ -7688,7 +7688,7 @@ object CardSet {
             }))
             null
         })
-        megumiPalm.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.WHEN_THIS_CARD_GET_OUT_ENCHANTMENT)
+        megumiPalm.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_THIS_CARD_GET_OUT_ENCHANTMENT)
         { card_number, player, game_status, _ ->
             game_status.removeThisTurnAttackBuff(player, BufTag.PLUS_MINUS, card_number)
             null
@@ -7702,10 +7702,8 @@ object CardSet {
     private val emphasizing = CardData(CardClass.IDEA, CardName.IDEA_EMPHASIZING, MegamiEnum.KANAWE, CardType.UNDEFINED, SubType.NONE)
     private val positioning = CardData(CardClass.IDEA, CardName.IDEA_POSITIONING, MegamiEnum.KANAWE, CardType.UNDEFINED, SubType.NONE)
 
-    private suspend fun nextAct(player: PlayerEnum, game_status: GameStatus, nextAct: Int){
-        val nowPlayer = game_status.getPlayer(player)
-        nowPlayer.nowAct = StoryBoard.getActByNumber(nextAct)
-        when(nowPlayer.nowAct?.actColor){
+    private suspend fun activeAct(player: PlayerEnum, game_status: GameStatus){
+        when(game_status.getPlayer(player).nowAct?.actColor){
             Act.COLOR_RED -> {
                 game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 1), false,
                     null, null, Log.ACT_DAMAGE)
@@ -7743,6 +7741,15 @@ object CardSet {
             }
             else -> {}
         }
+    }
+
+    private suspend fun nextAct(player: PlayerEnum, game_status: GameStatus, nextAct: Int){
+        val nowPlayer = game_status.getPlayer(player)
+        nowPlayer.nowAct = StoryBoard.getActByNumber(nextAct)
+        for(card in game_status.getPlayer(player).usedSpecialCard.values){
+            card.effectAllValidEffect(player, game_status, TextEffectTag.WHEN_ACT_CHANGE)
+        }
+        activeAct(player, game_status)
     }
 
     private suspend fun completeIdea(card_number: Int, player: PlayerEnum, game_status: GameStatus){
@@ -7913,12 +7920,160 @@ object CardSet {
         })
     }
 
-    private val image = CardData(CardClass.NORMAL, CardName.KANAWE_IMAGE, MegamiEnum.KANAWE, CardType.ATTACK, SubType.NONE) //9000
+    private val image = CardData(CardClass.NORMAL, CardName.KANAWE_IMAGE, MegamiEnum.KANAWE, CardType.ATTACK, SubType.NONE) //2000
+    private val screenplay = CardData(CardClass.NORMAL, CardName.KANAWE_SCREENPLAY, MegamiEnum.KANAWE, CardType.ATTACK, SubType.NONE)
+    private val production = CardData(CardClass.NORMAL, CardName.KANAWE_PRODUCTION, MegamiEnum.KANAWE, CardType.ATTACK, SubType.NONE)
+    private val publish = CardData(CardClass.NORMAL, CardName.KANAWE_PUBLISH, MegamiEnum.KANAWE, CardType.BEHAVIOR, SubType.NONE)
+    private val afterglow = CardData(CardClass.NORMAL, CardName.KANAWE_AFTERGLOW, MegamiEnum.KANAWE, CardType.BEHAVIOR, SubType.NONE)
+    private val impromptu = CardData(CardClass.NORMAL, CardName.KANAWE_IMPROMPTU, MegamiEnum.KANAWE, CardType.BEHAVIOR, SubType.NONE)
+    private val seal = CardData(CardClass.NORMAL, CardName.KANAWE_SEAL, MegamiEnum.KANAWE, CardType.ENCHANTMENT, SubType.NONE)
+    private val vagueStory = CardData(CardClass.SPECIAL, CardName.KANAWE_VAGUE_STORY, MegamiEnum.KANAWE, CardType.BEHAVIOR, SubType.NONE)
+    private val infiniteStarlight = CardData(CardClass.SPECIAL, CardName.KANAWE_INFINITE_STARLIGHT, MegamiEnum.KANAWE, CardType.BEHAVIOR, SubType.NONE)
+    private val bendOverThisNight = CardData(CardClass.SPECIAL, CardName.KANAWE_BEND_OVER_THIS_NIGHT, MegamiEnum.KANAWE, CardType.ATTACK, SubType.REACTION)
+    private val distantSky = CardData(CardClass.SPECIAL, CardName.KANAWE_DISTANT_SKY, MegamiEnum.KANAWE, CardType.BEHAVIOR, SubType.NONE)
+
+    private val screenPlayText = Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_END_PHASE_YOUR_IN_DISCARD) { card_number, player, game_status, _ ->
+        while(true){
+            when(game_status.receiveCardEffectSelect(player, 2002)){
+                CommandEnum.SELECT_ONE -> {
+                    game_status.popCardFrom(player, card_number, LocationEnum.DISCARD_YOUR, true)?.let {
+                        game_status.insertCardTo(player, it, LocationEnum.YOUR_DECK_BELOW, true)
+                    }
+                    game_status.addConcentration(player.opposite())
+                    break
+                }
+                CommandEnum.SELECT_NOT -> {
+                    break
+                }
+                else -> {}
+            }
+        }
+        null
+    }
+
+    private val vagueStoryText = Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_START_PHASE_OTHER) { card_number, player, game_status, _ ->
+        game_status.returnSpecialCard(player, card_number)
+        null
+    }
 
     private fun getActValue(player: PlayerEnum, game_status: GameStatus) = game_status.getPlayer(player).nowAct?.actValue ?: 0
 
+    private fun getActColor(player: PlayerEnum, game_status: GameStatus) = game_status.getPlayer(player).nowAct?.actColor ?: 0
+
+    private fun makeIdeaList(player: PlayerEnum, game_status: GameStatus, from: LocationEnum): MutableList<Int>{
+        val cardList = mutableListOf<Int>()
+        val nowPlayer = game_status.getPlayer(player)
+        if(from == LocationEnum.ALL || from == LocationEnum.ADDITIONAL_CARD){
+            nowPlayer.additionalHand[CardName.IDEA_SAL_JIN]?.let {
+                cardList.add(it.card_number)
+            }
+            nowPlayer.additionalHand[CardName.IDEA_SAKURA_WAVE]?.let {
+                cardList.add(it.card_number)
+            }
+            nowPlayer.additionalHand[CardName.IDEA_WHISTLE]?.let {
+                cardList.add(it.card_number)
+            }
+            nowPlayer.additionalHand[CardName.IDEA_MYEONG_JEON]?.let {
+                cardList.add(it.card_number)
+            }
+            nowPlayer.additionalHand[CardName.IDEA_POSITIONING]?.let {
+                cardList.add(it.card_number)
+            }
+            nowPlayer.additionalHand[CardName.IDEA_EMPHASIZING]?.let {
+                cardList.add(it.card_number)
+            }
+        }
+
+        if(from == LocationEnum.ALL || from == LocationEnum.END_IDEA_YOUR){
+            for(card in nowPlayer.endIdeaCards.keys){
+                cardList.add(card)
+            }
+        }
+        return cardList
+    }
+
+    private suspend fun readyIdea(player: PlayerEnum, game_status: GameStatus, from: LocationEnum): Boolean{
+        val nowPlayer = game_status.getPlayer(player)
+        if(game_status.dust == 0 && game_status.getPlayerAura(player) == 0 && nowPlayer.ideaCard == null){
+            return false
+        }
+        val cardList = makeIdeaList(player, game_status, from)
+        if(cardList.size != 0){
+            while(true){
+                val get = game_status.selectCardFrom(player, cardList, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2001)
+                if(get.size == 0) return false
+                if(get.size != 1) continue
+
+                var newFrom: LocationEnum = LocationEnum.ADDITIONAL_CARD
+                val idea = game_status.getCardFrom(player, get[0], LocationEnum.ADDITIONAL_CARD)?.apply {
+                    newFrom = LocationEnum.ADDITIONAL_CARD
+                }?: game_status.getCardFrom(player, get[0], LocationEnum.END_IDEA_YOUR)?.apply {
+                    newFrom = LocationEnum.END_IDEA_YOUR
+                }?: return false
+
+                nowPlayer.ideaCardStage = 0
+
+                if(nowPlayer.ideaCard != null){
+                    game_status.popCardFrom(player, -1, LocationEnum.IDEA_YOUR, true)?.let {beforeIdea ->
+                        game_status.cardToDust(player, beforeIdea.getNap(), beforeIdea, false,
+                            Log.END_IDEA, LocationEnum.IDEA_YOUR)
+                        game_status.logger.insert(Log(player, LogText.END_EFFECT, Log.END_IDEA, -1))
+                        game_status.insertCardTo(player, beforeIdea, LocationEnum.ADDITIONAL_CARD, true)
+                    }
+                }
+
+                if(newFrom == LocationEnum.ADDITIONAL_CARD){
+                    game_status.moveAdditionalCard(player, idea.card_data.card_name, LocationEnum.IDEA_YOUR)
+                }
+                else{
+                    game_status.popCardFrom(player, idea.card_number, LocationEnum.END_IDEA_YOUR, true)?.let{
+                        game_status.insertCardTo(player, it, LocationEnum.IDEA_YOUR, true)
+                    }
+                }
+
+                while(true){
+                    when(game_status.receiveCardEffectSelect(player, idea.card_number)){
+                        CommandEnum.SELECT_ONE -> {
+                            break
+                        }
+                        CommandEnum.SELECT_TWO -> {
+                            game_status.sendCommand(player, player.opposite(), CommandEnum.SET_IDEA_FLIP_YOUR)
+                            break
+                        }
+                        else -> {}
+                    }
+                }
+                if(game_status.dust == 0){
+                    game_status.auraToCard(player, 1, idea, idea.card_number, LocationEnum.IDEA_YOUR)
+
+                }
+                else if(game_status.getPlayerAura(player) == 0){
+                    game_status.dustToCard(player, 1, idea, idea.card_number, LocationEnum.IDEA_YOUR)
+                }
+                else{
+                    while(true){
+                        when(game_status.receiveCardEffectSelect(player, 2001)){
+                            CommandEnum.SELECT_ONE -> {
+                                game_status.auraToCard(player, 1, idea, idea.card_number, LocationEnum.IDEA_YOUR)
+                                break
+                            }
+                            CommandEnum.SELECT_TWO -> {
+                                game_status.dustToCard(player, 1, idea, idea.card_number, LocationEnum.IDEA_YOUR)
+                                break
+                            }
+                            else -> {}
+                        }
+                    }
+                }
+                game_status.logger.insert(Log(player, LogText.END_EFFECT, idea.card_number, -1))
+            }
+        }
+
+        return true
+    }
+
     private fun kanaweCardInit(){
-        image.setAttack(DistanceType.CONTINUOUS, Pair(0, 10), null, 999, 1,
+        image.setAttack(DistanceType.CONTINUOUS, Pair(0, 10), null, 1000, 1,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         image.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
             game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.INSERT_IMMEDIATE, {_, _, _ ->
@@ -7942,6 +8097,252 @@ object CardSet {
                     val nowCommand = game_status.receiveCardEffectSelect(player, 2000)
                     if(selectDustToDistance(nowCommand, game_status, player,
                             game_status.getCardOwner(card_number), card_number)) break
+                }
+            }
+            null
+        })
+        screenplay.setAttack(DistanceType.CONTINUOUS, Pair(2, 8), null, 0, 0,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        screenplay.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) {_, player, game_status, _ ->
+            readyIdea(player, game_status, LocationEnum.ADDITIONAL_CARD)
+            null
+        })
+        screenplay.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_END_PHASE_YOUR_IN_DISCARD) { card_number, _, game_status, _ ->
+            game_status.endPhaseEffect[card_number] = Pair(CardEffectLocation.DISCARD_YOUR, screenPlayText)
+            null
+        })
+        production.setAttack(DistanceType.CONTINUOUS, Pair(2, 3), null, 2, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        production.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ ->
+                true
+            }, {nowPlayer, gameStatus, madeAttack ->
+                if(getActColor(nowPlayer, gameStatus) == Act.COLOR_PURPLE){
+                    madeAttack.lifePlusMinus(1)
+                }
+            }))
+            null
+        })
+        production.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
+            game_status.getPlayer(player).canIdeaProcess = false
+            null
+        })
+        publish.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
+            while(true){
+                when(game_status.receiveCardEffectSelect(player, 2003)){
+                    CommandEnum.SELECT_ONE -> {
+                        game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND, 202003)
+                        break
+                    }
+                    CommandEnum.SELECT_NOT -> {
+                        break
+                    }
+                    else -> {
+                        continue
+                    }
+                }
+            }
+            while(true){
+                when(val command = game_status.requestBasicOperation(player, 2003)){
+                    CommandEnum.ACTION_GO_FORWARD, CommandEnum.ACTION_GO_BACKWARD, CommandEnum.ACTION_INCUBATE,
+                    CommandEnum.ACTION_BREAK_AWAY, CommandEnum.ACTION_NAGA, CommandEnum.ACTION_YAKSHA,
+                    CommandEnum.ACTION_GARUDA, CommandEnum.ACTION_ASURA -> {
+                        if(game_status.canDoBasicOperation(player, command)){
+                            game_status.doBasicOperation(player, command, 202003)
+                            break
+                        }
+                        else{
+                            continue
+                        }
+                    }
+                    CommandEnum.SELECT_NOT -> break
+                    else -> {}
+                }
+            }
+            null
+        })
+        publish.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {_, player, game_status, _ ->
+            if(game_status.getFullAction(player)){
+                readyIdea(player, game_status, LocationEnum.ALL)
+                game_status.setShrink(player.opposite())
+            }
+            null
+        })
+        afterglow.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {_, player, game_status, _ ->
+            val actColor = getActColor(player, game_status)
+            if(actColor == Act.COLOR_PURPLE || actColor == Act.COLOR_GREEN){
+                game_status.selectCardFrom(player.opposite(), player, listOf(LocationEnum.HAND),
+                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2004, 1
+                ) { true }?.let {selected ->
+                    game_status.popCardFrom(player.opposite(), selected[0], LocationEnum.HAND, true)?.let {
+                        game_status.insertCardTo(player.opposite(), it, LocationEnum.YOUR_DECK_BELOW, true)
+                    }
+                }
+                game_status.addConcentration(player.opposite())
+            }
+            null
+        })
+        impromptu.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) {_, player, game_status, react_attack ->
+            while(true){
+                val selected = game_status.selectCardFrom(player, player, listOf(LocationEnum.HAND),
+                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2005
+                ) { card ->
+                    card.card_data.megami != MegamiEnum.KANAWE && card.card_data.sub_type != SubType.FULL_POWER
+                            && card.card_data.card_type == CardType.ATTACK
+                }?: break
+                if(selected.size == 0){
+                    break
+                }
+                else if(selected.size == 1){
+                    val selectNumber = selected[0]
+                    game_status.getCardFrom(player, selectNumber, LocationEnum.HAND)?.let { card ->
+                        game_status.useCardFrom(player, card, LocationEnum.HAND, false, react_attack,
+                            isCost = true, isConsume = true)
+                    }
+                    if(getActColor(player, game_status) == Act.COLOR_GREEN){
+                        game_status.popCardFrom(player, selectNumber, LocationEnum.DISCARD_YOUR, true)?.let {
+                            game_status.insertCardTo(player, it, LocationEnum.HAND, true)
+                        }
+                    }
+                    break
+                }
+                else{
+                    continue
+                }
+            }
+            null
+        })
+        seal.setEnchantment(3)
+        seal.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.REACT_ATTACK_CHANGE)
+        ret@{ card_number, player, game_status, _ ->
+            game_status.selectCardFrom(player.opposite(), player, listOf(LocationEnum.ALL),
+                CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2006, 1
+            ) { true }?.let { selected ->
+                val sealedPlayer = game_status.getPlayer(player.opposite())
+                if(sealedPlayer.canNotUseCardName1 == null){
+                    sealedPlayer.canNotUseCardName1 = Pair(card_number, selected[0].toCardName())
+                }
+                else{
+                    sealedPlayer.canNotUseCardName2 = Pair(card_number, selected[0].toCardName())
+                }
+            }
+            null
+        })
+        seal.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_THIS_CARD_GET_OUT_ENCHANTMENT)
+        { card_number, player, game_status, _ ->
+            val sealedPlayer = game_status.getPlayer(player.opposite())
+            if(sealedPlayer.canNotUseCardName1?.first == card_number){
+                sealedPlayer.canNotUseCardName1 = sealedPlayer.canNotUseCardName2
+                sealedPlayer.canNotUseCardName2 = null
+            }
+            else if(sealedPlayer.canNotUseCardName2?.first == card_number){
+                sealedPlayer.canNotUseCardName2 = null
+            }
+            null
+        })
+        seal.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.CHANGE_CONCENTRATION) {_, player, game_status, _ ->
+            game_status.getConcentration(player)
+            null
+        })
+        vagueStory.setSpecial(1)
+        vagueStory.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {card_number, player, game_status, _ ->
+            val nowPlayer = game_status.getPlayer(player)
+            if(nowPlayer.concentration >= 1){
+                while(true){
+                    when(game_status.receiveCardEffectSelect(player, 2007)){
+                        CommandEnum.SELECT_ONE -> {
+                            game_status.setConcentration(player, nowPlayer.concentration - 1)
+                            readyIdea(player, game_status, LocationEnum.ADDITIONAL_CARD)
+                            break
+                        }
+                        CommandEnum.SELECT_TWO -> {
+                            game_status.setConcentration(player, nowPlayer.concentration - 1)
+                            if(readyIdea(player, game_status, LocationEnum.END_IDEA_YOUR)){
+                                game_status.movePlayingCard(player, LocationEnum.OUT_OF_GAME, card_number)
+                            }
+                            break
+                        }
+                        CommandEnum.SELECT_NOT -> {
+                            break
+                        }
+                        else -> {
+                            continue
+                        }
+                    }
+                }
+            }
+            null
+        })
+        vagueStory.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_START_PHASE_OTHER){card_number, player, game_status, _ ->
+            if(!(game_status.getPlayer(player).beforeTurnIdeaProcess)){
+                game_status.startPhaseEffect[card_number] = Pair(CardEffectLocation.USED_YOUR, vagueStoryText)
+            }
+
+            null
+        })
+        infiniteStarlight.setSpecial(null)
+        infiniteStarlight.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.COST_X) {_, player, game_status, _->
+            getActValue(player, game_status)
+        })
+        infiniteStarlight.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.EFFECT_ACT) {_, player, game_status, _ ->
+            activeAct(player, game_status)
+            null
+        })
+        infiniteStarlight.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
+            game_status.returnSpecialCard(player, card_number)
+            null
+        })
+        bendOverThisNight.setSpecial(4)
+        bendOverThisNight.setAttack(DistanceType.CONTINUOUS, Pair(0, 4), null, 2, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        bendOverThisNight.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.REACT_ATTACK_INVALID) {card_number, player, game_status, reactedAttack ->
+            if(reactedAttack?.card_class != CardClass.SPECIAL){
+                reactedAttack?.addOtherBuff(OtherBuff(card_number, 1, OtherBuffTag.GET_IMMEDIATE, { _, _, _ ->
+                    true
+                }, { _, _, attack ->
+                    attack.makeNotValid()
+                }))
+            }
+            if(reactedAttack?.card_class == CardClass.NORMAL){
+                game_status.movePlayingCard(player.opposite(), LocationEnum.YOUR_DECK_TOP, reactedAttack.card_number)
+            }
+            null
+        })
+        distantSky.setSpecial(2)
+        distantSky.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {card_number, player, game_status, _ ->
+            while(true) {
+                val selected = game_status.selectCardFrom(player, player, listOf(LocationEnum.HAND),
+                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2008
+                ) { card -> card.card_data.card_class == CardClass.NORMAL }?: break
+                if(selected.size == 0){
+                    break
+                }
+                else if(selected.size == 1){
+                    game_status.popCardFrom(player, selected[0], LocationEnum.HAND, true)?.let {
+                        game_status.insertCardTo(player, it, LocationEnum.OUT_OF_GAME, true)
+                    }
+
+                    game_status.selectCardFrom(player, player, listOf(LocationEnum.NOT_SELECTED_NORMAL),
+                        CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2009, 1){ true }?.let { normal ->
+                        game_status.getPlayer(player).unselectedCard.remove(normal[0].toCardName())
+                        game_status.insertCardTo(player,
+                            Card.cardMakerByName(game_status.getPlayer(player).first_turn, normal[0].toCardName(), player),
+                        LocationEnum.HAND, true)
+                    }
+
+                    game_status.movePlayingCard(player, LocationEnum.OUT_OF_GAME, card_number)
+
+                    game_status.selectCardFrom(player, player, listOf(LocationEnum.NOT_SELECTED_SPECIAL),
+                        CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2010, 1){ true }?.let { special ->
+                        game_status.getPlayer(player).unselectedSpecialCard.remove(special[0].toCardName())
+                        game_status.insertCardTo(player,
+                            Card.cardMakerByName(game_status.getPlayer(player).first_turn, special[0].toCardName(), player),
+                            LocationEnum.SPECIAL_CARD, true)
+                    }
+                    break
+                }
+                else{
+                    continue
                 }
             }
             null

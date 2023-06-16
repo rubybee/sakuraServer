@@ -249,6 +249,8 @@ enum class CommandEnum {
 
     SET_IDEA_STAGE_YOUR,
     SET_IDEA_STAGE_OTHER,
+    SET_IDEA_FLIP_YOUR,
+    SET_IDEA_FLIP_OTHER,
 
     REDUCE_THIS_TURN_DISTANCE,
     ADD_THIS_TURN_DISTANCE,
@@ -387,6 +389,8 @@ enum class CommandEnum {
             POP_IDEA_OTHER -> return POP_IDEA_YOUR
             POP_END_IDEA_YOUR -> return POP_END_IDEA_OTHER
             POP_END_IDEA_OTHER -> return POP_END_IDEA_YOUR
+            SET_IDEA_FLIP_YOUR -> return SET_IDEA_FLIP_OTHER
+            SET_IDEA_FLIP_OTHER -> return SET_IDEA_FLIP_YOUR
             else -> TODO()
         }
     }
@@ -444,7 +448,7 @@ enum class LocationEnum(var real_number: Int){
     DISCARD_YOUR(11),
     DECK(12),
     HAND(13),
-    OTHER_HAND(29),
+    HAND_OTHER(29),
     YOUR_DECK_TOP(14),
     OTHER_DECK_TOP(15),
     YOUR_DECK_BELOW(16),
@@ -474,7 +478,10 @@ enum class LocationEnum(var real_number: Int){
     IDEA_YOUR(41),
     IDEA_OTHER(42),
     END_IDEA_YOUR(43),
-    END_IDEA_OTHER(44);
+    END_IDEA_OTHER(44),
+
+    NOT_SELECTED_NORMAL(45),
+    NOT_SELECTED_SPECIAL(46);
 
     fun Opposite(): LocationEnum{
         return when(this){

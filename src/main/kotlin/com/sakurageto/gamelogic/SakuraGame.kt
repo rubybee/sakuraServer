@@ -232,10 +232,30 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
 
         if(gameStatus.player1.megami_1 == MegamiEnum.KANAWE || gameStatus.player1.megami_2 == MegamiEnum.KANAWE){
             gameStatus.player1.nowAct = StoryBoard.getActByNumber(0)
+            if(gameStatus.player1.megami_1 == MegamiEnum.KANAWE){
+                gameStatus.player1.megamiCard = Card.cardMakerByName(firstTurn == PlayerEnum.PLAYER1,
+                    CardName.KANAWE_KANAWE, PlayerEnum.PLAYER1)
+                gameStatus.player1.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
+            }
+            else{
+                gameStatus.player1.megamiCard2 = Card.cardMakerByName(firstTurn == PlayerEnum.PLAYER1,
+                    CardName.KANAWE_KANAWE, PlayerEnum.PLAYER1)
+                gameStatus.player1.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
+            }
         }
 
         if(gameStatus.player2.megami_1 == MegamiEnum.KANAWE || gameStatus.player2.megami_2 == MegamiEnum.KANAWE){
             gameStatus.player2.nowAct = StoryBoard.getActByNumber(0)
+            if(gameStatus.player2.megami_1 == MegamiEnum.KANAWE){
+                gameStatus.player2.megamiCard = Card.cardMakerByName(firstTurn == PlayerEnum.PLAYER2,
+                    CardName.KANAWE_KANAWE, PlayerEnum.PLAYER2)
+                gameStatus.player2.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
+            }
+            else{
+                gameStatus.player2.megamiCard2 = Card.cardMakerByName(firstTurn == PlayerEnum.PLAYER2,
+                    CardName.KANAWE_KANAWE, PlayerEnum.PLAYER2)
+                gameStatus.player2.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
+            }
         }
         //additional board setting here
     }

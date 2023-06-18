@@ -7744,8 +7744,7 @@ object CardSet {
     }
 
     private suspend fun nextAct(player: PlayerEnum, game_status: GameStatus, nextAct: Int){
-        val nowPlayer = game_status.getPlayer(player)
-        nowPlayer.nowAct = StoryBoard.getActByNumber(nextAct)
+        game_status.setAct(player, nextAct)
         for(card in game_status.getPlayer(player).usedSpecialCard.values){
             card.effectAllValidEffect(player, game_status, TextEffectTag.WHEN_ACT_CHANGE)
         }
@@ -7931,6 +7930,7 @@ object CardSet {
     private val infiniteStarlight = CardData(CardClass.SPECIAL, CardName.KANAWE_INFINITE_STARLIGHT, MegamiEnum.KANAWE, CardType.BEHAVIOR, SubType.NONE)
     private val bendOverThisNight = CardData(CardClass.SPECIAL, CardName.KANAWE_BEND_OVER_THIS_NIGHT, MegamiEnum.KANAWE, CardType.ATTACK, SubType.REACTION)
     private val distantSky = CardData(CardClass.SPECIAL, CardName.KANAWE_DISTANT_SKY, MegamiEnum.KANAWE, CardType.BEHAVIOR, SubType.NONE)
+    private val kanawe = CardData(CardClass.SPECIAL, CardName.KANAWE_KANAWE, MegamiEnum.KANAWE, CardType.BEHAVIOR, SubType.NONE)
 
     private val screenPlayText = Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_END_PHASE_YOUR_IN_DISCARD) { card_number, player, game_status, _ ->
         while(true){
@@ -8344,6 +8344,16 @@ object CardSet {
                 else{
                     continue
                 }
+            }
+            null
+        })
+        kanawe.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { card_number, player, game_status, _ ->
+            if(game_status.getPlayer(player).nowAct?.actColor == Act.COLOR_GOLD){
+                game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, condition_attack ->
+                    condition_attack.card_class != CardClass.NULL
+                }, {_, _, attack ->
+                    attack.lifePlusMinus(1)
+                }))
             }
             null
         })

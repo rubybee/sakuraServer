@@ -7,6 +7,7 @@ import com.sakurageto.card.CardSet.toCardName
 import com.sakurageto.gamelogic.log.Log
 import com.sakurageto.gamelogic.log.LogText
 import com.sakurageto.gamelogic.log.Logger
+import com.sakurageto.gamelogic.storyboard.StoryBoard
 import com.sakurageto.protocol.*
 import io.ktor.websocket.*
 
@@ -1751,6 +1752,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     suspend fun addAllCardTextBuff(player: PlayerEnum){
         val mine = getPlayer(player)
         val other = getPlayer(player.opposite())
+        mine.megamiCard?.effectAllValidEffect(player, this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT)
+        mine.megamiCard2?.effectAllValidEffect(player, this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT)
         for(card in mine.enchantmentCard.values){
             card.effectAllValidEffect(player, this, TextEffectTag.NEXT_ATTACK_ENCHANTMENT)
         }
@@ -4102,8 +4105,17 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return receiveSelectAct(getSocket(player), list)
     }
 
+    suspend fun setAct(player: PlayerEnum, act_number: Int){
+        getPlayer(player).nowAct = StoryBoard.getActByNumber(act_number)
+        sendCommand(player, player.opposite(), CommandEnum.SET_ACT_YOUR, act_number)
+    }
+
     suspend fun sendCommand(player1: PlayerEnum, player2: PlayerEnum, command: CommandEnum){
         sendSimpleCommand(getSocket(player1), getSocket(player2), command)
+    }
+
+    suspend fun sendCommand(player1: PlayerEnum, player2: PlayerEnum, command: CommandEnum, data: Int){
+        sendSimpleCommand(getSocket(player1), getSocket(player2), command, data)
     }
 
     //megami special function

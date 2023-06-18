@@ -252,6 +252,9 @@ enum class CommandEnum {
     SET_IDEA_FLIP_YOUR,
     SET_IDEA_FLIP_OTHER,
 
+    SET_ACT_YOUR,
+    SET_ACT_OTHER,
+
     REDUCE_THIS_TURN_DISTANCE,
     ADD_THIS_TURN_DISTANCE,
     REDUCE_THIS_TURN_SWELL_DISTANCE,
@@ -391,6 +394,8 @@ enum class CommandEnum {
             POP_END_IDEA_OTHER -> return POP_END_IDEA_YOUR
             SET_IDEA_FLIP_YOUR -> return SET_IDEA_FLIP_OTHER
             SET_IDEA_FLIP_OTHER -> return SET_IDEA_FLIP_YOUR
+            SET_ACT_YOUR -> return SET_ACT_OTHER
+            SET_ACT_OTHER -> return SET_ACT_YOUR
             else -> TODO()
         }
     }

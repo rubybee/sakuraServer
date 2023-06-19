@@ -476,6 +476,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         gameStatus.nowPhase = END_PHASE
         sendEndPhaseStart(getSocket(this.turnPlayer), getSocket(this.turnPlayer.opposite()))
         gameStatus.endPhaseEffectProcess(this.turnPlayer)
+        gameStatus.endPhaseEffectProcess2()
         gameStatus.setEndTurn(PlayerEnum.PLAYER1, false)
         gameStatus.setEndTurn(PlayerEnum.PLAYER2, false)
         gameStatus.endTurnHandCheck(this.turnPlayer)

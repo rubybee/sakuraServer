@@ -1,12 +1,10 @@
 package com.sakurageto.card
 
-import com.sakurageto.card.CardSet.toCardName
 import com.sakurageto.gamelogic.*
 import com.sakurageto.gamelogic.GameStatus.Companion.START_PHASE
 import com.sakurageto.gamelogic.log.Log
 import com.sakurageto.gamelogic.log.LogText
 import com.sakurageto.gamelogic.storyboard.Act
-import com.sakurageto.gamelogic.storyboard.StoryBoard
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import com.sakurageto.protocol.sendSimpleCommand
@@ -360,6 +358,38 @@ object CardSet {
         cardNumberHashmap[1814] = CardName.SOLDIER_SHIELD
         cardNumberHashmap[1815] = CardName.SOLDIER_HORSE
 
+        cardNumberHashmap[1900] = CardName.MEGUMI_GONG_SUM
+        cardNumberHashmap[1901] = CardName.MEGUMI_TA_CHEOG
+        cardNumberHashmap[1902] = CardName.MEGUMI_SHELL_ATTACK
+        cardNumberHashmap[1903] = CardName.MEGUMI_POLE_THRUST
+        cardNumberHashmap[1904] = CardName.MEGUMI_REED
+        cardNumberHashmap[1905] = CardName.MEGUMI_BALSAM
+        cardNumberHashmap[1906] = CardName.MEGUMI_WILD_ROSE
+        cardNumberHashmap[1907] = CardName.MEGUMI_ROOT_OF_CAUSALITY
+        cardNumberHashmap[1908] = CardName.MEGUMI_BRANCH_OF_POSSIBILITY
+        cardNumberHashmap[1909] = CardName.MEGUMI_FRUIT_OF_END
+        cardNumberHashmap[1910] = CardName.MEGUMI_MEGUMI_PALM
+
+        cardNumberHashmap[2000] = CardName.KANAWE_IMAGE
+        cardNumberHashmap[2001] = CardName.KANAWE_SCREENPLAY
+        cardNumberHashmap[2002] = CardName.KANAWE_PRODUCTION
+        cardNumberHashmap[2003] = CardName.KANAWE_PUBLISH
+        cardNumberHashmap[2004] = CardName.KANAWE_AFTERGLOW
+        cardNumberHashmap[2005] = CardName.KANAWE_IMPROMPTU
+        cardNumberHashmap[2006] = CardName.KANAWE_SEAL
+        cardNumberHashmap[2007] = CardName.KANAWE_VAGUE_STORY
+        cardNumberHashmap[2008] = CardName.KANAWE_INFINITE_STARLIGHT
+        cardNumberHashmap[2009] = CardName.KANAWE_BEND_OVER_THIS_NIGHT
+        cardNumberHashmap[2010] = CardName.KANAWE_DISTANT_SKY
+        cardNumberHashmap[2011] = CardName.KANAWE_KANAWE
+
+        cardNumberHashmap[9000] = CardName.IDEA_SAL_JIN
+        cardNumberHashmap[9001] = CardName.IDEA_SAKURA_WAVE
+        cardNumberHashmap[9002] = CardName.IDEA_WHISTLE
+        cardNumberHashmap[9003] = CardName.IDEA_MYEONG_JEON
+        cardNumberHashmap[9004] = CardName.IDEA_EMPHASIZING
+        cardNumberHashmap[9005] = CardName.IDEA_POSITIONING
+
 
         cardNumberHashmap[10100] = CardName.YURINA_CHAM
         cardNumberHashmap[10101] = CardName.YURINA_ILSUM
@@ -651,6 +681,38 @@ object CardSet {
         cardNumberHashmap[11813] = CardName.SOLDIER_SPEAR_2
         cardNumberHashmap[11814] = CardName.SOLDIER_SHIELD
         cardNumberHashmap[11815] = CardName.SOLDIER_HORSE
+
+        cardNumberHashmap[11900] = CardName.MEGUMI_GONG_SUM
+        cardNumberHashmap[11901] = CardName.MEGUMI_TA_CHEOG
+        cardNumberHashmap[11902] = CardName.MEGUMI_SHELL_ATTACK
+        cardNumberHashmap[11903] = CardName.MEGUMI_POLE_THRUST
+        cardNumberHashmap[11904] = CardName.MEGUMI_REED
+        cardNumberHashmap[11905] = CardName.MEGUMI_BALSAM
+        cardNumberHashmap[11906] = CardName.MEGUMI_WILD_ROSE
+        cardNumberHashmap[11907] = CardName.MEGUMI_ROOT_OF_CAUSALITY
+        cardNumberHashmap[11908] = CardName.MEGUMI_BRANCH_OF_POSSIBILITY
+        cardNumberHashmap[11909] = CardName.MEGUMI_FRUIT_OF_END
+        cardNumberHashmap[11910] = CardName.MEGUMI_MEGUMI_PALM
+
+        cardNumberHashmap[12000] = CardName.KANAWE_IMAGE
+        cardNumberHashmap[12001] = CardName.KANAWE_SCREENPLAY
+        cardNumberHashmap[12002] = CardName.KANAWE_PRODUCTION
+        cardNumberHashmap[12003] = CardName.KANAWE_PUBLISH
+        cardNumberHashmap[12004] = CardName.KANAWE_AFTERGLOW
+        cardNumberHashmap[12005] = CardName.KANAWE_IMPROMPTU
+        cardNumberHashmap[12006] = CardName.KANAWE_SEAL
+        cardNumberHashmap[12007] = CardName.KANAWE_VAGUE_STORY
+        cardNumberHashmap[12008] = CardName.KANAWE_INFINITE_STARLIGHT
+        cardNumberHashmap[12009] = CardName.KANAWE_BEND_OVER_THIS_NIGHT
+        cardNumberHashmap[12010] = CardName.KANAWE_DISTANT_SKY
+        cardNumberHashmap[12011] = CardName.KANAWE_KANAWE
+
+        cardNumberHashmap[19000] = CardName.IDEA_SAL_JIN
+        cardNumberHashmap[19001] = CardName.IDEA_SAKURA_WAVE
+        cardNumberHashmap[19002] = CardName.IDEA_WHISTLE
+        cardNumberHashmap[19003] = CardName.IDEA_MYEONG_JEON
+        cardNumberHashmap[19004] = CardName.IDEA_EMPHASIZING
+        cardNumberHashmap[19005] = CardName.IDEA_POSITIONING
 
 
         cardDataHashmap[CardName.CARD_UNNAME] = unused
@@ -966,6 +1028,38 @@ object CardSet {
         cardDataHashmap[CardName.SOLDIER_SPEAR_2] = spearSoldier2
         cardDataHashmap[CardName.SOLDIER_SHIELD] = shieldSoldier
         cardDataHashmap[CardName.SOLDIER_HORSE] = horseSoldier
+
+        cardDataHashmap[CardName.MEGUMI_GONG_SUM] = gongSum
+        cardDataHashmap[CardName.MEGUMI_TA_CHEOG] = taCheog
+        cardDataHashmap[CardName.MEGUMI_SHELL_ATTACK] = shellAttack
+        cardDataHashmap[CardName.MEGUMI_POLE_THRUST] = poleThrust
+        cardDataHashmap[CardName.MEGUMI_REED] = reed
+        cardDataHashmap[CardName.MEGUMI_BALSAM] = balsam
+        cardDataHashmap[CardName.MEGUMI_WILD_ROSE] = wildRose
+        cardDataHashmap[CardName.MEGUMI_ROOT_OF_CAUSALITY] = rootCausality
+        cardDataHashmap[CardName.MEGUMI_BRANCH_OF_POSSIBILITY] = branchPossibility
+        cardDataHashmap[CardName.MEGUMI_FRUIT_OF_END] = fruitEnd
+        cardDataHashmap[CardName.MEGUMI_MEGUMI_PALM] = megumiPalm
+
+        cardDataHashmap[CardName.KANAWE_IMAGE] = image
+        cardDataHashmap[CardName.KANAWE_SCREENPLAY] = screenplay
+        cardDataHashmap[CardName.KANAWE_PRODUCTION] = production
+        cardDataHashmap[CardName.KANAWE_PUBLISH] = publish
+        cardDataHashmap[CardName.KANAWE_AFTERGLOW] = afterglow
+        cardDataHashmap[CardName.KANAWE_IMPROMPTU] = impromptu
+        cardDataHashmap[CardName.KANAWE_SEAL] = seal
+        cardDataHashmap[CardName.KANAWE_VAGUE_STORY] = vagueStory
+        cardDataHashmap[CardName.KANAWE_INFINITE_STARLIGHT] = infiniteStarlight
+        cardDataHashmap[CardName.KANAWE_BEND_OVER_THIS_NIGHT] = bendOverThisNight
+        cardDataHashmap[CardName.KANAWE_DISTANT_SKY] = distantSky
+        cardDataHashmap[CardName.KANAWE_KANAWE] = kanawe
+
+        cardDataHashmap[CardName.IDEA_SAL_JIN] = saljin
+        cardDataHashmap[CardName.IDEA_SAKURA_WAVE] = sakuraWave
+        cardDataHashmap[CardName.IDEA_WHISTLE] = whistle
+        cardDataHashmap[CardName.IDEA_MYEONG_JEON] = myeongjeon
+        cardDataHashmap[CardName.IDEA_EMPHASIZING] = emphasizing
+        cardDataHashmap[CardName.IDEA_POSITIONING] = positioning
     }
 
     private suspend fun selectDustToDistance(nowCommand: CommandEnum, game_status: GameStatus,
@@ -3199,7 +3293,7 @@ object CardSet {
                 game_status.moveAdditionalCard(player, getCard.card_data.card_name, LocationEnum.YOUR_DECK_BELOW)
             }
             val ownerPlayer = game_status.getPlayer(game_status.getCardOwner(card_number))
-            var duplicateCardData: CardData? = ownerPlayer.sealZone[ownerPlayer.sealInformation[card_number]?.get(0)]?.card_data
+            val duplicateCardData: CardData? = ownerPlayer.sealZone[ownerPlayer.sealInformation[card_number]?.get(0)]?.card_data
             if(duplicateCardData != null){
                 for(card in ownerPlayer.hand.values + ownerPlayer.normalCardDeck + ownerPlayer.discard + ownerPlayer.cover_card
                         + ownerPlayer.readySoldierZone.values + ownerPlayer.notReadySoldierZone.values
@@ -5046,6 +5140,7 @@ object CardSet {
                         }
                     }
                 }
+                @Suppress("UNREACHABLE_CODE")
                 0
             }
             else{
@@ -5541,6 +5636,15 @@ object CardSet {
     private val sixStarSea = CardData(CardClass.SPECIAL, CardName.YATSUHA_SIX_STAR_SEA, MegamiEnum.YATSUHA, CardType.ATTACK, SubType.NONE)
     private val eightMirrorOtherSide = CardData(CardClass.SPECIAL, CardName.YATSUHA_EIGHT_MIRROR_OTHER_SIDE, MegamiEnum.YATSUHA, CardType.ENCHANTMENT, SubType.NONE)
 
+    private val contractText = Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
+        if(game_status.getPlayerFlare(player) >= game_status.getPlayerFlare(player.opposite())){
+            game_status.auraToFlare(player, player.opposite(), 1, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
+            game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
+        }
+        null
+    }
+
     private fun getMirror(game_status: GameStatus): Int {
         val player1 = game_status.getPlayer(PlayerEnum.PLAYER1)
         val player2 = game_status.getPlayer(PlayerEnum.PLAYER2)
@@ -5697,14 +5801,7 @@ object CardSet {
             null
         })
         contract.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.ADD_END_PHASE_EFFECT) {card_number, player, game_status, _ ->
-            game_status.endPhaseEffect[card_number] = Pair(CardEffectLocation.TEMP, Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {in_card_number, in_player, in_game_status, _ ->
-                if(in_game_status.getPlayerFlare(in_player) >= in_game_status.getPlayerFlare(in_player.opposite())){
-                    in_game_status.auraToFlare(in_player, in_player.opposite(), 1, Arrow.ONE_DIRECTION, player,
-                        game_status.getCardOwner(in_card_number), in_card_number)
-                    game_status.logger.insert(Log(player, LogText.END_EFFECT, in_card_number, -1))
-                }
-                null
-            })
+            game_status.endPhaseEffect[card_number] = Pair(CardEffectLocation.TEMP, contractText)
             null
         })
         clingyFlower.setEnchantment(3)
@@ -6446,7 +6543,7 @@ object CardSet {
             game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE,
                 {conditionPlayer, conditionGameStatus, _ -> isTailWind(conditionPlayer, conditionGameStatus)})
                 {_, _, attack ->
-                    attack.lifePlusMinus(2);
+                    attack.lifePlusMinus(2)
                 })
             null
         }))
@@ -6913,7 +7010,7 @@ object CardSet {
                 fixed(buff_game_status)
             }, {_, _, madeAttack ->
                 madeAttack.run {
-                    lifePlusMinus(1);
+                    lifePlusMinus(1)
                 }
             }))
             null
@@ -7300,7 +7397,7 @@ object CardSet {
                         game_status.addThisTurnAttackBuff(player, Buff(1214, 1, BufTag.PLUS_MINUS,
                             {_, _, _ -> true},
                             {_, _, attack ->
-                                attack.auraPlusMinus(1);
+                                attack.auraPlusMinus(1)
                             }))
                         game_status.setGauge(player, true, nowPlayer.thunderGauge!! - 1)
                         sendSimpleCommand(game_status.getSocket(player.opposite()), CommandEnum.SELECT_THUNDER_ONE)
@@ -7332,7 +7429,7 @@ object CardSet {
                         game_status.addThisTurnAttackBuff(player, Buff(1216, 1, BufTag.PLUS_MINUS,
                             {_, _, attack -> attack.editedAuraDamage != 999},
                             {_, _, attack ->
-                                attack.lifePlusMinus(1);
+                                attack.lifePlusMinus(1)
                             }))
                         game_status.setGauge(player, true, nowPlayer.thunderGauge!! - 3)
                         sendSimpleCommand(game_status.getSocket(player.opposite()), CommandEnum.SELECT_THUNDER_THREE)
@@ -7427,7 +7524,7 @@ object CardSet {
     private val gongSum = CardData(CardClass.NORMAL, CardName.MEGUMI_GONG_SUM, MegamiEnum.MEGUMI, CardType.ATTACK, SubType.NONE)
     private val taCheog = CardData(CardClass.NORMAL, CardName.MEGUMI_TA_CHEOG, MegamiEnum.MEGUMI, CardType.ATTACK, SubType.NONE)
     private val shellAttack = CardData(CardClass.NORMAL, CardName.MEGUMI_SHELL_ATTACK, MegamiEnum.MEGUMI, CardType.ATTACK, SubType.NONE)
-    private val pollThrust = CardData(CardClass.NORMAL, CardName.MEGUMI_POLE_THRUST, MegamiEnum.MEGUMI, CardType.ATTACK, SubType.REACTION)
+    private val poleThrust = CardData(CardClass.NORMAL, CardName.MEGUMI_POLE_THRUST, MegamiEnum.MEGUMI, CardType.ATTACK, SubType.REACTION)
     private val reed = CardData(CardClass.NORMAL, CardName.MEGUMI_REED, MegamiEnum.MEGUMI, CardType.ENCHANTMENT, SubType.NONE)
     private val balsam = CardData(CardClass.NORMAL, CardName.MEGUMI_BALSAM, MegamiEnum.MEGUMI, CardType.ENCHANTMENT, SubType.NONE)
     private val wildRose = CardData(CardClass.NORMAL, CardName.MEGUMI_WILD_ROSE, MegamiEnum.MEGUMI, CardType.ENCHANTMENT, SubType.FULL_POWER)
@@ -7531,15 +7628,15 @@ object CardSet {
             game_status.getPlayer(player).nextEnchantmentGrowing += 2
             null
         })
-        pollThrust.setAttack(DistanceType.CONTINUOUS, Pair(2, 4), null, 1, 1,
+        poleThrust.setAttack(DistanceType.CONTINUOUS, Pair(2, 4), null, 1, 1,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
-        pollThrust.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.AFTER_AURA_DAMAGE_PLACE_CHANGE){ _, _, _, _ ->
+        poleThrust.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.AFTER_AURA_DAMAGE_PLACE_CHANGE){ _, _, _, _ ->
             LocationEnum.DISTANCE.real_number
         })
-        pollThrust.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.AFTER_LIFE_DAMAGE_PLACE_CHANGE){ _, _, _, _ ->
+        poleThrust.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.AFTER_LIFE_DAMAGE_PLACE_CHANGE){ _, _, _, _ ->
             LocationEnum.DISTANCE.real_number
         })
-        pollThrust.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.NEXT_BASIC_OPERATION_INVALID) {_, player, game_status, _ ->
+        poleThrust.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.NEXT_BASIC_OPERATION_INVALID) { _, player, game_status, _ ->
             game_status.getPlayer(player.opposite()).isNextBasicOperationInvalid = true
             null
         })
@@ -7766,6 +7863,7 @@ object CardSet {
 
     private suspend fun ideaProcess(card_number: Int, player: PlayerEnum, game_status: GameStatus, maxStage: Int){
         game_status.processIdeaStage(player)
+        game_status.getPlayer(player).ideaProcess = true
         if(game_status.getPlayer(player).ideaCardStage == maxStage){
             completeIdea(card_number, player, game_status)
         }
@@ -7934,7 +8032,7 @@ object CardSet {
 
     private val screenPlayText = Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_END_PHASE_YOUR_IN_DISCARD) { card_number, player, game_status, _ ->
         while(true){
-            when(game_status.receiveCardEffectSelect(player, 2002)){
+            when(game_status.receiveCardEffectSelect(player, 2001)){
                 CommandEnum.SELECT_ONE -> {
                     game_status.popCardFrom(player, card_number, LocationEnum.DISCARD_YOUR, true)?.let {
                         game_status.insertCardTo(player, it, LocationEnum.YOUR_DECK_BELOW, true)
@@ -8052,13 +8150,13 @@ object CardSet {
                 }
                 else{
                     while(true){
-                        when(game_status.receiveCardEffectSelect(player, 2001)){
+                        when(game_status.receiveCardEffectSelect(player, 2002)){
                             CommandEnum.SELECT_ONE -> {
-                                game_status.auraToCard(player, 1, idea, idea.card_number, LocationEnum.IDEA_YOUR)
+                                game_status.dustToCard(player, 1, idea, idea.card_number, LocationEnum.IDEA_YOUR)
                                 break
                             }
                             CommandEnum.SELECT_TWO -> {
-                                game_status.dustToCard(player, 1, idea, idea.card_number, LocationEnum.IDEA_YOUR)
+                                game_status.auraToCard(player, 1, idea, idea.card_number, LocationEnum.IDEA_YOUR)
                                 break
                             }
                             else -> {}
@@ -8066,6 +8164,7 @@ object CardSet {
                     }
                 }
                 game_status.logger.insert(Log(player, LogText.END_EFFECT, idea.card_number, -1))
+                break
             }
         }
 
@@ -8127,7 +8226,7 @@ object CardSet {
             game_status.getPlayer(player).canIdeaProcess = false
             null
         })
-        publish.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
+        publish.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
             while(true){
                 when(game_status.receiveCardEffectSelect(player, 2003)){
                     CommandEnum.SELECT_ONE -> {
@@ -8329,21 +8428,21 @@ object CardSet {
                             Card.cardMakerByName(game_status.getPlayer(player).first_turn, normal[0].toCardName(), player),
                         LocationEnum.HAND, true)
                     }
-
-                    game_status.movePlayingCard(player, LocationEnum.OUT_OF_GAME, card_number)
-
-                    game_status.selectCardFrom(player, player, listOf(LocationEnum.NOT_SELECTED_SPECIAL),
-                        CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2010, 1){ true }?.let { special ->
-                        game_status.getPlayer(player).unselectedSpecialCard.remove(special[0].toCardName())
-                        game_status.insertCardTo(player,
-                            Card.cardMakerByName(game_status.getPlayer(player).first_turn, special[0].toCardName(), player),
-                            LocationEnum.SPECIAL_CARD, true)
-                    }
                     break
                 }
                 else{
                     continue
                 }
+            }
+
+            game_status.movePlayingCard(player, LocationEnum.OUT_OF_GAME, card_number)
+
+            game_status.selectCardFrom(player, player, listOf(LocationEnum.NOT_SELECTED_SPECIAL),
+                CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2010, 1){ true }?.let { special ->
+                game_status.getPlayer(player).unselectedSpecialCard.remove(special[0].toCardName())
+                game_status.insertCardTo(player,
+                    Card.cardMakerByName(game_status.getPlayer(player).first_turn, special[0].toCardName(), player),
+                    LocationEnum.SPECIAL_CARD, true)
             }
             null
         })

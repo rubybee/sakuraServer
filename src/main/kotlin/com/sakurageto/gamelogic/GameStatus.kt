@@ -240,13 +240,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    fun getPlayerFullAction(player: PlayerEnum): Boolean{
-        return when (player){
-            PlayerEnum.PLAYER1 -> player1.full_action
-            PlayerEnum.PLAYER2 -> player2.full_action
-        }
-    }
-
     fun getPlayerFlare(player: PlayerEnum): Int{
         return when(player){
             PlayerEnum.PLAYER1 -> player1.flare
@@ -947,12 +940,16 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             toCard.addNap(sakura)
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, sakura, fromCard.card_number, toCard.card_number)
+            logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, sakura,
+                LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, false))
         }
 
         if(seed != 0){
             toCard.addNap(seed, true)
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SEED_TOKEN,
                 LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, seed, fromCard.card_number, toCard.card_number)
+            logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, seed,
+                LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, false))
         }
     }
 
@@ -2043,8 +2040,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
      */
     suspend fun terminationListenerProcess(player: PlayerEnum, card: Card): Boolean{
         if(card.card_data.sub_type == SubType.REACTION && logger.checkThisCardUseInSoldier(player, card.card_number)){
-            for(card in getPlayer(player).usedSpecialCard.values){
-                if(card.effectAllValidEffect(player, this, TextEffectTag.REMOVE_REACTIONS_TERMINATION) == 1){
+            for(usedCard in getPlayer(player).usedSpecialCard.values){
+                if(usedCard.effectAllValidEffect(player, this, TextEffectTag.REMOVE_REACTIONS_TERMINATION) == 1){
                     return false
                 }
             }
@@ -2077,8 +2074,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
      */
     suspend fun useCardFrom(player: PlayerEnum, card: Card, location: LocationEnum, react: Boolean, react_attack: MadeAttack?,
                             isCost: Boolean, isConsume: Boolean, napChange: Int = -1): Boolean{
-        val nowPlayer = getPlayer(player)
-
         if(getEndTurn(player) || endCurrentPhase){
             return false
         }
@@ -2971,7 +2966,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     }
                     else -> TODO()
                 }
-                endPhaseEffect.remove(keys[0])
+                startPhaseEffect.remove(keys[0])
+                keys.remove(keys[0])
             }
         }
     }
@@ -3001,6 +2997,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     val endPhaseEffect = HashMap<Int, Pair<CardEffectLocation, Text?>>()
     val startPhaseEffect = HashMap<Int, Pair<CardEffectLocation, Text?>>()
+
+    fun cleanEffect(effects: HashMap<Int, Pair<CardEffectLocation, Text?>>){
+        for(key in effects.keys.toMutableList()){
+            if(effects[key]!!.first != CardEffectLocation.TEMP){
+                effects.remove(key)
+            }
+        }
+    }
 
     suspend fun endPhaseEffectProcess(player: PlayerEnum){
         val nowPlayer = getPlayer(player)
@@ -3056,11 +3060,16 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     keys.remove(selected)
                 }
 
-                if(!(player1.ideaProcess) && player1.canIdeaProcess){
+                if(!(player1.tempIdeaProcess) && player1.canIdeaProcess){
                     player1.ideaCard?.ideaProcess(PlayerEnum.PLAYER1, this, player1.isIdeaCardFlipped, keys)
                 }
-                if(!(player2.ideaProcess && player2.canIdeaProcess)){
+                if(!(player2.tempIdeaProcess && player2.canIdeaProcess)){
                     player2.ideaCard?.ideaProcess(PlayerEnum.PLAYER1, this, player2.isIdeaCardFlipped, keys)
+                }
+
+                if(endCurrentPhase){
+                    cleanEffect(endPhaseEffect)
+                    return
                 }
             }
             if(keys.size == 1){
@@ -3083,11 +3092,17 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     }
                 }
                 endPhaseEffect.remove(keys[0])
-                if(!(player1.ideaProcess) && player1.canIdeaProcess){
+                keys.remove(keys[0])
+                if(!(player1.tempIdeaProcess) && player1.canIdeaProcess){
                     player1.ideaCard?.ideaProcess(PlayerEnum.PLAYER1, this, player1.isIdeaCardFlipped, keys)
                 }
-                if(!(player2.ideaProcess) && player2.canIdeaProcess){
+                if(!(player2.tempIdeaProcess) && player2.canIdeaProcess){
                     player2.ideaCard?.ideaProcess(PlayerEnum.PLAYER1, this, player2.isIdeaCardFlipped, keys)
+                }
+
+                if(endCurrentPhase){
+                    cleanEffect(endPhaseEffect)
+                    return
                 }
             }
 
@@ -3105,9 +3120,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     }
                 }
                 endPhaseEffect.remove(keys[0])
+                keys.remove(keys[0])
             }
         }
+    }
 
+    suspend fun endPhaseEffectProcess2(){
         if(player1.isNextTurnTailWind){
             player1.isThisTurnTailWind = true
             sendSimpleCommand(player1_socket, player2_socket, CommandEnum.SET_TAIL_WIND_YOUR)
@@ -3128,7 +3146,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             sendSimpleCommand(player2_socket, player1_socket, CommandEnum.SET_HEAD_WIND_YOUR)
         }
 
-
         thisTurnSwellDistance = 2; thisTurnDistance = distanceToken
         player1.didBasicOperation = false; player2.didBasicOperation = false
         player1.canNotGoForward = false; player2.canNotGoForward = false
@@ -3138,11 +3155,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         player1.thisTurnReact = false; player2.thisTurnReact = false
         thisTurnDistanceChange = false
         player1.asuraUsed = false; player2.asuraUsed = false
+        player1.nextEnchantmentGrowing = 0; player2.nextEnchantmentGrowing = 0
         player1.isNextBasicOperationInvalid = false; player2.isNextBasicOperationInvalid = false
         player1.isMoveDistanceToken = false; player2.isMoveDistanceToken = false
         player1.beforeTurnIdeaProcess = player1.ideaProcess; player2.beforeTurnIdeaProcess = player2.ideaProcess
-        player1.ideaProcess = false; player2.ideaProcess = false
+        player1.tempIdeaProcess = false; player2.tempIdeaProcess = false
         player1.canIdeaProcess = true; player2.canIdeaProcess = true
+        player1.ideaProcess = false; player2.ideaProcess = false
     }
 
     //0 = player don't want using card more || 1 = player card use success || 2 = cannot use because there are no installation card
@@ -3632,10 +3651,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun selectCardFrom(player: PlayerEnum, cardList: MutableList<Int>, reason: CommandEnum, card_number: Int): MutableList<Int>{
-        while (true){
-            val set = mutableSetOf<Int>()
-            val list = receiveSelectCard(getSocket(player), cardList, reason, card_number) ?: continue
-            return list
+        while (true) {
+            return receiveSelectCard(getSocket(player), cardList, reason, card_number) ?: continue
         }
     }
 

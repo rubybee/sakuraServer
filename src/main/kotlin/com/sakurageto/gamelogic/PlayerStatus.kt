@@ -7,7 +7,6 @@ import com.sakurageto.gamelogic.storyboard.Act
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import com.sakurageto.protocol.SakuraSendData
-import java.lang.Exception
 import java.util.*
 import kotlin.collections.ArrayDeque
 import kotlin.collections.HashMap
@@ -45,6 +44,7 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     var notReadySeed: Int? = null
 
     var nowAct: Act? = null
+    var tempIdeaProcess: Boolean = false
     var ideaProcess: Boolean = false
     var beforeTurnIdeaProcess: Boolean = false
     var ideaCard: Card? = null
@@ -104,10 +104,6 @@ class PlayerStatus(val player_enum: PlayerEnum) {
     }
 
     var usingCard = ArrayDeque<Card>()
-
-    fun getCard(card_number: Int): Card = getCardFromUsed(card_number)?: getCardFromCover(card_number)?:
-    getCardFromSpecial(card_number)?: getCardFromHand(card_number)?: getCardFromDiscard(card_number)?:
-    getCardFromDeck(card_number)?: getCardFromAdditional(card_number)?: throw Exception("${card_number.toCardName()} not founded")
 
     fun getCardFromPlaying(card_number: Int): Card?{
         for(card in usingCard){
@@ -174,13 +170,6 @@ class PlayerStatus(val player_enum: PlayerEnum) {
 
     fun getCardFromUsed(index: Int): Card?{
         return usedSpecialCard[index]
-    }
-
-    fun getCardFromDeck(card_number: Int): Card?{
-        for(card in normalCardDeck){
-            if(card.card_number == card_number) return card
-        }
-        return null
     }
 
     fun getCardFromDeckTop(index: Int): Card?{
@@ -372,10 +361,6 @@ class PlayerStatus(val player_enum: PlayerEnum) {
             megami_2 = MegamiEnum.HIMIKA
             megami_ban = MegamiEnum.SAINE
         }
-    }
-
-    fun returnListMegami2(): MutableList<Int>{
-        return mutableListOf(megami_1.real_number, megami_2.real_number)
     }
 
     fun returnListMegami3(): MutableList<Int>{

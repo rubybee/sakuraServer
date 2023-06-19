@@ -569,7 +569,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             CardType.ATTACK -> {
                 attackUseNormal(player, game_status, react_attack)
             }
-            CardType.BEHAVIOR -> {1
+            CardType.BEHAVIOR -> {
                 behaviorUseNormal(player, game_status, react_attack)
             }
             CardType.ENCHANTMENT -> {
@@ -735,19 +735,6 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
     }
 
-    fun addValidEffect(location: CardEffectLocation, effectTag: TextEffectTag, queue: HashMap<Int, Pair<CardEffectLocation, Text?>>){
-        card_data.effect?.let {
-            for(text in it){
-                if(usedEffectUsable(text) || enchantmentUsable(text)){
-                    if(text.tag == effectTag) {
-                        queue[this.card_number] = Pair(location, text)
-                        return
-                    }
-                }
-            }
-        }
-    }
-
     suspend fun effectAllValidEffect(player: PlayerEnum, game_status: GameStatus, effectTag: TextEffectTag): Int{
         var now = 0
         if(this.card_data.umbrellaMark) {
@@ -893,7 +880,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
 
         val nowPlayer = game_status.getPlayer(player)
         if(checkIdeaCondition(player, game_status, flipped)){
-            nowPlayer.ideaProcess = true
+            nowPlayer.tempIdeaProcess = true
             ideaRun(player, game_status, flipped, keys)
         }
     }

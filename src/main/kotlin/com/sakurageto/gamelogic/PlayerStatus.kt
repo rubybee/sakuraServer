@@ -11,15 +11,31 @@ import java.util.*
 import kotlin.collections.ArrayDeque
 import kotlin.collections.HashMap
 
-class PlayerStatus(val player_enum: PlayerEnum) {
-    var first_turn = false
+class PlayerStatus(private val player_enum: PlayerEnum) {
+    var firstTurn = false
 
-    var full_action = false
+    var fullAction = false
 
-    var max_hand = 2
-    var maxAura = 5
+    var maxHand = 2
     var aura = 3
     var freezeToken = 0
+
+    var maxAura = 5
+    fun setMaxAura(arrow: Arrow, user: PlayerEnum) {
+        if(user == player_enum && arrow != Arrow.NULL){
+            for(card in usedSpecialCard.values){
+                card.card_data.effect?.let {
+                    for(text in it){
+                        if(text.tag == TextEffectTag.TOKOYO_EIGHT_SAKURA){
+                            maxAura = 8
+                            return
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     fun checkAuraFull(): Boolean = aura + freezeToken >= maxAura
 
 

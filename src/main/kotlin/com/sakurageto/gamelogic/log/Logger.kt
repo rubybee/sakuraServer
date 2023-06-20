@@ -2,7 +2,6 @@ package com.sakurageto.gamelogic.log
 
 import com.sakurageto.card.PlayerEnum
 import com.sakurageto.protocol.LocationEnum
-import kotlin.math.max
 
 class Logger {
     private val logQueue = ArrayDeque<Log>()
@@ -288,5 +287,24 @@ class Logger {
         return false
     }
 
+    fun findGetDamageByThisAttack(attack_number: Int): Pair<Int, Int>{
+        for(log in logQueue.asReversed()){
+            if(log.number2 == attack_number){
+                when (log.text) {
+                    LogText.GET_AURA_DAMAGE -> {
+                        return Pair(log.number1, 0)
+                    }
+                    LogText.GET_LIFE_DAMAGE -> {
+                        return Pair(0, log.number1)
+                    }
+                    LogText.DAMAGE_PROCESS_START -> {
+                        return Pair(0, 0)
+                    }
+                    else -> {}
+                }
+            }
+        }
+        return Pair(0, 0)
+    }
 
 }

@@ -222,7 +222,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     fun getCardNumber(player: PlayerEnum, card_name: CardName): Int{
-        return if (getPlayer(player).first_turn) card_name.toCardNumber(true)
+        return if (getPlayer(player).firstTurn) card_name.toCardNumber(true)
         else card_name.toCardNumber(false)
     }
 
@@ -270,8 +270,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     fun getFullAction(player: PlayerEnum): Boolean{
         return when(player){
-            PlayerEnum.PLAYER1 -> player1.full_action
-            PlayerEnum.PLAYER2 -> player2.full_action
+            PlayerEnum.PLAYER1 -> player1.fullAction
+            PlayerEnum.PLAYER2 -> player2.fullAction
         }
     }
     
@@ -285,8 +285,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     fun setPlayerFullAction(player: PlayerEnum, full: Boolean){
         when (player){
-            PlayerEnum.PLAYER1 -> player1.full_action = full
-            PlayerEnum.PLAYER2 -> player2.full_action = full
+            PlayerEnum.PLAYER1 -> player1.fullAction = full
+            PlayerEnum.PLAYER2 -> player2.fullAction = full
         }
     }
 
@@ -300,11 +300,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         first_turn = player
         when(player){
             PlayerEnum.PLAYER1 -> {
-                player1.first_turn = true
+                player1.firstTurn = true
                 player2.concentration = 1
             }
             PlayerEnum.PLAYER2 -> {
-                player2.first_turn = true
+                player2.firstTurn = true
                 player1.concentration = 1
             }
         }
@@ -633,6 +633,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
 
         val nowPlayer = getPlayer(player)
+        nowPlayer.setMaxAura(arrow, user)
         val beforeFull = nowPlayer.checkAuraFull()
         var value = number
 
@@ -647,6 +648,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 LocationEnum.OUT_OF_GAME, LocationEnum.YOUR_AURA, arrow != Arrow.NULL))
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.OUT_OF_GAME, LocationEnum.YOUR_AURA, value, -1)
+            nowPlayer.maxAura = 5
             val afterFull = nowPlayer.checkAuraFull()
             auraListenerProcess(player, beforeFull, afterFull)
         }
@@ -718,6 +720,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         var value = number
 
         val nowPlayer = getPlayer(playerGet)
+        nowPlayer.setMaxAura(arrow, user)
         val beforeFull = nowPlayer.checkAuraFull()
         val emptyPlace = nowPlayer.maxAura - nowPlayer.aura - nowPlayer.freezeToken
 
@@ -736,6 +739,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 LocationEnum.YOUR_AURA, LocationEnum.OTHER_AURA, arrow != Arrow.NULL))
             sendMoveToken(getSocket(playerGive), getSocket(playerGet), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.YOUR_AURA, LocationEnum.OTHER_AURA, value, -1)
+            nowPlayer.maxAura = 5
             val afterFull = nowPlayer.checkAuraFull()
             auraListenerProcess(playerGet, beforeFull, afterFull)
         }
@@ -1039,6 +1043,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         var value = number
         val nowPlayer = getPlayer(player)
+        nowPlayer.setMaxAura(arrow, user)
         val beforeFull = nowPlayer.checkAuraFull()
         val emptyPlace = nowPlayer.maxAura - nowPlayer.aura - nowPlayer.freezeToken
 
@@ -1060,6 +1065,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 LocationEnum.DISTANCE, LocationEnum.YOUR_AURA, Arrow.NULL != arrow))
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.DISTANCE, LocationEnum.YOUR_AURA, value, -1)
+            nowPlayer.maxAura = 5
             val afterFull = nowPlayer.checkAuraFull()
             auraListenerProcess(player, beforeFull, afterFull)
             distanceListenerProcess(PlayerEnum.PLAYER1)
@@ -1165,14 +1171,15 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val nowPlayer = getPlayer(player)
         var value = number
 
-        if(nowPlayer.readySeed > value){
+        if(nowPlayer.readySeed < value){
             value = nowPlayer.readySeed
         }
 
+        nowPlayer.readySeed -= value
         card.addNap(value, true)
 
         sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SEED_TOKEN,
-            LocationEnum.YOUR_AURA, location, value, card.card_number)
+            LocationEnum.READY_DIRT_ZONE_YOUR, location, value, card.card_number)
     }
 
     //this two function is must check number before use
@@ -1329,6 +1336,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
 
         val nowPlayer = getPlayer(player)
+        nowPlayer.setMaxAura(arrow, user)
         var value = number
         val beforeFull = nowPlayer.checkAuraFull()
         val emptyPlace = nowPlayer.maxAura - nowPlayer.freezeToken - nowPlayer.aura
@@ -1349,6 +1357,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 LocationEnum.DUST, LocationEnum.YOUR_AURA, arrow != Arrow.NULL))
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.DUST, LocationEnum.YOUR_AURA, value, -1)
+            nowPlayer.maxAura = 5
             val afterFull = nowPlayer.checkAuraFull()
             auraListenerProcess(player, beforeFull, afterFull)
         }
@@ -1398,7 +1407,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
 
         if(value != 0){
-            nowPlayer.aura -= 1
+            nowPlayer.aura -= value
             dust += value
 
             logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, value,
@@ -1508,7 +1517,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         val flarePlayer = getPlayer(player_flare)
         val auraPlayer = getPlayer(player_aura)
+        auraPlayer.setMaxAura(arrow, user)
         val beforeFull = auraPlayer.checkAuraFull()
+        val emptyPlace = auraPlayer.maxAura - auraPlayer.freezeToken - auraPlayer.aura
 
         var value = number
 
@@ -1516,8 +1527,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = flarePlayer.flare
         }
 
-        if(auraPlayer.maxAura - auraPlayer.aura > value){
-            value = auraPlayer.maxAura - auraPlayer.aura
+        if(emptyPlace < value){
+            value = emptyPlace
         }
 
         if(value != 0){
@@ -1536,6 +1547,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 sendMoveToken(getSocket(player_flare), getSocket(player_flare.opposite()), TokenEnum.SAKURA_TOKEN,
                     LocationEnum.YOUR_FLARE, LocationEnum.OTHER_AURA, value, -1)
             }
+            auraPlayer.maxAura = 5
             val afterFull = auraPlayer.checkAuraFull()
             auraListenerProcess(player_aura, beforeFull, afterFull)
         }
@@ -2264,12 +2276,15 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             return
         }
 
+        logger.insert(Log(player, LogText.DAMAGE_PROCESS_START, nowAttack.card_number, nowAttack.card_number))
         if(nowAttack.editedInevitable || nowAttack.rangeCheck(getAdjustDistance(player), this, player, nowPlayer.rangeBuff)){
             otherPlayer.isNextTurnTailWind = false
             if(nowAttack.isItValid){
                 if(nowAttack.isItDamage){
                     if(nowAttack.beforeProcessDamageCheck(player, this, react_attack)){
-                        val chosen = damageSelect(player.opposite(), damage)
+                        val chosen = if(nowAttack.effectText(player, this, react_attack, TextEffectTag.SELECT_DAMAGE_BY_ATTACKER) == 1){
+                            damageSelect(player, damage, false)
+                        } else damageSelect(player.opposite(), damage)
                         val auraReplace = nowAttack.effectText(player, this, react_attack, TextEffectTag.AFTER_AURA_DAMAGE_PLACE_CHANGE)
                         val lifeReplace = nowAttack.effectText(player, this, react_attack, TextEffectTag.AFTER_LIFE_DAMAGE_PLACE_CHANGE)
 
@@ -2668,11 +2683,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    suspend fun damageSelect(player: PlayerEnum, damage: Pair<Int, Int>): CommandEnum{
+    suspend fun damageSelect(player: PlayerEnum, damage: Pair<Int, Int>, your: Boolean = true): CommandEnum{
         if(damage.first == 999) return CommandEnum.CHOOSE_LIFE
         if(damage.second == 999) return CommandEnum.CHOOSE_AURA
-        if(getPlayer(player).checkAuraDamage(damage.first) == null) return CommandEnum.CHOOSE_LIFE
-        sendChooseDamage(getSocket(player), CommandEnum.CHOOSE_CARD_DAMAGE, damage.first, damage.second)
+        if(if(your) getPlayer(player).checkAuraDamage(damage.first) == null
+            else getPlayer(player.opposite()).checkAuraDamage(damage.first) == null ) return CommandEnum.CHOOSE_LIFE
+        sendChooseDamage(getSocket(player), if(your) CommandEnum.CHOOSE_CARD_DAMAGE
+            else CommandEnum.CHOOSE_CARD_DAMAGE_OTHER, damage.first, damage.second)
         return receiveChooseDamage(getSocket(player))
     }
 
@@ -2747,7 +2764,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         if(command == CommandEnum.CHOOSE_AURA){
             val selectable = nowPlayer.checkAuraDamage(damage.first)
-            logger.insert(Log(player, LogText.GET_AURA_DAMAGE, damage.first, damage.first))
+            logger.insert(Log(player, LogText.GET_AURA_DAMAGE, damage.first, card_number))
             sendSimpleCommand(getSocket(player), getSocket(player.opposite()), CommandEnum.GET_DAMAGE_AURA_YOUR)
             if(selectable == null){
                 auraDamageProcess(player, nowPlayer.getFullAuraDamage(), auraReplace, card_number)
@@ -2786,7 +2803,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
         }
         else{
-            logger.insert(Log(player, LogText.GET_LIFE_DAMAGE, damage.second, damage.second))
+            logger.insert(Log(player, LogText.GET_LIFE_DAMAGE, damage.second, card_number))
             sendSimpleCommand(getSocket(player), getSocket(player.opposite()), CommandEnum.GET_DAMAGE_LIFE_YOUR)
             if(lifeReplace == null){
                 lifeToSelfFlare(player, damage.second, reconstruct, true, Arrow.NULL, PlayerEnum.PLAYER1, PlayerEnum.PLAYER2, card_number)
@@ -3586,8 +3603,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val nowPlayer = getPlayer(player)
 
         while (true){
-            if(nowPlayer.hand.size <= nowPlayer.max_hand) {
-                nowPlayer.max_hand = 2
+            if(nowPlayer.hand.size <= nowPlayer.maxHand) {
+                nowPlayer.maxHand = 2
                 return
             }
             coverCard(player, player, 0)
@@ -4069,7 +4086,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun moveOutCard(to_player: PlayerEnum, nameList: MutableList<CardName>, to_location: LocationEnum){
         for(card_name in nameList){
-            Card.cardMakerByName(getPlayer(to_player).first_turn, card_name, to_player).let {
+            Card.cardMakerByName(getPlayer(to_player).firstTurn, card_name, to_player).let {
                 insertCardTo(to_player, it, to_location, false)
             }
         }

@@ -18,9 +18,6 @@ import com.sakurageto.protocol.LocationEnum
  */
 class Log(val player: PlayerEnum, val text: LogText, val number1: Int, val number2: Int, val resource: LocationEnum = LocationEnum.DUST,
           val destination: LocationEnum = LocationEnum.DUST, val boolean: Boolean = false) {
-    fun cardCheck(card_name: CardName): Boolean{
-        return card_name.toCardNumber(true) == number1 || card_name.toCardNumber(false) == number1
-    }
 
     fun isTextUseCard() = this.text == LogText.USE_CARD || this.text == LogText.USE_CARD_IN_SOLDIER ||
             this.text == LogText.USE_CARD_REACT || this.text == LogText.USE_CARD_IN_COVER || this.text == LogText.USE_CARD_IN_COVER_AND_REACT
@@ -55,4 +52,5 @@ enum class LogText{
     USE_CENTRIFUGAL,
     GET_LIFE_DAMAGE,
     GET_AURA_DAMAGE,
+    DAMAGE_PROCESS_START,
 }

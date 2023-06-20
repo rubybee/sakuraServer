@@ -414,8 +414,11 @@ enum class CardName {
     IDEA_WHISTLE,
     IDEA_MYEONG_JEON,
     IDEA_EMPHASIZING,
-    IDEA_POSITIONING;
+    IDEA_POSITIONING,
 
+    TOKOYO_PASSING_FEAR,
+    TOKOYO_RELIC_EYE,
+    TOKOYO_EIGHT_SAKURA_IN_VAIN;
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -490,6 +493,9 @@ enum class CardName {
             put(TOKOYO_FLOWING_PLAY, 411)
             put(TOKOYO_SOUND_OF_SUN, 412)
             put(TOKOYO_DUET_CHI_TAN_YANG_MYEONG, 413)
+            put(TOKOYO_PASSING_FEAR, 414)
+            put(TOKOYO_RELIC_EYE, 415)
+            put(TOKOYO_EIGHT_SAKURA_IN_VAIN, 416)
 
             put(OBORO_WIRE, 500)
             put(OBORO_SHADOWCALTROP, 501)
@@ -819,6 +825,9 @@ enum class CardName {
             put(TOKOYO_FLOWING_PLAY, 411)
             put(TOKOYO_SOUND_OF_SUN, 412)
             put(TOKOYO_DUET_CHI_TAN_YANG_MYEONG, 413)
+            put(TOKOYO_PASSING_FEAR, 10414)
+            put(TOKOYO_RELIC_EYE, 10415)
+            put(TOKOYO_EIGHT_SAKURA_IN_VAIN, 10416)
 
             put(OBORO_WIRE, 10500)
             put(OBORO_SHADOWCALTROP, 10501)
@@ -1121,6 +1130,10 @@ enum class CardName {
                     TOKOYO_FLOWING_PLAY, TOKOYO_WOOAHHANTAGUCK, TOKOYO_RUNNINGRABIT, TOKOYO_POETDANCE,
                     TOKOYO_SOUND_OF_SUN, TOKOYO_WINDSTAGE, TOKOYO_SUNSTAGE
                 )
+                TOKOYO_A2 -> listOf(
+                    TOKOYO_BITSUNERIGI, TOKOYO_PASSING_FEAR, TOKOYO_RUNNINGRABIT, TOKOYO_POETDANCE,
+                    TOKOYO_FLIPFAN, TOKOYO_WINDSTAGE, TOKOYO_SUNSTAGE
+                )
                 OBORO -> listOf(
                     OBORO_WIRE, OBORO_SHADOWCALTROP, OBORO_ZANGEKIRANBU, OBORO_NINJAWALK,
                     OBORO_INDUCE, OBORO_CLONE, OBORO_BIOACTIVITY
@@ -1273,6 +1286,9 @@ enum class CardName {
                 TOKOYO -> listOf(
                     TOKOYO_KUON, TOKOYO_THOUSANDBIRD, TOKOYO_ENDLESSWIND, TOKOYO_TOKOYOMOON
                 )
+                TOKOYO_A2 -> listOf(
+                    TOKOYO_KUON, TOKOYO_RELIC_EYE, TOKOYO_EIGHT_SAKURA_IN_VAIN, TOKOYO_TOKOYOMOON
+                )
                 TOKOYO_A1 -> listOf(
                     TOKOYO_KUON, TOKOYO_DUET_CHI_TAN_YANG_MYEONG, TOKOYO_ENDLESSWIND, TOKOYO_TOKOYOMOON
                 )
@@ -1384,6 +1400,7 @@ enum class CardName {
                 HIMIKA_A1 -> listOf()
                 TOKOYO -> listOf()
                 TOKOYO_A1 -> listOf()
+                TOKOYO_A2 -> listOf()
                 OBORO -> listOf()
                 OBORO_A1 -> listOf(
                     OBORO_LAST_CRYSTAL

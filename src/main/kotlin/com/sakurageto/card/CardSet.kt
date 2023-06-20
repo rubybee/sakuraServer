@@ -129,6 +129,9 @@ object CardSet {
         cardNumberHashmap[411] = CardName.TOKOYO_FLOWING_PLAY
         cardNumberHashmap[412] = CardName.TOKOYO_SOUND_OF_SUN
         cardNumberHashmap[413] = CardName.TOKOYO_DUET_CHI_TAN_YANG_MYEONG
+        cardNumberHashmap[414] = CardName.TOKOYO_PASSING_FEAR
+        cardNumberHashmap[415] = CardName.TOKOYO_RELIC_EYE
+        cardNumberHashmap[416] = CardName.TOKOYO_EIGHT_SAKURA_IN_VAIN
 
         cardNumberHashmap[500] = CardName.OBORO_WIRE
         cardNumberHashmap[501] = CardName.OBORO_SHADOWCALTROP
@@ -453,6 +456,9 @@ object CardSet {
         cardNumberHashmap[10411] = CardName.TOKOYO_FLOWING_PLAY
         cardNumberHashmap[10412] = CardName.TOKOYO_SOUND_OF_SUN
         cardNumberHashmap[10413] = CardName.TOKOYO_DUET_CHI_TAN_YANG_MYEONG
+        cardNumberHashmap[10414] = CardName.TOKOYO_PASSING_FEAR
+        cardNumberHashmap[10415] = CardName.TOKOYO_RELIC_EYE
+        cardNumberHashmap[10416] = CardName.TOKOYO_EIGHT_SAKURA_IN_VAIN
 
         cardNumberHashmap[10500] = CardName.OBORO_WIRE
         cardNumberHashmap[10501] = CardName.OBORO_SHADOWCALTROP
@@ -988,18 +994,6 @@ object CardSet {
         cardDataHashmap[CardName.YATSUHA_SIX_STAR_SEA] = sixStarSea
         cardDataHashmap[CardName.YATSUHA_EIGHT_MIRROR_OTHER_SIDE] = eightMirrorOtherSide
 
-        cardDataHashmap[CardName.YATSUHA_STAR_NAIL] = starNail
-        cardDataHashmap[CardName.YATSUHA_DARKNESS_GILL] = darknessGill
-        cardDataHashmap[CardName.YATSUHA_MIRROR_DEVIL] = mirrorDevil
-        cardDataHashmap[CardName.YATSUHA_GHOST_STEP] = ghostStep
-        cardDataHashmap[CardName.YATSUHA_WILLING] = willing
-        cardDataHashmap[CardName.YATSUHA_CONTRACT] = contract
-        cardDataHashmap[CardName.YATSUHA_CLINGY_FLOWER] = clingyFlower
-        cardDataHashmap[CardName.YATSUHA_TWO_LEAP_MIRROR_DIVINE] = twoLeapMirrorDivine
-        cardDataHashmap[CardName.YATSUHA_FOUR_LEAP_SONG] = fourLeapSong
-        cardDataHashmap[CardName.YATSUHA_SIX_STAR_SEA] = sixStarSea
-        cardDataHashmap[CardName.YATSUHA_EIGHT_MIRROR_OTHER_SIDE] = eightMirrorOtherSide
-
         cardDataHashmap[CardName.HATSUMI_WATER_BALL] = waterBall
         cardDataHashmap[CardName.HATSUMI_WATER_CURRENT] = waterCurrent
         cardDataHashmap[CardName.HATSUMI_STRONG_ACID] = strongAcid
@@ -1060,6 +1054,10 @@ object CardSet {
         cardDataHashmap[CardName.IDEA_MYEONG_JEON] = myeongjeon
         cardDataHashmap[CardName.IDEA_EMPHASIZING] = emphasizing
         cardDataHashmap[CardName.IDEA_POSITIONING] = positioning
+
+        cardDataHashmap[CardName.TOKOYO_PASSING_FEAR] = passingFear
+        cardDataHashmap[CardName.TOKOYO_RELIC_EYE] = relicEye
+        cardDataHashmap[CardName.TOKOYO_EIGHT_SAKURA_IN_VAIN] = eightSakuraInVain
     }
 
     private suspend fun selectDustToDistance(nowCommand: CommandEnum, game_status: GameStatus,
@@ -3679,7 +3677,7 @@ object CardSet {
         })
         formGaruda.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_TRANSFORM) {_, player, game_status, _ ->
             game_status.drawCard(player, 2)
-            game_status.getPlayer(player).max_hand = 99999
+            game_status.getPlayer(player).maxHand = 99999
             null
         })
     }
@@ -6457,7 +6455,7 @@ object CardSet {
                     }
                 }
             }
-            game_status.getPlayer(player).max_hand += 1
+            game_status.getPlayer(player).maxHand += 1
             null
         })
         compass.setEnchantment(3)
@@ -7071,7 +7069,7 @@ object CardSet {
     private val helpOrThreat = CardData(CardClass.NORMAL, CardName.YUKIHI_HELP_SLASH_THREAT, MegamiEnum.YUKIHI, CardType.ATTACK, SubType.NONE)
     private val threadOrRawThread = CardData(CardClass.NORMAL, CardName.YUKIHI_THREAD_SLASH_RAW_THREAD, MegamiEnum.YUKIHI, CardType.ATTACK, SubType.NONE)
     private val flutteringCollar = CardData(CardClass.SPECIAL, CardName.YUKIHI_FLUTTERING_COLLAR, MegamiEnum.YUKIHI, CardType.ENCHANTMENT, SubType.NONE)
-    private val textForFlutteringCollarStartPhase = Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_START_PHASE_YOUR) {card_number, player, game_status, _->
+    private val flutteringCollarText = Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_START_PHASE_YOUR) { card_number, player, game_status, _->
         if(game_status.addPreAttackZone(player, MadeAttack(CardName.YUKIHI_FLUTTERING_COLLAR, card_number, CardClass.NULL,
                 DistanceType.CONTINUOUS, 2,  2, Pair(0, 5), null, MegamiEnum.YUKIHI,
                 cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
@@ -7178,8 +7176,8 @@ object CardSet {
             }
             null
         })
-        flutteringCollar.addTextUnfold(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_START_PHASE_YOUR) {card_number, player, game_status, _->
-            game_status.startPhaseEffect[card_number] = Pair(CardEffectLocation.ENCHANTMENT_YOUR, textForFlutteringCollarStartPhase)
+        flutteringCollar.addTextUnfold(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_START_PHASE_YOUR) {card_number, _, game_status, _->
+            game_status.startPhaseEffect[card_number] = Pair(CardEffectLocation.ENCHANTMENT_YOUR, flutteringCollarText)
             null
         })
     }
@@ -7509,7 +7507,7 @@ object CardSet {
             null
         })
         jinPungJeCheonUi.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_MAIN_PHASE_YOUR) {_, player, game_status, _->
-            if(!game_status.getPlayer(player).full_action){
+            if(!game_status.getPlayer(player).fullAction){
                 stormForce(player, game_status)
                 stormForce(player, game_status)
             }
@@ -8141,6 +8139,7 @@ object CardSet {
                         else -> {}
                     }
                 }
+
                 if(game_status.dust == 0){
                     game_status.auraToCard(player, 1, idea, idea.card_number, LocationEnum.IDEA_YOUR)
 
@@ -8163,6 +8162,7 @@ object CardSet {
                         }
                     }
                 }
+
                 game_status.logger.insert(Log(player, LogText.END_EFFECT, idea.card_number, -1))
                 break
             }
@@ -8425,7 +8425,7 @@ object CardSet {
                         CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2009, 1){ true }?.let { normal ->
                         game_status.getPlayer(player).unselectedCard.remove(normal[0].toCardName())
                         game_status.insertCardTo(player,
-                            Card.cardMakerByName(game_status.getPlayer(player).first_turn, normal[0].toCardName(), player),
+                            Card.cardMakerByName(game_status.getPlayer(player).firstTurn, normal[0].toCardName(), player),
                         LocationEnum.HAND, true)
                     }
                     break
@@ -8441,7 +8441,7 @@ object CardSet {
                 CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2010, 1){ true }?.let { special ->
                 game_status.getPlayer(player).unselectedSpecialCard.remove(special[0].toCardName())
                 game_status.insertCardTo(player,
-                    Card.cardMakerByName(game_status.getPlayer(player).first_turn, special[0].toCardName(), player),
+                    Card.cardMakerByName(game_status.getPlayer(player).firstTurn, special[0].toCardName(), player),
                     LocationEnum.SPECIAL_CARD, true)
             }
             null
@@ -8454,6 +8454,72 @@ object CardSet {
                     attack.lifePlusMinus(1)
                 }))
             }
+            null
+        })
+    }
+
+    private val passingFear = CardData(CardClass.NORMAL, CardName.TOKOYO_PASSING_FEAR, MegamiEnum.TOKOYO, CardType.ATTACK, SubType.REACTION) //414
+    private val relicEye = CardData(CardClass.SPECIAL, CardName.TOKOYO_RELIC_EYE, MegamiEnum.TOKOYO, CardType.ATTACK, SubType.NONE)
+    private val eightSakuraInVain = CardData(CardClass.SPECIAL, CardName.TOKOYO_EIGHT_SAKURA_IN_VAIN, MegamiEnum.TOKOYO, CardType.BEHAVIOR, SubType.NONE)
+    private val eightSakuraInVainText = Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_START_PHASE_YOUR) {card_number, player, game_status, _->
+        if(game_status.getPlayer(player).aura >= 6){
+            if(game_status.addPreAttackZone(player, MadeAttack(CardName.TOKOYO_EIGHT_SAKURA_IN_VAIN, card_number, CardClass.NULL,
+                    DistanceType.CONTINUOUS, 999, 1, Pair(0, 8), null, MegamiEnum.TOKOYO,
+                    cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
+                )) ){
+                game_status.afterMakeAttack(card_number, player, null)
+            }
+        }
+        null
+    }
+
+    private fun tokoyoA2CardInit(){
+        passingFear.setAttack(DistanceType.CONTINUOUS, Pair(2, 3), null, 2, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        passingFear.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.SELECT_DAMAGE_BY_ATTACKER) {_, player, game_status, _ ->
+            if(game_status.getPlayer(player.opposite()).concentration == 0){
+                1
+            }
+            else{
+                0
+            }
+        })
+        passingFear.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.REACT_ATTACK_CHANGE){ card_number, _, _, reactedAttack ->
+            reactedAttack?.addAttackBuff(Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true },
+                {_, gameStatus, madeAttack ->
+                    madeAttack.apply {
+                        val (aura, life) = gameStatus.logger.findGetDamageByThisAttack(card_number)
+                        madeAttack.apply {
+                            auraPlusMinus(aura * -1); lifePlusMinus(life * -1)
+                        }
+                    }
+                }))
+            null
+        })
+        relicEye.setSpecial(1)
+        relicEye.setAttack(DistanceType.CONTINUOUS, Pair(3, 5), null, 1, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        relicEye.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.WHEN_CHOOSE_AURA_DAMAGE) { card_number, player, game_status, _ ->
+            game_status.flareToAura(player.opposite(), player, 1, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
+            null
+        })
+        relicEye.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.RETURN){_, player, game_status, _ ->
+            if(game_status.getPlayer(player.opposite()).concentration == 1) 1
+            else 0
+        })
+        eightSakuraInVain.setSpecial(4)
+        eightSakuraInVain.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.DO_BASIC_OPERATION){_, player, game_status, _->
+            for(i in 1..5){
+                game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND, 201416)
+            }
+            null
+        })
+        eightSakuraInVain.addTextUnfold(Text(TextEffectTimingTag.USED, TextEffectTag.TOKOYO_EIGHT_SAKURA) {_, _, _, _->
+            1
+        })
+        eightSakuraInVain.addTextUnfold(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_START_PHASE_YOUR) {card_number, _, game_status, _->
+            game_status.startPhaseEffect[card_number] = Pair(CardEffectLocation.USED_YOUR, eightSakuraInVainText)
             null
         })
     }
@@ -8493,22 +8559,17 @@ object CardSet {
         megumiCardInit()
         kanaweIdeaInit()
         kanaweCardInit()
+        tokoyoA2CardInit()
 
         hashMapInit()
         hashMapTest()
     }
 
-    fun isPoison(card_number: Int): Boolean{
-        return when(card_number){
-            1, 995, 996, 997, 998, 999, 10995, 10996, 10997, 10998, 10999 -> true
-            else -> false
-        }
-    }
+    private val poisonSet = setOf(1, 995, 996, 997, 998, 999, 10995, 10996, 10997, 10998, 10999)
 
-    fun isSolder(card_number: Int): Boolean{
-        return when(card_number){
-            1812, 1813, 1814, 1815, 11812, 11813, 11814, 11815 -> true
-            else -> false
-        }
-    }
+    fun isPoison(card_number: Int) = card_number in poisonSet
+
+    private val soldierSet = setOf(1812, 1813, 1814, 1815, 11812, 11813, 11814, 11815)
+
+    fun isSoldier(card_number: Int) = card_number in soldierSet
 }

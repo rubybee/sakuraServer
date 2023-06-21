@@ -3008,7 +3008,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
 
         for(card in getPlayer(turnPlayer.opposite()).enchantmentCard.values){
-            card.effectAllValidEffect(turnPlayer, this, TextEffectTag.WHEN_MAIN_PHASE_OTHER)
+            card.effectAllValidEffect(turnPlayer.opposite(), this, TextEffectTag.WHEN_MAIN_PHASE_OTHER)
         }
     }
 
@@ -3035,7 +3035,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             card.effectAllValidEffect(player, this, TextEffectTag.WHEN_END_PHASE_YOUR)
         }
         for(card in nowPlayer.discard){
-            card.effectAllValidEffect(player, this, TextEffectTag.WHEN_END_PHASE_YOUR_IN_DISCARD)
+            card.effectText(player, this, null, TextEffectTag.WHEN_END_PHASE_YOUR_IN_DISCARD)
         }
         nowPlayer.megamiCard?.effectAllValidEffect(player, this, TextEffectTag.WHEN_END_PHASE_YOUR)
         nowPlayer.megamiCard2?.effectAllValidEffect(player, this, TextEffectTag.WHEN_END_PHASE_YOUR)
@@ -3122,7 +3122,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     return
                 }
             }
-
             if(keys.size == 1){
                 val lastEffect = endPhaseEffect[keys[0]]
                 when(lastEffect!!.first){

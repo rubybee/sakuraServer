@@ -7,7 +7,7 @@ object StoryBoard {
     private val act12 = Act(2, Act.COLOR_RED, mutableListOf(), mutableListOf(15))
     private val act11 = Act(3, Act.COLOR_RED, mutableListOf(14), mutableListOf())
     private val act10 = Act(0, Act.COLOR_PURPLE, mutableListOf(12, 13, 14), mutableListOf())
-    private val act9 = Act(5, Act.COLOR_PURPLE, mutableListOf(9), mutableListOf(11))
+    private val act9 = Act(5, Act.COLOR_PURPLE, mutableListOf(), mutableListOf(11))
     private val act8 = Act(4, Act.COLOR_GOLD, mutableListOf(11), mutableListOf())
     private val act7 = Act(6, Act.COLOR_GREEN, mutableListOf(10), mutableListOf())
     private val act6 = Act(4, Act.COLOR_RED, mutableListOf(10), mutableListOf())

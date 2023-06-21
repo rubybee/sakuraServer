@@ -418,7 +418,16 @@ enum class CardName {
 
     TOKOYO_PASSING_FEAR,
     TOKOYO_RELIC_EYE,
-    TOKOYO_EIGHT_SAKURA_IN_VAIN;
+    TOKOYO_EIGHT_SAKURA_IN_VAIN,
+
+    HONOKA_SAKURA_SWORD, //1418
+    HONOKA_SHADOW_HAND,
+    HONOKA_EYE_OPEN_ALONE,
+    HONOKA_FOLLOW_TRACE, //1421
+    HONOKA_FACING_SHADOW,
+    HONOKA_SAKURA_SHINING_BRIGHTLY,
+    HONOKA_HOLD_HANDS,
+    HONOKA_WALK_OLD_LOAD;
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -675,6 +684,14 @@ enum class CardName {
             put(HONOKA_UNDER_THE_NAME_OF_FLAG, 1415)
             put(HONOKA_FOUR_SEASON_BACK, 1416)
             put(HONOKA_FULL_BLOOM_PATH, 1417)
+            put(HONOKA_SAKURA_SWORD, 1418)
+            put(HONOKA_SHADOW_HAND, 1419)
+            put(HONOKA_EYE_OPEN_ALONE, 1420)
+            put(HONOKA_FOLLOW_TRACE, 1421)
+            put(HONOKA_FACING_SHADOW, 1422)
+            put(HONOKA_SAKURA_SHINING_BRIGHTLY, 1423)
+            put(HONOKA_HOLD_HANDS, 1424)
+            put(HONOKA_WALK_OLD_LOAD, 1425)
 
             put(KORUNU_SNOW_BLADE, 1500)
             put(KORUNU_REVOLVING_BLADE, 1501)
@@ -1004,6 +1021,14 @@ enum class CardName {
             put(HONOKA_UNDER_THE_NAME_OF_FLAG, 11415)
             put(HONOKA_FOUR_SEASON_BACK, 11416)
             put(HONOKA_FULL_BLOOM_PATH, 11417)
+            put(HONOKA_SAKURA_SWORD, 11418)
+            put(HONOKA_SHADOW_HAND, 11419)
+            put(HONOKA_EYE_OPEN_ALONE, 11420)
+            put(HONOKA_FOLLOW_TRACE, 11421)
+            put(HONOKA_FACING_SHADOW, 11422)
+            put(HONOKA_SAKURA_SHINING_BRIGHTLY, 11423)
+            put(HONOKA_HOLD_HANDS, 11424)
+            put(HONOKA_WALK_OLD_LOAD, 11425)
 
             put(KORUNU_SNOW_BLADE, 11500)
             put(KORUNU_REVOLVING_BLADE, 11501)
@@ -1224,6 +1249,11 @@ enum class CardName {
                     HONOKA_SAKURA_WING, HONOKA_SAKURA_AMULET, HONOKA_COMMAND,
                     HONOKA_TAIL_WIND,
                 )
+                HONOKA_A1 -> listOf(
+                    HONOKA_SAKURA_SWORD, HONOKA_SAKURA_BLIZZARD, HONOKA_UI_GI_GONG_JIN,
+                    HONOKA_SAKURA_WING, HONOKA_SAKURA_AMULET, HONOKA_COMMAND,
+                    HONOKA_TAIL_WIND,
+                )
                 KORUNU -> listOf(
                     KORUNU_SNOW_BLADE, KORUNU_REVOLVING_BLADE, KORUNU_BLADE_DANCE,
                     KORUNU_RIDE_SNOW, KORUNU_ABSOLUTE_ZERO, KORUNU_FROSTBITE,
@@ -1355,6 +1385,10 @@ enum class CardName {
                     HONOKA_CHEST_WILLINGNESS, HONOKA_UNDER_THE_NAME_OF_FLAG, HONOKA_FOUR_SEASON_BACK,
                     HONOKA_FULL_BLOOM_PATH
                 )
+                HONOKA_A1 -> listOf(
+                    HONOKA_EYE_OPEN_ALONE, HONOKA_UNDER_THE_NAME_OF_FLAG, HONOKA_FOUR_SEASON_BACK,
+                    HONOKA_FULL_BLOOM_PATH
+                )
                 UTSURO_A1 -> listOf(
                     UTSURO_REVERBERATE_DEVICE_KURURUSIK, UTSURO_HEO_WI, UTSURO_JONG_MAL,
                     UTSURO_MA_SIG
@@ -1432,6 +1466,11 @@ enum class CardName {
                 HONOKA -> listOf(
                     HONOKA_GUARDIAN_SPIRIT_SIK, HONOKA_ASSAULT_SPIRIT_SIK, HONOKA_DIVINE_OUKA,
                     HONOKA_REGENERATION, HONOKA_HONOKA_SPARKLE, HONOKA_HAND_FLOWER, HONOKA_A_NEW_OPENING
+                )
+                HONOKA_A1 -> listOf(
+                    HONOKA_SHADOW_HAND, HONOKA_FOLLOW_TRACE, HONOKA_FACING_SHADOW,
+                    HONOKA_SAKURA_SHINING_BRIGHTLY, HONOKA_HOLD_HANDS, HONOKA_WALK_OLD_LOAD,
+                    HONOKA_REGENERATION, HONOKA_HONOKA_SPARKLE,
                 )
                 KORUNU -> listOf()
                 YATSUHA -> listOf()

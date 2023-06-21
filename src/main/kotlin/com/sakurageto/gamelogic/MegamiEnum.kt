@@ -33,6 +33,7 @@ enum class MegamiEnum(var real_number: Int) {
     UTSURO(130),
     UTSURO_A1(131),
     HONOKA(140),
+    HONOKA_A1(141),
     KORUNU(150),
     YATSUHA(160),
     HATSUMI(170),

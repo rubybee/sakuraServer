@@ -71,6 +71,7 @@ enum class TextEffectTag {
     END_CURRENT_PHASE,
     STORM_FORCE,
     NEXT_BASIC_OPERATION_INVALID,
+    PHASE_SKIP,
 
     //description when this effect use
     WHEN_USE_BEHAVIOR_END,

@@ -514,7 +514,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         if(nowGrowing > 0){
             while(true){
                 val growingData =
-                    receiveNapInformation(game_status.getSocket(player), nowNeedNap, this.card_number, CommandEnum.SELECT_GROWING)
+                    receiveNapInformation(game_status.getSocket(player), nowGrowing, this.card_number, CommandEnum.SELECT_GROWING)
                 val growing = growingData.first
                 if(growing > nowGrowing || growing > nowPlayer.readySeed || growing < 0) {
                     continue
@@ -692,18 +692,6 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             for(text in it){
                 if (usedEffectUsable(text) || enchantmentUsable(text)) {
                     if(text.tag == TextEffectTag.WHEN_END_PHASE_YOUR){
-                        text.effect!!(this.card_number, player, game_status, null)
-                    }
-                }
-            }
-        }
-    }
-
-    suspend fun endPhaseDiscardEffect(player: PlayerEnum, game_status: GameStatus) {
-        this.card_data.effect?.let {
-            for(text in it){
-                if (text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT) {
-                    if(text.tag == TextEffectTag.WHEN_END_PHASE_YOUR_IN_DISCARD){
                         text.effect!!(this.card_number, player, game_status, null)
                     }
                 }

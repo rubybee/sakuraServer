@@ -430,6 +430,10 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
     }
 
     suspend fun mainPhase(){
+        if(gameStatus.getPlayer(turnPlayer).nextMainPhaseSkip){
+            gameStatus.getPlayer(turnPlayer).nextMainPhaseSkip = false
+            return
+        }
         gameStatus.endCurrentPhase = false
         gameStatus.nowPhase = MAIN_PHASE
         sendMainPhaseStart(getSocket(this.turnPlayer), getSocket(this.turnPlayer.opposite()))

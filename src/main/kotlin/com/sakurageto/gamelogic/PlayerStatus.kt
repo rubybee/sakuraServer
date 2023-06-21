@@ -88,6 +88,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var canNotGoForward: Boolean = false
     var didBasicOperation: Boolean = false
     var napBuff = 0
+    var nextMainPhaseSkip = false
     //for some card(some day refactor may be needed)
 
 

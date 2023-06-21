@@ -307,6 +307,14 @@ object CardSet {
         cardNumberHashmap[1415] = CardName.HONOKA_UNDER_THE_NAME_OF_FLAG
         cardNumberHashmap[1416] = CardName.HONOKA_FOUR_SEASON_BACK
         cardNumberHashmap[1417] = CardName.HONOKA_FULL_BLOOM_PATH
+        cardNumberHashmap[1418] = CardName.HONOKA_SAKURA_SWORD
+        cardNumberHashmap[1419] = CardName.HONOKA_SHADOW_HAND
+        cardNumberHashmap[1420] = CardName.HONOKA_EYE_OPEN_ALONE
+        cardNumberHashmap[1421] = CardName.HONOKA_FOLLOW_TRACE
+        cardNumberHashmap[1422] = CardName.HONOKA_FACING_SHADOW
+        cardNumberHashmap[1423] = CardName.HONOKA_SAKURA_SHINING_BRIGHTLY
+        cardNumberHashmap[1424] = CardName.HONOKA_HOLD_HANDS
+        cardNumberHashmap[1425] = CardName.HONOKA_WALK_OLD_LOAD
 
         cardNumberHashmap[1500] = CardName.KORUNU_SNOW_BLADE
         cardNumberHashmap[1501] = CardName.KORUNU_REVOLVING_BLADE
@@ -634,6 +642,14 @@ object CardSet {
         cardNumberHashmap[11415] = CardName.HONOKA_UNDER_THE_NAME_OF_FLAG
         cardNumberHashmap[11416] = CardName.HONOKA_FOUR_SEASON_BACK
         cardNumberHashmap[11417] = CardName.HONOKA_FULL_BLOOM_PATH
+        cardNumberHashmap[11418] = CardName.HONOKA_SAKURA_SWORD
+        cardNumberHashmap[11419] = CardName.HONOKA_SHADOW_HAND
+        cardNumberHashmap[11420] = CardName.HONOKA_EYE_OPEN_ALONE
+        cardNumberHashmap[11421] = CardName.HONOKA_FOLLOW_TRACE
+        cardNumberHashmap[11422] = CardName.HONOKA_FACING_SHADOW
+        cardNumberHashmap[11423] = CardName.HONOKA_SAKURA_SHINING_BRIGHTLY
+        cardNumberHashmap[11424] = CardName.HONOKA_HOLD_HANDS
+        cardNumberHashmap[11425] = CardName.HONOKA_WALK_OLD_LOAD
 
         cardNumberHashmap[11500] = CardName.KORUNU_SNOW_BLADE
         cardNumberHashmap[11501] = CardName.KORUNU_REVOLVING_BLADE
@@ -953,6 +969,14 @@ object CardSet {
         cardDataHashmap[CardName.HONOKA_UNDER_THE_NAME_OF_FLAG] = underFlag
         cardDataHashmap[CardName.HONOKA_FOUR_SEASON_BACK] = fourSeason
         cardDataHashmap[CardName.HONOKA_FULL_BLOOM_PATH] = bloomPath
+        cardDataHashmap[CardName.HONOKA_SAKURA_SWORD] = sakuraSword
+        cardDataHashmap[CardName.HONOKA_SHADOW_HAND] = shadowHand
+        cardDataHashmap[CardName.HONOKA_EYE_OPEN_ALONE] = eyeOpenAlone
+        cardDataHashmap[CardName.HONOKA_FOLLOW_TRACE] = followTrace
+        cardDataHashmap[CardName.HONOKA_FACING_SHADOW] = facingShadow
+        cardDataHashmap[CardName.HONOKA_SAKURA_SHINING_BRIGHTLY] = sakuraShiningBrightly
+        cardDataHashmap[CardName.HONOKA_HOLD_HANDS] = holdHands
+        cardDataHashmap[CardName.HONOKA_WALK_OLD_LOAD] = walkOldLoad
 
         cardDataHashmap[CardName.OBORO_SHURIKEN] = shuriken
         cardDataHashmap[CardName.OBORO_AMBUSH] = ambush
@@ -1178,7 +1202,6 @@ object CardSet {
         })
         jjockbae.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
             game_status.dustToAura(player, 5, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
-
             null
         })
         jjockbae.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
@@ -4529,7 +4552,7 @@ object CardSet {
             true
         }, {_, gameStatus, madeAttack ->
             madeAttack.run {
-                val temp = countTokenFive(null, gameStatus)
+                val temp = countTokenFive(gameStatus)
                 editedAuraDamage = temp
                 editedLifeDamage = temp
             }
@@ -4582,18 +4605,18 @@ object CardSet {
         }
     }
 
-    private fun countTokenFive(player: PlayerEnum?, game_status: GameStatus): Int{
+    private fun countTokenFive(game_status: GameStatus): Int{
         var count = 0
-        val player1 = game_status.getPlayer(player?: PlayerEnum.PLAYER1)
-        val player2 = game_status.getPlayer((player?: PlayerEnum.PLAYER1).opposite())
+        val player1 = game_status.getPlayer(PlayerEnum.PLAYER1)
+        val player2 = game_status.getPlayer(PlayerEnum.PLAYER2)
+
         if(player1.aura == 5) count += 1
         if(player1.flare == 5) count += 1
         if(player1.life == 5) count += 1
-        if(game_status.countToken(player?: PlayerEnum.PLAYER1, LocationEnum.YOUR_USED_CARD) == 5) count += 1
-        if(game_status.countToken(player?: PlayerEnum.PLAYER1, LocationEnum.ENCHANTMENT_ZONE) == 5) count += 1
+        if(game_status.countToken(PlayerEnum.PLAYER1, LocationEnum.YOUR_USED_CARD) == 5) count += 1
+        if(game_status.countToken(PlayerEnum.PLAYER1, LocationEnum.ENCHANTMENT_ZONE) == 5) count += 1
         if(game_status.dust == 5) count += 1
         if(game_status.distanceToken == 5) count += 1
-        if(player != null) return count
         if(player2.aura == 5) count += 1
         if(player2.flare == 5) count += 1
         if(player2.life == 5) count += 1
@@ -4606,7 +4629,8 @@ object CardSet {
         spiritSik.setAttack(DistanceType.CONTINUOUS, Pair(2, 8), null, 1, 1,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = true, chogek = false)
         spiritSik.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
-            if(checkCardName(card_number, CardName.HONOKA_SPIRIT_SIK) && requestCardChange(player, 1400, game_status)){
+            if(game_status.getCardOwner(card_number) == player && checkCardName(card_number, CardName.HONOKA_SPIRIT_SIK)
+                && requestCardChange(player, 1400, game_status)){
                 game_status.getCardFrom(player, CardName.HONOKA_GUARDIAN_SPIRIT_SIK, LocationEnum.ADDITIONAL_CARD)?.let {
                     game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
                     if(requestDeckBelow(player, game_status)){
@@ -4627,7 +4651,8 @@ object CardSet {
             null
         })
         guardianSik.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
-            if(checkCardName(card_number, CardName.HONOKA_GUARDIAN_SPIRIT_SIK) && requestCardChange(player, 1401, game_status)){
+            if(game_status.getCardOwner(card_number) == player && checkCardName(card_number, CardName.HONOKA_GUARDIAN_SPIRIT_SIK)
+                && requestCardChange(player, 1401, game_status)){
                 game_status.getCardFrom(player, CardName.HONOKA_ASSAULT_SPIRIT_SIK, LocationEnum.ADDITIONAL_CARD)?.let {
                     game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
                     if(requestDeckBelow(player, game_status)){
@@ -4648,7 +4673,8 @@ object CardSet {
             null
         })
         assaultSik.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
-            if(checkCardName(card_number, CardName.HONOKA_ASSAULT_SPIRIT_SIK) && requestCardChange(player, 1402, game_status)){
+            if(game_status.getCardOwner(card_number) == player && checkCardName(card_number, CardName.HONOKA_ASSAULT_SPIRIT_SIK)
+                && requestCardChange(player, 1402, game_status)){
                 game_status.getCardFrom(player, CardName.HONOKA_DIVINE_OUKA, LocationEnum.ADDITIONAL_CARD)?.let {
                     game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
                     if(requestDeckBelow(player, game_status)){
@@ -4768,7 +4794,7 @@ object CardSet {
             null
         })
         sakuraWing.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
-            if(checkCardName(card_number, CardName.HONOKA_SAKURA_WING)){
+            if(game_status.getCardOwner(card_number) == player && checkCardName(card_number, CardName.HONOKA_SAKURA_WING)){
                 game_status.getCardFrom(player, CardName.HONOKA_REGENERATION, LocationEnum.ADDITIONAL_CARD)?.let {
                     game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
                     game_status.moveAdditionalCard(player, CardName.HONOKA_REGENERATION, LocationEnum.DISCARD_YOUR)
@@ -4785,7 +4811,7 @@ object CardSet {
             null
         })
         regeneration.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
-            if(checkCardName(card_number, CardName.HONOKA_REGENERATION)){
+            if(game_status.getCardOwner(card_number) == player && checkCardName(card_number, CardName.HONOKA_REGENERATION)){
                 game_status.getCardFrom(player, CardName.HONOKA_SAKURA_WING, LocationEnum.ADDITIONAL_CARD)?.let {
                     game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
                     game_status.moveAdditionalCard(player, CardName.HONOKA_SAKURA_WING, LocationEnum.DISCARD_YOUR)
@@ -4820,7 +4846,8 @@ object CardSet {
             null
         })
         sakuraAmulet.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
-            if(checkCardName(card_number, CardName.HONOKA_SAKURA_AMULET) && requestCardChange(player, 1408, game_status)){
+            if(game_status.getCardOwner(card_number) == player && checkCardName(card_number, CardName.HONOKA_SAKURA_AMULET)
+                && requestCardChange(player, 1408, game_status)){
                 game_status.getCardFrom(player, CardName.HONOKA_HONOKA_SPARKLE, LocationEnum.ADDITIONAL_CARD)?.let {
                     game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
                     if(requestDeckBelow(player, game_status)){
@@ -4849,7 +4876,7 @@ object CardSet {
         })
         chestWilling.setSpecial(5)
         chestWilling.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
-            if(checkCardName(card_number, CardName.HONOKA_CHEST_WILLINGNESS)){
+            if(game_status.getCardOwner(card_number) == player && checkCardName(card_number, CardName.HONOKA_CHEST_WILLINGNESS)){
                 game_status.getCardFrom(player, CardName.HONOKA_HAND_FLOWER, LocationEnum.ADDITIONAL_CARD)?.let {
                     game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
                     it.special_card_state = SpecialCardEnum.PLAYED
@@ -4884,9 +4911,9 @@ object CardSet {
                         }
                         game_status.getCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD)?.let {
                             game_status.auraToCard(player, 1, it, card_number, LocationEnum.YOUR_USED_CARD)
-                            //TODO("maybe end_effect log needed?")
+                            game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
                             if(it.getNap() == 5){
-                                if(checkCardName(card_number, CardName.HONOKA_HAND_FLOWER)){
+                                if(game_status.getCardOwner(card_number) == player && checkCardName(card_number, CardName.HONOKA_HAND_FLOWER)){
                                     game_status.getCardFrom(player, CardName.HONOKA_A_NEW_OPENING, LocationEnum.ADDITIONAL_CARD)?.let { additionalCard ->
                                         game_status.cardToFlare(player, it.getNap(), it, card_number, LocationEnum.YOUR_USED_CARD)
                                         game_status.popCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD, true)
@@ -4894,6 +4921,7 @@ object CardSet {
                                         additionalCard.special_card_state = SpecialCardEnum.PLAYED
                                         game_status.moveAdditionalCard(player, CardName.HONOKA_A_NEW_OPENING, LocationEnum.YOUR_USED_CARD)
                                         game_status.returnSpecialCard(player, additionalCard.card_number)
+                                        game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
                                     }
                                 }
                             }
@@ -4906,9 +4934,9 @@ object CardSet {
                         }
                         game_status.getCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD)?.let {
                             game_status.dustToCard(player, 1, it, card_number, LocationEnum.YOUR_USED_CARD)
-                            //TODO("maybe end_effect log needed?")
+                            game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
                             if(it.getNap() == 5){
-                                if(checkCardName(card_number, CardName.HONOKA_HAND_FLOWER)){
+                                if(game_status.getCardOwner(card_number) == player && checkCardName(card_number, CardName.HONOKA_HAND_FLOWER)){
                                     game_status.getCardFrom(player, CardName.HONOKA_A_NEW_OPENING, LocationEnum.ADDITIONAL_CARD)?.let { additionalCard ->
                                         game_status.cardToFlare(player, it.getNap() , it, card_number, LocationEnum.YOUR_USED_CARD)
                                         game_status.popCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD, true)
@@ -4916,6 +4944,7 @@ object CardSet {
                                         additionalCard.special_card_state = SpecialCardEnum.PLAYED
                                         game_status.moveAdditionalCard(player, CardName.HONOKA_A_NEW_OPENING, LocationEnum.YOUR_USED_CARD)
                                         game_status.returnSpecialCard(player, additionalCard.card_number)
+                                        game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
                                     }
                                 }
                             }
@@ -5097,7 +5126,8 @@ object CardSet {
             game_status.movePlayingCard(player, LocationEnum.OUT_OF_GAME, card_number)
             null
         })
-        branchOfDivine.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.GET_ADDITIONAL_CARD) {_, player, game_status, _ ->
+        branchOfDivine.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
+            if(game_status.getCardOwner(card_number) == player)
             game_status.getCardFrom(player, CardName.OBORO_LAST_CRYSTAL, LocationEnum.ADDITIONAL_CARD)?.let {
                 game_status.moveAdditionalCard(player, CardName.OBORO_LAST_CRYSTAL, LocationEnum.SPECIAL_CARD)
             }
@@ -8133,6 +8163,7 @@ object CardSet {
                             break
                         }
                         CommandEnum.SELECT_TWO -> {
+                            game_status.getPlayer(player).isIdeaCardFlipped = true
                             game_status.sendCommand(player, player.opposite(), CommandEnum.SET_IDEA_FLIP_YOUR)
                             break
                         }
@@ -8524,6 +8555,219 @@ object CardSet {
         })
     }
 
+    private val sakuraSword = CardData(CardClass.NORMAL, CardName.HONOKA_SAKURA_SWORD, MegamiEnum.HONOKA, CardType.ATTACK, SubType.NONE)
+    private val shadowHand = CardData(CardClass.NORMAL, CardName.HONOKA_SHADOW_HAND, MegamiEnum.HONOKA, CardType.ATTACK, SubType.NONE)
+    private val eyeOpenAlone = CardData(CardClass.SPECIAL, CardName.HONOKA_EYE_OPEN_ALONE, MegamiEnum.HONOKA, CardType.BEHAVIOR, SubType.NONE)
+    private val followTrace = CardData(CardClass.NORMAL, CardName.HONOKA_FOLLOW_TRACE, MegamiEnum.HONOKA, CardType.BEHAVIOR, SubType.NONE)
+    private val facingShadow = CardData(CardClass.NORMAL, CardName.HONOKA_FACING_SHADOW, MegamiEnum.HONOKA, CardType.BEHAVIOR, SubType.NONE)
+    private val sakuraShiningBrightly = CardData(CardClass.SPECIAL, CardName.HONOKA_SAKURA_SHINING_BRIGHTLY, MegamiEnum.HONOKA, CardType.ATTACK, SubType.NONE)
+    private val holdHands = CardData(CardClass.SPECIAL, CardName.HONOKA_HOLD_HANDS, MegamiEnum.HONOKA, CardType.BEHAVIOR, SubType.NONE)
+    private val walkOldLoad = CardData(CardClass.SPECIAL, CardName.HONOKA_WALK_OLD_LOAD, MegamiEnum.HONOKA, CardType.BEHAVIOR, SubType.NONE)
+
+    private fun honokaA1CardInit(){
+        sakuraSword.setAttack(DistanceType.CONTINUOUS, Pair(4, 6), null, 2, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        sakuraSword.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
+            game_status.dustToAura(player, 1, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
+            null
+        })
+        sakuraSword.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
+            if(game_status.getCardOwner(card_number) == player && checkCardName(card_number, CardName.HONOKA_SAKURA_SWORD)){
+                game_status.getCardFrom(player, CardName.HONOKA_SHADOW_HAND, LocationEnum.ADDITIONAL_CARD)?.let {
+                    game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
+                    if(requestDeckBelow(player, game_status)){
+                        game_status.moveAdditionalCard(player, CardName.HONOKA_SHADOW_HAND, LocationEnum.YOUR_DECK_BELOW)
+                    }
+                    else{
+                        game_status.moveAdditionalCard(player, CardName.HONOKA_SHADOW_HAND, LocationEnum.DISCARD_YOUR)
+                    }
+                }
+            }
+            null
+        })
+        shadowHand.setAttack(DistanceType.CONTINUOUS, Pair(3, 4), null, 1, 0,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        shadowHand.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.WHEN_CHOOSE_AURA_DAMAGE) { _, player, game_status, _ ->
+            game_status.selectCardFrom(player.opposite(), player, listOf(LocationEnum.HAND),
+                CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1419, 1)
+            { true }?.let { selected ->
+                game_status.popCardFrom(player.opposite(), selected[0], LocationEnum.HAND, true)?.let {
+                    game_status.insertCardTo(player.opposite(), it, LocationEnum.DISCARD_YOUR, true)
+                }
+            }
+            null
+        })
+        shadowHand.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.WHEN_CHOOSE_LIFE_DAMAGE) {card_number, player, game_status, _ ->
+            game_status.flareToDust(player.opposite(), 2, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
+            null
+        })
+        shadowHand.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
+            if(game_status.getCardOwner(card_number) == player && checkCardName(card_number, CardName.HONOKA_SHADOW_HAND)){
+                game_status.getCardFrom(player, CardName.HONOKA_SAKURA_SWORD, LocationEnum.ADDITIONAL_CARD)?.let {
+                    game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
+                    if(requestDeckBelow(player, game_status)){
+                        game_status.moveAdditionalCard(player, CardName.HONOKA_SAKURA_SWORD, LocationEnum.YOUR_DECK_BELOW)
+                    }
+                    else{
+                        game_status.moveAdditionalCard(player, CardName.HONOKA_SAKURA_SWORD, LocationEnum.DISCARD_YOUR)
+                    }
+                }
+            }
+            null
+        })
+        eyeOpenAlone.setSpecial(3)
+        eyeOpenAlone.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
+            game_status.auraToAura(player.opposite(), player, 1, Arrow.ONE_DIRECTION,
+                player, game_status.getCardOwner(card_number), card_number)
+            null
+        })
+        eyeOpenAlone.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
+            if(game_status.getCardOwner(card_number) == player && checkCardName(card_number, CardName.HONOKA_EYE_OPEN_ALONE)){
+                if(game_status.dust <= 5){
+                    game_status.getCardFrom(player, CardName.HONOKA_FOLLOW_TRACE, LocationEnum.ADDITIONAL_CARD)?.let{
+                        game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
+                        game_status.moveAdditionalCard(player, CardName.HONOKA_FOLLOW_TRACE, LocationEnum.YOUR_DECK_BELOW)
+                    }
+                }
+                else{
+                    game_status.getCardFrom(player, CardName.HONOKA_FACING_SHADOW, LocationEnum.ADDITIONAL_CARD)?.let{
+                        game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
+                        game_status.moveAdditionalCard(player, CardName.HONOKA_FACING_SHADOW, LocationEnum.YOUR_DECK_BELOW)
+                    }
+                }
+            }
+            null
+        })
+        followTrace.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN)ret@{_, player, game_status, _ ->
+            val set = mutableSetOf<CommandEnum>()
+            for(i in 1..2){
+                while(true){
+                    when(val command = game_status.requestBasicOperation(player, 1421)){
+                        CommandEnum.ACTION_GO_FORWARD, CommandEnum.ACTION_GO_BACKWARD, CommandEnum.ACTION_WIND_AROUND,
+                        CommandEnum.ACTION_INCUBATE, CommandEnum.ACTION_BREAK_AWAY, CommandEnum.ACTION_NAGA,
+                        CommandEnum.ACTION_YAKSHA, CommandEnum.ACTION_GARUDA, CommandEnum.ACTION_ASURA -> {
+                            if(game_status.canDoBasicOperation(player, command) && command !in set){
+                                game_status.doBasicOperation(player, command, 201421)
+                                set.add(command)
+                                break
+                            }
+                            else{
+                                continue
+                            }
+                        }
+                        CommandEnum.SELECT_NOT -> {
+                            return@ret null
+                        }
+                        else -> {}
+                    }
+                }
+            }
+            null
+        })
+        followTrace.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
+            if(game_status.getCardOwner(card_number) == player && checkCardName(card_number, CardName.HONOKA_FOLLOW_TRACE)){
+                if(game_status.dust == 0){
+                    game_status.getCardFrom(player, CardName.HONOKA_SAKURA_SHINING_BRIGHTLY, LocationEnum.ADDITIONAL_CARD)?.let{
+                        game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
+                        game_status.moveAdditionalCard(player, CardName.HONOKA_SAKURA_SHINING_BRIGHTLY, LocationEnum.YOUR_USED_CARD)
+                        game_status.returnSpecialCard(player, it.card_number)
+                    }
+                }
+                else{
+                    game_status.getCardFrom(player, CardName.HONOKA_HOLD_HANDS, LocationEnum.ADDITIONAL_CARD)?.let{
+                        game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
+                        game_status.moveAdditionalCard(player, CardName.HONOKA_HOLD_HANDS, LocationEnum.YOUR_USED_CARD)
+                        game_status.returnSpecialCard(player, it.card_number)
+                    }
+                }
+            }
+            null
+        })
+        facingShadow.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
+            while(true){
+                when(game_status.receiveCardEffectSelect(player.opposite(), 1422)){
+                    CommandEnum.SELECT_ONE -> {
+                        game_status.flareToDust(player.opposite(), 1, Arrow.ONE_DIRECTION, player,
+                            game_status.getCardOwner(card_number), card_number)
+                        break
+                    }
+                    CommandEnum.SELECT_TWO -> {
+                        game_status.lifeToDust(player.opposite(),1, Arrow.ONE_DIRECTION, player,
+                            game_status.getCardOwner(card_number), card_number)
+                        break
+                    }
+                    else -> {
+                        continue
+                    }
+                }
+            }
+            null
+        })
+        facingShadow.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
+            if(game_status.getCardOwner(card_number) == player && checkCardName(card_number, CardName.HONOKA_FACING_SHADOW)){
+                if(game_status.dust >= 12){
+                    game_status.getCardFrom(player, CardName.HONOKA_WALK_OLD_LOAD, LocationEnum.ADDITIONAL_CARD)?.let{
+                        game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
+                        game_status.moveAdditionalCard(player, CardName.HONOKA_WALK_OLD_LOAD, LocationEnum.YOUR_USED_CARD)
+                        game_status.returnSpecialCard(player, it.card_number)
+                    }
+                }
+                else{
+                    game_status.getCardFrom(player, CardName.HONOKA_HOLD_HANDS, LocationEnum.ADDITIONAL_CARD)?.let{
+                        game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
+                        game_status.moveAdditionalCard(player, CardName.HONOKA_HOLD_HANDS, LocationEnum.YOUR_USED_CARD)
+                        game_status.returnSpecialCard(player, it.card_number)
+                    }
+                }
+            }
+            null
+        })
+        sakuraShiningBrightly.setSpecial(1)
+        sakuraShiningBrightly.setAttack(DistanceType.CONTINUOUS, Pair(3, 5), null, 1000, 2,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = true)
+        sakuraShiningBrightly.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.INSERT_IMMEDIATE, {_, _, _ ->
+                true
+            }, {nowPlayer, gameStatus, madeAttack ->
+                val damage = gameStatus.getCardFrom(nowPlayer, madeAttack.card_number, LocationEnum.PLAYING_ZONE_YOUR)
+                    ?.getNap() ?: 0
+                madeAttack.editedAuraDamage = damage
+            }))
+            null
+        })
+        sakuraShiningBrightly.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
+            game_status.getCardFrom(player, card_number, LocationEnum.PLAYING_ZONE_YOUR)?.let {
+                game_status.dustToCard(player, 1, it, Log.IGNORE, LocationEnum.PLAYING_ZONE_YOUR)
+            }
+            null
+        })
+        sakuraShiningBrightly.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.RETURN){card_number, player, game_status, _ ->
+            if(countTokenFive(game_status) >= 1) {
+                game_status.getCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD)?.let {
+                    game_status.logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, it.getNap()?: 0,
+                        LocationEnum.YOUR_USED_CARD, LocationEnum.SPECIAL_CARD, false))
+                    game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
+                }
+                1
+            }
+            else 0
+        })
+        holdHands.setSpecial(5)
+        holdHands.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
+            game_status.auraToAura(player.opposite(), player, 5, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
+            null
+        })
+        walkOldLoad.setSpecial(3)
+        walkOldLoad.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.PHASE_SKIP){card_number, player, game_status, _ ->
+            game_status.getPlayer(player.opposite()).nextMainPhaseSkip = true
+            game_status.movePlayingCard(player, LocationEnum.OUT_OF_GAME, card_number)
+            null
+        })
+    }
+
     fun init(){
         yurinaCardInit()
         saineCardInit()
@@ -8560,6 +8804,7 @@ object CardSet {
         kanaweIdeaInit()
         kanaweCardInit()
         tokoyoA2CardInit()
+        honokaA1CardInit()
 
         hashMapInit()
         hashMapTest()

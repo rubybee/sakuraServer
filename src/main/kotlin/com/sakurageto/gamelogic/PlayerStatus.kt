@@ -89,6 +89,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var didBasicOperation: Boolean = false
     var napBuff = 0
     var nextMainPhaseSkip = false
+    var anvil: Card? = null
     //for some card(some day refactor may be needed)
 
 
@@ -418,17 +419,99 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
         }
     }
 
-    suspend fun insertCardNumber(location: LocationEnum, list: MutableList<Int>, condition: suspend (Card) -> Boolean){
-        when(location){
-            LocationEnum.DISCARD_YOUR -> for (card in discard) if(condition(card)) list.add(card.card_number)
-            LocationEnum.DECK -> for (card in normalCardDeck) if(condition(card)) list.add(card.card_number)
-            LocationEnum.HAND -> for (card in hand.values) if(condition(card)) list.add(card.card_number)
-            LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.ENCHANTMENT_ZONE, LocationEnum.OTHER_ENCHANTMENT_ZONE_CARD  -> {
-                for (card in enchantmentCard.values) if(condition(card)) list.add(card.card_number)
+    suspend fun insertCardNumberPlusCondition(location: LocationEnum, list: MutableList<Int>, condition: suspend (Card, LocationEnum) -> Boolean,
+        condition2: suspend (Card) -> Boolean) {
+        when (location) {
+            LocationEnum.DISCARD_YOUR -> for (card in discard) {
+                if (condition(card, location) && condition2(card)) {
+                    list.add(card.card_number)
+                }
             }
-            LocationEnum.COVER_CARD -> for (card in cover_card) if(condition(card)) list.add(card.card_number)
-            LocationEnum.YOUR_USED_CARD -> for (card in usedSpecialCard.values) if(condition(card)) list.add(card.card_number)
-            LocationEnum.ALL -> {
+
+            LocationEnum.DECK -> for (card in normalCardDeck) {
+                if (condition(card, location) && condition2(card)) {
+                    list.add(card.card_number)
+                }
+            }
+
+            LocationEnum.HAND -> for (card in hand.values) {
+                if (condition(card, location) && condition2(card)) {
+                    list.add(card.card_number)
+                }
+            }
+
+            LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.ENCHANTMENT_ZONE, LocationEnum.OTHER_ENCHANTMENT_ZONE_CARD -> {
+                for (card in enchantmentCard.values) {
+                    if (condition(card, location) && condition2(card)) {
+                        list.add(card.card_number)
+                    }
+                }
+            }
+
+            LocationEnum.COVER_CARD -> for (card in cover_card) {
+                if (condition(card, location) && condition2(card)) {
+                    list.add(card.card_number)
+                }
+            }
+
+            LocationEnum.YOUR_USED_CARD -> for (card in usedSpecialCard.values) {
+                if (condition(card, location) && condition2(card)) {
+                    list.add(card.card_number)
+                }
+            }
+
+            LocationEnum.NOT_READY_SOLDIER_ZONE ->
+                for (card in notReadySoldierZone.values) {
+                    if (condition(card, location) && condition2(card)) {
+                        list.add(card.card_number)
+                    }
+                }
+
+            else -> TODO()
+        }
+    }
+
+    suspend fun insertCardNumber(location: LocationEnum, list: MutableList<Int>, condition: suspend (Card, LocationEnum) -> Boolean){
+        when(location){
+            LocationEnum.DISCARD_YOUR -> for (card in discard) {
+                if(condition(card, location)) {
+                    list.add(card.card_number)
+                }
+            }
+            LocationEnum.DECK -> for (card in normalCardDeck) {
+                if(condition(card, location)) {
+                    list.add(card.card_number)
+                }
+            }
+            LocationEnum.HAND -> for (card in hand.values) {
+                if(condition(card, location)) {
+                    list.add(card.card_number)
+                }
+            }
+            LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.ENCHANTMENT_ZONE, LocationEnum.OTHER_ENCHANTMENT_ZONE_CARD  -> {
+                for (card in enchantmentCard.values){
+                    if(condition(card, location)){
+                        list.add(card.card_number)
+                    }
+                }
+            }
+            LocationEnum.COVER_CARD -> for (card in cover_card) {
+                if(condition(card, location)){
+                    list.add(card.card_number)
+                }
+            }
+            LocationEnum.YOUR_USED_CARD -> for (card in usedSpecialCard.values){
+                if(condition(card, location)){
+                    list.add(card.card_number)
+                }
+            }
+            LocationEnum.NOT_READY_SOLDIER_ZONE ->
+                for(card in notReadySoldierZone.values){
+                    if(condition(card, location)){
+                        list.add(card.card_number)
+                    }
+                }
+            LocationEnum.ALL_NORMAL -> {
                 list.addAll(megami_1.getAllNormalCardName().map { it.toCardNumber(true) })
                 list.addAll(megami_2.getAllNormalCardName().map { it.toCardNumber(true) })
                 list.addAll(megami_1.getAllAdditionalCardName().filter
@@ -438,7 +521,14 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
                 {it.toCardData().card_class == CardClass.NORMAL}.map
                 {it.toCardNumber(true)})
             }
-            LocationEnum.NOT_READY_SOLDIER_ZONE -> list.addAll(notReadySoldierZone.keys)
+            LocationEnum.ALL -> {
+                list.addAll(megami_1.getAllNormalCardName().map { it.toCardNumber(true) })
+                list.addAll(megami_2.getAllNormalCardName().map { it.toCardNumber(true) })
+                list.addAll(megami_1.getAllSpecialCardName().map { it.toCardNumber(true) })
+                list.addAll(megami_2.getAllSpecialCardName().map { it.toCardNumber(true) })
+                list.addAll(megami_1.getAllAdditionalCardName().map {it.toCardNumber(true)})
+                list.addAll(megami_2.getAllAdditionalCardName().map {it.toCardNumber(true)})
+            }
             LocationEnum.NOT_SELECTED_NORMAL -> {
                 unselectedCard.forEach{
                     list.add(it.toCardNumber(true))

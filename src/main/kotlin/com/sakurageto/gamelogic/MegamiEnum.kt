@@ -22,6 +22,7 @@ enum class MegamiEnum(var real_number: Int) {
     SHINRA(70),
     SHINRA_A1(71),
     HAGANE(80),
+    HAGANE_A1(81),
     CHIKAGE(90),
     CHIKAGE_A1(91),
     KURURU(100),
@@ -48,6 +49,10 @@ enum class MegamiEnum(var real_number: Int) {
 
     fun getAllAdditionalCardName(): List<CardName>{
         return CardName.returnAdditionalCardNameByMegami(this)
+    }
+
+    fun getAllSpecialCardName(): List<CardName>{
+        return CardName.returnSpecialCardNameByMegami(this)
     }
 
     companion object {

@@ -18,6 +18,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     private var nap: Int? = null
     private var seedToken: Int = 0
 
+    var isSoftAttack = false
+
     fun getNap() = nap
     fun getSeedToken() = seedToken
 
@@ -256,6 +258,13 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         if(this.card_data.umbrellaMark){
             when(game_status.getUmbrella(this.player)){
                 Umbrella.FOLD -> {
+                    card_data.effectFold?.let {
+                        for(text in it){
+                            if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT && text.tag == TextEffectTag.NEXT_ATTACK_ENCHANTMENT){
+                                text.effect!!(this.card_number, player, game_status, react_attack)
+                            }
+                        }
+                    }
                     return MadeAttack(
                         card_name =  this.card_data.card_name,
                         card_number = this.card_number,
@@ -275,6 +284,13 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                     )
                 }
                 Umbrella.UNFOLD -> {
+                    card_data.effectUnfold?.let {
+                        for(text in it){
+                            if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT && text.tag == TextEffectTag.NEXT_ATTACK_ENCHANTMENT){
+                                text.effect!!(this.card_number, player, game_status, react_attack)
+                            }
+                        }
+                    }
                     return MadeAttack(
                         card_name =  this.card_data.card_name,
                         card_number = this.card_number,

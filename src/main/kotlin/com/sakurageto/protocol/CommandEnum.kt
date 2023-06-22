@@ -37,6 +37,8 @@ enum class CommandEnum {
     NOT_READY_SOLDIER_ZONE_OTHER,
     READY_SOLDIER_ZONE_YOUR,
     READY_SOLDIER_ZONE_OTHER,
+    ANVIL_YOUR,
+    ANVIL_OTHER,
 
     POP_POISON_BAG_YOUR,
     POP_POISON_BAG_OTHER,
@@ -397,6 +399,12 @@ enum class CommandEnum {
             SET_IDEA_FLIP_OTHER -> return SET_IDEA_FLIP_YOUR
             SET_ACT_YOUR -> return SET_ACT_OTHER
             SET_ACT_OTHER -> return SET_ACT_YOUR
+            ADD_THIS_TURN_DISTANCE -> return ADD_THIS_TURN_DISTANCE
+            REDUCE_THIS_TURN_DISTANCE -> return REDUCE_THIS_TURN_DISTANCE
+            ADD_THIS_TURN_SWELL_DISTANCE -> return ADD_THIS_TURN_SWELL_DISTANCE
+            REDUCE_THIS_TURN_SWELL_DISTANCE -> return REDUCE_THIS_TURN_SWELL_DISTANCE
+            ANVIL_YOUR -> return ANVIL_OTHER
+            ANVIL_OTHER -> return ANVIL_YOUR
             else -> TODO()
         }
     }
@@ -487,7 +495,11 @@ enum class LocationEnum(var real_number: Int){
     END_IDEA_OTHER(44),
 
     NOT_SELECTED_NORMAL(45),
-    NOT_SELECTED_SPECIAL(46);
+    NOT_SELECTED_SPECIAL(46),
+
+    ANVIL_YOUR(47),
+    ANVIL_OTHER(48),
+    ALL_NORMAL(49);
 
     fun Opposite(): LocationEnum{
         return when(this){
@@ -518,6 +530,8 @@ enum class LocationEnum(var real_number: Int){
             IDEA_OTHER -> IDEA_YOUR
             END_IDEA_YOUR -> END_IDEA_OTHER
             END_IDEA_OTHER -> END_IDEA_YOUR
+            ANVIL_YOUR -> ANVIL_OTHER
+            ANVIL_OTHER -> ANVIL_YOUR
             else -> DISCARD_YOUR
         }
     }

@@ -427,7 +427,12 @@ enum class CardName {
     HONOKA_FACING_SHADOW,
     HONOKA_SAKURA_SHINING_BRIGHTLY,
     HONOKA_HOLD_HANDS,
-    HONOKA_WALK_OLD_LOAD;
+    HONOKA_WALK_OLD_LOAD,
+
+    HAGANE_BONFIRE, //811
+    HAGANE_WHEEL_SKILL,
+    HAGANE_GRAND_SOFT_MATERIAL,
+    HAGANE_SOFT_ATTACK;
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -566,6 +571,10 @@ enum class CardName {
             put(HAGANE_GRAND_BELL_MEGALOBEL, 808)
             put(HAGANE_GRAND_GRAVITATION_ATTRACT, 809)
             put(HAGANE_GRAND_MOUNTAIN_RESPECT, 810)
+            put(HAGANE_BONFIRE, 811)
+            put(HAGANE_WHEEL_SKILL, 812)
+            put(HAGANE_GRAND_SOFT_MATERIAL, 813)
+            put(HAGANE_SOFT_ATTACK, 814)
 
             put(CHIKAGE_THROW_KUNAI, 900)
             put(CHIKAGE_POISON_NEEDLE, 901)
@@ -906,6 +915,10 @@ enum class CardName {
             put(HAGANE_GRAND_BELL_MEGALOBEL, 10808)
             put(HAGANE_GRAND_GRAVITATION_ATTRACT, 10809)
             put(HAGANE_GRAND_MOUNTAIN_RESPECT, 10810)
+            put(HAGANE_BONFIRE, 10811)
+            put(HAGANE_WHEEL_SKILL, 10812)
+            put(HAGANE_GRAND_SOFT_MATERIAL, 10813)
+            put(HAGANE_SOFT_ATTACK, 10814)
 
             put(CHIKAGE_THROW_KUNAI, 10900)
             put(CHIKAGE_POISON_NEEDLE, 10901)
@@ -1194,6 +1207,12 @@ enum class CardName {
                     HAGANE_WON_MU_RUYN, HAGANE_RING_A_BELL,
                     HAGANE_GRAVITATION_FIELD
                 )
+                HAGANE_A1 -> listOf(
+                    HAGANE_BONFIRE, HAGANE_WHEEL_SKILL,
+                    HAGANE_GROUND_BREAKING, HAGANE_HYPER_RECOIL,
+                    HAGANE_WON_MU_RUYN, HAGANE_RING_A_BELL,
+                    HAGANE_GRAVITATION_FIELD
+                )
                 CHIKAGE -> listOf(
                     CHIKAGE_THROW_KUNAI, CHIKAGE_POISON_NEEDLE, CHIKAGE_TO_ZU_CHU,
                     CHIKAGE_CUTTING_NECK, CHIKAGE_POISON_SMOKE, CHIKAGE_TIP_TOEING,
@@ -1345,6 +1364,10 @@ enum class CardName {
                     HAGANE_GRAND_SKY_HOLE_CRASH, HAGANE_GRAND_BELL_MEGALOBEL, HAGANE_GRAND_GRAVITATION_ATTRACT,
                     HAGANE_GRAND_MOUNTAIN_RESPECT
                 )
+                HAGANE_A1 -> listOf(
+                    HAGANE_GRAND_SOFT_MATERIAL, HAGANE_GRAND_BELL_MEGALOBEL, HAGANE_GRAND_GRAVITATION_ATTRACT,
+                    HAGANE_GRAND_MOUNTAIN_RESPECT
+                )
                 CHIKAGE -> listOf(
                     CHIKAGE_DEADLY_POISON, CHIKAGE_HAN_KI_POISON,
                     CHIKAGE_REINCARNATION_POISON, CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE
@@ -1443,6 +1466,9 @@ enum class CardName {
                 YUKIHI_A1 -> listOf()
                 SHINRA -> listOf()
                 HAGANE -> listOf()
+                HAGANE_A1 -> listOf(
+                    HAGANE_SOFT_ATTACK
+                )
                 CHIKAGE -> listOf()
                 CHIKAGE_A1 -> listOf()
                 KURURU -> listOf(

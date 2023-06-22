@@ -557,6 +557,27 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return false
     }
 
+    suspend fun dustToAnvil(player: PlayerEnum, number: Int){
+        if(number <= 0) return
+
+        var value = number
+
+        if(dust < value){
+            value = dust
+        }
+
+        if(value != 0){
+            val anvilCard = getPlayer(player).anvil!!
+            dust -= value
+            anvilCard.addNap(value)
+
+            logger.insert(Log(player, LogText.MOVE_TOKEN, anvilCard.card_number, value,
+                LocationEnum.DUST, LocationEnum.ANVIL_YOUR, false))
+            sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
+                LocationEnum.DUST, LocationEnum.ANVIL_YOUR, value, anvilCard.card_number)
+        }
+    }
+
     suspend fun notReadyToReadySeed(player: PlayerEnum, number: Int){
         val nowPlayer = getPlayer(player)
         if(number == 0 || nowPlayer.notReadySeed == 0) return
@@ -2339,7 +2360,19 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     card.special_card_state = SpecialCardEnum.PLAYED
                 }
             }
-            insertCardTo(card.player, card, place, true)
+
+            if(card.isSoftAttack){
+                if(place == LocationEnum.HAND || place == LocationEnum.DECK || place == LocationEnum.YOUR_DECK_BELOW
+                    || place == LocationEnum.YOUR_DECK_TOP){
+                    insertCardTo(card.player, card, LocationEnum.DISCARD_YOUR, true)
+                }
+                else{
+                    insertCardTo(card.player, card, place, true)
+                }
+            }
+            else{
+                insertCardTo(card.player, card, place, true)
+            }
         }
         else if(card.card_data.card_type == CardType.ENCHANTMENT){
             insertCardTo(player, card, LocationEnum.ENCHANTMENT_ZONE, true)
@@ -3612,18 +3645,27 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     //select_player -> player who select card ||| player -> victim ||| function that select card in list(list check is not needed)
-    suspend fun selectCardFrom(player: PlayerEnum, select_player: PlayerEnum, location_list: List<LocationEnum>,
-                               reason: CommandEnum, card_number: Int, condition: suspend (Card) -> Boolean): MutableList<Int>?{
+    suspend fun selectCardFrom(player: PlayerEnum, select_player: PlayerEnum, user: PlayerEnum, location_list: List<LocationEnum>,
+                               reason: CommandEnum, card_number: Int, condition: suspend (Card, LocationEnum) -> Boolean): MutableList<Int>?{
         val cardList = mutableListOf<Int>()
         val searchPlayer = getPlayer(player)
         val otherPlayer = getPlayer(player.opposite())
 
         for (location in location_list){
-            if(location == LocationEnum.OTHER_ENCHANTMENT_ZONE_CARD) {
-                otherPlayer.insertCardNumber(location, cardList, condition)
-            }
-            else{
-                searchPlayer.insertCardNumber(location, cardList, condition)
+            when(location){
+                LocationEnum.HAND -> {
+                    if(user != player){
+                        searchPlayer.insertCardNumberPlusCondition(location, cardList, condition) {
+                                card -> !(card.isSoftAttack)
+                        }
+                    }
+                }
+                LocationEnum.OTHER_ENCHANTMENT_ZONE_CARD -> {
+                    otherPlayer.insertCardNumber(location, cardList, condition)
+                }
+                else -> {
+                    searchPlayer.insertCardNumber(location, cardList, condition)
+                }
             }
         }
 
@@ -3635,13 +3677,28 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     //use this function player cannot select card select number
-    suspend fun selectCardFrom(player: PlayerEnum, select_player: PlayerEnum, location_list: List<LocationEnum>,
-                               reason: CommandEnum, card_number: Int, listSize: Int, condition: (Card) -> Boolean): MutableList<Int>?{
+    suspend fun selectCardFrom(player: PlayerEnum, select_player: PlayerEnum, user: PlayerEnum, location_list: List<LocationEnum>,
+                               reason: CommandEnum, card_number: Int, listSize: Int, condition: suspend (Card, LocationEnum) -> Boolean): MutableList<Int>?{
         val cardList = mutableListOf<Int>()
         val searchPlayer = getPlayer(player)
+        val otherPlayer = getPlayer(player.opposite())
 
         for (location in location_list){
-            searchPlayer.insertCardNumber(location, cardList, condition)
+            when(location){
+                LocationEnum.HAND -> {
+                    if(user != player){
+                        searchPlayer.insertCardNumberPlusCondition(location, cardList, condition) {
+                                card -> !(card.isSoftAttack)
+                        }
+                    }
+                }
+                LocationEnum.OTHER_ENCHANTMENT_ZONE_CARD -> {
+                    otherPlayer.insertCardNumber(location, cardList, condition)
+                }
+                else -> {
+                    searchPlayer.insertCardNumber(location, cardList, condition)
+                }
+            }
         }
 
         if(cardList.isEmpty()) return null
@@ -3928,6 +3985,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             LocationEnum.END_IDEA_YOUR -> {
                 nowPlayer.endIdeaCards[card.card_number] = card
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, publicForOther, CommandEnum.END_IDEA_YOUR, publicForYour)
+            }
+            LocationEnum.ANVIL_YOUR -> {
+                nowPlayer.anvil = card
+                sendAddCardZone(nowSocket, otherSocket, card.card_number, publicForOther, CommandEnum.ANVIL_YOUR, publicForYour)
             }
             else -> TODO()
         }

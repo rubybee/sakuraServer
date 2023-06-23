@@ -432,7 +432,21 @@ enum class CardName {
     HAGANE_BONFIRE, //811
     HAGANE_WHEEL_SKILL,
     HAGANE_GRAND_SOFT_MATERIAL,
-    HAGANE_SOFT_ATTACK;
+    HAGANE_SOFT_ATTACK,
+
+    KAMUWI_RED_BLADE,
+    KAMUWI_FLUTTERING_BLADE,
+    KAMUWI_SI_KEN_LAN_JIN,
+    KAMUWI_CUT_DOWN,
+    KAMUWI_THREADING_THORN,
+    KAMUWI_KE_SYO_LAN_LYU,
+    KAMUWI_BLOOD_WAVE,
+
+    KAMUWI_LAMP,
+    KAMUWI_DAWN,
+    KAMUWI_GRAVEYARD,
+    KAMUWI_KATA_SHIRO,
+    KAMUWI_LOGIC;
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -1305,6 +1319,12 @@ enum class CardName {
                     KANAWE_PUBLISH, KANAWE_AFTERGLOW, KANAWE_IMPROMPTU,
                     KANAWE_SEAL
                 )
+
+                KAMUWI -> listOf(
+                    KAMUWI_RED_BLADE, KAMUWI_FLUTTERING_BLADE, KAMUWI_SI_KEN_LAN_JIN,
+                    KAMUWI_CUT_DOWN, KAMUWI_THREADING_THORN, KAMUWI_KE_SYO_LAN_LYU,
+                    KAMUWI_BLOOD_WAVE,
+                )
             }
         }
 
@@ -1442,6 +1462,9 @@ enum class CardName {
                     KANAWE_VAGUE_STORY, KANAWE_INFINITE_STARLIGHT, KANAWE_BEND_OVER_THIS_NIGHT,
                     KANAWE_DISTANT_SKY
                 )
+                KAMUWI -> listOf(
+                    KAMUWI_LAMP, KAMUWI_GRAVEYARD, KAMUWI_KATA_SHIRO, KAMUWI_LOGIC
+                )
             }
         }
 
@@ -1514,6 +1537,9 @@ enum class CardName {
                     IDEA_SAL_JIN, IDEA_SAKURA_WAVE, IDEA_WHISTLE,
                     IDEA_MYEONG_JEON, IDEA_EMPHASIZING, IDEA_POSITIONING
                 )
+                KAMUWI -> listOf(
+                    KAMUWI_DAWN,
+                )
             }
         }
 
@@ -1552,6 +1578,7 @@ enum class CardEffectLocation {
     DISCARD_YOUR,
     RETURN_YOUR,
     USED_YOUR,
+    USED_OTHER,
     MEGAMI_YOUR,
     TEMP,
     IDEA_PLAYER1,

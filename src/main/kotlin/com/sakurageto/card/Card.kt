@@ -9,7 +9,6 @@ import com.sakurageto.gamelogic.log.LogText
 import com.sakurageto.gamelogic.storyboard.Act
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.receiveNapInformation
-import java.util.*
 import kotlin.collections.ArrayDeque
 import kotlin.collections.HashMap
 
@@ -73,7 +72,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
 
         fun cardInitInsert(start_turn: Boolean, dest: ArrayDeque<Card>, src: MutableList<CardName>, player: PlayerEnum){
-            src.shuffle(Random(System.currentTimeMillis()))
+            src.shuffle()
             for(card_name in src){
                 dest.add(cardMakerByName(start_turn, card_name, player))
             }
@@ -93,7 +92,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         fun cardReconstructInsert(src1: ArrayDeque<Card>, src2: ArrayDeque<Card>, dest: ArrayDeque<Card>){
             dest.addAll(src1)
             dest.addAll(src2)
-            dest.shuffle(Random(System.currentTimeMillis()))
+            dest.shuffle()
             for(card in dest){
                 if(CardSet.isPoison(card.card_number)){
                     dest.remove(card)
@@ -407,7 +406,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         chogek = false ,
                         inevitable = this.card_data.inevitable,
                         subType = this.card_data.sub_type
-                    ))){
+                    ), react_attack)){
                     return cost
                 }
                 if(card_data.card_class == CardClass.SPECIAL){

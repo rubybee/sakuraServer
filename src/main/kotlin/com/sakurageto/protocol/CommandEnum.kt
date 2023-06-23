@@ -268,6 +268,9 @@ enum class CommandEnum {
     SHOW_SPECIAL_OTHER,
     SELECT_ACT,
 
+    SET_TABOO_GAUGE_YOUR,
+    SET_TABOO_GAUGE_OTHER,
+
     SELECT_NAP_LOCATION;
 
     fun Opposite(): CommandEnum{
@@ -405,6 +408,8 @@ enum class CommandEnum {
             REDUCE_THIS_TURN_SWELL_DISTANCE -> return REDUCE_THIS_TURN_SWELL_DISTANCE
             ANVIL_YOUR -> return ANVIL_OTHER
             ANVIL_OTHER -> return ANVIL_YOUR
+            SET_TABOO_GAUGE_YOUR -> return SET_TABOO_GAUGE_OTHER
+            SET_TABOO_GAUGE_OTHER -> return SET_TABOO_GAUGE_YOUR
             else -> TODO()
         }
     }

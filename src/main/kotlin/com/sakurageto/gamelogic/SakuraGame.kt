@@ -257,6 +257,14 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
                 gameStatus.player2.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
             }
         }
+
+        if(gameStatus.player1.megami_1 == MegamiEnum.KAMUWI || gameStatus.player1.megami_2 == MegamiEnum.KAMUWI){
+            gameStatus.player1.tabooGauge = 0
+        }
+
+        if(gameStatus.player2.megami_1 == MegamiEnum.KAMUWI || gameStatus.player2.megami_2 == MegamiEnum.KAMUWI){
+            gameStatus.player2.tabooGauge = 0
+        }
         //additional board setting here
     }
 

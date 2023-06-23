@@ -1833,9 +1833,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return now_cost
     }
 
-    private fun applyAllAttackBuff(player: PlayerEnum){
+    private suspend fun applyAllAttackBuff(player: PlayerEnum, react_attack: MadeAttack?){
         val nowPlayer = getPlayer(player)
         val nowAttack = nowPlayer.pre_attack_card!!
+
+        nowAttack.effectText(player, this, react_attack, TextEffectTag.NEXT_ATTACK_ENCHANTMENT_AFTER_MAKE_ATTACK)
 
         nowAttack.addTempAttackBuff(getPlayerTempAttackBuff(player))
         nowAttack.addTempOtherBuff(getPlayerTempOtherBuff(player))
@@ -1874,7 +1876,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         player2TempOtherBuff.clearBuff()
     }
 
-    suspend fun addPreAttackZone(player: PlayerEnum, attack: MadeAttack): Boolean{
+    suspend fun addPreAttackZone(player: PlayerEnum, attack: MadeAttack, react_attack: MadeAttack?): Boolean{
         val nowPlayer = getPlayer(player)
 
         nowPlayer.addPreAttackZone(attack)
@@ -1883,7 +1885,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             getPlayerTempRangeBuff(player.opposite()).clearBuff()
             getPlayerTempAttackBuff(player.opposite()).clearBuff()
             getPlayerTempOtherBuff(player.opposite()).clearBuff()
-            applyAllAttackBuff(player)
+            applyAllAttackBuff(player, react_attack)
             true
         } else{
             cleanAllBuffWhenUnused(player)
@@ -2023,6 +2025,18 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
+    suspend fun tabooGaugeIncrease(player: PlayerEnum, number: Int){
+        val nowPlayer = getPlayer(player)
+
+        nowPlayer.tabooGauge = nowPlayer.tabooGauge?.let {
+            sendSimpleCommand(getSocket(player), getSocket(player.opposite()), CommandEnum.INCREASE_WIND_GAUGE_YOUR, it + number)
+            if(it + number >= 16){
+                gameEnd(null, player)
+            }
+            it + number
+        }
+    }
+
     //call this function when use some card that have effect to change wind, thunder gauge, cannot select not increase
     suspend fun gaugeIncreaseRequest(player: PlayerEnum, card: Int){
         val nowPlayer = getPlayer(player)
@@ -2107,6 +2121,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
      */
     suspend fun useCardFrom(player: PlayerEnum, card: Card, location: LocationEnum, react: Boolean, react_attack: MadeAttack?,
                             isCost: Boolean, isConsume: Boolean, napChange: Int = -1): Boolean{
+        if(react_attack != null && !react){
+            react_attack.isItReact = false
+        }
+
         if(getEndTurn(player) || endCurrentPhase){
             return false
         }
@@ -2667,12 +2685,16 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             val loserPlayer = getPlayer(loser!!)
             for(card in loserPlayer.special_card_deck.values){
                 if(card.effectText(loser, this, null, TextEffectTag.WHEN_LOSE_GAME) == 1){
-                    return
+                    if((loserPlayer.tabooGauge?: 0) < 16){
+                        return
+                    }
                 }
             }
             for(card in loserPlayer.usedSpecialCard.values){
                 if(card.effectText(loser, this, null, TextEffectTag.WHEN_LOSE_GAME) == 1){
-                    return
+                    if((loserPlayer.tabooGauge?: 0) < 16){
+                        return
+                    }
                 }
             }
             winnerSocket = getSocket(loser.opposite())
@@ -2985,7 +3007,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                         CardEffectLocation.ENCHANTMENT_YOUR, CardEffectLocation.USED_YOUR -> {
                             result.second!!.effect!!(selected, turnPlayer, this, null)
                         }
-                        CardEffectLocation.ENCHANTMENT_OTHER -> {
+                        CardEffectLocation.ENCHANTMENT_OTHER, CardEffectLocation.USED_OTHER -> {
                             result.second!!.effect!!(selected, turnPlayer.opposite(), this, null)
                         }
                         CardEffectLocation.ARTIFICIAL_TOKEN -> {
@@ -3008,7 +3030,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     CardEffectLocation.ENCHANTMENT_YOUR, CardEffectLocation.USED_YOUR -> {
                         lastEffect.second!!.effect!!(keys[0], turnPlayer, this, null)
                     }
-                    CardEffectLocation.ENCHANTMENT_OTHER -> {
+                    CardEffectLocation.ENCHANTMENT_OTHER, CardEffectLocation.USED_OTHER -> {
                         lastEffect.second!!.effect!!(keys[0], turnPlayer.opposite(), this, null)
                     }
                     CardEffectLocation.ARTIFICIAL_TOKEN -> {
@@ -3493,7 +3515,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     DistanceType.DISCONTINUOUS, 3,  2, null,
                     distance_uncont = arrayOf(false, false, false, true, false, true, false, false, false, false, false)
                     ,MegamiEnum.THALLYA, cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
-                ).addTextAndReturn(CardSet.attackAsuraText)) ){
+                ).addTextAndReturn(CardSet.attackAsuraText), null) ){
                 afterMakeAttack(1118, player, null)
             }
             getPlayer(player).asuraUsed = true
@@ -3507,7 +3529,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     DistanceType.DISCONTINUOUS, 1,  1, null,
                     distance_uncont = arrayOf(false, false, true, false, true, false, true, false, true, false, false)
                     ,MegamiEnum.THALLYA, cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
-                ).addTextAndReturn(CardSet.attackYakshaText)) ){
+                ).addTextAndReturn(CardSet.attackYakshaText), null) ){
                 afterMakeAttack(1111, player, null)
             }
         }

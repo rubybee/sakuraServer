@@ -23,6 +23,8 @@ class MadeAttack(
 ) {
     var editedChogek = false
 
+    var isItReact = true
+
     fun Chogek(){
         editedChogek = true
     }

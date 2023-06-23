@@ -70,6 +70,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var canIdeaProcess: Boolean = true
     var canNotUseCardName1: Pair<Int, CardName>? = null
     var canNotUseCardName2: Pair<Int, CardName>? = null
+    var tabooGauge: Int? = null
     //for megami(must be present)
 
 

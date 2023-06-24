@@ -1157,7 +1157,7 @@ object CardSet {
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         guhab.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _ ->
             game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, buff_game_status, _ ->
-                buff_game_status.getAdjustDistance(player) <= 2
+                buff_game_status.getAdjustDistance() <= 2
             }, {_, _, madeAttack ->
                 madeAttack.run {
                     auraPlusMinus(1); lifePlusMinus(1)
@@ -1476,7 +1476,7 @@ object CardSet {
             null
         }))
         crimsonzero.addtext((Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
-            if(game_status.getAdjustDistance(player) == 0){
+            if(game_status.getAdjustDistance() == 0){
                 game_status.addThisTurnOtherBuff(player, OtherBuff(card_number, 1, OtherBuffTag.GET_IMMEDIATE, {_, _, _ ->
                     true }, {_, _, attack ->
                     attack.canNotReact()
@@ -1544,7 +1544,7 @@ object CardSet {
             null
         })
         runningrabit.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _->
-            if(game_status.getAdjustDistance(player) <= 3){
+            if(game_status.getAdjustDistance() <= 3){
                 game_status.dustToDistance(2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
             }
             null
@@ -2510,7 +2510,7 @@ object CardSet {
             null
         })
         hyperRecoil.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
-            if(game_status.getAdjustDistance(player) >= 5){
+            if(game_status.getAdjustDistance() >= 5){
                 game_status.distanceToFlare(player, 1, Arrow.ONE_DIRECTION, player,
                     game_status.getCardOwner(card_number), card_number)
             }
@@ -2591,7 +2591,7 @@ object CardSet {
                 true
             }, {nowPlayer, gameStatus, madeAttack ->
                 madeAttack.run {
-                    val temp = abs(gameStatus.getAdjustDistance(nowPlayer) - gameStatus.startTurnDistance)
+                    val temp = abs(gameStatus.getAdjustDistance() - gameStatus.startTurnDistance)
                     editedAuraDamage = temp
                     editedLifeDamage = if(temp % 2 == 0) temp / 2 else temp / 2 + 1
                 }
@@ -3786,7 +3786,7 @@ object CardSet {
             null
         })
         windRun.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _->
-            if(game_status.getAdjustDistance(player) >= 3){
+            if(game_status.getAdjustDistance() >= 3){
                 game_status.distanceToDust(2, Arrow.BOTH_DIRECTION, player,
                     game_status.getCardOwner(card_number), card_number)
             }
@@ -4433,7 +4433,7 @@ object CardSet {
                 true
             }, {nowPlayer, gameStatus, madeAttack ->
                 madeAttack.run {
-                    val temp = abs(gameStatus.getAdjustDistance(nowPlayer) - 8)
+                    val temp = abs(gameStatus.getAdjustDistance() - 8)
                     editedAuraDamage = temp
                     editedLifeDamage = temp
                 }
@@ -5473,7 +5473,7 @@ object CardSet {
         })
         revolvingBlade.setAttack(DistanceType.CONTINUOUS, Pair(2, 3), null, 2, 2,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
-        revolvingBlade.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_THIS_CARD_REACTED) { card_number, player, game_status, _->
+        revolvingBlade.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_THIS_CARD_REACTED_AFTER) { card_number, player, game_status, _->
             while(true){
                 val nowCommand = game_status.receiveCardEffectSelect(player, 1501)
                 if(nowCommand == CommandEnum.SELECT_ONE){
@@ -5916,10 +5916,14 @@ object CardSet {
                 if (list.size == 1){
                     game_status.getCardFrom(player, list[0], LocationEnum.ENCHANTMENT_ZONE)?.also {
                         game_status.cardToDust(player, it.getNap() , it, false, card_number)
-                        game_status.enchantmentDestruction(player, it)
+                        if(it.isItDestruction()){
+                            game_status.enchantmentDestruction(player, it)
+                        }
                     }?: game_status.getCardFrom(player.opposite(), list[0], LocationEnum.ENCHANTMENT_ZONE)?.also {
                         game_status.cardToDust(player.opposite(), it.getNap() , it, false, card_number)
-                        game_status.enchantmentDestruction(player.opposite(), it)
+                        if(it.isItDestruction()){
+                            game_status.enchantmentDestruction(player.opposite(), it)
+                        }
                     }
 
                     if(game_status.endCurrentPhase){
@@ -6497,7 +6501,7 @@ object CardSet {
             }
         })
         tsunami.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
-            if(game_status.getAdjustDistance(player) <= 4){
+            if(game_status.getAdjustDistance() <= 4){
                 if(isHeadWind(player, game_status)){
                     game_status.flareToDistance(player.opposite(), 1, Arrow.ONE_DIRECTION, player,
                         game_status.getCardOwner(card_number), card_number)
@@ -6659,7 +6663,7 @@ object CardSet {
         })
         oyogibiFire.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
             game_status.addDistanceListener(player, Listener(player, card_number) {gameStatus, cardNumber, _, _, _, _ ->
-                if(game_status.startTurnDistance - game_status.getAdjustDistance(player) >= 2){
+                if(game_status.startTurnDistance - game_status.getAdjustDistance() >= 2){
                     gameStatus.returnSpecialCard(player, cardNumber)
                     true
                 }
@@ -7592,7 +7596,7 @@ object CardSet {
             }
             null
         })
-        jinPungJeCheonUi.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_THIS_CARD_REACTED) {_, player, game_status, _->
+        jinPungJeCheonUi.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_THIS_CARD_RETURN) {_, player, game_status, _->
             game_status.getPlayer(player).notCharge = false
             null
         })
@@ -8069,7 +8073,7 @@ object CardSet {
             null
         })
         positioning.addtext(Text(TextEffectTimingTag.IDEA_CONDITION, TextEffectTag.IDEA){_, _, game_status, _ ->
-            val nowDistance = game_status.getAdjustDistance(null)
+            val nowDistance = game_status.getAdjustDistance()
             if(abs(game_status.startTurnDistance - nowDistance) >= 2 && nowDistance <= 8){
                 1
             }
@@ -8078,7 +8082,7 @@ object CardSet {
             }
         })
         positioning.addtext(Text(TextEffectTimingTag.IDEA_CONDITION_FLIP, TextEffectTag.IDEA){ _, _, game_status, _ ->
-            if(abs(game_status.startTurnDistance - game_status.getAdjustDistance(null)) >= 5){
+            if(abs(game_status.startTurnDistance - game_status.getAdjustDistance()) >= 5){
                 1
             }
             else {
@@ -8938,7 +8942,7 @@ object CardSet {
 
     private fun haganeA1CardInit(){
         bonfire.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
-            if(game_status.getAdjustDistance(null) <= 3){
+            if(game_status.getAdjustDistance() <= 3){
                 game_status.distanceToFlare(player, 1, Arrow.ONE_DIRECTION, player,
                     game_status.getCardOwner(card_number), card_number)
                 game_status.distanceToFlare(player.opposite(), 1, Arrow.ONE_DIRECTION, player,
@@ -8947,7 +8951,7 @@ object CardSet {
             null
         })
         wheelSkill.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.DRAW_CARD){card_number, player, game_status, _ ->
-            if(abs(game_status.getAdjustDistance(null) - game_status.startTurnDistance) >= 2){
+            if(abs(game_status.getAdjustDistance() - game_status.startTurnDistance) >= 2){
                 game_status.drawCard(player, 1)
                 game_status.getConcentration(player)
             }
@@ -8999,6 +9003,12 @@ object CardSet {
     private val flutteringBlade = CardData(CardClass.NORMAL, CardName.KAMUWI_FLUTTERING_BLADE, MegamiEnum.KAMUWI, CardType.ATTACK, SubType.NONE)
     private val siKenLanJin = CardData(CardClass.NORMAL, CardName.KAMUWI_SI_KEN_LAN_JIN, MegamiEnum.KAMUWI, CardType.ATTACK, SubType.NONE)
     private val cutDown = CardData(CardClass.NORMAL, CardName.KAMUWI_CUT_DOWN, MegamiEnum.KAMUWI, CardType.ATTACK, SubType.REACTION)
+    private val threadingThorn = CardData(CardClass.NORMAL, CardName.KAMUWI_THREADING_THORN, MegamiEnum.KAMUWI, CardType.BEHAVIOR, SubType.NONE)
+    private val keSyoLanLyu = CardData(CardClass.NORMAL, CardName.KAMUWI_KE_SYO_LAN_LYU, MegamiEnum.KAMUWI, CardType.BEHAVIOR, SubType.FULL_POWER)
+    private val bloodWave = CardData(CardClass.NORMAL, CardName.KAMUWI_BLOOD_WAVE, MegamiEnum.KAMUWI, CardType.ENCHANTMENT, SubType.NONE)
+    private val lamp = CardData(CardClass.SPECIAL, CardName.KAMUWI_LAMP, MegamiEnum.KAMUWI, CardType.BEHAVIOR, SubType.NONE)
+    private val dawn = CardData(CardClass.SPECIAL, CardName.KAMUWI_DAWN, MegamiEnum.KAMUWI, CardType.ATTACK, SubType.NONE)
+    private val graveYard = CardData(CardClass.SPECIAL, CardName.KAMUWI_GRAVEYARD, MegamiEnum.KAMUWI, CardType.ENCHANTMENT, SubType.NONE)
 
     private fun kamuwiCardInit(){
         redBlade.setAttack(DistanceType.CONTINUOUS, Pair(3, 3), null, 3, 1,
@@ -9099,6 +9109,224 @@ object CardSet {
                             if(react_attack?.card_class == CardClass.SPECIAL || react_attack?.subType == SubType.FULL_POWER){
                                 game_status.tabooGaugeIncrease(player, 2)
                             }
+                            break
+                        }
+                        CommandEnum.SELECT_NOT -> {
+                            break
+                        }
+                        else -> {}
+                    }
+                }
+            }
+            null
+        })
+        thornBush.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
+            val distance = game_status.getAdjustDistance()
+            if(distance >= 5){
+                game_status.distanceToDust(2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
+            }
+            else if(distance <= 1){
+                game_status.dustToDistance(2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
+            }
+            else{
+                game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS, {_, _, condition_attack ->
+                    (condition_attack.megami != MegamiEnum.KAMUWI) && (condition_attack.card_class != CardClass.SPECIAL)
+                }, {_, _, attack ->
+                    attack.auraPlusMinus(1)
+                }))
+                game_status.addThisTurnOtherBuff(player, OtherBuff(card_number,1, OtherBuffTag.GET, { _, _, condition_attack ->
+                    (condition_attack.megami != MegamiEnum.KAMUWI) && (condition_attack.card_class != CardClass.SPECIAL)},
+                    { _, _, attack ->
+                        attack.canNotReactNormal()
+                    })
+                )
+            }
+            null
+        })
+        keSyoLanLyu.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) { card_number, player, game_status, _ ->
+            var (selectOne, selectTwo, selectThree, selectFour) = listOf(false, false, false, false)
+            var firstCommand: CommandEnum
+            var secondCommand: CommandEnum
+
+            while(true){
+                firstCommand = game_status.receiveCardEffectSelect(player, 2105)
+                when(firstCommand){
+                    CommandEnum.SELECT_ONE, CommandEnum.SELECT_TWO, CommandEnum.SELECT_THREE, CommandEnum.SELECT_FOUR
+                    -> {
+                        break
+                    }
+                    else -> {
+                        continue
+                    }
+                }
+            }
+
+            while(true){
+                secondCommand = game_status.receiveCardEffectSelect(player, 2105)
+                when(secondCommand){
+                    firstCommand -> {
+                        continue
+                    }
+                    CommandEnum.SELECT_ONE, CommandEnum.SELECT_TWO, CommandEnum.SELECT_THREE, CommandEnum.SELECT_FOUR
+                    -> {
+                        break
+                    }
+                    else -> {
+                        continue
+                    }
+                }
+            }
+
+            when(firstCommand){
+                CommandEnum.SELECT_ONE -> selectOne = true
+                CommandEnum.SELECT_TWO -> selectTwo = true
+                CommandEnum.SELECT_THREE -> selectThree = true
+                CommandEnum.SELECT_FOUR -> selectFour = true
+                else -> {}
+            }
+
+            when(secondCommand){
+                CommandEnum.SELECT_ONE -> selectOne = true
+                CommandEnum.SELECT_TWO -> selectTwo = true
+                CommandEnum.SELECT_THREE -> selectThree = true
+                CommandEnum.SELECT_FOUR -> selectFour = true
+                else -> {}
+            }
+
+            if(selectOne){
+                if(game_status.addPreAttackZone(player, MadeAttack(CardName.KAMUWI_KE_SYO_LAN_LYU, card_number, CardClass.NULL,
+                        DistanceType.CONTINUOUS, 4,  1, Pair(5, 9), null, MegamiEnum.KAMUWI,
+                        cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
+                    ), null) ){
+                    game_status.afterMakeAttack(card_number, player, null)
+                }
+            }
+
+            if(selectTwo){
+                if(game_status.getAdjustDistance() >= 5){
+                    game_status.distanceToDust(2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
+                }
+            }
+
+            if(selectThree){
+                if(game_status.addPreAttackZone(player, MadeAttack(CardName.KAMUWI_KE_SYO_LAN_LYU, card_number, CardClass.NULL,
+                        DistanceType.CONTINUOUS, 2,  2, Pair(2, 4), null, MegamiEnum.KAMUWI,
+                        cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
+                    ), null) ){
+                    game_status.afterMakeAttack(card_number, player, null)
+                }
+            }
+
+            if(selectFour){
+                game_status.dustToAura(player, 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
+            }
+            null
+        })
+        bloodWave.setEnchantment(2)
+        bloodWave.addtext(chasm)
+        bloodWave.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
+            if(game_status.getPlayer(player).tabooGauge != null){
+                while(true){
+                    when(game_status.receiveCardEffectSelect(player, 2106)){
+                        CommandEnum.SELECT_ONE -> {
+                            game_status.tabooGaugeIncrease(player, 1)
+                            if(game_status.addPreAttackZone(player, MadeAttack(CardName.KAMUWI_BLOOD_WAVE, card_number, CardClass.NULL,
+                                    DistanceType.CONTINUOUS, 2,  2, Pair(3, 3), null, MegamiEnum.KAMUWI,
+                                    cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false, inevitable = true
+                                ), null) ){
+                                game_status.afterMakeAttack(card_number, player, null)
+                            }
+                            break
+                        }
+                        CommandEnum.SELECT_NOT -> {
+                            break
+                        }
+                        else -> {}
+                    }
+                }
+            }
+            null
+        })
+        bloodWave.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.FORBID_GET_AURA_OTHER) {_, _, _, _ ->
+            1
+        })
+        bloodWave.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.FORBID_GET_AURA_OTHER_AFTER) {card_number, player, game_status, _ ->
+            game_status.getCardFrom(player, card_number, LocationEnum.ENCHANTMENT_ZONE)?.let {card ->
+                game_status.cardToDust(player, 1, card, false, card_number)
+                game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
+                if(card.isItDestruction()){
+                    game_status.enchantmentDestruction(player, card)
+                }
+            }
+            1
+        })
+        lamp.setSpecial(5)
+        lamp.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {card_number, player, game_status, _->
+            while(true){
+                when(game_status.receiveCardEffectSelect(player, 2107)){
+                    CommandEnum.SELECT_ONE -> {
+                        game_status.tabooGaugeIncrease(player, 3)
+                        game_status.flareToDust(player, game_status.getPlayerFlare(player), Arrow.NULL, player,
+                            game_status.getCardOwner(card_number), card_number)
+                        game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
+                        game_status.processDamage(player, CommandEnum.CHOOSE_LIFE, Pair(999, 1), false,
+                            null, null, card_number)
+                        game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
+                        game_status.moveAdditionalCard(player, CardName.KAMUWI_DAWN, LocationEnum.SPECIAL_CARD)
+                        break
+                    }
+                    CommandEnum.SELECT_NOT -> {
+                        break
+                    }
+                    else -> {}
+                }
+            }
+            null
+        })
+        dawn.setSpecial(6)
+        dawn.setAttack(DistanceType.CONTINUOUS, Pair(3, 7), null, 6, 4,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = true)
+        dawn.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_THIS_CARD_REACTED) { card_number, player, game_status, this_attack ->
+            game_status.getCardFrom(player.opposite(), card_number, LocationEnum.PLAYING_ZONE_YOUR)?.let {react_card ->
+                if(react_card.card_data.card_class == CardClass.NORMAL){
+                    this_attack?.addAttackBuff(Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true },
+                        {_, _, attack ->
+                            attack.auraPlusMinus(-1)
+                        }))
+                }
+
+                if(react_card.card_data.card_class == CardClass.SPECIAL){
+                    this_attack?.addAttackBuff(Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true },
+                        {_, _, attack ->
+                            attack.apply {
+                                auraPlusMinus(-1); lifePlusMinus(-1)
+                            }
+                        }))
+                }
+            }
+            1
+        })
+        dawn.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) {card_number, player, game_status, _ ->
+            game_status.movePlayingCard(player, LocationEnum.OUT_OF_GAME, card_number)
+            null
+        })
+        graveYard.setSpecial(3)
+        graveYard.setEnchantment(4)
+        graveYard.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
+            if(game_status.getPlayer(player).tabooGauge != null){
+                while(true){
+                    when(game_status.receiveCardEffectSelect(player, 2109)){
+                        CommandEnum.SELECT_ONE -> {
+                            game_status.tabooGaugeIncrease(player, 2)
+                            if(game_status.addPreAttackZone(player, MadeAttack(CardName.KAMUWI_GRAVEYARD, card_number, CardClass.NULL,
+                                    DistanceType.CONTINUOUS, 3,  3, Pair(3, 4), null, MegamiEnum.KAMUWI,
+                                    cannotReactNormal = true, cannotReactSpecial = false, cannotReact = false, chogek = false, inevitable = false
+                                ), null) ){
+                                game_status.afterMakeAttack(card_number, player, null)
+                            }
+                            game_status.processDamage(player, CommandEnum.CHOOSE_LIFE, Pair(999, 1), false,
+                                null, null, card_number)
+                            game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
                             break
                         }
                         CommandEnum.SELECT_NOT -> {

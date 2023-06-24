@@ -549,6 +549,19 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     }
 
     suspend fun use(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, isTermination: Boolean, nap_change: Int = -1){
+        if(react_attack?.effectText(this.card_number, player.opposite(), game_status, react_attack,
+                TextEffectTag.WHEN_THIS_CARD_REACTED) == 1){
+            game_status.movePlayingCard(player, null, card_number)
+            if(card_data.card_type == CardType.ATTACK){
+                val nowAttack = game_status.getPlayer(player).pre_attack_card
+                val nowPlayer = game_status.getPlayer(player)
+                nowAttack?.activeOtherBuff(game_status, player, nowPlayer.otherBuff)
+                val damage = nowAttack?.getDamage(game_status, player, nowPlayer.attackBuff)
+                game_status.getPlayer(player).pre_attack_card = null
+            }
+            return
+        }
+
         if(isTermination){
             game_status.setEndTurn(player, true)
         }
@@ -578,7 +591,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 card.addValidEffect(TextEffectTag.WHEN_USE_REACT_CARD_YOUR_END, cardUseEndEffect)
             }
         }
-        react_attack?.addValidEffect(TextEffectTag.WHEN_THIS_CARD_REACTED, cardUseEndEffect)
+
+        react_attack?.addValidEffect(TextEffectTag.WHEN_THIS_CARD_REACTED_AFTER, cardUseEndEffect)
 
         when(this.card_data.card_type){
             CardType.ATTACK -> {

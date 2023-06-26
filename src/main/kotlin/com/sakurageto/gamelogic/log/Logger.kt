@@ -146,6 +146,7 @@ class Logger {
             if(log.text == LogText.ATTACK) count += 1
             else if(log.text == LogText.USE_CARD_REACT) count += 1
         }
+
         return if(flipped){
             count >= 5
         } else {

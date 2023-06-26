@@ -439,43 +439,33 @@ class MadeAttack(
     }
 
     fun addTextAndReturn(umbrella: Umbrella?, card_data: CardData): MadeAttack{
-        when(umbrella){
-            Umbrella.FOLD -> {
-                card_data.effectFold?.let {
-                    this.effect = mutableListOf()
-                    for(text in it){
-                        this.effect!!.add(text)
-                    }
-                }?: run{
-                    card_data.effect?.let {
+        if(card_data.umbrellaMark){
+            when(umbrella){
+                Umbrella.FOLD -> {
+                    card_data.effectFold?.let {
                         this.effect = mutableListOf()
                         for(text in it){
                             this.effect!!.add(text)
                         }
                     }
                 }
-            }
-            Umbrella.UNFOLD -> {
-                card_data.effectUnfold?.let {
-                    this.effect = mutableListOf()
-                    for(text in it){
-                        this.effect!!.add(text)
-                    }
-                }?: run{
-                    card_data.effect?.let {
+                Umbrella.UNFOLD -> {
+                    card_data.effectUnfold?.let {
                         this.effect = mutableListOf()
                         for(text in it){
                             this.effect!!.add(text)
                         }
                     }
                 }
+                null -> {
+
+                }
             }
-            null -> {
-                card_data.effect?.let {
-                    this.effect = mutableListOf()
-                    for(text in it){
-                        this.effect!!.add(text)
-                    }
+
+            card_data.effect?.let {
+                this.effect = mutableListOf()
+                for(text in it){
+                    this.effect!!.add(text)
                 }
             }
         }

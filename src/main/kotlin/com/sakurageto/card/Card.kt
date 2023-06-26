@@ -336,16 +336,41 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
 
     //-2: can't use                    -1: can use                 >= 0: cost
     suspend fun canUse(player: PlayerEnum, gameStatus: GameStatus, react_attack: MadeAttack?, isCost: Boolean, isConsume: Boolean): Int{
+        val nowPlayer = gameStatus.getPlayer(player)
+        var cost: Int
+
         if(!textUseCheck(player, gameStatus, react_attack)){
             return -2
         }
 
-        if(isCost && !textCostCheck(player, gameStatus, react_attack)){
-            return -2
-        }
+        if(isCost){
+            if(!textCostCheck(player, gameStatus, react_attack)){
+                return -2
+            }
 
-        var cost: Int
-        val nowPlayer = gameStatus.getPlayer(player)
+            val otherPlayer = gameStatus.getPlayer(player.opposite())
+            var cardMustPay = 0
+
+            if(nowPlayer.nextCostAddMegami == card_data.megami){
+                cardMustPay += 1
+            }
+
+            if(card_data.card_class == CardClass.SPECIAL && card_data.card_type == CardType.BEHAVIOR){
+                for(card in otherPlayer.usedSpecialCard.values){
+                    cardMustPay += card.effectAllValidEffect(player.opposite(), gameStatus, TextEffectTag.KAMUWI_LOGIC)
+                }
+            }
+
+            if(cardMustPay != 0){
+                val cardCanUseCost = nowPlayer.hand.values.filter {
+                    it.card_data.megami == nowPlayer.nextCostAddMegami
+                }.size
+
+                if(cardCanUseCost < cardMustPay){
+                    return -2
+                }
+            }
+        }
 
         if(card_data.card_class == CardClass.SPECIAL){
             if(nowPlayer.canNotUseCardName1?.second == card_data.card_name
@@ -556,7 +581,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 val nowAttack = game_status.getPlayer(player).pre_attack_card
                 val nowPlayer = game_status.getPlayer(player)
                 nowAttack?.activeOtherBuff(game_status, player, nowPlayer.otherBuff)
-                val damage = nowAttack?.getDamage(game_status, player, nowPlayer.attackBuff)
+                nowAttack?.getDamage(game_status, player, nowPlayer.attackBuff)
                 game_status.getPlayer(player).pre_attack_card = null
             }
             return

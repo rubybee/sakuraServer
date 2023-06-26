@@ -112,10 +112,9 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
 
         //additional board setting here
         if(gameStatus.player1.megami_1 == MegamiEnum.YUKIHI || gameStatus.player1.megami_2 == MegamiEnum.YUKIHI ||
-            gameStatus.player1.megami_1 == MegamiEnum.YUKIHI_A1 || gameStatus.player1.megami_2 == MegamiEnum.YUKIHI_A1
-        ){
+            gameStatus.player1.megami_1 == MegamiEnum.YUKIHI_A1 || gameStatus.player1.megami_2 == MegamiEnum.YUKIHI_A1) {
             gameStatus.player1.umbrella = Umbrella.FOLD
-            if(gameStatus.player1.megami_1 == MegamiEnum.YUKIHI){
+            if(gameStatus.player1.megami_1 == MegamiEnum.YUKIHI || gameStatus.player1.megami_1 == MegamiEnum.YUKIHI_A1){
                 gameStatus.player1.megamiCard = Card.cardMakerByName(firstTurn == PlayerEnum.PLAYER1, CardName.YUKIHI_YUKIHI, PlayerEnum.PLAYER1)
                 gameStatus.player1.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
             }
@@ -126,9 +125,9 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         }
 
         if(gameStatus.player2.megami_1 == MegamiEnum.YUKIHI || gameStatus.player2.megami_2 == MegamiEnum.YUKIHI ||
-            gameStatus.player2.megami_1 == MegamiEnum.YUKIHI_A1 || gameStatus.player2.megami_2 == MegamiEnum.YUKIHI_A1){
+            gameStatus.player2.megami_1 == MegamiEnum.YUKIHI_A1 || gameStatus.player2.megami_2 == MegamiEnum.YUKIHI_A1) {
             gameStatus.player2.umbrella = Umbrella.FOLD
-            if(gameStatus.player2.megami_1 == MegamiEnum.YUKIHI){
+            if(gameStatus.player2.megami_1 == MegamiEnum.YUKIHI || gameStatus.player2.megami_1 == MegamiEnum.YUKIHI){
                 gameStatus.player2.megamiCard = Card.cardMakerByName(firstTurn == PlayerEnum.PLAYER2, CardName.YUKIHI_YUKIHI, PlayerEnum.PLAYER2)
                 gameStatus.player2.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
             }
@@ -427,9 +426,9 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
 
     suspend fun startPhase(){
         gameStatus.endCurrentPhase = false
+        gameStatus.startPhaseBeforeEffect(this.turnPlayer)
         gameStatus.nowPhase = START_PHASE
         sendStartPhaseStart(getSocket(this.turnPlayer), getSocket(this.turnPlayer.opposite()))
-        gameStatus.startPhaseDefaultFirst(this.turnPlayer)
         gameStatus.startPhaseEffectProcess(this.turnPlayer)
         if(turnNumber == 0 || turnNumber == 1){
             return

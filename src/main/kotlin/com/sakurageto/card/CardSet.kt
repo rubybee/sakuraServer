@@ -1,6 +1,7 @@
 package com.sakurageto.card
 
 import com.sakurageto.gamelogic.*
+import com.sakurageto.gamelogic.GameStatus.Companion.END_PHASE
 import com.sakurageto.gamelogic.GameStatus.Companion.START_PHASE
 import com.sakurageto.gamelogic.log.Log
 import com.sakurageto.gamelogic.log.LogText
@@ -405,6 +406,19 @@ object CardSet {
         cardNumberHashmap[9004] = CardName.IDEA_EMPHASIZING
         cardNumberHashmap[9005] = CardName.IDEA_POSITIONING
 
+        cardNumberHashmap[2100] = CardName.KAMUWI_RED_BLADE
+        cardNumberHashmap[2101] = CardName.KAMUWI_FLUTTERING_BLADE
+        cardNumberHashmap[2102] = CardName.KAMUWI_SI_KEN_LAN_JIN
+        cardNumberHashmap[2103] = CardName.KAMUWI_CUT_DOWN
+        cardNumberHashmap[2104] = CardName.KAMUWI_THREADING_THORN
+        cardNumberHashmap[2105] = CardName.KAMUWI_KE_SYO_LAN_LYU
+        cardNumberHashmap[2106] = CardName.KAMUWI_BLOOD_WAVE
+        cardNumberHashmap[2107] = CardName.KAMUWI_LAMP
+        cardNumberHashmap[2108] = CardName.KAMUWI_DAWN
+        cardNumberHashmap[2109] = CardName.KAMUWI_GRAVEYARD
+        cardNumberHashmap[2110] = CardName.KAMUWI_KATA_SHIRO
+        cardNumberHashmap[2111] = CardName.KAMUWI_LOGIC
+
 
         cardNumberHashmap[10100] = CardName.YURINA_CHAM
         cardNumberHashmap[10101] = CardName.YURINA_ILSUM
@@ -743,6 +757,19 @@ object CardSet {
         cardNumberHashmap[19003] = CardName.IDEA_MYEONG_JEON
         cardNumberHashmap[19004] = CardName.IDEA_EMPHASIZING
         cardNumberHashmap[19005] = CardName.IDEA_POSITIONING
+
+        cardNumberHashmap[12100] = CardName.KAMUWI_RED_BLADE
+        cardNumberHashmap[12101] = CardName.KAMUWI_FLUTTERING_BLADE
+        cardNumberHashmap[12102] = CardName.KAMUWI_SI_KEN_LAN_JIN
+        cardNumberHashmap[12103] = CardName.KAMUWI_CUT_DOWN
+        cardNumberHashmap[12104] = CardName.KAMUWI_THREADING_THORN
+        cardNumberHashmap[12105] = CardName.KAMUWI_KE_SYO_LAN_LYU
+        cardNumberHashmap[12106] = CardName.KAMUWI_BLOOD_WAVE
+        cardNumberHashmap[12107] = CardName.KAMUWI_LAMP
+        cardNumberHashmap[12108] = CardName.KAMUWI_DAWN
+        cardNumberHashmap[12109] = CardName.KAMUWI_GRAVEYARD
+        cardNumberHashmap[12110] = CardName.KAMUWI_KATA_SHIRO
+        cardNumberHashmap[12111] = CardName.KAMUWI_LOGIC
 
 
         cardDataHashmap[CardName.CARD_UNNAME] = unused
@@ -1095,6 +1122,19 @@ object CardSet {
         cardDataHashmap[CardName.HAGANE_WHEEL_SKILL] = wheelSkill
         cardDataHashmap[CardName.HAGANE_GRAND_SOFT_MATERIAL] = grandSoftMaterial
         cardDataHashmap[CardName.HAGANE_SOFT_ATTACK] = softAttack
+
+        cardDataHashmap[CardName.KAMUWI_RED_BLADE] = redBlade
+        cardDataHashmap[CardName.KAMUWI_FLUTTERING_BLADE] = flutteringBlade
+        cardDataHashmap[CardName.KAMUWI_SI_KEN_LAN_JIN] = siKenLanJin
+        cardDataHashmap[CardName.KAMUWI_CUT_DOWN] = cutDown
+        cardDataHashmap[CardName.KAMUWI_THREADING_THORN] = threadingThorn
+        cardDataHashmap[CardName.KAMUWI_KE_SYO_LAN_LYU] = keSyoLanLyu
+        cardDataHashmap[CardName.KAMUWI_BLOOD_WAVE] = bloodWave
+        cardDataHashmap[CardName.KAMUWI_LAMP] = lamp
+        cardDataHashmap[CardName.KAMUWI_DAWN] = dawn
+        cardDataHashmap[CardName.KAMUWI_GRAVEYARD] = graveYard
+        cardDataHashmap[CardName.KAMUWI_KATA_SHIRO] = kataShiro
+        cardDataHashmap[CardName.KAMUWI_LOGIC] = logic
     }
 
     private suspend fun selectDustToDistance(nowCommand: CommandEnum, game_status: GameStatus,
@@ -2996,6 +3036,7 @@ object CardSet {
             canDiscard = card_data.canDiscard
 
             effect = card_data.effect
+
         }
         return result
     }
@@ -5706,12 +5747,6 @@ object CardSet {
         null
     }
 
-    private fun getMirror(game_status: GameStatus): Int {
-        val player1 = game_status.getPlayer(PlayerEnum.PLAYER1)
-        val player2 = game_status.getPlayer(PlayerEnum.PLAYER2)
-        return if(player1.aura == player2.aura) 1 else 0 + if(player1.flare == player2.flare) 1 else 0 + if(player1.life == player2.life) 1 else 0
-    }
-
     private fun yatsuhaCardInit(){
         starNail.setAttack(DistanceType.CONTINUOUS, Pair(3, 4), null, 3, 2,
             cannotReactNormal = true, cannotReactSpecial = false, cannotReact = false, chogek = false)
@@ -5725,8 +5760,8 @@ object CardSet {
         darknessGill.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
             game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ ->
                 true
-            }, {_, buff_game_status, attack ->
-                attack.lifePlusMinus(getMirror(buff_game_status))
+            }, {_, gameStatus, attack ->
+                attack.lifePlusMinus(gameStatus.getMirror())
             }))
             null
         })
@@ -5862,13 +5897,28 @@ object CardSet {
             null
         })
         contract.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.ADD_END_PHASE_EFFECT) {card_number, player, game_status, _ ->
-            game_status.endPhaseEffect[card_number] = Pair(CardEffectLocation.TEMP, contractText)
+            if(game_status.nowPhase == END_PHASE){
+                if(player == PlayerEnum.PLAYER1){
+                    game_status.nextEndPhaseEffect[card_number] = Pair(CardEffectLocation.TEMP_PLAYER1, contractText)
+                }
+                else{
+                    game_status.nextEndPhaseEffect[card_number] = Pair(CardEffectLocation.TEMP_PLAYER2, contractText)
+                }
+            }
+            else{
+                if(player == PlayerEnum.PLAYER1){
+                    game_status.endPhaseEffect[card_number] = Pair(CardEffectLocation.TEMP_PLAYER1, contractText)
+                }
+                else{
+                    game_status.endPhaseEffect[card_number] = Pair(CardEffectLocation.TEMP_PLAYER2, contractText)
+                }
+            }
             null
         })
         clingyFlower.setEnchantment(3)
         clingyFlower.addtext(chasm)
         clingyFlower.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.THIS_CARD_NAP_CHANGE) {_, player, game_status, _ ->
-            game_status.getPlayer(player).napBuff -= getMirror(game_status)
+            game_status.getPlayer(player).napBuff -= game_status.getMirror()
             null
         })
         clingyFlower.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
@@ -5966,9 +6016,9 @@ object CardSet {
         sixStarSea.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
             game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ ->
                 true
-            }, {_, buff_game_status, attack ->
+            }, {_, gameStatus, attack ->
                 attack.apply {
-                    lifePlusMinus(getMirror(buff_game_status)); auraPlusMinus(getMirror(buff_game_status))
+                    lifePlusMinus(gameStatus.getMirror()); auraPlusMinus(gameStatus.getMirror())
                 }
             }))
             null
@@ -6777,8 +6827,6 @@ object CardSet {
             }
             canCover = cardData.canCover
             canDiscard = cardData.canDiscard
-
-            effect = cardData.effect
         }
         original.beforeCardData = original.card_data
         original.card_data = result
@@ -6828,8 +6876,6 @@ object CardSet {
             }
             canCover = cardData.canCover
             canDiscard = cardData.canDiscard
-
-            effect = cardData.effect
         }
         original.beforeCardData = original.card_data
         original.card_data = result
@@ -7224,8 +7270,8 @@ object CardSet {
             game_status.movePlayingCard(player, LocationEnum.YOUR_DECK_BELOW, card_number)
             null
         })
-        threadOrRawThread.addTextUnfold(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
-            if(game_status.logger.checkThisTurnUseCard(player) { card -> card != card_number }){
+        threadOrRawThread.addTextUnfold(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.USE_CARD) {card_number, player, game_status, _->
+            if(!(game_status.logger.checkThisTurnUseCard(player) { card -> card != card_number })){
                 game_status.selectCardFrom(player, player, player,
                     listOf(LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 611, 1){
                     card, _ -> card.card_data.sub_type != SubType.FULL_POWER &&
@@ -7240,6 +7286,7 @@ object CardSet {
             }
             null
         })
+        flutteringCollar.umbrellaMark = true
         flutteringCollar.setSpecial(4)
         flutteringCollar.setEnchantment(1)
         flutteringCollar.addTextFold(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_AFTER_CARD_USE) ret@{card_number, player, game_status, card->
@@ -8045,7 +8092,7 @@ object CardSet {
             null
         })
         myeongjeon.addtext(Text(TextEffectTimingTag.IDEA_PROCESS_FLIP, TextEffectTag.IDEA){ card_number, player, game_status, _ ->
-            ideaProcess(card_number, player, game_status, 1)
+            ideaProcess(card_number, player, game_status, 2)
             null
         })
         emphasizing.addtext(Text(TextEffectTimingTag.IDEA_CONDITION, TextEffectTag.IDEA){ _, player, game_status, _ ->
@@ -8214,6 +8261,7 @@ object CardSet {
                 while(true){
                     when(game_status.receiveCardEffectSelect(player, idea.card_number)){
                         CommandEnum.SELECT_ONE -> {
+                            game_status.getPlayer(player).isIdeaCardFlipped = false
                             break
                         }
                         CommandEnum.SELECT_TWO -> {
@@ -8476,7 +8524,7 @@ object CardSet {
             activeAct(player, game_status)
             null
         })
-        infiniteStarlight.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
+        infiniteStarlight.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_ACT_CHANGE){card_number, player, game_status, _ ->
             game_status.returnSpecialCard(player, card_number)
             null
         })
@@ -8892,6 +8940,7 @@ object CardSet {
                     }
                 }
             }
+
             effectUnfold = if(card_data.effectUnfold == null) null
             else mutableListOf<Text>().apply {
                 card_data.effectUnfold?.let {
@@ -8934,8 +8983,6 @@ object CardSet {
             }
             canCover = card_data.canCover
             canDiscard = card_data.canDiscard
-
-            effect = card_data.effect
         }
         return result
     }
@@ -8950,7 +8997,7 @@ object CardSet {
             }
             null
         })
-        wheelSkill.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.DRAW_CARD){card_number, player, game_status, _ ->
+        wheelSkill.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.DRAW_CARD){_, player, game_status, _ ->
             if(abs(game_status.getAdjustDistance() - game_status.startTurnDistance) >= 2){
                 game_status.drawCard(player, 1)
                 game_status.getConcentration(player)
@@ -8959,12 +9006,12 @@ object CardSet {
         })
         grandSoftMaterial.setSpecial(1)
         grandSoftMaterial.addtext(termination)
-        grandSoftMaterial.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
+        grandSoftMaterial.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD){card_number, player, game_status, _ ->
             if(player == game_status.getCardOwner(card_number)){
                 if(game_status.getPlayer(player).anvil == null){
                     while(true){
                         val list = game_status.selectCardFrom(player, player, player, listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 813
-                        ) { card, _ -> card.card_data.card_type == CardType.ATTACK }?: break
+                        ) { card, _ -> card.card_data.card_type == CardType.ATTACK && card.card_data.megami != MegamiEnum.HAGANE }?: break
                         if (list.size == 1){
                             game_status.popCardFrom(player, list[0], LocationEnum.HAND, true)?.let { selectedAttack ->
                                 game_status.insertCardTo(player, selectedAttack, LocationEnum.ANVIL_YOUR, true)
@@ -9009,6 +9056,8 @@ object CardSet {
     private val lamp = CardData(CardClass.SPECIAL, CardName.KAMUWI_LAMP, MegamiEnum.KAMUWI, CardType.BEHAVIOR, SubType.NONE)
     private val dawn = CardData(CardClass.SPECIAL, CardName.KAMUWI_DAWN, MegamiEnum.KAMUWI, CardType.ATTACK, SubType.NONE)
     private val graveYard = CardData(CardClass.SPECIAL, CardName.KAMUWI_GRAVEYARD, MegamiEnum.KAMUWI, CardType.ENCHANTMENT, SubType.NONE)
+    private val kataShiro = CardData(CardClass.SPECIAL, CardName.KAMUWI_KATA_SHIRO, MegamiEnum.KAMUWI, CardType.ATTACK, SubType.REACTION)
+    private val logic = CardData(CardClass.SPECIAL, CardName.KAMUWI_LOGIC, MegamiEnum.KAMUWI, CardType.BEHAVIOR, SubType.NONE)
 
     private fun kamuwiCardInit(){
         redBlade.setAttack(DistanceType.CONTINUOUS, Pair(3, 3), null, 3, 1,
@@ -9337,6 +9386,40 @@ object CardSet {
                 }
             }
             null
+        })
+        graveYard.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CAN_NOT_WIN) {_, _, _, _ ->
+            1
+        })
+        graveYard.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_THIS_CARD_NAP_REMOVE) {_, player, game_status, _ ->
+            if(game_status.getPlayer(player.opposite()).life == 0){
+                game_status.gameEnd(player, player.opposite())
+            }
+            null
+        })
+        kataShiro.setSpecial(1)
+        kataShiro.setAttack(DistanceType.CONTINUOUS, Pair(0, 6), null, 0, 0,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        kataShiro.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.ADD_COST) {card_number, player, game_status, react_attack ->
+            game_status.getPlayer(player.opposite()).nextCostAddMegami = react_attack?.megami
+            null
+        })
+        kataShiro.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_TABOO_CHANGE){card_number, player, game_status, _ ->
+            if((game_status.getPlayer(player).tabooGauge?: 1) % 6 == 0){
+                game_status.returnSpecialCard(player, card_number)
+            }
+            null
+        })
+        logic.setSpecial(3)
+        logic.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.USING_CONDITION){_, player, game_status, _ ->
+            if(game_status.getPlayerLife(player) <= 6) 1
+            else 0
+        })
+        logic.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
+            game_status.dustToLife(player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
+            null
+        })
+        logic.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.KAMUWI_LOGIC){_, _, _, _ ->
+            1
         })
     }
 

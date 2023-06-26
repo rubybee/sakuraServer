@@ -800,6 +800,19 @@ enum class CardName {
             put(IDEA_MYEONG_JEON, 9003)
             put(IDEA_EMPHASIZING, 9004)
             put(IDEA_POSITIONING, 9005)
+
+            put(KAMUWI_RED_BLADE, 2100)
+            put(KAMUWI_FLUTTERING_BLADE, 2101)
+            put(KAMUWI_SI_KEN_LAN_JIN, 2102)
+            put(KAMUWI_CUT_DOWN, 2103)
+            put(KAMUWI_THREADING_THORN, 2104)
+            put(KAMUWI_KE_SYO_LAN_LYU, 2105)
+            put(KAMUWI_BLOOD_WAVE, 2106)
+            put(KAMUWI_LAMP, 2107)
+            put(KAMUWI_DAWN, 2108)
+            put(KAMUWI_GRAVEYARD, 2109)
+            put(KAMUWI_KATA_SHIRO, 2110)
+            put(KAMUWI_LOGIC, 2111)
         }
         private val cardNameHashmapSecond = EnumMap<CardName, Int>(CardName::class.java).apply {
             //for second turn player 10000~19999
@@ -1141,6 +1154,19 @@ enum class CardName {
             put(IDEA_MYEONG_JEON, 19003)
             put(IDEA_EMPHASIZING, 19004)
             put(IDEA_POSITIONING, 19005)
+
+            put(KAMUWI_RED_BLADE, 12100)
+            put(KAMUWI_FLUTTERING_BLADE, 12101)
+            put(KAMUWI_SI_KEN_LAN_JIN, 12102)
+            put(KAMUWI_CUT_DOWN, 12103)
+            put(KAMUWI_THREADING_THORN, 12104)
+            put(KAMUWI_KE_SYO_LAN_LYU, 12105)
+            put(KAMUWI_BLOOD_WAVE, 12106)
+            put(KAMUWI_LAMP, 12107)
+            put(KAMUWI_DAWN, 12108)
+            put(KAMUWI_GRAVEYARD, 12109)
+            put(KAMUWI_KATA_SHIRO, 12110)
+            put(KAMUWI_LOGIC, 12111)
         }
 
         fun returnNormalCardNameByMegami(megami_name: MegamiEnum):List<CardName>{
@@ -1580,7 +1606,8 @@ enum class CardEffectLocation {
     USED_YOUR,
     USED_OTHER,
     MEGAMI_YOUR,
-    TEMP,
+    TEMP_PLAYER1,
+    TEMP_PLAYER2,
     IDEA_PLAYER1,
     IDEA_PLAYER2;
 }

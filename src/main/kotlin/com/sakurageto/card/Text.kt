@@ -72,6 +72,7 @@ enum class TextEffectTag {
     STORM_FORCE,
     NEXT_BASIC_OPERATION_INVALID,
     PHASE_SKIP,
+    ADD_COST,
 
     //description when this effect use
     WHEN_USE_BEHAVIOR_END,
@@ -95,6 +96,8 @@ enum class TextEffectTag {
     WHEN_DISCARD_NUMBER_CHANGE_OTHER,
     WHEN_OTHER_PLAYER_CHANGE_DISTANCE_TOKEN,
     WHEN_ACT_CHANGE,
+    WHEN_TABOO_CHANGE,
+    WHEN_THIS_CARD_NAP_REMOVE,
 
     CONDITION_ADD_DO_WIND_AROUND,
 
@@ -108,6 +111,7 @@ enum class TextEffectTag {
     WHEN_END_PHASE_YOUR_IN_DISCARD,
 
     //check effect when some process is running
+    CAN_NOT_WIN,
     OTHER_CARD_NAP_LOCATION_HERE,
     DO_NOT_GET_DAMAGE,
     DO_NOT_MOVE_TOKEN,
@@ -150,5 +154,6 @@ enum class TextEffectTag {
     ADD_GROWING,
     REMOVE_REACTIONS_TERMINATION,
     MIZUKI_BATTLE_CRY,
-    TOKOYO_EIGHT_SAKURA;
+    TOKOYO_EIGHT_SAKURA,
+    KAMUWI_LOGIC;
 }

@@ -21,6 +21,9 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var freezeToken = 0
 
     var maxAura = 5
+
+    fun isLose() = (tabooGauge?: 0) >= 16 || life == 0
+
     fun setMaxAura(arrow: Arrow, user: PlayerEnum) {
         if(user == player_enum && arrow != Arrow.NULL){
             for(card in usedSpecialCard.values){
@@ -71,6 +74,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var canNotUseCardName1: Pair<Int, CardName>? = null
     var canNotUseCardName2: Pair<Int, CardName>? = null
     var tabooGauge: Int? = null
+    var anvil: Card? = null
     //for megami(must be present)
 
 
@@ -90,7 +94,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var didBasicOperation: Boolean = false
     var napBuff = 0
     var nextMainPhaseSkip = false
-    var anvil: Card? = null
+    var nextCostAddMegami: MegamiEnum? = null
     //for some card(some day refactor may be needed)
 
 

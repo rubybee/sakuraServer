@@ -461,12 +461,12 @@ class MadeAttack(
 
                 }
             }
+        }
 
-            card_data.effect?.let {
-                this.effect = mutableListOf()
-                for(text in it){
-                    this.effect!!.add(text)
-                }
+        card_data.effect?.let {
+            this.effect = mutableListOf()
+            for(text in it){
+                this.effect!!.add(text)
             }
         }
         return this

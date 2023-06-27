@@ -4596,7 +4596,7 @@ object CardSet {
     private val handFlower = CardData(CardClass.SPECIAL, CardName.HONOKA_HAND_FLOWER, MegamiEnum.HONOKA, CardType.BEHAVIOR, SubType.FULL_POWER)
     private val newOpening = CardData(CardClass.SPECIAL, CardName.HONOKA_A_NEW_OPENING, MegamiEnum.HONOKA, CardType.BEHAVIOR, SubType.FULL_POWER)
     private val underFlag = CardData(CardClass.SPECIAL, CardName.HONOKA_UNDER_THE_NAME_OF_FLAG, MegamiEnum.HONOKA, CardType.ATTACK, SubType.NONE)
-    private val fourSeason = CardData(CardClass.SPECIAL, CardName.HONOKA_UNDER_THE_NAME_OF_FLAG, MegamiEnum.HONOKA, CardType.BEHAVIOR, SubType.NONE)
+    private val fourSeason = CardData(CardClass.SPECIAL, CardName.HONOKA_FOUR_SEASON_BACK, MegamiEnum.HONOKA, CardType.BEHAVIOR, SubType.NONE)
     private val bloomPath = CardData(CardClass.SPECIAL, CardName.HONOKA_FULL_BLOOM_PATH, MegamiEnum.HONOKA, CardType.ENCHANTMENT, SubType.NONE)
 
     private val commandText = Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_END_PHASE_YOUR){card_number, player, game_status, _ ->
@@ -5076,7 +5076,7 @@ object CardSet {
             }
             null
         })
-        fourSeason.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) ret@{_, player, game_status, _ ->
+        fourSeason.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {_, player, game_status, _ ->
             while(true){
                 when(game_status.receiveCardEffectSelect(player, 1416)){
                     CommandEnum.SELECT_ONE -> {
@@ -5121,9 +5121,11 @@ object CardSet {
                         }
                     }
                 }
+
                 gameStatus.popCardFrom(player, cardNumber, LocationEnum.YOUR_USED_CARD, true)?.let {
                     it.special_card_state = SpecialCardEnum.UNUSED
                     gameStatus.insertCardTo(player, it, LocationEnum.ADDITIONAL_CARD, true)
+                    println("{${it.card_data.card_name}}")
                     gameStatus.moveAdditionalCard(player, CardName.HONOKA_FOUR_SEASON_BACK, LocationEnum.SPECIAL_CARD)
                 }
                 true
@@ -9169,7 +9171,7 @@ object CardSet {
             }
             null
         })
-        thornBush.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
+        threadingThorn.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
             val distance = game_status.getAdjustDistance()
             if(distance >= 5){
                 game_status.distanceToDust(2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)

@@ -1403,6 +1403,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, value,
             LocationEnum.DUST, location, false))
+
         if(value != 0){
             dust -= value
             card.addNap(value)
@@ -2179,7 +2180,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val nowPlayer = getPlayer(player)
 
         nowPlayer.tabooGauge = nowPlayer.tabooGauge?.let {
-            sendSimpleCommand(getSocket(player), getSocket(player.opposite()), CommandEnum.INCREASE_WIND_GAUGE_YOUR, it + number)
+            sendSimpleCommand(getSocket(player), getSocket(player.opposite()), CommandEnum.SET_TABOO_GAUGE_YOUR, it + number)
             if(it + number >= 16){
                 gameEnd(null, player)
             }
@@ -2285,6 +2286,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         val cost = card.canUse(player, this, react_attack, isCost, isConsume)
         if(cost != -2){
+            if(!getPlayer(player).notCharge){
+                gaugeIncreaseRequest(player, card)
+            }
+
             if(location == LocationEnum.READY_SOLDIER_ZONE) {
                 logger.insert(
                     Log(
@@ -2361,10 +2366,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             //kamuwi card cost
 
             if(cost == -1){
-                if(!getPlayer(player).notCharge){
-                    gaugeIncreaseRequest(player, card)
-                }
-
                 var lightHouseCheck = 0
                 if(turnPlayer == player && card.card_data.card_type != CardType.ATTACK){
                     for(otherUsedCard in getPlayer(player.opposite()).usedSpecialCard.values){
@@ -2392,9 +2393,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 flareToDust(player, cost, Arrow.NULL, player, card.player, Log.SPECIAL_COST)
                 logger.insert(Log(player, LogText.END_EFFECT, Log.SPECIAL_COST, -1))
                 cleanAfterUseCost()
-                if(!getPlayer(player).notCharge){
-                    gaugeIncreaseRequest(player, card)
-                }
                 popCardFrom(player, card.card_number, location, true)
                 insertCardTo(player, card, LocationEnum.PLAYING_ZONE_YOUR, true)
                 sendUseCardMeesage(getSocket(player), getSocket(player.opposite()), react, card.card_number)
@@ -2404,6 +2402,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
         return false
     }
+
+//    suspend fun useCardPerjury(player: PlayerEnum, card: Card, location: LocationEnum, isCost: Boolean): Boolean{
+//        true
+//    }
 
     private suspend fun checkWhenGetDamageByAttack(player: PlayerEnum, selectedDamage: DamageSelect, damage: Pair<Int, Int>){
         if((selectedDamage == DamageSelect.BOTH && (damage.first >= 1 || damage.second >= 1)) ||
@@ -3417,7 +3419,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
         else{
             player1.isThisTurnTailWind = false
-            player1.isNextTurnTailWind = true
             sendSimpleCommand(player1_socket, player2_socket, CommandEnum.SET_HEAD_WIND_YOUR)
         }
 
@@ -3427,9 +3428,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
         else{
             player2.isThisTurnTailWind = false
-            player2.isNextTurnTailWind = true
             sendSimpleCommand(player2_socket, player1_socket, CommandEnum.SET_HEAD_WIND_YOUR)
         }
+        player1.isNextTurnTailWind = true; player2.isNextTurnTailWind = true
 
         thisTurnSwellDistance = 2; thisTurnDistance = distanceToken
         player1.didBasicOperation = false; player2.didBasicOperation = false
@@ -3448,6 +3449,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         player1.canIdeaProcess = true; player2.canIdeaProcess = true
         player1.ideaProcess = false; player2.ideaProcess = false
         player1.nextCostAddMegami = null; player2.nextCostAddMegami = null
+        player1.fullAction = false; player2.fullAction = false
     }
 
     //0 = player don't want using card more || 1 = player card use success || 2 = cannot use because there are no installation card
@@ -3601,8 +3603,22 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 if(!checkFullPowerCanUse(player, card)) return false
                 if(card.canUseAtCover()){
                     if(useCardFrom(player, card, LocationEnum.COVER_CARD, false, null,
-                            isCost = true, isConsume = true)) return true
+                            isCost = true, isConsume = true)) {
+                        return true
+                    }
                 }
+            }
+            CommandEnum.ACTION_USE_CARD_SOLDIER -> {
+                val card = getCardFrom(player, card_number, LocationEnum.READY_SOLDIER_ZONE)?: return false
+                if(!checkFullPowerCanUse(player, card)) return false
+                if(useCardFrom(player, card, LocationEnum.READY_SOLDIER_ZONE, false, null,
+                        isCost = true, isConsume = true)) {
+                    return true
+                }
+            }
+            //
+            CommandEnum.ACTION_USE_CARD_PERJURY -> {
+
             }
             else -> return false
         }
@@ -3931,6 +3947,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                                 card -> !(card.isSoftAttack)
                         }
                     }
+                    else{
+                        searchPlayer.insertCardNumber(location, cardList, condition)
+                    }
                 }
                 LocationEnum.OTHER_ENCHANTMENT_ZONE_CARD -> {
                     otherPlayer.insertCardNumber(location, cardList, condition)
@@ -4134,12 +4153,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 }
             }
         }
+
         val nowPlayer = getPlayer(player)
         val nowSocket = getSocket(player)
         val otherSocket = getSocket(player.opposite())
         val cardOwner = getPlayer(card.player)
         val cardOwnerSocket = getSocket(card.player)
         val cardOwnerOppositeSocket = getSocket(card.player.opposite())
+
         when(location){
             LocationEnum.YOUR_DECK_BELOW -> {
                 cardOwner.normalCardDeck.addLast(card)

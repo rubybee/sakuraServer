@@ -448,6 +448,7 @@ enum class CardName {
     KAMUWI_KATA_SHIRO,
     KAMUWI_LOGIC;
 
+
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
             cardNameHashmapFirst[this]

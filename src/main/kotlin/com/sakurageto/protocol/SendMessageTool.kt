@@ -591,6 +591,7 @@ suspend fun receiveFullPowerActionRequestMain(player: Connection): Pair<CommandE
                         data.command == ACTION_USE_CARD_SPECIAL ||
                         data.command == ACTION_USE_CARD_COVER ||
                         data.command == ACTION_USE_CARD_SOLDIER ||
+                        data.command == ACTION_USE_CARD_PERJURY ||
                         data.command == ACTION_END_TURN
                     ){
                         return Pair(data.command, data.card)
@@ -629,6 +630,7 @@ suspend fun receiveActionRequestMain(player: Connection): Pair<CommandEnum, Int>
                         data.command == ACTION_USE_CARD_SPECIAL ||
                         data.command == ACTION_USE_CARD_COVER ||
                         data.command == ACTION_USE_CARD_SOLDIER ||
+                        data.command == ACTION_USE_CARD_PERJURY ||
                         data.command == ACTION_GO_FORWARD ||
                         data.command == ACTION_GO_BACKWARD ||
                         data.command == ACTION_WIND_AROUND ||

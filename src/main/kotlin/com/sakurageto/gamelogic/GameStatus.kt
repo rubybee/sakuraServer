@@ -15,9 +15,28 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     companion object{
         const val START_PHASE = 1
+        const val START_PHASE_REDUCE_NAP = 4
         const val MAIN_PHASE = 2
         const val END_PHASE = 3
+
+        val RENRI_FALSE_STAB = Card.cardMakerByName(true, CardName.RENRI_FALSE_STAB, PlayerEnum.PLAYER1)
+        val RENRI_TEMPORARY_EXPEDIENT = Card.cardMakerByName(true, CardName.RENRI_TEMPORARY_EXPEDIENT, PlayerEnum.PLAYER1)
+        val RENRI_BLACK_AND_WHITE = Card.cardMakerByName(true, CardName.RENRI_BLACK_AND_WHITE, PlayerEnum.PLAYER1)
+        val RENRI_FLOATING_CLOUDS = Card.cardMakerByName(true, CardName.RENRI_FLOATING_CLOUDS, PlayerEnum.PLAYER1)
+        val RENRI_FISHING = Card.cardMakerByName(true, CardName.RENRI_FISHING, PlayerEnum.PLAYER1)
+
+        fun getPerjuryCard(card_number: Int): Card?{
+            return when(card_number){
+                2200 -> RENRI_FALSE_STAB
+                2201 -> RENRI_TEMPORARY_EXPEDIENT
+                2202 -> RENRI_BLACK_AND_WHITE
+                2204 -> RENRI_FLOATING_CLOUDS
+                2205 -> RENRI_FISHING
+                else -> null
+            }
+        }
     }
+    var perjuryCheck = arrayOf(false, false, false, false, false, false)
 
     var turnPlayer = PlayerEnum.PLAYER1
 
@@ -400,6 +419,21 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         when (player) {
             PlayerEnum.PLAYER1 -> player1MainPhaseListener.addLast(listener)
             PlayerEnum.PLAYER2 -> player2MainPhaseListener.addLast(listener)
+        }
+    }
+
+    fun removeMainPhaseListener(player: PlayerEnum, card_number: Int){
+        when(player){
+            PlayerEnum.PLAYER1 -> {
+                player1MainPhaseListener.removeIf {
+                    it.cardNumber == card_number
+                }
+            }
+            PlayerEnum.PLAYER2 -> {
+                player2MainPhaseListener.removeIf {
+                    it.cardNumber == card_number
+                }
+            }
         }
     }
 
@@ -1012,7 +1046,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = emptyPlace
         }
 
-        val (sakura, seed) = card.reduceNap(value)
+        val (sakura, seed) = card.reduceNap(player, this,  value)
 
         if(seed != 0){
             nowPlayer.notReadySeed = nowPlayer.notReadySeed!! + seed
@@ -1056,7 +1090,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(!(card.checkCanMoveToken(player, this)) || number == null || number <= 0  || card.isItDestruction()) return
         val nowPlayer = getPlayer(player)
 
-        val (sakura, seed) = card.reduceNap(number)
+        val (sakura, seed) = card.reduceNap(player, this, number)
 
         if(seed != 0){
             nowPlayer.notReadySeed = nowPlayer.notReadySeed!! + seed
@@ -1088,7 +1122,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val nowPlayer = getPlayer(player)
         if(distanceToken + value > 10) value = 10 - distanceToken
 
-        val (sakura, seed) = card.reduceNap(value)
+        val (sakura, seed) = card.reduceNap(player, this, value)
 
         logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, sakura,
             LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.DISTANCE, false))
@@ -1127,7 +1161,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         if(value > (fromCard.getNap()?: 0)) value = fromCard.getNap()?: 0
 
-        val (sakura, seed) = fromCard.reduceNap(value)
+        val (sakura, seed) = fromCard.reduceNap(player, this, value)
 
         logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, sakura,
             LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, false))
@@ -1294,7 +1328,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         if(value != 0){
             if(cardToDustCheck(player, value, card, startPhaseProcess, card_number)){
-                val (sakura, seed) = card.reduceNap(number)
+                val (sakura, seed) = card.reduceNap(player, this, number)
 
                 if(sakura != 0){
                     dust += sakura
@@ -2353,7 +2387,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             if(cardMustPay > 0){
                 selectCardFrom(player, player, player, listOf(LocationEnum.HAND),
                     CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2111, cardMustPay
-                ) { it, _ -> card.card_data.megami == it.card_data.megami }?.let {selected ->
+                ) { it, _ -> nowPlayer.nextCostAddMegami == it.card_data.megami }?.let {selected ->
                     for(card_number in selected){
                         popCardFrom(player.opposite(), card_number, LocationEnum.HAND, true)?.let {
                             insertCardTo(player.opposite(), it, LocationEnum.DISCARD_YOUR, true)
@@ -2367,23 +2401,27 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
             if(cost == -1){
                 var lightHouseCheck = 0
-                if(turnPlayer == player && card.card_data.card_type != CardType.ATTACK){
+                if(turnPlayer == player && card.card_data.card_type != CardType.ATTACK && location == LocationEnum.HAND){
                     for(otherUsedCard in getPlayer(player.opposite()).usedSpecialCard.values){
                         lightHouseCheck += otherUsedCard.effectAllValidEffect(player.opposite(), this, TextEffectTag.HATSUMI_LIGHTHOUSE)
                     }
                 }
 
                 if(lightHouseCheck == 0){
-                    popCardFrom(player, card.card_number, location, true)
-                    insertCardTo(player, card, LocationEnum.PLAYING_ZONE_YOUR, true)
+                    popCardFrom(player, card.card_number, location, true)?.let {
+                        insertCardTo(player, it, LocationEnum.PLAYING_ZONE_YOUR, true)
+                    }
                     sendUseCardMeesage(getSocket(player), getSocket(player.opposite()), react, card.card_number)
                     card.use(player, this, react_attack, isTermination, napChange)
                 }
                 else{
-                    popCardFrom(player, card.card_number, location, true)
-                    insertCardTo(player, card, LocationEnum.DISCARD_YOUR, true)
+                    popCardFrom(player, card.card_number, location, true)?.let {
+                        insertCardTo(player, it, LocationEnum.DISCARD_YOUR, true)
+                    }
                     for(otherUsedCard in getPlayer(player.opposite()).usedSpecialCard.values){
-                        otherUsedCard.effectAllValidEffect(player.opposite(), this, TextEffectTag.AFTER_HATSUMI_LIGHTHOUSE)
+                        if(otherUsedCard.effectAllValidEffect(player.opposite(), this, TextEffectTag.AFTER_HATSUMI_LIGHTHOUSE) > 0){
+                            break
+                        }
                     }
                 }
                 return true
@@ -2393,8 +2431,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 flareToDust(player, cost, Arrow.NULL, player, card.player, Log.SPECIAL_COST)
                 logger.insert(Log(player, LogText.END_EFFECT, Log.SPECIAL_COST, -1))
                 cleanAfterUseCost()
-                popCardFrom(player, card.card_number, location, true)
-                insertCardTo(player, card, LocationEnum.PLAYING_ZONE_YOUR, true)
+                popCardFrom(player, card.card_number, location, true)?.let {
+                    insertCardTo(player, it, LocationEnum.PLAYING_ZONE_YOUR, true)
+                }
                 sendUseCardMeesage(getSocket(player), getSocket(player.opposite()), react, card.card_number)
                 card.use(player, this, react_attack, isTermination, napChange)
                 return true
@@ -2403,9 +2442,135 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return false
     }
 
-//    suspend fun useCardPerjury(player: PlayerEnum, card: Card, location: LocationEnum, isCost: Boolean): Boolean{
-//        true
-//    }
+    private suspend fun useCardPerjury(player: PlayerEnum, falseCard: Card, perjury_card_number: Int,
+                                       location: LocationEnum): Boolean{
+        val perjuryCard = getPerjuryCard(perjury_card_number)?: return false
+        if(perjuryCheck[perjury_card_number - 2200]){
+            return false
+        }
+        val cost = perjuryCard.canUse(player, this, null, isCost = true, isConsume = true)
+
+        if(cost != -2){
+            if(!getPlayer(player).notCharge){
+                gaugeIncreaseRequest(player, perjuryCard)
+            }
+
+            //kamuwi card cost
+            val nowPlayer = getPlayer(player)
+            var cardMustPay = 0
+
+            if(nowPlayer.nextCostAddMegami == perjuryCard.card_data.megami){
+                cardMustPay += 1
+            }
+
+            if(cardMustPay > 0){
+                selectCardFrom(player, player, player, listOf(LocationEnum.HAND),
+                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2111, cardMustPay
+                ) { it, _ -> nowPlayer.nextCostAddMegami == it.card_data.megami }?.let {selected ->
+                    for(card_number in selected){
+                        popCardFrom(player.opposite(), card_number, LocationEnum.HAND, true)?.let {
+                            insertCardTo(player.opposite(), it, LocationEnum.DISCARD_YOUR, true)
+                        }
+                    }
+                }
+            }
+
+            nowPlayer.nextCostAddMegami = null
+            //kamuwi card cost
+
+            perjuryCheck[perjury_card_number - 2200] = true
+            var public = true
+            when(receiveSelectDisprove(getSocket(player.opposite()), perjury_card_number)){
+                CommandEnum.SELECT_ONE -> {
+                    sendSimpleCommand(player1_socket, player2_socket, CommandEnum.SHOW_DISPROVE_RESULT, falseCard.card_number)
+                    if(perjuryCard.card_data.card_name == falseCard.card_data.card_name){
+                        //반증에 실패
+                        logger.insert(Log(player, LogText.FAIL_DISPROVE, -1, -1))
+
+                        sendChooseDamage(getSocket(player.opposite()), CommandEnum.CHOOSE_CHOJO, 1, 1)
+                        val chosen = receiveChooseDamage(getSocket(player.opposite()))
+                        processDamage(player, chosen, Pair(1, 1), false, null, null, Log.CHOJO)
+                        logger.insert(Log(player, LogText.END_EFFECT, Log.CHOJO, -1))
+
+                        if(perjuryCard.card_data.card_name == CardName.RENRI_FLOATING_CLOUDS){
+                            sendChooseDamage(getSocket(player.opposite()), CommandEnum.CHOOSE_CHOJO, 1, 1)
+                            val secondChosen = receiveChooseDamage(getSocket(player.opposite()))
+                            processDamage(player, secondChosen, Pair(1, 1), false, null, null, Log.CHOJO)
+                            logger.insert(Log(player, LogText.END_EFFECT, Log.CHOJO, -1))
+                        }
+                    }
+                    else{
+                        //반증에 성공
+                        popCardFrom(player, falseCard.card_number, location, true)?.let {
+                            insertCardTo(player, it, LocationEnum.DISCARD_YOUR, true)
+                        }
+                        return false
+                    }
+                }
+                else -> {
+                    if(perjuryCard.effectText(falseCard.card_number,
+                        player, this, null, TextEffectTag.WHEN_THIS_CARD_NOT_DISPROVE) == 0){
+                        public = false
+                    }
+                }
+            }
+
+            if(location == LocationEnum.READY_SOLDIER_ZONE) {
+                logger.insert(
+                    Log(
+                        player, LogText.USE_CARD_IN_SOLDIER_PERJURE, perjuryCard.card_number,
+                        perjuryCard.card_data.megami.real_number, boolean = perjuryCard.card_data.sub_type == SubType.FULL_POWER
+                    )
+                )
+            }
+            else {
+                logger.insert(
+                    Log(
+                        player, LogText.USE_CARD_PERJURE, perjuryCard.card_number,
+                        perjuryCard.card_data.megami.real_number, boolean = perjuryCard.card_data.sub_type == SubType.FULL_POWER
+                    )
+                )
+            }
+
+            var lightHouseCheck = 0
+            if(turnPlayer == player && perjuryCard.card_data.card_type != CardType.ATTACK && location == LocationEnum.HAND){
+                for(otherUsedCard in getPlayer(player.opposite()).usedSpecialCard.values){
+                    lightHouseCheck += otherUsedCard.effectAllValidEffect(player.opposite(), this, TextEffectTag.HATSUMI_LIGHTHOUSE)
+                }
+            }
+
+            if(lightHouseCheck == 0){
+                popCardFrom(player, falseCard.card_number, location, public)?.let {
+                    insertCardTo(player, it, LocationEnum.PLAYING_ZONE_YOUR, public)
+                }
+                sendUseCardMeesage(getSocket(player), getSocket(player.opposite()), false, perjuryCard.card_number)
+                perjuryCard.use(player, this, null, false, 0)
+
+                if(public){
+                    popCardFrom(player, falseCard.card_number, LocationEnum.PLAYING_ZONE_YOUR, true)?.let {
+                        insertCardTo(player, it, LocationEnum.DISCARD_YOUR, true)
+                    }
+                }
+                else{
+                    popCardFrom(player, falseCard.card_number, LocationEnum.PLAYING_ZONE_YOUR, false)?.let {
+                        insertCardTo(player, it, LocationEnum.COVER_CARD, false)
+                    }
+                }
+            }
+            else{
+                popCardFrom(player, falseCard.card_number, location, true)
+                insertCardTo(player, falseCard, LocationEnum.DISCARD_YOUR, true)
+                for(otherUsedCard in getPlayer(player.opposite()).usedSpecialCard.values){
+                    if(otherUsedCard.effectAllValidEffect(player.opposite(), this, TextEffectTag.AFTER_HATSUMI_LIGHTHOUSE) > 0){
+                        break
+                    }
+                }
+            }
+
+            return true
+        }
+        return false
+    }
 
     private suspend fun checkWhenGetDamageByAttack(player: PlayerEnum, selectedDamage: DamageSelect, damage: Pair<Int, Int>){
         if((selectedDamage == DamageSelect.BOTH && (damage.first >= 1 || damage.second >= 1)) ||
@@ -2508,9 +2673,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             if(nowAttack.isItValid){
                 if(nowAttack.isItDamage){
                     if(nowAttack.beforeProcessDamageCheck(player, this, react_attack)){
-                        val chosen = if(nowAttack.effectText(player, this, react_attack, TextEffectTag.SELECT_DAMAGE_BY_ATTACKER) == 1){
+                        val chosen = if(nowAttack.canNotSelectAura){
+                            CommandEnum.CHOOSE_LIFE
+                        }
+                        else if(nowAttack.effectText(player, this, react_attack, TextEffectTag.SELECT_DAMAGE_BY_ATTACKER) == 1){
                             damageSelect(player, damage, false)
-                        } else damageSelect(player.opposite(), damage)
+                        } else {
+                            damageSelect(player.opposite(), damage)
+                        }
                         val auraReplace = nowAttack.effectText(player, this, react_attack, TextEffectTag.AFTER_AURA_DAMAGE_PLACE_CHANGE)
                         val lifeReplace = nowAttack.effectText(player, this, react_attack, TextEffectTag.AFTER_LIFE_DAMAGE_PLACE_CHANGE)
 
@@ -2720,6 +2890,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val player1Card: HashMap<Int, Boolean> = HashMap()
         val player2Card: HashMap<Int, Boolean> = HashMap()
 
+        nowPhase = START_PHASE_REDUCE_NAP
 
         for(nowCard in player1.enchantmentCard.values){
             val nap = nowCard.reduceNapNormal(PlayerEnum.PLAYER1, this)
@@ -2736,6 +2907,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 player2Card[nowCard.card_number] = true
             }
         }
+
+        nowPhase = START_PHASE
 
         logger.insert(Log(PlayerEnum.PLAYER1, LogText.END_EFFECT, Log.NORMAL_NAP_PROCESS, -1))
 
@@ -3450,6 +3623,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         player1.ideaProcess = false; player2.ideaProcess = false
         player1.nextCostAddMegami = null; player2.nextCostAddMegami = null
         player1.fullAction = false; player2.fullAction = false
+        for(i in 0..5){
+            perjuryCheck[i] = false
+        }
     }
 
     //0 = player don't want using card more || 1 = player card use success || 2 = cannot use because there are no installation card
@@ -3618,7 +3794,19 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
             //
             CommandEnum.ACTION_USE_CARD_PERJURY -> {
-
+                if(getPlayer(player).megami_1 == MegamiEnum.RENRI || getPlayer(player).megami_2 == MegamiEnum.RENRI){
+                    val realCardNumber = card_number / 100000
+                    val perjuryCardNumber = card_number % 100000
+                    getCardFrom(player, realCardNumber, LocationEnum.HAND)?.let {
+                        if(!(CardSet.isPoison(realCardNumber) && CardSet.isSoldier(realCardNumber))){
+                            return useCardPerjury(player, it, perjuryCardNumber, LocationEnum.HAND)
+                        }
+                    }?: getCardFrom(player, realCardNumber, LocationEnum.READY_SOLDIER_ZONE)?.let {
+                        if(!(CardSet.isPoison(realCardNumber) && CardSet.isSoldier(realCardNumber))){
+                            return useCardPerjury(player, it, perjuryCardNumber, LocationEnum.READY_SOLDIER_ZONE)
+                        }
+                    }
+                }
             }
             else -> return false
         }
@@ -4386,6 +4574,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun moveAdditionalCard(player: PlayerEnum, card_name: CardName, location: LocationEnum): Card?{
         val card = popCardFrom(player, card_name, LocationEnum.ADDITIONAL_CARD, true)?.let {
+            if(location == LocationEnum.YOUR_USED_CARD){
+                it.special_card_state = SpecialCardEnum.PLAYED
+            }
             insertCardTo(player, it, location, true)
             it
         } ?: return null

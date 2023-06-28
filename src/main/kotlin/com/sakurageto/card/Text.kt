@@ -98,6 +98,8 @@ enum class TextEffectTag {
     WHEN_ACT_CHANGE,
     WHEN_TABOO_CHANGE,
     WHEN_THIS_CARD_NAP_REMOVE,
+    WHEN_THIS_CARD_NOT_DISPROVE, //this effect get original card's number(not disprove card)
+    WHEN_MOVE_TOKEN,
 
     CONDITION_ADD_DO_WIND_AROUND,
 

@@ -272,7 +272,10 @@ enum class CommandEnum {
     SET_TABOO_GAUGE_YOUR,
     SET_TABOO_GAUGE_OTHER,
 
-    SELECT_NAP_LOCATION;
+    SELECT_NAP_LOCATION,
+
+    CHOOSE_DISPROVE,
+    SHOW_DISPROVE_RESULT;
 
     fun Opposite(): CommandEnum{
         when(this){
@@ -411,6 +414,7 @@ enum class CommandEnum {
             ANVIL_OTHER -> return ANVIL_YOUR
             SET_TABOO_GAUGE_YOUR -> return SET_TABOO_GAUGE_OTHER
             SET_TABOO_GAUGE_OTHER -> return SET_TABOO_GAUGE_YOUR
+            SHOW_DISPROVE_RESULT -> return SHOW_DISPROVE_RESULT
             else -> TODO()
         }
     }
@@ -505,7 +509,8 @@ enum class LocationEnum(var real_number: Int){
 
     ANVIL_YOUR(47),
     ANVIL_OTHER(48),
-    ALL_NORMAL(49);
+    ALL_NORMAL(49),
+    NOT_SELECTED_NORMAL_CARD(50);
 
     fun Opposite(): LocationEnum{
         return when(this){

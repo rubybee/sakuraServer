@@ -446,8 +446,22 @@ enum class CardName {
     KAMUWI_DAWN,
     KAMUWI_GRAVEYARD,
     KAMUWI_KATA_SHIRO,
-    KAMUWI_LOGIC;
+    KAMUWI_LOGIC,
 
+    RENRI_FALSE_STAB,
+    RENRI_TEMPORARY_EXPEDIENT,
+    RENRI_BLACK_AND_WHITE,
+    RENRI_IRRITATING_GESTURE,
+    RENRI_FLOATING_CLOUDS,
+    RENRI_FISHING,
+    RENRI_PULLING_FISHING,
+
+    RENRI_RU_RU_RA_RA_RI,
+    RENRI_RA_NA_RA_RO_MI_RE_RI_RA,
+    RENRI_O_RI_RE_TE_RA_RE_RU,
+    RENRI_RENRI_THE_END,
+    RENRI_ENGRAVED_GARMENT,
+    KIRIKO_SHAMANISTIC_MUSIC;
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -814,6 +828,20 @@ enum class CardName {
             put(KAMUWI_GRAVEYARD, 2109)
             put(KAMUWI_KATA_SHIRO, 2110)
             put(KAMUWI_LOGIC, 2111)
+
+            put(RENRI_FALSE_STAB, 2200)
+            put(RENRI_TEMPORARY_EXPEDIENT, 2201)
+            put(RENRI_BLACK_AND_WHITE, 2202)
+            put(RENRI_IRRITATING_GESTURE, 2203)
+            put(RENRI_FLOATING_CLOUDS, 2204)
+            put(RENRI_FISHING, 2205)
+            put(RENRI_PULLING_FISHING, 2206)
+            put(RENRI_RU_RU_RA_RA_RI, 2207)
+            put(RENRI_RA_NA_RA_RO_MI_RE_RI_RA, 2208)
+            put(RENRI_O_RI_RE_TE_RA_RE_RU, 2209)
+            put(RENRI_RENRI_THE_END, 2210)
+            put(RENRI_ENGRAVED_GARMENT, 2211)
+            put(KIRIKO_SHAMANISTIC_MUSIC, 2212)
         }
         private val cardNameHashmapSecond = EnumMap<CardName, Int>(CardName::class.java).apply {
             //for second turn player 10000~19999
@@ -1168,11 +1196,26 @@ enum class CardName {
             put(KAMUWI_GRAVEYARD, 12109)
             put(KAMUWI_KATA_SHIRO, 12110)
             put(KAMUWI_LOGIC, 12111)
+
+            put(RENRI_FALSE_STAB, 12200)
+            put(RENRI_TEMPORARY_EXPEDIENT, 12201)
+            put(RENRI_BLACK_AND_WHITE, 12202)
+            put(RENRI_IRRITATING_GESTURE, 12203)
+            put(RENRI_FLOATING_CLOUDS, 12204)
+            put(RENRI_FISHING, 12205)
+            put(RENRI_PULLING_FISHING, 12206)
+            put(RENRI_RU_RU_RA_RA_RI, 12207)
+            put(RENRI_RA_NA_RA_RO_MI_RE_RI_RA, 12208)
+            put(RENRI_O_RI_RE_TE_RA_RE_RU, 12209)
+            put(RENRI_RENRI_THE_END, 12210)
+            put(RENRI_ENGRAVED_GARMENT, 12211)
+            put(KIRIKO_SHAMANISTIC_MUSIC, 12212)
         }
 
         fun returnNormalCardNameByMegami(megami_name: MegamiEnum):List<CardName>{
             return when (megami_name){
                 NONE -> listOf()
+                KIRIKO -> listOf()
                 YURINA -> listOf(
                     YURINA_CHAM, YURINA_ILSUM, YURINA_JARUCHIGI, YURINA_GUHAB, YURINA_GIBACK,
                     YURINA_APDO, YURINA_GIYENBANJO
@@ -1346,11 +1389,15 @@ enum class CardName {
                     KANAWE_PUBLISH, KANAWE_AFTERGLOW, KANAWE_IMPROMPTU,
                     KANAWE_SEAL
                 )
-
                 KAMUWI -> listOf(
                     KAMUWI_RED_BLADE, KAMUWI_FLUTTERING_BLADE, KAMUWI_SI_KEN_LAN_JIN,
                     KAMUWI_CUT_DOWN, KAMUWI_THREADING_THORN, KAMUWI_KE_SYO_LAN_LYU,
                     KAMUWI_BLOOD_WAVE,
+                )
+                RENRI -> listOf(
+                    RENRI_FALSE_STAB, RENRI_TEMPORARY_EXPEDIENT, RENRI_BLACK_AND_WHITE,
+                    RENRI_IRRITATING_GESTURE, RENRI_FLOATING_CLOUDS, RENRI_FISHING,
+                    RENRI_PULLING_FISHING
                 )
             }
         }
@@ -1358,6 +1405,7 @@ enum class CardName {
         fun returnSpecialCardNameByMegami(megami_name: MegamiEnum): List<CardName> {
             return when (megami_name){
                 NONE -> listOf()
+                KIRIKO -> listOf()
                 YURINA -> listOf(
                     YURINA_WOLYUNGNACK, YURINA_POBARAM, YURINA_JJOCKBAE, YURINA_JURUCK
                 )
@@ -1492,12 +1540,17 @@ enum class CardName {
                 KAMUWI -> listOf(
                     KAMUWI_LAMP, KAMUWI_GRAVEYARD, KAMUWI_KATA_SHIRO, KAMUWI_LOGIC
                 )
+                RENRI -> listOf(
+                    RENRI_RU_RU_RA_RA_RI, RENRI_RA_NA_RA_RO_MI_RE_RI_RA, RENRI_O_RI_RE_TE_RA_RE_RU,
+                    RENRI_RENRI_THE_END
+                )
             }
         }
 
         fun returnAdditionalCardNameByMegami(megami_name: MegamiEnum): List<CardName> {
             return when (megami_name){
                 NONE -> listOf()
+                KIRIKO -> listOf()
                 YURINA -> listOf()
                 YURINA_A1 -> listOf()
                 SAINE -> listOf()
@@ -1566,6 +1619,9 @@ enum class CardName {
                 )
                 KAMUWI -> listOf(
                     KAMUWI_DAWN,
+                )
+                RENRI -> listOf(
+                    RENRI_ENGRAVED_GARMENT, KIRIKO_SHAMANISTIC_MUSIC
                 )
             }
         }

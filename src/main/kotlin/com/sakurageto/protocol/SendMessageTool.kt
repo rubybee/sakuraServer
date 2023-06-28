@@ -326,6 +326,11 @@ suspend fun sendSimpleCommand(mine: Connection, command: CommandEnum){
     send(mine, Json.encodeToString(dataYour))
 }
 
+suspend fun sendSimpleCommand(mine: Connection, command: CommandEnum, card_number: Int){
+    val dataYour = SakuraCardCommand(command, card_number)
+    send(mine, Json.encodeToString(dataYour))
+}
+
 suspend fun sendSimpleCommand(mine: Connection, other: Connection, command: CommandEnum){
     val dataYour = SakuraCardCommand(command, -1)
     val dataOther = SakuraCardCommand(command.Opposite(), -1)
@@ -881,6 +886,36 @@ suspend fun receiveSelectActMain(player: Connection, act_list: MutableList<Int>,
         } catch (e: Exception){
             waitReconnect(player)
             return receiveSelectActMain(player, act_list, SELECT_ACT)
+        }
+    }
+}
+
+suspend fun receiveSelectDisprove(player: Connection, card_number: Int): CommandEnum{
+    sendSimpleCommand(player, CHOOSE_DISPROVE, card_number)
+    return receiveSelectDisproveMain(player, card_number)
+}
+
+suspend fun receiveSelectDisproveMain(player: Connection, card_number: Int): CommandEnum{
+    val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
+
+    while (true) {
+        try {
+            val frame = player.session.incoming.receive()
+            if (frame is Frame.Text) {
+                val text = frame.readText()
+                try {
+                    val data = json.decodeFromString<SakuraCardCommand>(text)
+                    if(data.command == SELECT_ONE || data.command == SELECT_NOT){
+                        return data.command
+                    }
+                    sendSimpleCommand(player, CHOOSE_DISPROVE, card_number)
+                }catch (e: Exception){
+                    continue
+                }
+            }
+        } catch (e: Exception){
+            waitReconnect(player)
+            return receiveSelectDisproveMain(player, card_number)
         }
     }
 }

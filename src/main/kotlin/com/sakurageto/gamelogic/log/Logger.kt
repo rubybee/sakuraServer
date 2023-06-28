@@ -17,8 +17,7 @@ class Logger {
     fun playerUseCardNumber(player: PlayerEnum): Int{
         var result = 0
         for(log in logQueue){
-            if(log.player == player && (log.text == LogText.USE_CARD || log.text == LogText.USE_CARD_REACT ||
-                        log.text == LogText.USE_CARD_IN_COVER_AND_REACT || log.text == LogText.USE_CARD_IN_COVER)) result +=1
+            if(log.player == player && log.isTextUseCard()) result +=1
         }
         return result
     }
@@ -26,9 +25,14 @@ class Logger {
     fun checkThisCardUseInCover(player: PlayerEnum, card_number: Int): Boolean{
         for (log in logQueue.asReversed()){
             if(log.player == player){
-                if(log.text == LogText.USE_CARD_REACT && log.number1 == card_number) return false
-                else if(log.text == LogText.USE_CARD && log.number1 == card_number) return false
-                else if(log.text == LogText.USE_CARD_IN_COVER && log.number1 == card_number) return true
+                if(card_number == log.number1){
+                    if(log.text == LogText.USE_CARD_IN_COVER || log.text == LogText.USE_CARD_IN_COVER_AND_REACT){
+                        return true
+                    }
+                    else if(log.isTextUseCard()){
+                        return false
+                    }
+                }
             }
         }
         return false
@@ -37,7 +41,7 @@ class Logger {
     fun checkThisCardUseInSoldier(player: PlayerEnum, card_number: Int): Boolean{
         for (log in logQueue.asReversed()){
             if(log.player == player && log.number1 == card_number){
-                return log.text == LogText.USE_CARD_IN_SOLDIER
+                return log.text == LogText.USE_CARD_IN_SOLDIER || log.text == LogText.USE_CARD_IN_SOLDIER_PERJURE
             }
         }
         return false
@@ -306,6 +310,24 @@ class Logger {
             }
         }
         return Pair(0, 0)
+    }
+
+    fun checkThisTurnMoveDustToken(): Boolean{
+        for(log in logQueue){
+            if(log.text == LogText.MOVE_TOKEN && log.resource == LocationEnum.DUST && log.number2 >= 1){
+                return true
+            }
+        }
+        return false
+    }
+
+    fun checkThisTurnFailDisprove(player: PlayerEnum): Boolean{
+        for(log in logQueue){
+            if(log.player == player && log.text == LogText.FAIL_DISPROVE){
+                return true
+            }
+        }
+        return false
     }
 
 }

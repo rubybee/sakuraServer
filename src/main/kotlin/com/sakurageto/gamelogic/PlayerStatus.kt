@@ -527,12 +527,25 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
                 {it.toCardNumber(true)})
             }
             LocationEnum.ALL -> {
+                if(megami_2 == MegamiEnum.RENRI){
+                    list.add(707); list.add(407); list.add(1313)
+                }
+                else if(megami_1 == MegamiEnum.RENRI){
+                    list.add(707); list.add(407); list.add(1313)
+                }
                 list.addAll(megami_1.getAllNormalCardName().map { it.toCardNumber(true) })
                 list.addAll(megami_2.getAllNormalCardName().map { it.toCardNumber(true) })
                 list.addAll(megami_1.getAllSpecialCardName().map { it.toCardNumber(true) })
                 list.addAll(megami_2.getAllSpecialCardName().map { it.toCardNumber(true) })
                 list.addAll(megami_1.getAllAdditionalCardName().map {it.toCardNumber(true)})
                 list.addAll(megami_2.getAllAdditionalCardName().map {it.toCardNumber(true)})
+            }
+            LocationEnum.NOT_SELECTED_NORMAL_CARD -> {
+                unselectedCard.forEach{
+                    if(condition(Card.cardMakerByName(this.firstTurn, it, player_enum), location)){
+                        list.add(it.toCardNumber(true))
+                    }
+                }
             }
             LocationEnum.NOT_SELECTED_NORMAL -> {
                 unselectedCard.forEach{

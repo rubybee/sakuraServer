@@ -30,20 +30,28 @@ class MadeAttack(
     }
 
     fun auraPlusMinus(number: Int){
-        if(editedAuraDamage < 999){
-            editedAuraDamage += number
+        if(tempEditedAuraDamage < 999){
+            tempEditedAuraDamage += number
         }
 
     }
 
     fun lifePlusMinus(number: Int) {
-        if (editedLifeDamage < 999) {
-            editedLifeDamage += number
+        if (tempEditedLifeDamage < 999) {
+            tempEditedLifeDamage += number
         }
     }
 
-    var editedAuraDamage = -1
-    var editedLifeDamage = -1
+
+    var tempEditedAuraDamage = -1
+    var tempEditedLifeDamage = -1
+    private var editedAuraDamage = -1
+
+    fun getEditedAuraDamage() = editedAuraDamage
+
+    private var editedLifeDamage = -1
+
+    fun getEditedLifeDamage() = editedLifeDamage
 
     private val thisTempAttackBuff: AttackBuffQueue = AttackBuffQueue()
     private val thisTurnAttackBuff: AttackBuffQueue = AttackBuffQueue()
@@ -59,8 +67,8 @@ class MadeAttack(
 
     suspend fun getDamage(game_status: GameStatus, player: PlayerEnum, continuousAttackBuff: AttackBuffQueue): Pair<Int, Int>{
         editedChogek = chogek
-        editedAuraDamage = aura_damage
-        editedLifeDamage = life_damage
+        editedAuraDamage = aura_damage; tempEditedAuraDamage
+        editedLifeDamage = life_damage; tempEditedLifeDamage
         thisTurnAttackBuff.addAllBuff(continuousAttackBuff)
         continuousAttackBuff.clearBuff()
         for(index in 0 until AttackBuffQueue.buffQueueNumber){
@@ -70,6 +78,8 @@ class MadeAttack(
             for(buff in tempQueue){
                 buff.effect(player, game_status, this)
             }
+            editedAuraDamage = tempEditedAuraDamage
+            editedLifeDamage = tempEditedLifeDamage
         }
         if(!editedChogek && editedAuraDamage >= 5 && editedAuraDamage != 999) editedAuraDamage = 5
         return Pair(editedAuraDamage, editedLifeDamage)
@@ -80,6 +90,7 @@ class MadeAttack(
 
     var isItValid= true
     var isItDamage = true
+    var canNotSelectAura = false
 
     fun makeNoDamage(){
         isItDamage = false

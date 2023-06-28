@@ -22,7 +22,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     fun getNap() = nap
     fun getSeedToken() = seedToken
 
-    fun reduceNap(number: Int): Pair<Int, Int>{
+    suspend fun reduceNap(player: PlayerEnum, game_status: GameStatus, number: Int): Pair<Int, Int>{
         var value = number
         if((nap?: 0) < number){
             value = nap?: 0
@@ -30,6 +30,9 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         val sakuraToken = (nap?: 0) - seedToken
 
         nap = (nap?: 0) - value
+
+        effectText(player, game_status, null, TextEffectTag.WHEN_MOVE_TOKEN)
+
         if(sakuraToken >= value){
             return Pair(value, 0)
         }
@@ -728,6 +731,17 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             }
         }
         return false
+    }
+
+    suspend fun effectText(card_number: Int, player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, tag: TextEffectTag): Int?{
+        this.card_data.effect?.let {
+            for(text in it){
+                if(text.tag == tag){
+                    return text.effect!!(card_number, player, game_status, react_attack)
+                }
+            }
+        }
+        return null
     }
 
     suspend fun effectText(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, tag: TextEffectTag): Int?{

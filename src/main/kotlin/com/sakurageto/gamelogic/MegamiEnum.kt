@@ -5,6 +5,7 @@ import com.sakurageto.card.CardName
 enum class MegamiEnum(var real_number: Int) {
     NONE(0),
     KODAMA(1),
+    KIRIKO(2),
     YURINA(10),
     YURINA_A1(11),
     SAINE(20),
@@ -41,7 +42,8 @@ enum class MegamiEnum(var real_number: Int) {
     MIZUKI(180),
     MEGUMI(190),
     KANAWE(200),
-    KAMUWI(210);
+    KAMUWI(210),
+    RENRI(220);
 
 
     fun getAllNormalCardName(): List<CardName>{

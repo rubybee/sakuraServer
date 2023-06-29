@@ -557,6 +557,13 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
                     list.add(it.toCardNumber(true))
                 }
             }
+            LocationEnum.ADDITIONAL_CARD -> {
+                additionalHand.values.forEach{
+                    if(condition(it, location)){
+                        list.add(it.card_number)
+                    }
+                }
+            }
             else -> TODO()
         }
     }

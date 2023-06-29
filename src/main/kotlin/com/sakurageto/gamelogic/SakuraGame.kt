@@ -468,7 +468,11 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
                 }
                 val data = receiveActionRequest(getSocket(this.turnPlayer))
                 if(data.first == CommandEnum.ACTION_END_TURN) return
-                else if(data.first == CommandEnum.ACTION_USE_CARD_HAND || data.first == CommandEnum.ACTION_USE_CARD_SPECIAL || data.first == CommandEnum.ACTION_USE_CARD_COVER){
+                else if(data.first == CommandEnum.ACTION_USE_CARD_HAND
+                    || data.first == CommandEnum.ACTION_USE_CARD_SPECIAL
+                    || data.first == CommandEnum.ACTION_USE_CARD_COVER
+                    || data.first == CommandEnum.ACTION_USE_CARD_PERJURY
+                    || data.first == CommandEnum.ACTION_USE_CARD_SOLDIER){
                     gameStatus.cardUseNormal(this.turnPlayer, data.first, data.second)
                 }
                 else{

@@ -461,7 +461,17 @@ enum class CardName {
     RENRI_O_RI_RE_TE_RA_RE_RU,
     RENRI_RENRI_THE_END,
     RENRI_ENGRAVED_GARMENT,
-    KIRIKO_SHAMANISTIC_MUSIC;
+    KIRIKO_SHAMANISTIC_MUSIC,
+
+    YATSUHA_HOLY_RAKE_HANDS,
+    YATSUHA_ENTRANCE_OF_ABYSS,
+    YATSUHA_TRUE_MONSTER,
+    YATSUHA_GHOST_LINK,
+    YATSUHA_RESOLUTION,
+    YATSUHA_PLEDGE,
+    YATSUHA_VAIN_FLOWER,
+
+    YATSUHA_EIGHT_MIRROR_VAIN_SAKURA;
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -754,6 +764,14 @@ enum class CardName {
             put(YATSUHA_FOUR_LEAP_SONG, 1608)
             put(YATSUHA_SIX_STAR_SEA, 1609)
             put(YATSUHA_EIGHT_MIRROR_OTHER_SIDE, 1610)
+            put(YATSUHA_HOLY_RAKE_HANDS, 1611)
+            put(YATSUHA_ENTRANCE_OF_ABYSS, 1612)
+            put(YATSUHA_TRUE_MONSTER, 1613)
+            put(YATSUHA_GHOST_LINK, 1614)
+            put(YATSUHA_RESOLUTION, 1615)
+            put(YATSUHA_PLEDGE, 1616)
+            put(YATSUHA_VAIN_FLOWER, 1617)
+            put(YATSUHA_EIGHT_MIRROR_VAIN_SAKURA, 1618)
 
             put(HATSUMI_WATER_BALL, 1700)
             put(HATSUMI_WATER_CURRENT, 1701)
@@ -1122,6 +1140,14 @@ enum class CardName {
             put(YATSUHA_FOUR_LEAP_SONG, 11608)
             put(YATSUHA_SIX_STAR_SEA, 11609)
             put(YATSUHA_EIGHT_MIRROR_OTHER_SIDE, 11610)
+            put(YATSUHA_HOLY_RAKE_HANDS, 11611)
+            put(YATSUHA_ENTRANCE_OF_ABYSS, 11612)
+            put(YATSUHA_TRUE_MONSTER, 11613)
+            put(YATSUHA_GHOST_LINK, 11614)
+            put(YATSUHA_RESOLUTION, 11615)
+            put(YATSUHA_PLEDGE, 11616)
+            put(YATSUHA_VAIN_FLOWER, 11617)
+            put(YATSUHA_EIGHT_MIRROR_VAIN_SAKURA, 11618)
 
             put(HATSUMI_WATER_BALL, 11700)
             put(HATSUMI_WATER_CURRENT, 11701)

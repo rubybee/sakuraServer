@@ -345,6 +345,14 @@ object CardSet {
         cardNumberHashmap[1608] = CardName.YATSUHA_FOUR_LEAP_SONG
         cardNumberHashmap[1609] = CardName.YATSUHA_SIX_STAR_SEA
         cardNumberHashmap[1610] = CardName.YATSUHA_EIGHT_MIRROR_OTHER_SIDE
+        cardNumberHashmap[1611] = CardName.YATSUHA_HOLY_RAKE_HANDS
+        cardNumberHashmap[1612] = CardName.YATSUHA_ENTRANCE_OF_ABYSS
+        cardNumberHashmap[1613] = CardName.YATSUHA_TRUE_MONSTER
+        cardNumberHashmap[1614] = CardName.YATSUHA_GHOST_LINK
+        cardNumberHashmap[1615] = CardName.YATSUHA_RESOLUTION
+        cardNumberHashmap[1616] = CardName.YATSUHA_PLEDGE
+        cardNumberHashmap[1617] = CardName.YATSUHA_VAIN_FLOWER
+        cardNumberHashmap[1618] = CardName.YATSUHA_EIGHT_MIRROR_VAIN_SAKURA
 
         cardNumberHashmap[1700] = CardName.HATSUMI_WATER_BALL
         cardNumberHashmap[1701] = CardName.HATSUMI_WATER_CURRENT
@@ -711,6 +719,14 @@ object CardSet {
         cardNumberHashmap[11608] = CardName.YATSUHA_FOUR_LEAP_SONG
         cardNumberHashmap[11609] = CardName.YATSUHA_SIX_STAR_SEA
         cardNumberHashmap[11610] = CardName.YATSUHA_EIGHT_MIRROR_OTHER_SIDE
+        cardNumberHashmap[11611] = CardName.YATSUHA_HOLY_RAKE_HANDS
+        cardNumberHashmap[11612] = CardName.YATSUHA_ENTRANCE_OF_ABYSS
+        cardNumberHashmap[11613] = CardName.YATSUHA_TRUE_MONSTER
+        cardNumberHashmap[11614] = CardName.YATSUHA_GHOST_LINK
+        cardNumberHashmap[11615] = CardName.YATSUHA_RESOLUTION
+        cardNumberHashmap[11616] = CardName.YATSUHA_PLEDGE
+        cardNumberHashmap[11617] = CardName.YATSUHA_VAIN_FLOWER
+        cardNumberHashmap[11618] = CardName.YATSUHA_EIGHT_MIRROR_VAIN_SAKURA
 
         cardNumberHashmap[11700] = CardName.HATSUMI_WATER_BALL
         cardNumberHashmap[11701] = CardName.HATSUMI_WATER_CURRENT
@@ -1178,6 +1194,15 @@ object CardSet {
         cardDataHashmap[CardName.RENRI_RENRI_THE_END] = renriTheEnd
         cardDataHashmap[CardName.RENRI_ENGRAVED_GARMENT] = engravedGarment
         cardDataHashmap[CardName.KIRIKO_SHAMANISTIC_MUSIC] = shamanisticMusic
+
+        cardDataHashmap[CardName.YATSUHA_HOLY_RAKE_HANDS] = holyRakeHand
+        cardDataHashmap[CardName.YATSUHA_ENTRANCE_OF_ABYSS] = entranceOfAbyss
+        cardDataHashmap[CardName.YATSUHA_TRUE_MONSTER] = trueMonster
+        cardDataHashmap[CardName.YATSUHA_GHOST_LINK] = ghostLink
+        cardDataHashmap[CardName.YATSUHA_RESOLUTION] = resolution
+        cardDataHashmap[CardName.YATSUHA_PLEDGE] = pledge
+        cardDataHashmap[CardName.YATSUHA_VAIN_FLOWER] = vainFlower
+        cardDataHashmap[CardName.YATSUHA_EIGHT_MIRROR_VAIN_SAKURA] = eightMirrorVainSakura
     }
 
     private suspend fun selectDustToDistance(nowCommand: CommandEnum, game_status: GameStatus,
@@ -1303,7 +1328,7 @@ object CardSet {
         jjockbae.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
             game_status.addImmediateLifeListener(player, Listener(player, card_number) {_, cardNumber, beforeLife,
                 afterLife, _, _ ->
-                if(beforeLife > 3 && afterLife < 3){
+                if(beforeLife > 3 && afterLife <= 3){
                     game_status.returnSpecialCard(player, cardNumber)
                     true
                 }
@@ -9772,6 +9797,287 @@ object CardSet {
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
     }
 
+    private val holyRakeHand = CardData(CardClass.NORMAL, CardName.YATSUHA_HOLY_RAKE_HANDS, MegamiEnum.YATSUHA, CardType.ATTACK, SubType.NONE)
+    private val entranceOfAbyss = CardData(CardClass.NORMAL, CardName.YATSUHA_ENTRANCE_OF_ABYSS, MegamiEnum.YATSUHA, CardType.ATTACK, SubType.NONE)
+    private val trueMonster = CardData(CardClass.NORMAL, CardName.YATSUHA_TRUE_MONSTER, MegamiEnum.YATSUHA, CardType.ATTACK, SubType.FULL_POWER)
+    private val ghostLink = CardData(CardClass.NORMAL, CardName.YATSUHA_GHOST_LINK, MegamiEnum.YATSUHA, CardType.BEHAVIOR, SubType.NONE)
+    private val resolution = CardData(CardClass.NORMAL, CardName.YATSUHA_RESOLUTION, MegamiEnum.YATSUHA, CardType.BEHAVIOR, SubType.REACTION)
+    private val pledge = CardData(CardClass.NORMAL, CardName.YATSUHA_PLEDGE, MegamiEnum.YATSUHA, CardType.BEHAVIOR, SubType.REACTION)
+    private val vainFlower = CardData(CardClass.NORMAL, CardName.YATSUHA_VAIN_FLOWER, MegamiEnum.YATSUHA, CardType.ENCHANTMENT, SubType.NONE)
+    private val eightMirrorVainSakura = CardData(CardClass.SPECIAL, CardName.YATSUHA_EIGHT_MIRROR_VAIN_SAKURA, MegamiEnum.YATSUHA, CardType.BEHAVIOR, SubType.NONE)
+
+    val notCompleteSet = setOf(CardName.YATSUHA_STAR_NAIL, CardName.YATSUHA_DARKNESS_GILL, CardName.YATSUHA_MIRROR_DEVIL,
+        CardName.YATSUHA_GHOST_STEP, CardName.YATSUHA_WILLING, CardName.YATSUHA_CONTRACT, CardName.YATSUHA_CLINGY_FLOWER)
+
+    val completeSet = setOf(CardName.YATSUHA_HOLY_RAKE_HANDS, CardName.YATSUHA_ENTRANCE_OF_ABYSS, CardName.YATSUHA_TRUE_MONSTER,
+        CardName.YATSUHA_GHOST_LINK, CardName.YATSUHA_RESOLUTION, CardName.YATSUHA_PLEDGE, CardName.YATSUHA_VAIN_FLOWER)
+
+    val completeMap =  EnumMap<CardName, CardName>(CardName::class.java).apply {
+        put(CardName.YATSUHA_STAR_NAIL, CardName.YATSUHA_HOLY_RAKE_HANDS)
+        put(CardName.YATSUHA_DARKNESS_GILL, CardName.YATSUHA_ENTRANCE_OF_ABYSS)
+        put(CardName.YATSUHA_MIRROR_DEVIL, CardName.YATSUHA_TRUE_MONSTER)
+        put(CardName.YATSUHA_GHOST_STEP, CardName.YATSUHA_GHOST_LINK)
+        put(CardName.YATSUHA_WILLING, CardName.YATSUHA_RESOLUTION)
+        put(CardName.YATSUHA_CONTRACT, CardName.YATSUHA_PLEDGE)
+        put(CardName.YATSUHA_CLINGY_FLOWER, CardName.YATSUHA_VAIN_FLOWER)
+    }
+
+    private fun countCompleteCard(game_status: GameStatus, player: PlayerEnum): Int{
+        var count = 0
+        for(cardName in game_status.getPlayer(player).additionalHand.keys){
+            if(cardName in notCompleteSet){
+                count += 1
+            }
+        }
+        return count
+    }
+
+    private suspend fun changeCompleteCard(game_status: GameStatus, player: PlayerEnum): Boolean{
+        while (true){
+            val list = game_status.selectCardFrom(player, player, player,
+                listOf(LocationEnum.HAND, LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1617
+            ) {card, _ -> card.card_data.megami == MegamiEnum.YATSUHA && card.card_data.card_name in notCompleteSet}?: break
+            if (list.size == 1){
+                game_status.popCardFrom(player, list[0], LocationEnum.HAND, true)?.let {
+                    game_status.insertCardTo(player, it, LocationEnum.ADDITIONAL_CARD, true)
+                    game_status.moveAdditionalCard(player, completeMap[it.card_data.card_name]!!, LocationEnum.HAND)
+
+                }?: game_status.popCardFrom(player, list[0], LocationEnum.DISCARD_YOUR, true)?.let {
+                    game_status.insertCardTo(player, it, LocationEnum.ADDITIONAL_CARD, true)
+                    game_status.moveAdditionalCard(player, completeMap[it.card_data.card_name]!!, LocationEnum.DISCARD_YOUR)
+                }?: return false
+                return true
+            }
+            else if(list.size == 0){
+                break
+            }
+        }
+        return false
+    }
+
+
+    private fun yatsuhaA1CardInit(){
+        holyRakeHand.setAttack(DistanceType.CONTINUOUS, Pair(3, 4), null, 2, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        holyRakeHand.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
+           game_status.flareToAura(player.opposite(), player, 1, Arrow.ONE_DIRECTION, player,
+               game_status.getCardOwner(card_number), card_number)
+            null
+        })
+        entranceOfAbyss.setAttack(DistanceType.CONTINUOUS, Pair(4, 5), null, 2, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = true, chogek = false)
+        entranceOfAbyss.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ ->
+                true
+            }, {_, gameStatus, attack ->
+                attack.apply {
+                    val mirror = gameStatus.getMirror()
+                    lifePlusMinus(mirror); auraPlusMinus(mirror)
+                }
+            }))
+            null
+        })
+        trueMonster.setAttack(DistanceType.CONTINUOUS, Pair(1, 3), null, 4, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        trueMonster.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.WHEN_CHOOSE_LIFE_DAMAGE) {card_number, player, game_status, _ ->
+            game_status.lifeToLife(player.opposite(), player, 1, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
+            null
+        })
+        ghostLink.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
+            while (true){
+                when(game_status.receiveCardEffectSelect(player, 1614)){
+                    CommandEnum.SELECT_ONE -> {
+                        game_status.addThisTurnDistance(1)
+                        game_status.addThisTurnSwellDistance(1)
+                        break
+                    }
+                    CommandEnum.SELECT_TWO -> {
+                        game_status.addThisTurnDistance(-1)
+                        game_status.addThisTurnSwellDistance(-1)
+                        break
+                    }
+                    else -> {
+                        continue
+                    }
+                }
+            }
+            null
+        })
+        ghostLink.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_ATTACK){card_number, player, game_status, _ ->
+            if(game_status.addPreAttackZone(player, MadeAttack(CardName.YATSUHA_GHOST_LINK, card_number, CardClass.NULL,
+                    DistanceType.CONTINUOUS, 2,  1, Pair(3, 5), null, MegamiEnum.YATSUHA,
+                    cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false), null)){
+                game_status.afterMakeAttack(card_number, player, null)
+            }
+            null
+        })
+        resolution.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, react_attack->
+            while (true){
+                when(game_status.receiveCardEffectSelect(player, 1615)){
+                    CommandEnum.SELECT_ONE -> {
+                        while (true){
+                            when(game_status.receiveCardEffectSelect(player, 1611)){
+                                CommandEnum.SELECT_ONE -> {
+                                    game_status.auraToFlare(player, player, 1, Arrow.BOTH_DIRECTION, player,
+                                        game_status.getCardOwner(card_number), card_number)
+                                    break
+                                }
+                                CommandEnum.SELECT_TWO -> {
+                                    game_status.flareToAura(player, player, 1, Arrow.BOTH_DIRECTION, player,
+                                        game_status.getCardOwner(card_number), card_number)
+                                    break
+                                }
+                                else -> {
+                                    continue
+                                }
+                            }
+                        }
+                        break
+                    }
+                    CommandEnum.SELECT_TWO -> {
+                        if(react_attack?.card_class != CardClass.SPECIAL){
+                            react_attack?.addOtherBuff(OtherBuff(card_number, 1, OtherBuffTag.GET_IMMEDIATE, { _, _, _ ->
+                                true
+                            }, { nowPlayer, gameStatus, attack ->
+                                val (aura, _) = attack.getDamage(gameStatus, nowPlayer.opposite(),
+                                    gameStatus.getPlayerAttackBuff(nowPlayer.opposite()))
+                                if(aura <= gameStatus.getMirror() + 1){
+                                    attack.makeNotValid()
+                                }
+                            }))
+                        }
+                        break
+                    }
+                    CommandEnum.SELECT_THREE -> {
+                        while (true){
+                            when(game_status.receiveCardEffectSelect(player, 1611)){
+                                CommandEnum.SELECT_ONE -> {
+                                    game_status.auraToFlare(player, player, 1, Arrow.BOTH_DIRECTION, player,
+                                        game_status.getCardOwner(card_number), card_number)
+                                    break
+                                }
+                                CommandEnum.SELECT_TWO -> {
+                                    game_status.flareToAura(player, player, 1, Arrow.BOTH_DIRECTION, player,
+                                        game_status.getCardOwner(card_number), card_number)
+                                    break
+                                }
+                                else -> {
+                                    continue
+                                }
+                            }
+                        }
+                        if(react_attack?.card_class != CardClass.SPECIAL){
+                            react_attack?.addOtherBuff(OtherBuff(card_number, 1, OtherBuffTag.GET_IMMEDIATE, { _, _, _ ->
+                                true
+                            }, { nowPlayer, gameStatus, attack ->
+                                val (aura, _) = attack.getDamage(gameStatus, nowPlayer.opposite(),
+                                    gameStatus.getPlayerAttackBuff(nowPlayer.opposite()))
+                                if(aura <= gameStatus.getMirror() + 1){
+                                    attack.makeNotValid()
+                                }
+                            }))
+                        }
+                        break
+                    }
+                    else -> {
+                        continue
+                    }
+                }
+            }
+            null
+        })
+        pledge.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, react_attack->
+            while (true) {
+                when (game_status.receiveCardEffectSelect(player, 1616)) {
+                    CommandEnum.SELECT_ONE -> {
+                        while (true) {
+                            when (game_status.receiveCardEffectSelect(player, 1612)) {
+                                CommandEnum.SELECT_ONE -> {
+                                    game_status.auraToFlare(
+                                        player.opposite(), player, 1, Arrow.BOTH_DIRECTION, player,
+                                        game_status.getCardOwner(card_number), card_number
+                                    )
+                                    break
+                                }
+                                CommandEnum.SELECT_TWO -> {
+                                    game_status.flareToAura(
+                                        player, player.opposite(), 1, Arrow.BOTH_DIRECTION, player,
+                                        game_status.getCardOwner(card_number), card_number
+                                    )
+                                    break
+                                }
+                                else -> {
+                                    continue
+                                }
+                            }
+                        }
+                        break
+                    }
+                    CommandEnum.SELECT_TWO -> {
+                        while (true) {
+                            when (game_status.receiveCardEffectSelect(player, 1613)) {
+                                CommandEnum.SELECT_ONE -> {
+                                    game_status.flareToAura(
+                                        player.opposite(), player, 1, Arrow.BOTH_DIRECTION, player,
+                                        game_status.getCardOwner(card_number), card_number
+                                    )
+                                    break
+                                }
+
+                                CommandEnum.SELECT_TWO -> {
+                                    game_status.auraToFlare(
+                                        player, player.opposite(), 1, Arrow.BOTH_DIRECTION, player,
+                                        game_status.getCardOwner(card_number), card_number
+                                    )
+                                    break
+                                }
+                                else -> {
+                                    continue
+                                }
+                            }
+                        }
+                        break
+                    }
+                    else -> {
+                        continue
+                    }
+                }
+            }
+            null
+        })
+        vainFlower.setEnchantment(3)
+        vainFlower.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MOVE_CARD) {card_number, player, game_status, _ ->
+            if(countCompleteCard(game_status, player) < 4){
+                changeCompleteCard(game_status, player)
+            }
+            else{
+                game_status.popCardFrom(player, card_number, LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, true)?.let {
+                    game_status.insertCardTo(player, it, LocationEnum.YOUR_DECK_BELOW, true)
+                }
+                game_status.lifeToOut(player.opposite(), 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
+            }
+            null
+        })
+        eightMirrorVainSakura.addtext(termination)
+        eightMirrorVainSakura.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.USING_CONDITION){_, player, game_status, _ ->
+            if(game_status.getAdjustDistance() <= 7) 1
+            else 0
+        })
+        eightMirrorVainSakura.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {_, player, game_status, _->
+            if(changeCompleteCard(game_status, player)){
+                game_status.setShrink(player)
+            }
+            null
+        })
+        eightMirrorVainSakura.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_DECK_RECONSTRUCT_YOUR) {_, player, game_status, _->
+            if(changeCompleteCard(game_status, player)){
+                game_status.setShrink(player)
+            }
+            null
+        })
+    }
+
     fun init(){
         yurinaCardInit()
         saineCardInit()
@@ -9812,6 +10118,7 @@ object CardSet {
         haganeA1CardInit()
         kamuwiCardInit()
         renriCardInit()
+        yatsuhaA1CardInit()
 
         hashMapInit()
         hashMapTest()

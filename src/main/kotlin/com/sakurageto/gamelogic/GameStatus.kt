@@ -1917,6 +1917,133 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
+    suspend fun outToLife(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum,
+                            card_owner: PlayerEnum, card_number: Int){
+        if(number <= 0) return
+
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner)){
+            if(player == user){
+                if(!getBothDirection(user, LocToLoc.LIFE_YOUR_TO_OUT.encode(number))){
+                    return lifeToOut(player, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                }
+            }
+            else{
+                if(!getBothDirection(user, LocToLoc.LIFE_OTHER_TO_OUT.encode(number))){
+                    return lifeToOut(player, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                }
+            }
+        }
+
+        var value = number
+
+        val nowPlayer = getPlayer(player)
+
+        if(10 - nowPlayer.life < value){
+            value = 10 - nowPlayer.life
+        }
+
+        logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, value,
+            LocationEnum.OUT_OF_GAME, LocationEnum.YOUR_LIFE, arrow != Arrow.NULL))
+        if(value != 0) {
+            nowPlayer.life += value
+            sendMoveToken(
+                getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
+                LocationEnum.OUT_OF_GAME, LocationEnum.YOUR_LIFE, value, -1
+            )
+        }
+    }
+
+    suspend fun lifeToOut(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum,
+                          card_owner: PlayerEnum, card_number: Int){
+        if(number <= 0) return
+
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner)){
+            if(player == user){
+                if(getBothDirection(user, LocToLoc.LIFE_YOUR_TO_OUT.encode(number))){
+                    return outToLife(player, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                }
+            }
+            else{
+                if(getBothDirection(user, LocToLoc.LIFE_OTHER_TO_OUT.encode(number))){
+                    return outToLife(player, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                }
+            }
+        }
+
+        var value = number
+
+        val nowPlayer = getPlayer(player)
+        val before = nowPlayer.life
+
+        if(before < value){
+            value = before
+        }
+
+        logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, value,
+            LocationEnum.YOUR_LIFE, LocationEnum.OUT_OF_GAME, arrow != Arrow.NULL))
+        if(value != 0) {
+            nowPlayer.life -= value
+
+            sendMoveToken(
+                getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
+                LocationEnum.YOUR_LIFE, LocationEnum.OUT_OF_GAME, value, -1
+            )
+            lifeListenerProcess(player, before, reconstruct = false, damage = false)
+            if (nowPlayer.life == 0) {
+                gameEnd(player.opposite(), player)
+            }
+        }
+    }
+
+    suspend fun lifeToLife(playerGive: PlayerEnum, playerGet: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum,
+                           card_owner: PlayerEnum, card_number: Int){
+        if(number <= 0) return
+
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner)){
+            if(playerGive == user){
+                if(getBothDirection(user, LocToLoc.LIFE_YOUR_TO_LIFE_OTHER.encode(number))){
+                    return lifeToLife(playerGet, playerGive, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                }
+            }
+            else{
+                if(!getBothDirection(user, LocToLoc.LIFE_YOUR_TO_LIFE_OTHER.encode(number))){
+                    return lifeToLife(playerGet, playerGive, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                }
+            }
+        }
+
+        var value = number
+
+        val getPlayer = getPlayer(playerGet)
+        val givePlayer = getPlayer(playerGive)
+
+        val before = givePlayer.life
+
+        if(givePlayer.life < value){
+            value = givePlayer.life
+        }
+
+        else if(10 - getPlayer.life < value){
+            value = 10 - getPlayer.life
+        }
+
+        logger.insert(Log(playerGive, LogText.MOVE_TOKEN, card_number, value,
+            LocationEnum.YOUR_LIFE, LocationEnum.OTHER_LIFE, arrow != Arrow.NULL))
+        if(value != 0) {
+            givePlayer.life -= value
+            getPlayer.life += value
+
+            sendMoveToken(
+                getSocket(playerGet), getSocket(playerGive), TokenEnum.SAKURA_TOKEN,
+                LocationEnum.YOUR_LIFE, LocationEnum.OTHER_LIFE, value, -1
+            )
+            lifeListenerProcess(playerGet, before, reconstruct = false, damage = false)
+            if (givePlayer.life == 0) {
+                gameEnd(playerGive.opposite(), playerGive)
+            }
+        }
+    }
+
     suspend fun lifeToDistance(player: PlayerEnum, number: Int, damage: Boolean, arrow: Arrow, user: PlayerEnum,
                                card_owner: PlayerEnum, card_number: Int) {
         if(number == 0) {
@@ -2479,9 +2606,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             //kamuwi card cost
 
             perjuryCheck[perjury_card_number - 2200] = true
-            var public = true
+            var public = false
             when(receiveSelectDisprove(getSocket(player.opposite()), perjury_card_number)){
                 CommandEnum.SELECT_ONE -> {
+                    public = true
                     sendSimpleCommand(player1_socket, player2_socket, CommandEnum.SHOW_DISPROVE_RESULT, falseCard.card_number)
                     if(perjuryCard.card_data.card_name == falseCard.card_data.card_name){
                         //반증에 실패
@@ -2509,8 +2637,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 }
                 else -> {
                     if(perjuryCard.effectText(falseCard.card_number,
-                        player, this, null, TextEffectTag.WHEN_THIS_CARD_NOT_DISPROVE) == 0){
-                        public = false
+                        player, this, null, TextEffectTag.WHEN_THIS_CARD_NOT_DISPROVE) == 1){
+                        public = true
                     }
                 }
             }
@@ -3709,6 +3837,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         val nowSocket = getSocket(player)
         val otherSocket = getSocket(player.opposite())
+
+        for(card in getPlayer(player).usedSpecialCard.values){
+            card.effectAllValidEffect(player.opposite(), this, TextEffectTag.WHEN_DECK_RECONSTRUCT_YOUR)
+        }
 
         installationProcess(player)
 

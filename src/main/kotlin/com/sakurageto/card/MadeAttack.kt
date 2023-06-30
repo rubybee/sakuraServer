@@ -87,6 +87,7 @@ class MadeAttack(
 
     var kururuChangeRangeUpper = false
     var kururuChangeRangeUnder = false
+    var kururuChange2X = false
 
     var isItValid= true
     var isItDamage = true
@@ -241,7 +242,7 @@ class MadeAttack(
                 DistanceType.DISCONTINUOUS -> {
                     if (closable) {
                         var min = -1
-                        for (i in 0..10) {
+                        for (i in 0..14) {
                             if(editedDistanceUncont!![i]){
                                 min = i
                                 break
@@ -255,14 +256,14 @@ class MadeAttack(
                         }
                     }
                     else{
-                        var max = 11
-                        for (i in 10 downTo 0) {
+                        var max = 5000
+                        for (i in 14 downTo 0) {
                             if(editedDistanceUncont!![i]){
                                 max = i
                                 break
                             }
                         }
-                        if(max != 11){
+                        if(max != 5000){
                             for (i in max + 1..max + number){
                                 editedDistanceUncont!![i] = true
                             }
@@ -292,12 +293,11 @@ class MadeAttack(
             }
         }
         else{
-
             when(editedDistanceType){
                 DistanceType.DISCONTINUOUS -> {
                     if (closable) {
                         var min = -1
-                        for (i in 0..10) {
+                        for (i in 0..14) {
                             if(editedDistanceUncont!![i]){
                                 min = i
                                 break
@@ -311,14 +311,14 @@ class MadeAttack(
                         }
                     }
                     else{
-                        var max = 11
-                        for (i in 10 downTo 0) {
+                        var max = 5000
+                        for (i in 14 downTo 0) {
                             if(editedDistanceUncont!![i]){
                                 max = i
                                 break
                             }
                         }
-                        if(max != 11){
+                        if(max != 5000){
                             for (i in max + number + 1..max){
                                 editedDistanceUncont!![i] = false
                             }
@@ -346,7 +346,7 @@ class MadeAttack(
                     }
                     if(editedDistanceCont!!.first < editedDistanceCont!!.second){
                         editedDistanceType = DistanceType.DISCONTINUOUS
-                        editedDistanceUncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false)
+                        editedDistanceUncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
                         editedDistanceCont = null
                     }
                 }
@@ -367,7 +367,7 @@ class MadeAttack(
                 if(range.first <= editedDistanceCont!!.first){
                     if(range.second < editedDistanceCont!!.first){
                         editedDistanceType = DistanceType.DISCONTINUOUS
-                        editedDistanceUncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false)
+                        editedDistanceUncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
                         for(i in editedDistanceCont!!.first..editedDistanceCont!!.second){
                             editedDistanceUncont!![i] = true
                         }
@@ -385,7 +385,7 @@ class MadeAttack(
                 else{
                     if(range.first > editedDistanceCont!!.second){
                         editedDistanceType = DistanceType.DISCONTINUOUS
-                        editedDistanceUncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false)
+                        editedDistanceUncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
                         for(i in editedDistanceCont!!.first..editedDistanceCont!!.second){
                             editedDistanceUncont!![i] = true
                         }
@@ -416,7 +416,7 @@ class MadeAttack(
                         }
                         else{
                             editedDistanceType = DistanceType.DISCONTINUOUS
-                            editedDistanceUncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false)
+                            editedDistanceUncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
                             for(i in editedDistanceCont!!.first..editedDistanceCont!!.second){
                                 editedDistanceUncont!![i] = true
                             }
@@ -428,7 +428,7 @@ class MadeAttack(
                     else{
                         if(range.second >= editedDistanceCont!!.second){
                             editedDistanceType = DistanceType.DISCONTINUOUS
-                            editedDistanceUncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false)
+                            editedDistanceUncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
                             editedDistanceCont = null
                         }
                         else{

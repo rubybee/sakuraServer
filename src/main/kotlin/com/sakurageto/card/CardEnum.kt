@@ -471,7 +471,11 @@ enum class CardName {
     YATSUHA_PLEDGE,
     YATSUHA_VAIN_FLOWER,
 
-    YATSUHA_EIGHT_MIRROR_VAIN_SAKURA;
+    YATSUHA_EIGHT_MIRROR_VAIN_SAKURA,
+
+    KURURU_BLASTER,
+    KURURU_RAILGUN,
+    KURURU_CONNECT_DIVE;
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -567,7 +571,7 @@ enum class CardName {
             put(OBORO_BRANCH_OF_DIVINE, 513)
             put(OBORO_LAST_CRYSTAL, 514)
 
-            put(YUKIHI_YUKIHI, 100000)
+            put(YUKIHI_YUKIHI, 9999)
             put(YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE, 600)
             put(YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS, 601)
             put(YUKIHI_PUSH_OUT_SLASH_PULL, 602)
@@ -655,6 +659,9 @@ enum class CardName {
             put(KURURU_DAUZING, 1015)
             put(KURURU_LAST_RESEARCH, 1016)
             put(KURURU_GRAND_GULLIVER, 1017)
+            put(KURURU_BLASTER, 1018)
+            put(KURURU_RAILGUN, 1019)
+            put(KURURU_CONNECT_DIVE, 1020)
 
             put(THALLYA_BURNING_STEAM, 1100)
             put(THALLYA_WAVING_EDGE, 1101)
@@ -946,7 +953,7 @@ enum class CardName {
             put(OBORO_LAST_CRYSTAL, 10514)
 
 
-            put(YUKIHI_YUKIHI, 200000)
+            put(YUKIHI_YUKIHI, 19999)
             put(YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE, 10600)
             put(YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS, 10601)
             put(YUKIHI_PUSH_OUT_SLASH_PULL, 10602)
@@ -1032,6 +1039,9 @@ enum class CardName {
             put(KURURU_DAUZING, 11015)
             put(KURURU_LAST_RESEARCH, 11016)
             put(KURURU_GRAND_GULLIVER, 11017)
+            put(KURURU_BLASTER, 11018)
+            put(KURURU_RAILGUN, 11019)
+            put(KURURU_CONNECT_DIVE, 11020)
 
             put(THALLYA_BURNING_STEAM, 11100)
             put(THALLYA_WAVING_EDGE, 11101)
@@ -1343,6 +1353,11 @@ enum class CardName {
                     KURURU_TORNADO, KURURU_REGAINER, KURURU_MODULE,
                     KURURU_REFLECTOR
                 )
+                KURURU_A2 -> listOf(
+                    KURURU_BLASTER, KURURU_RAILGUN, KURURU_KURURUOONG,
+                    KURURU_TORNADO, KURURU_REGAINER, KURURU_MODULE,
+                    KURURU_REFLECTOR
+                )
                 THALLYA -> listOf(
                     THALLYA_BURNING_STEAM, THALLYA_WAVING_EDGE, THALLYA_SHIELD_CHARGE,
                     THALLYA_STEAM_CANNON, THALLYA_STUNT, THALLYA_ROARING,
@@ -1505,6 +1520,10 @@ enum class CardName {
                     KURURU_DRAIN_DEVIL, KURURU_BIG_GOLEM, KURURU_LAST_RESEARCH,
                     KURURU_KANSHOUSOUCHI_KURURUSIK
                 )
+                KURURU_A2 -> listOf(
+                    KURURU_DRAIN_DEVIL, KURURU_BIG_GOLEM, KURURU_INDUSTRIA,
+                    KURURU_CONNECT_DIVE
+                )
                 THALLYA -> listOf(
                     THALLYA_ALPHA_EDGE, THALLYA_OMEGA_BURST, THALLYA_THALLYA_MASTERPIECE,
                     THALLYA_JULIA_BLACKBOX,
@@ -1603,6 +1622,12 @@ enum class CardName {
                 KURURU -> listOf(
                     KURURU_DUPLICATED_GEAR_1, KURURU_DUPLICATED_GEAR_2, KURURU_DUPLICATED_GEAR_3
                 )
+                KURURU_A1 -> listOf(
+                    KURURU_GRAND_GULLIVER
+                )
+                KURURU_A2 -> listOf(
+                    KURURU_DUPLICATED_GEAR_1, KURURU_DUPLICATED_GEAR_2, KURURU_DUPLICATED_GEAR_3
+                )
                 THALLYA -> listOf(
                     FORM_YAKSHA, FORM_NAGA, FORM_GARUDA
                 )
@@ -1630,9 +1655,6 @@ enum class CardName {
                 KORUNU -> listOf()
                 YATSUHA -> listOf()
                 SHINRA_A1 -> listOf()
-                KURURU_A1 -> listOf(
-                    KURURU_GRAND_GULLIVER
-                )
                 HATSUMI -> listOf()
                 KODAMA -> listOf()
                 MIZUKI -> listOf(

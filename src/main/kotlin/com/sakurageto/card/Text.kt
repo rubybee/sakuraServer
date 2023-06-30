@@ -101,6 +101,7 @@ enum class TextEffectTag {
     WHEN_THIS_CARD_NOT_DISPROVE, //this effect get original card's number(not disprove card)
     WHEN_MOVE_TOKEN,
     WHEN_DECK_RECONSTRUCT_YOUR,
+    WHEN_RESOLVE_COG_EFFECT,
 
     CONDITION_ADD_DO_WIND_AROUND,
 

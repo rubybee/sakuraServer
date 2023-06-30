@@ -2526,6 +2526,27 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             nowPlayer.nextCostAddMegami = null
             //kamuwi card cost
 
+            //kamuwi dawn
+            if(react_attack?.effectText(card.card_number, player.opposite(), this, react_attack,
+                    TextEffectTag.WHEN_THIS_CARD_REACTED) == 1){
+                popCardFrom(player, card.card_number, location, true)?.let {
+                    if(cost == -1){
+                        insertCardTo(player, it, LocationEnum.DISCARD_YOUR, true)
+                    }
+                    else{
+                        insertCardTo(player, it, LocationEnum.YOUR_USED_CARD, true)
+                    }
+                }
+                if(card.card_data.card_type == CardType.ATTACK){
+                    val nowAttack = nowPlayer.pre_attack_card
+                    nowAttack?.activeOtherBuff(this, player, nowPlayer.otherBuff)
+                    nowAttack?.getDamage(this, player, nowPlayer.attackBuff)
+                    nowPlayer.pre_attack_card = null
+                }
+                return true
+            }
+            //kamuwi dawn
+
             if(cost == -1){
                 var lightHouseCheck = 0
                 if(turnPlayer == player && card.card_data.card_type != CardType.ATTACK && location == LocationEnum.HAND){
@@ -4064,7 +4085,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             sendDoBasicAction(getSocket(player), getSocket(player.opposite()), CommandEnum.ACTION_ASURA_YOUR, card)
             if(addPreAttackZone(player, MadeAttack(CardName.FORM_ASURA, 1118, CardClass.NULL,
                     DistanceType.DISCONTINUOUS, 3,  2, null,
-                    distance_uncont = arrayOf(false, false, false, true, false, true, false, false, false, false, false)
+                    distance_uncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
                     ,MegamiEnum.THALLYA, cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
                 ).addTextAndReturn(CardSet.attackAsuraText), null) ){
                 afterMakeAttack(1118, player, null)
@@ -4078,7 +4099,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             sendDoBasicAction(getSocket(player), getSocket(player.opposite()), CommandEnum.ACTION_YAKSHA_YOUR, card)
             if(addPreAttackZone(player, MadeAttack(CardName.FORM_YAKSHA, 1111, CardClass.NULL,
                     DistanceType.DISCONTINUOUS, 1,  1, null,
-                    distance_uncont = arrayOf(false, false, true, false, true, false, true, false, true, false, false)
+                    distance_uncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
                     ,MegamiEnum.THALLYA, cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
                 ).addTextAndReturn(CardSet.attackYakshaText), null) ){
                 afterMakeAttack(1111, player, null)

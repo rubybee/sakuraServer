@@ -28,6 +28,7 @@ enum class MegamiEnum(var real_number: Int) {
     CHIKAGE_A1(91),
     KURURU(100),
     KURURU_A1(101),
+    KURURU_A2(102),
     THALLYA(110),
     THALLYA_A1(111),
     RAIRA(120),

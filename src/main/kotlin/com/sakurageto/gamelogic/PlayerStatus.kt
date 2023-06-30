@@ -95,6 +95,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var napBuff = 0
     var nextMainPhaseSkip = false
     var nextCostAddMegami: MegamiEnum? = null
+    var afterCardUseTermination: Boolean = false
     //for some card(some day refactor may be needed)
 
 

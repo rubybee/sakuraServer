@@ -108,7 +108,7 @@ class CardData(
             this.distance_cont = Pair(distance_cont!!.first, distance_cont.second)
         }
         else{
-            this.distance_uncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false)
+            this.distance_uncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
             for (i in distance_uncont!!){
                 this.distance_uncont!![i] = true
             }

@@ -426,7 +426,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         life_damage = 0,
                         aura_damage = 0,
                         distance_cont = null,
-                        distance_uncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false),
+                        distance_uncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false),
                         megami = this.card_data.megami,
                         cannotReactNormal = false,
                         cannotReactSpecial = false,
@@ -577,23 +577,6 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     }
 
     suspend fun use(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, isTermination: Boolean, nap_change: Int = -1){
-        if(react_attack?.effectText(this.card_number, player.opposite(), game_status, react_attack,
-                TextEffectTag.WHEN_THIS_CARD_REACTED) == 1){
-            game_status.movePlayingCard(player, null, card_number)
-            if(card_data.card_type == CardType.ATTACK){
-                val nowAttack = game_status.getPlayer(player).pre_attack_card
-                val nowPlayer = game_status.getPlayer(player)
-                nowAttack?.activeOtherBuff(game_status, player, nowPlayer.otherBuff)
-                nowAttack?.getDamage(game_status, player, nowPlayer.attackBuff)
-                game_status.getPlayer(player).pre_attack_card = null
-            }
-            return
-        }
-
-        if(isTermination){
-            game_status.setEndTurn(player, true)
-        }
-
         this.card_data.effect?.let {
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
@@ -633,6 +616,11 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 enchantmentUseNormal(player, game_status, react_attack, nap_change)
             }
             CardType.UNDEFINED -> {}
+        }
+
+        if(isTermination || game_status.getPlayer(player).afterCardUseTermination){
+            game_status.setEndTurn(player, true)
+            game_status.getPlayer(player).afterCardUseTermination = false
         }
 
         game_status.afterCardUsed(this.card_number, player, this)
@@ -789,6 +777,51 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 }
             }
         }
+    }
+
+    suspend fun effectAllValidEffect(card_number: Int, player: PlayerEnum, game_status: GameStatus, effectTag: TextEffectTag): Int{
+        var now = 0
+        if(this.card_data.umbrellaMark) {
+            when (game_status.getUmbrella(this.player)) {
+                Umbrella.FOLD -> {
+                    card_data.effectFold?.let {
+                        for(text in it){
+                            if(usedEffectUsable(text) || enchantmentUsable(text)){
+                                if(text.tag == effectTag) text.effect!!(card_number, player, game_status, null)?.let { result ->
+                                    now += result
+                                }
+                            }
+                        }
+                    }
+                }
+                Umbrella.UNFOLD -> {
+                    card_data.effectUnfold?.let {
+                        for(text in it){
+                            if(usedEffectUsable(text) || enchantmentUsable(text)){
+                                if(text.tag == effectTag) text.effect!!(card_number, player, game_status, null)?.let { result ->
+                                    now += result
+                                }
+                            }
+                        }
+                    }
+                }
+                null -> {
+                }
+            }
+        }
+        else{
+            card_data.effect?.let {
+                for(text in it){
+                    if(usedEffectUsable(text) || enchantmentUsable(text)){
+                        if(text.tag == effectTag) text.effect!!(card_number, player, game_status, null)?.let { result ->
+                            now += result
+                        }
+                    }
+                }
+            }
+        }
+
+        return now
     }
 
     suspend fun effectAllValidEffect(player: PlayerEnum, game_status: GameStatus, effectTag: TextEffectTag): Int{

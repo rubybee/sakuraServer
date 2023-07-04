@@ -2431,6 +2431,62 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return false
     }
 
+    suspend fun afterDivingSuccess(player: PlayerEnum, card: Card, location: LocationEnum){
+        val nowPlayer = getPlayer(player)
+
+        if(card.card_data.card_class == CardClass.SPECIAL){
+            card.special_card_state = SpecialCardEnum.PLAYED
+            popCardFrom(player, card.card_number, location, true)?.let {
+                insertCardTo(player, it, LocationEnum.YOUR_USED_CARD, true)
+            }
+        }
+        else{
+            popCardFrom(player, card.card_number, location, true)?.let {
+                insertCardTo(player, it, LocationEnum.DISCARD_YOUR, true)
+            }
+        }
+
+        val nowAttack = nowPlayer.pre_attack_card
+        nowAttack?.activeOtherBuff(this, player, nowPlayer.otherBuff)
+        nowAttack?.getDamage(this, player, nowPlayer.attackBuff)
+        nowPlayer.pre_attack_card = null
+    }
+
+    suspend fun divingProcess(player: PlayerEnum, card: Card): Boolean{
+        val otherPlayer = getPlayer(player.opposite())
+
+
+        when(otherPlayer.forwardDiving){
+            null -> {
+                return false
+            }
+            true -> {
+                sendSimpleCommand(getSocket(player), CommandEnum.DIVING_SHOW)
+                sendSimpleCommand(getSocket(player.opposite()), CommandEnum.DIVING_FORWARD)
+                addThisTurnDistance(-1)
+                addThisTurnSwellDistance(-1)
+
+            }
+            false -> {
+                sendSimpleCommand(getSocket(player), CommandEnum.DIVING_SHOW)
+                sendSimpleCommand(getSocket(player.opposite()), CommandEnum.DIVING_BACKWARD)
+                addThisTurnDistance(1)
+                addThisTurnSwellDistance(1)
+            }
+        }
+
+        val nowPlayer = getPlayer(player)
+
+        if(card.card_data.card_type == CardType.ATTACK){
+            val nowAttack = nowPlayer.pre_attack_card
+            if(nowAttack?.rangeCheck(getAdjustDistance(), this, player, getPlayerRangeBuff(player)) == false){
+                nowPlayer.divingSuccess = true
+                return true
+            }
+        }
+        return false
+    }
+
     /**
      isCost means bi yong
      isConsume means so mo gap
@@ -2563,6 +2619,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     card.use(player, this, react_attack, isTermination, napChange)
                 }
                 else{
+                    if(divingProcess(player, card)){
+                        afterDivingSuccess(player, card, location)
+                        return true
+                    }
                     popCardFrom(player, card.card_number, location, true)?.let {
                         insertCardTo(player, it, LocationEnum.DISCARD_YOUR, true)
                     }
@@ -2579,6 +2639,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 flareToDust(player, cost, Arrow.NULL, player, card.player, Log.SPECIAL_COST)
                 logger.insert(Log(player, LogText.END_EFFECT, Log.SPECIAL_COST, -1))
                 cleanAfterUseCost()
+
+                if(divingProcess(player, card)){
+                    afterDivingSuccess(player, card, location)
+                    return true
+                }
+
                 popCardFrom(player, card.card_number, location, true)?.let {
                     insertCardTo(player, it, LocationEnum.PLAYING_ZONE_YOUR, true)
                 }
@@ -4830,6 +4896,32 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             count += 1
         }
         return count
+    }
+
+    suspend fun diving(player: PlayerEnum){
+        if(getPlayer(player).forwardDiving != null){
+            return
+        }
+
+        val nowSocket = getSocket(player)
+        val otherSocket = getSocket(player)
+
+        sendSimpleCommand(nowSocket, otherSocket, CommandEnum.DIVING_YOUR)
+        while(true){
+            when(receiveSimpleCommand(nowSocket, CommandEnum.DIVING_REQUEST)){
+                CommandEnum.SELECT_ONE -> {
+                    getPlayer(player).forwardDiving = true
+                    break
+                }
+                CommandEnum.SELECT_TWO -> {
+                    getPlayer(player).forwardDiving = false
+                    break
+                }
+                else -> {
+                    continue
+                }
+            }
+        }
     }
 
     //megami special function

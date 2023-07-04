@@ -920,3 +920,30 @@ suspend fun receiveSelectDisproveMain(player: Connection, card_number: Int): Com
     }
 }
 
+suspend fun receiveSimpleCommand(player: Connection, command: CommandEnum): CommandEnum{
+    sendSimpleCommand(player, command)
+    return receiveSimpleCommandMain(player)
+}
+
+suspend fun receiveSimpleCommandMain(player: Connection): CommandEnum{
+    val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
+
+    while (true) {
+        try {
+            val frame = player.session.incoming.receive()
+            if (frame is Frame.Text) {
+                val text = frame.readText()
+                try {
+                    val data = json.decodeFromString<SakuraCardCommand>(text)
+                    return data.command
+                }catch (e: Exception){
+                    continue
+                }
+            }
+        } catch (e: Exception){
+            waitReconnect(player)
+            return receiveSimpleCommandMain(player)
+        }
+    }
+}
+

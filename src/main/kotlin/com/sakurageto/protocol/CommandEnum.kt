@@ -275,7 +275,15 @@ enum class CommandEnum {
     SELECT_NAP_LOCATION,
 
     CHOOSE_DISPROVE,
-    SHOW_DISPROVE_RESULT;
+    SHOW_DISPROVE_RESULT,
+
+    DIVING_YOUR,
+    DIVING_OTHER,
+
+    DIVING_REQUEST,
+    DIVING_FORWARD,
+    DIVING_BACKWARD,
+    DIVING_SHOW;
 
     fun Opposite(): CommandEnum{
         when(this){
@@ -415,6 +423,8 @@ enum class CommandEnum {
             SET_TABOO_GAUGE_YOUR -> return SET_TABOO_GAUGE_OTHER
             SET_TABOO_GAUGE_OTHER -> return SET_TABOO_GAUGE_YOUR
             SHOW_DISPROVE_RESULT -> return SHOW_DISPROVE_RESULT
+            DIVING_YOUR -> return DIVING_OTHER
+            DIVING_OTHER -> return DIVING_YOUR
             else -> TODO()
         }
     }

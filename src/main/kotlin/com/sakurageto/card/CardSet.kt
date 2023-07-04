@@ -12,12 +12,10 @@ import com.sakurageto.protocol.LocationEnum
 import com.sakurageto.protocol.sendSimpleCommand
 import io.ktor.network.sockets.*
 import java.util.EnumMap
-import java.util.concurrent.locks.Condition
 import kotlin.collections.HashMap
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.random.Random
-import kotlin.reflect.jvm.internal.impl.metadata.ProtoBuf.Effect
 
 data class Kikou(var attack: Int = 0, var behavior: Int = 0, var enchantment: Int = 0, var reaction: Int = 0, var fullPower: Int = 0){
     fun add(card: Card){
@@ -2610,8 +2608,8 @@ object CardSet {
     private val grandGravitationAttract = CardData(CardClass.SPECIAL, CardName.HAGANE_GRAND_GRAVITATION_ATTRACT, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
     private val grandMountainRespect = CardData(CardClass.SPECIAL, CardName.HAGANE_GRAND_MOUNTAIN_RESPECT, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
 
-    private fun centrifugal(player: PlayerEnum, game_status: GameStatus): Boolean{
-        return game_status.startTurnDistance + 1 < game_status.thisTurnDistance && !game_status.logger.checkThisTurnDoAttack(player)
+    private suspend fun centrifugal(player: PlayerEnum, game_status: GameStatus): Boolean{
+        return game_status.startTurnDistance + 1 < game_status.getAdjustDistance() && !game_status.logger.checkThisTurnDoAttack(player)
     }
 
     private fun checkAllSpecialCardUsed(player: PlayerEnum, game_status: GameStatus, except: Int): Boolean{
@@ -10471,6 +10469,26 @@ object CardSet {
         })
     }
 
+    private val torpedo = CardData(CardClass.NORMAL, CardName.HATSUMI_TORPEDO, MegamiEnum.HATSUMI, CardType.ENCHANTMENT, SubType.NONE)
+
+    private fun hatsumiA1CardInit(){
+        torpedo.setEnchantment(2)
+        torpedo.addtext(chasm)
+        torpedo.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.DIVING) { _, player, game_status, _ ->
+            game_status.diving(player)
+            null
+        })
+        torpedo.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
+            if(game_status.addPreAttackZone(player, MadeAttack(CardName.HATSUMI_TORPEDO, card_number, CardClass.NULL,
+                    DistanceType.CONTINUOUS, 999,  1, Pair(1, 7), null, MegamiEnum.HATSUMI,
+                    cannotReactNormal = false, cannotReactSpecial = false, cannotReact = true, chogek = false
+                ), null) ){
+                game_status.afterMakeAttack(card_number, player, null)
+            }
+            null
+        })
+    }
+
     fun init(){
         yurinaCardInit()
         saineCardInit()
@@ -10513,6 +10531,7 @@ object CardSet {
         renriCardInit()
         yatsuhaA1CardInit()
         kururuA2CardInit()
+        hatsumiA1CardInit()
 
         hashMapInit()
         hashMapTest()

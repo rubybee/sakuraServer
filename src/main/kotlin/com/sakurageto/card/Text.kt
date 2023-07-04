@@ -73,6 +73,7 @@ enum class TextEffectTag {
     NEXT_BASIC_OPERATION_INVALID,
     PHASE_SKIP,
     ADD_COST,
+    DIVING,
 
     //description when this effect use
     WHEN_USE_BEHAVIOR_END,

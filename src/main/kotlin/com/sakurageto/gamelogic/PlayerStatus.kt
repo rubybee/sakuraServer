@@ -56,6 +56,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
 
     var isThisTurnTailWind: Boolean = true
     var isNextTurnTailWind: Boolean = true
+    var divingSuccess = false
 
     var readySoldierZone= hashMapOf<Int, Card>()
     fun getCardFromSoldier(card_number: Int) = readySoldierZone[card_number]
@@ -75,6 +76,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var canNotUseCardName2: Pair<Int, CardName>? = null
     var tabooGauge: Int? = null
     var anvil: Card? = null
+    var forwardDiving: Boolean? = null
     //for megami(must be present)
 
 

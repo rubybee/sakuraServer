@@ -475,7 +475,12 @@ enum class CardName {
 
     KURURU_BLASTER,
     KURURU_RAILGUN,
-    KURURU_CONNECT_DIVE;
+    KURURU_CONNECT_DIVE,
+
+    HATSUMI_TORPEDO,
+    HATSUMI_SAGIRI_HAIL,
+    HATSUMI_WADANAKA_ROUTE;
+
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){

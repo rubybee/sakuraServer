@@ -796,6 +796,9 @@ enum class CardName {
             put(HATSUMI_OYOGIBI_FIRE, 1708)
             put(HATSUMI_KIRAHARI_LIGHTHOUSE, 1709)
             put(HATSUMI_MIOBIKI_ROUTE, 1710)
+            put(HATSUMI_TORPEDO, 1711)
+            put(HATSUMI_SAGIRI_HAIL, 1712)
+            put(HATSUMI_WADANAKA_ROUTE, 1713)
 
             put(MIZUKI_JIN_DU, 1800)
             put(MIZUKI_BAN_GONG, 1801)
@@ -1175,6 +1178,9 @@ enum class CardName {
             put(HATSUMI_OYOGIBI_FIRE, 11708)
             put(HATSUMI_KIRAHARI_LIGHTHOUSE, 11709)
             put(HATSUMI_MIOBIKI_ROUTE, 11710)
+            put(HATSUMI_TORPEDO, 11711)
+            put(HATSUMI_SAGIRI_HAIL, 11712)
+            put(HATSUMI_WADANAKA_ROUTE, 11713)
 
             put(MIZUKI_JIN_DU, 11800)
             put(MIZUKI_BAN_GONG, 11801)
@@ -1413,10 +1419,19 @@ enum class CardName {
                     YATSUHA_GHOST_STEP, YATSUHA_WILLING, YATSUHA_CONTRACT,
                     YATSUHA_CLINGY_FLOWER
                 )
-
+                YATSUHA_A1 -> listOf(
+                    YATSUHA_STAR_NAIL, YATSUHA_DARKNESS_GILL, YATSUHA_MIRROR_DEVIL,
+                    YATSUHA_GHOST_STEP, YATSUHA_WILLING, YATSUHA_CONTRACT,
+                    YATSUHA_CLINGY_FLOWER
+                )
                 HATSUMI -> listOf(
                     HATSUMI_WATER_BALL, HATSUMI_WATER_CURRENT, HATSUMI_STRONG_ACID,
                     HATSUMI_TSUNAMI, HATSUMI_JUN_BI_MAN_TAN, HATSUMI_COMPASS,
+                    HATSUMI_CALL_WAVE,
+                )
+                HATSUMI_A1 -> listOf(
+                    HATSUMI_WATER_BALL, HATSUMI_WATER_CURRENT, HATSUMI_STRONG_ACID,
+                    HATSUMI_TORPEDO, HATSUMI_JUN_BI_MAN_TAN, HATSUMI_COMPASS,
                     HATSUMI_CALL_WAVE,
                 )
                 KODAMA -> listOf()
@@ -1452,6 +1467,7 @@ enum class CardName {
             return when (megami_name){
                 NONE -> listOf()
                 KIRIKO -> listOf()
+                KODAMA -> listOf()
                 YURINA -> listOf(
                     YURINA_WOLYUNGNACK, YURINA_POBARAM, YURINA_JJOCKBAE, YURINA_JURUCK
                 )
@@ -1569,12 +1585,17 @@ enum class CardName {
                     YATSUHA_TWO_LEAP_MIRROR_DIVINE, YATSUHA_FOUR_LEAP_SONG, YATSUHA_SIX_STAR_SEA,
                     YATSUHA_EIGHT_MIRROR_OTHER_SIDE
                 )
-
+                YATSUHA_A1 -> listOf(
+                    YATSUHA_EIGHT_MIRROR_VAIN_SAKURA
+                )
                 HATSUMI -> listOf(
                     HATSUMI_ISANA_HAIL, HATSUMI_OYOGIBI_FIRE, HATSUMI_KIRAHARI_LIGHTHOUSE,
                     HATSUMI_MIOBIKI_ROUTE
                 )
-                KODAMA -> listOf()
+                HATSUMI_A1 -> listOf(
+                    HATSUMI_SAGIRI_HAIL, HATSUMI_OYOGIBI_FIRE, HATSUMI_KIRAHARI_LIGHTHOUSE,
+                    HATSUMI_WADANAKA_ROUTE
+                )
                 MIZUKI -> listOf(
                     MIZUKI_HACHIRYU_CHEONJUGAK, MIZUKI_HIJAMARU_TRIPLET, MIZUKI_TARTENASHI_DAESUMUN,
                     MIZUKI_MIZUKI_BATTLE_CRY
@@ -1659,8 +1680,14 @@ enum class CardName {
                 )
                 KORUNU -> listOf()
                 YATSUHA -> listOf()
+                YATSUHA_A1 -> listOf(
+                    YATSUHA_HOLY_RAKE_HANDS, YATSUHA_ENTRANCE_OF_ABYSS, YATSUHA_TRUE_MONSTER,
+                    YATSUHA_GHOST_LINK, YATSUHA_RESOLUTION, YATSUHA_PLEDGE,
+                    YATSUHA_VAIN_FLOWER,
+                )
                 SHINRA_A1 -> listOf()
                 HATSUMI -> listOf()
+                HATSUMI_A1 -> listOf()
                 KODAMA -> listOf()
                 MIZUKI -> listOf(
                     KODAMA_TU_SIN
@@ -1716,6 +1743,7 @@ enum class CardEffectLocation {
     USED_YOUR,
     USED_OTHER,
     MEGAMI_YOUR,
+    DIVING,
     TEMP_PLAYER1,
     TEMP_PLAYER2,
     IDEA_PLAYER1,

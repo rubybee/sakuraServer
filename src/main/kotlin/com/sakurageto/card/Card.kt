@@ -9,6 +9,7 @@ import com.sakurageto.gamelogic.log.LogText
 import com.sakurageto.gamelogic.storyboard.Act
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.receiveNapInformation
+import java.util.SortedSet
 import kotlin.collections.ArrayDeque
 import kotlin.collections.HashMap
 
@@ -249,6 +250,67 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         return true
     }
 
+    private fun getDistance(umbrella: Umbrella?): SortedSet<Int>{
+        val result = sortedSetOf<Int>()
+        if(card_data.umbrellaMark){
+            when(umbrella){
+                Umbrella.FOLD -> {
+                    when(card_data.distanceTypeFold){
+                        DistanceType.DISCONTINUOUS -> {
+                            for(i in card_data.distanceUncontFold!!.indices){
+                                if(card_data.distanceUncontFold!![i]){
+                                    result.add(i)
+                                }
+                            }
+                        }
+                        DistanceType.CONTINUOUS -> {
+                            for(i in card_data.distanceContFold!!.first..card_data.distanceContFold!!.first){
+                                result.add(i)
+                            }
+                        }
+                        else -> {}
+                    }
+                }
+                Umbrella.UNFOLD -> {
+                    when(card_data.distanceTypeUnfold){
+                        DistanceType.DISCONTINUOUS -> {
+                            for(i in card_data.distanceUncontUnfold!!.indices){
+                                if(card_data.distanceUncontUnfold!![i]){
+                                    result.add(i)
+                                }
+                            }
+                        }
+                        DistanceType.CONTINUOUS -> {
+                            for(i in card_data.distanceContUnfold!!.first..card_data.distanceContUnfold!!.first){
+                                result.add(i)
+                            }
+                        }
+                        else -> {}
+                    }
+                }
+                null -> {}
+            }
+        }
+        else{
+            when(card_data.distance_type){
+                DistanceType.DISCONTINUOUS -> {
+                    for(i in card_data.distance_uncont!!.indices){
+                        if(card_data.distance_uncont!![i]){
+                            result.add(i)
+                        }
+                    }
+                }
+                DistanceType.CONTINUOUS -> {
+                    for(i in card_data.distance_cont!!.first..card_data.distance_cont!!.first){
+                        result.add(i)
+                    }
+                }
+                else -> {}
+            }
+        }
+        return result
+    }
+
     suspend fun makeAttack(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, subType: SubType?): MadeAttack?{
         card_data.effect?.let {
             for(text in it){
@@ -271,11 +333,9 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         card_name =  this.card_data.card_name,
                         card_number = this.card_number,
                         card_class = this.card_data.card_class,
-                        distance_type = this.card_data.distanceTypeFold!!,
+                        distance = this.getDistance(Umbrella.FOLD),
                         life_damage = this.card_data.lifeDamageFold!!,
                         aura_damage = this.card_data.auraDamageFold!!,
-                        distance_cont = this.card_data.distanceContFold,
-                        distance_uncont = this.card_data.distanceUncontFold,
                         megami = this.card_data.megami,
                         cannotReactNormal = this.card_data.cannotReactNormal,
                         cannotReactSpecial = this.card_data.cannotReactSpecial,
@@ -297,11 +357,9 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         card_name =  this.card_data.card_name,
                         card_number = this.card_number,
                         card_class = this.card_data.card_class,
-                        distance_type = this.card_data.distanceTypeUnfold!!,
+                        distance = getDistance(Umbrella.UNFOLD),
                         life_damage = this.card_data.lifeDamageUnfold!!,
                         aura_damage = this.card_data.auraDamageUnfold!!,
-                        distance_cont = this.card_data.distanceContUnfold,
-                        distance_uncont = this.card_data.distanceUncontUnfold,
                         megami = this.card_data.megami,
                         cannotReactNormal = this.card_data.cannotReactNormal,
                         cannotReactSpecial = this.card_data.cannotReactSpecial,
@@ -321,11 +379,9 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 card_name =  this.card_data.card_name,
                 card_number = this.card_number,
                 card_class = this.card_data.card_class,
-                distance_type = this.card_data.distance_type!!,
+                distance = getDistance(null),
                 life_damage = this.card_data.life_damage!!,
                 aura_damage = this.card_data.aura_damage!!,
-                distance_cont = this.card_data.distance_cont,
-                distance_uncont = this.card_data.distance_uncont,
                 megami = this.card_data.megami,
                 cannotReactNormal = this.card_data.cannotReactNormal,
                 cannotReactSpecial = this.card_data.cannotReactSpecial,
@@ -422,11 +478,9 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         card_name =  this.card_data.card_name,
                         card_number = this.card_number,
                         card_class = this.card_data.card_class,
-                        distance_type = DistanceType.DISCONTINUOUS,
+                        distance = sortedSetOf(),
                         life_damage = 0,
                         aura_damage = 0,
-                        distance_cont = null,
-                        distance_uncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false),
                         megami = this.card_data.megami,
                         cannotReactNormal = false,
                         cannotReactSpecial = false,

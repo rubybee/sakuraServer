@@ -2452,24 +2452,23 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         nowPlayer.pre_attack_card = null
     }
 
-    suspend fun divingProcess(player: PlayerEnum, card: Card): Boolean{
+    suspend fun divingProcess(player: PlayerEnum, card: Card?): Boolean{
         val otherPlayer = getPlayer(player.opposite())
-
 
         when(otherPlayer.forwardDiving){
             null -> {
                 return false
             }
             true -> {
-                sendSimpleCommand(getSocket(player), CommandEnum.DIVING_SHOW)
-                sendSimpleCommand(getSocket(player.opposite()), CommandEnum.DIVING_FORWARD)
+                sendSimpleCommand(getSocket(player.opposite()), CommandEnum.DIVING_SHOW)
+                sendSimpleCommand(getSocket(player), CommandEnum.DIVING_FORWARD)
                 addThisTurnDistance(-1)
                 addThisTurnSwellDistance(-1)
 
             }
             false -> {
-                sendSimpleCommand(getSocket(player), CommandEnum.DIVING_SHOW)
-                sendSimpleCommand(getSocket(player.opposite()), CommandEnum.DIVING_BACKWARD)
+                sendSimpleCommand(getSocket(player.opposite()), CommandEnum.DIVING_SHOW)
+                sendSimpleCommand(getSocket(player), CommandEnum.DIVING_BACKWARD)
                 addThisTurnDistance(1)
                 addThisTurnSwellDistance(1)
             }
@@ -2477,13 +2476,16 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         val nowPlayer = getPlayer(player)
 
-        if(card.card_data.card_type == CardType.ATTACK){
-            val nowAttack = nowPlayer.pre_attack_card
-            if(nowAttack?.rangeCheck(getAdjustDistance(), this, player, getPlayerRangeBuff(player)) == false){
-                nowPlayer.divingSuccess = true
-                return true
+        card?.let {
+            if(it.card_data.card_type == CardType.ATTACK){
+                val nowAttack = nowPlayer.pre_attack_card
+                if(nowAttack?.rangeCheck(getAdjustDistance(), this, player, getPlayerRangeBuff(player)) == false){
+                    nowPlayer.divingSuccess = true
+                    return true
+                }
             }
         }
+
         return false
     }
 
@@ -2755,6 +2757,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
 
             if(lightHouseCheck == 0){
+                if(divingProcess(player, perjuryCard)){
+                    afterDivingSuccess(player, perjuryCard, location)
+                    return true
+                }
                 popCardFrom(player, falseCard.card_number, location, public)?.let {
                     insertCardTo(player, it, LocationEnum.PLAYING_ZONE_YOUR, public)
                 }
@@ -2832,7 +2838,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         )
 
         makeAttackComplete(nowSocket, otherSocket, card_number)
-        sendAttackInformation(nowSocket, otherSocket, nowAttack.Information())
+        sendAttackInformation(nowSocket, otherSocket, nowAttack.toInformation())
         if(!otherPlayer.end_turn && react_attack == null){
             while(true){
                 sendRequestReact(otherSocket)
@@ -3589,10 +3595,16 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 if(player1ArtificialTokenOn != 0 || player1ArtificialTokenOut != 0) {
                     startPhaseEffect[0] = Pair(CardEffectLocation.ARTIFICIAL_TOKEN, null)
                 }
+                if(player1.forwardDiving != null){
+                    startPhaseEffect[1] = Pair(CardEffectLocation.DIVING, null)
+                }
             }
             PlayerEnum.PLAYER2 -> {
                 if(player2ArtificialTokenOn != 0 || player2ArtificialTokenOut != 0) {
                     startPhaseEffect[0] = Pair(CardEffectLocation.ARTIFICIAL_TOKEN, null)
+                }
+                if(player2.forwardDiving != null){
+                    startPhaseEffect[1] = Pair(CardEffectLocation.DIVING, null)
                 }
             }
         }
@@ -3626,6 +3638,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                         CardEffectLocation.ARTIFICIAL_TOKEN -> {
                             removeArtificialToken()
                         }
+                        CardEffectLocation.DIVING -> {
+                            divingProcess(turnPlayer.opposite(), null)
+                        }
                         else -> TODO()
                     }
                     startPhaseEffect.remove(selected)
@@ -3648,6 +3663,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     }
                     CardEffectLocation.ARTIFICIAL_TOKEN -> {
                         removeArtificialToken()
+                    }
+                    CardEffectLocation.DIVING -> {
+                        divingProcess(turnPlayer.opposite(), null)
                     }
                     else -> TODO()
                 }
@@ -3801,18 +3819,20 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun endPhaseEffectProcess2(){
-        if(player1.isNextTurnTailWind){
+        if(player1.isNextTurnTailWind || player1.divingSuccess){
             player1.isThisTurnTailWind = true
             sendSimpleCommand(player1_socket, player2_socket, CommandEnum.SET_TAIL_WIND_YOUR)
+            player1.divingSuccess = false
         }
         else{
             player1.isThisTurnTailWind = false
             sendSimpleCommand(player1_socket, player2_socket, CommandEnum.SET_HEAD_WIND_YOUR)
         }
 
-        if(player2.isNextTurnTailWind){
+        if(player2.isNextTurnTailWind || player2.divingSuccess){
             player2.isThisTurnTailWind = true
             sendSimpleCommand(player2_socket, player1_socket, CommandEnum.SET_TAIL_WIND_YOUR)
+            player2.divingSuccess = false
         }
         else{
             player2.isThisTurnTailWind = false
@@ -4150,9 +4170,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(canDoBasicOperation(player, CommandEnum.ACTION_ASURA)){
             sendDoBasicAction(getSocket(player), getSocket(player.opposite()), CommandEnum.ACTION_ASURA_YOUR, card)
             if(addPreAttackZone(player, MadeAttack(CardName.FORM_ASURA, 1118, CardClass.NULL,
-                    DistanceType.DISCONTINUOUS, 3,  2, null,
-                    distance_uncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
-                    ,MegamiEnum.THALLYA, cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
+                    sortedSetOf(3, 5), 3,  2, MegamiEnum.THALLYA,
+                    cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
                 ).addTextAndReturn(CardSet.attackAsuraText), null) ){
                 afterMakeAttack(1118, player, null)
             }
@@ -4164,9 +4183,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(canDoBasicOperation(player, CommandEnum.ACTION_YAKSHA)){
             sendDoBasicAction(getSocket(player), getSocket(player.opposite()), CommandEnum.ACTION_YAKSHA_YOUR, card)
             if(addPreAttackZone(player, MadeAttack(CardName.FORM_YAKSHA, 1111, CardClass.NULL,
-                    DistanceType.DISCONTINUOUS, 1,  1, null,
-                    distance_uncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
-                    ,MegamiEnum.THALLYA, cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
+                    sortedSetOf(2, 4, 6, 8), 1,  1, MegamiEnum.THALLYA,
+                    cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
                 ).addTextAndReturn(CardSet.attackYakshaText), null) ){
                 afterMakeAttack(1111, player, null)
             }

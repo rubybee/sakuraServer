@@ -3,16 +3,15 @@ package com.sakurageto.card
 import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.MegamiEnum
 import com.sakurageto.gamelogic.Umbrella
+import java.util.SortedSet
 
 class MadeAttack(
     var card_name: CardName,
     var card_number: Int,
     var card_class: CardClass,
-    private val distance_type: DistanceType,
+    private val distance: SortedSet<Int>,
     private val aura_damage: Int,
     private val life_damage: Int,
-    private val distance_cont: Pair<Int, Int>?,
-    private val distance_uncont: Array<Boolean>?,
     var megami: MegamiEnum,
     private val cannotReactNormal: Boolean,
     private val cannotReactSpecial: Boolean,
@@ -194,9 +193,7 @@ class MadeAttack(
         editedCannotReact = true
     }
 
-    var editedDistanceType = DistanceType.CONTINUOUS
-    var editedDistanceCont: Pair<Int, Int>? = null
-    var editedDistanceUncont: Array<Boolean>? = null
+    var editedDistance: SortedSet<Int> = sortedSetOf()
 
     private val thisTurnRangeBuff = RangeBuffQueue()
     private val thisTempRangeBuff = RangeBuffQueue()
@@ -214,10 +211,10 @@ class MadeAttack(
         thisTempRangeBuff.addRangeBuff(buff)
     }
 
+    val tempEditedDistance = mutableListOf<Int>()
+
     suspend fun rangeCheck(now_range: Int, game_status: GameStatus, player: PlayerEnum, continuousRangeBuff: RangeBuffQueue): Boolean{
-        editedDistanceType = distance_type
-        editedDistanceCont = distance_cont
-        editedDistanceUncont = distance_uncont
+        editedDistance = distance.toSortedSet()
         thisTurnRangeBuff.addAllBuff(continuousRangeBuff)
         continuousRangeBuff.clearBuff()
         for(index in 0 until RangeBuffQueue.buffQueueNumber) {
@@ -227,216 +224,64 @@ class MadeAttack(
             for (buff in tempQueue) {
                 buff.effect(player, game_status, this)
             }
+            if(index == 2){
+                for(i in tempEditedDistance){
+                    editedDistance.add(i)
+                }
+                tempEditedDistance.clear()
+            }
+            else if(index == 3){
+                for(i in tempEditedDistance){
+                    editedDistance.remove(i)
+                }
+                tempEditedDistance.clear()
+            }
         }
-
-        return when(editedDistanceType){
-            DistanceType.DISCONTINUOUS -> editedDistanceUncont!![now_range]
-            DistanceType.CONTINUOUS -> editedDistanceCont!!.first <= now_range && now_range <= editedDistanceCont!!.second
-        }
+        return now_range in editedDistance
     }
 
     //closable true -> increment range from left
     fun plusMinusRange(number: Int, closable: Boolean){
-        if(number >= 0){
-            when(editedDistanceType){
-                DistanceType.DISCONTINUOUS -> {
-                    if (closable) {
-                        var min = -1
-                        for (i in 0..14) {
-                            if(editedDistanceUncont!![i]){
-                                min = i
-                                break
-                            }
-                        }
-                        if(min != -1){
-                            for (i in min - 1 downTo  min - number){
-                                if(i < 0) continue
-                                editedDistanceUncont!![i] = true
-                            }
-                        }
-                    }
-                    else{
-                        var max = 5000
-                        for (i in 14 downTo 0) {
-                            if(editedDistanceUncont!![i]){
-                                max = i
-                                break
-                            }
-                        }
-                        if(max != 5000){
-                            for (i in max + 1..max + number){
-                                editedDistanceUncont!![i] = true
-                            }
-                        }
-                    }
+        if(number > 0){
+            if(closable){
+                val min = editedDistance.first()
+                for(i in min - number until min){
+                    editedDistance.add(i)
                 }
-                DistanceType.CONTINUOUS -> {
-                    if (closable){
-                        if(editedDistanceCont!!.first == 0){
-                            return
-                        }
-                        else{
-                            var now = editedDistanceCont!!.first
-                            now -= number
-                            if(now < 0){
-                                now = 0
-                            }
-                            editedDistanceCont = editedDistanceCont!!.copy(first = now)
-                        }
-                    }
-                    else{
-                        var now = editedDistanceCont!!.second
-                        now += number
-                        editedDistanceCont = editedDistanceCont!!.copy(second = now)
-                    }
+            }
+            else{
+                val max = editedDistance.last()
+                for(i in max + 1 .. max + number){
+                    editedDistance.add(i)
                 }
             }
         }
-        else{
-            when(editedDistanceType){
-                DistanceType.DISCONTINUOUS -> {
-                    if (closable) {
-                        var min = -1
-                        for (i in 0..14) {
-                            if(editedDistanceUncont!![i]){
-                                min = i
-                                break
-                            }
-                        }
-                        if(min != -1){
-                            for (i in min + number + 1..min){
-                                if(i < 0) continue
-                                editedDistanceUncont!![i] = false
-                            }
-                        }
-                    }
-                    else{
-                        var max = 5000
-                        for (i in 14 downTo 0) {
-                            if(editedDistanceUncont!![i]){
-                                max = i
-                                break
-                            }
-                        }
-                        if(max != 5000){
-                            for (i in max + number + 1..max){
-                                editedDistanceUncont!![i] = false
-                            }
-                        }
-                    }
+        else if(number < 0){
+            if(closable){
+                val min = editedDistance.first()
+                for(i in min until min + number){
+                    editedDistance.remove(i)
                 }
-                DistanceType.CONTINUOUS -> {
-                    if (closable){
-                        if(editedDistanceCont!!.first == 0){
-                            return
-                        }
-                        else{
-                            var now = editedDistanceCont!!.first
-                            now -= number
-                            if(now < 0){
-                                now = 0
-                            }
-                            editedDistanceCont = editedDistanceCont!!.copy(first = now)
-                        }
-                    }
-                    else{
-                        var now = editedDistanceCont!!.second
-                        now += number
-                        editedDistanceCont = editedDistanceCont!!.copy(second = now)
-                    }
-                    if(editedDistanceCont!!.first < editedDistanceCont!!.second){
-                        editedDistanceType = DistanceType.DISCONTINUOUS
-                        editedDistanceUncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
-                        editedDistanceCont = null
-                    }
+            }
+            else{
+                val max = editedDistance.last()
+                for(i in max + number + 1 .. max){
+                    editedDistance.remove(i)
                 }
             }
         }
-
 
     }
 
     fun addRange(range: Pair<Int, Int>){
-        when(editedDistanceType){
-            DistanceType.DISCONTINUOUS -> {
-                for(i in range.first..range.second){
-                    editedDistanceUncont!![i] = true
-                }
-            }
-            DistanceType.CONTINUOUS -> {
-                if(range.first <= editedDistanceCont!!.first){
-                    if(range.second < editedDistanceCont!!.first){
-                        editedDistanceType = DistanceType.DISCONTINUOUS
-                        editedDistanceUncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
-                        for(i in editedDistanceCont!!.first..editedDistanceCont!!.second){
-                            editedDistanceUncont!![i] = true
-                        }
-                        for(i in range.first..range.second){
-                            editedDistanceUncont!![i] = true
-                        }
-                    }
-                    else if(editedDistanceCont!!.second < range.second){
-                        editedDistanceCont = range
-                    }
-                    else{
-                        editedDistanceCont = editedDistanceCont!!.copy(first = range.first)
-                    }
-                }
-                else{
-                    if(range.first > editedDistanceCont!!.second){
-                        editedDistanceType = DistanceType.DISCONTINUOUS
-                        editedDistanceUncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
-                        for(i in editedDistanceCont!!.first..editedDistanceCont!!.second){
-                            editedDistanceUncont!![i] = true
-                        }
-                        for(i in range.first..range.second){
-                            editedDistanceUncont!![i] = true
-                        }
-                    }
-                    else if(range.second > editedDistanceCont!!.second){
-                        editedDistanceCont = editedDistanceCont!!.copy(second = range.second)
-                    }
-                }
-            }
+        for(i in range.first..range.second){
+            editedDistance.add(i)
         }
     }
 
     fun deleteRange(range: Pair<Int, Int>){
-        when(editedDistanceType){
-            DistanceType.DISCONTINUOUS -> {
-                for(i in range.first..range.second){
-                    editedDistanceUncont!![i] = false
-                }
-            }
-            DistanceType.CONTINUOUS -> {
-                if(range.second >= editedDistanceCont!!.first) {
-                    if(range.first > editedDistanceCont!!.first){
-                        if(range.second >= editedDistanceCont!!.second){
-                            editedDistanceCont = editedDistanceCont!!.copy(second = range.first - 1)
-                        }
-                        else{
-                            editedDistanceType = DistanceType.DISCONTINUOUS
-                            editedDistanceUncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
-                            for(i in editedDistanceCont!!.first..editedDistanceCont!!.second){
-                                editedDistanceUncont!![i] = true
-                            }
-                            for(i in range.first..range.second){
-                                editedDistanceUncont!![i] = false
-                            }
-                        }
-                    }
-                    else{
-                        if(range.second >= editedDistanceCont!!.second){
-                            editedDistanceType = DistanceType.DISCONTINUOUS
-                            editedDistanceUncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
-                            editedDistanceCont = null
-                        }
-                        else{
-                            editedDistanceCont = editedDistanceCont!!.copy(first = range.second + 1)
-                        }
-                    }
-                }
-            }
+        for(i in range.first..range.second){
+            editedDistance.remove(i)
         }
     }
 
@@ -488,23 +333,13 @@ class MadeAttack(
     //{uncont, distance..., uncont, auro, life, megami, reactable, reactable_normal, reactable_special, cardNumber}
     //{-2, 1, 4, -2, 4, 5, -1, 3, 5, 20, 0, 0, 0, 100}
     //{cont, distance..., cont, auro, life, megami, reactable, reactable_normal, reactable_special, cardNumber}
-    fun Information(): MutableList<Int>{
+    fun toInformation(): MutableList<Int>{
         val returnData = mutableListOf<Int>()
-        when(distance_type){
-            DistanceType.DISCONTINUOUS -> {
-                returnData.add(-1)
-                for(i in distance_uncont!!.indices){
-                    if(distance_uncont[i]) returnData.add(i)
-                }
-                returnData.add(-1)
-            }
-            DistanceType.CONTINUOUS -> {
-                returnData.add(-2)
-                returnData.add(distance_cont!!.first)
-                returnData.add(distance_cont.second)
-                returnData.add(-2)
-            }
+        returnData.add(-1)
+        for(i in distance){
+            returnData.add(i)
         }
+        returnData.add(-1)
         returnData.add(aura_damage)
         returnData.add(life_damage)
         returnData.add(megami.real_number)

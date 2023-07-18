@@ -8,6 +8,7 @@ enum class MegamiEnum(var real_number: Int) {
     KIRIKO(2),
     YURINA(10),
     YURINA_A1(11),
+    YURINA_A2(12),
     SAINE(20),
     SAINE_A1(21),
     SAINE_A2(22),

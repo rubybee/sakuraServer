@@ -66,8 +66,8 @@ class MadeAttack(
 
     suspend fun getDamage(game_status: GameStatus, player: PlayerEnum, continuousAttackBuff: AttackBuffQueue): Pair<Int, Int>{
         editedChogek = chogek
-        editedAuraDamage = aura_damage; tempEditedAuraDamage
-        editedLifeDamage = life_damage; tempEditedLifeDamage
+        editedAuraDamage = aura_damage; tempEditedAuraDamage = aura_damage
+        editedLifeDamage = life_damage; tempEditedLifeDamage = life_damage
         thisTurnAttackBuff.addAllBuff(continuousAttackBuff)
         continuousAttackBuff.clearBuff()
         for(index in 0 until AttackBuffQueue.buffQueueNumber){
@@ -224,13 +224,13 @@ class MadeAttack(
             for (buff in tempQueue) {
                 buff.effect(player, game_status, this)
             }
-            if(index == 2){
+            if(index == RangeBuffQueue.INDEX_ADD){
                 for(i in tempEditedDistance){
                     editedDistance.add(i)
                 }
                 tempEditedDistance.clear()
             }
-            else if(index == 3){
+            else if(index == RangeBuffQueue.INDEX_DELETE){
                 for(i in tempEditedDistance){
                     editedDistance.remove(i)
                 }
@@ -276,12 +276,6 @@ class MadeAttack(
     fun addRange(range: Pair<Int, Int>){
         for(i in range.first..range.second){
             editedDistance.add(i)
-        }
-    }
-
-    fun deleteRange(range: Pair<Int, Int>){
-        for(i in range.first..range.second){
-            editedDistance.remove(i)
         }
     }
 

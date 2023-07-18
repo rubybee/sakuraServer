@@ -98,7 +98,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             dest.addAll(src2)
             dest.shuffle()
             for(card in dest){
-                if(CardSet.isPoison(card.card_number)){
+                if(card.card_number.isPoison()){
                     dest.remove(card)
                     dest.addFirst(card)
                 }
@@ -264,7 +264,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                             }
                         }
                         DistanceType.CONTINUOUS -> {
-                            for(i in card_data.distanceContFold!!.first..card_data.distanceContFold!!.first){
+                            for(i in card_data.distanceContFold!!.first..card_data.distanceContFold!!.second){
                                 result.add(i)
                             }
                         }
@@ -281,7 +281,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                             }
                         }
                         DistanceType.CONTINUOUS -> {
-                            for(i in card_data.distanceContUnfold!!.first..card_data.distanceContUnfold!!.first){
+                            for(i in card_data.distanceContUnfold!!.first..card_data.distanceContUnfold!!.second){
                                 result.add(i)
                             }
                         }
@@ -301,7 +301,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                     }
                 }
                 DistanceType.CONTINUOUS -> {
-                    for(i in card_data.distance_cont!!.first..card_data.distance_cont!!.first){
+                    for(i in card_data.distance_cont!!.first..card_data.distance_cont!!.second){
                         result.add(i)
                     }
                 }

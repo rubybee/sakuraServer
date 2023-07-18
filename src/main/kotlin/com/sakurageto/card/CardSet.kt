@@ -38,14 +38,15 @@ object CardSet {
     private val cardNumberHashmap = HashMap<Int, CardName>()
     private val cardDataHashmap = EnumMap<CardName, CardData>(CardName::class.java)
 
-    const val SHINRA_SHINRA_CARD_NUMBER = 9998
     fun Int.toCardName(): CardName = cardNumberHashmap[this]?: CardName.CARD_UNNAME
     fun CardName.toCardData(): CardData = cardDataHashmap[this]?: unused
 
     private fun hashMapTest(){
         val cardNameList = CardName.values()
         for(cardName in cardNameList){
-            if(cardName == CardName.CARD_UNNAME || cardName == CardName.POISON_ANYTHING) continue
+            if(cardName == CardName.CARD_UNNAME || cardName == CardName.POISON_ANYTHING || cardName == CardName.SOLDIER_ANYTHING) {
+                continue
+            }
             if(cardName.toCardData() == unused){
                 println("cardDataHashmap don't have card name: $cardName")
             }
@@ -68,767 +69,772 @@ object CardSet {
 
     private fun hashMapInit(){
         //for number -> card name
-        cardNumberHashmap[0] = CardName.CARD_UNNAME
-        cardNumberHashmap[1] = CardName.POISON_ANYTHING
-        cardNumberHashmap[100] = CardName.YURINA_CHAM
-        cardNumberHashmap[101] = CardName.YURINA_ILSUM
-        cardNumberHashmap[102] = CardName.YURINA_JARUCHIGI
-        cardNumberHashmap[103] = CardName.YURINA_GUHAB
-        cardNumberHashmap[104] = CardName.YURINA_GIBACK
-        cardNumberHashmap[105] = CardName.YURINA_APDO
-        cardNumberHashmap[106] = CardName.YURINA_GIYENBANJO
-        cardNumberHashmap[107] = CardName.YURINA_WOLYUNGNACK
-        cardNumberHashmap[108] = CardName.YURINA_POBARAM
-        cardNumberHashmap[109] = CardName.YURINA_JJOCKBAE
-        cardNumberHashmap[110] = CardName.YURINA_JURUCK
-        cardNumberHashmap[111] = CardName.YURINA_NAN_TA
-        cardNumberHashmap[112] = CardName.YURINA_BEAN_BULLET
-        cardNumberHashmap[113] = CardName.YURINA_NOT_COMPLETE_POBARAM
+        cardNumberHashmap[NUMBER_CARD_UNAME] = CardName.CARD_UNNAME
+        cardNumberHashmap[NUMBER_POISON_ANYTHING] = CardName.POISON_ANYTHING
+        cardNumberHashmap[NUMBER_SOLDIER_ANYTHING] = CardName.SOLDIER_ANYTHING
 
-        cardNumberHashmap[200] = CardName.SAINE_DOUBLEBEGI
-        cardNumberHashmap[201] = CardName.SAINE_HURUBEGI
-        cardNumberHashmap[202] = CardName.SAINE_MOOGECHOO
-        cardNumberHashmap[203] = CardName.SAINE_GANPA
-        cardNumberHashmap[204] = CardName.SAINE_GWONYUCK
-        cardNumberHashmap[205] = CardName.SAINE_CHOONGEMJUNG
-        cardNumberHashmap[206] = CardName.SAINE_MOOEMBUCK
-        cardNumberHashmap[207] = CardName.SAINE_YULDONGHOGEK
-        cardNumberHashmap[208] = CardName.SAINE_HANGMUNGGONGJIN
-        cardNumberHashmap[209] = CardName.SAINE_EMMOOSHOEBING
-        cardNumberHashmap[210] = CardName.SAINE_JONGGEK
-        cardNumberHashmap[211] = CardName.SAINE_SOUND_OF_ICE
-        cardNumberHashmap[212] = CardName.SAINE_ACCOMPANIMENT
-        cardNumberHashmap[213] = CardName.SAINE_DUET_TAN_JU_BING_MYEONG
-        cardNumberHashmap[214] = CardName.SAINE_BETRAYAL
-        cardNumberHashmap[215] = CardName.SAINE_FLOWING_WALL
-        cardNumberHashmap[216] = CardName.SAINE_JEOL_CHANG_JEOL_HWA
+        cardNumberHashmap[NUMBER_YURINA_CHAM] = CardName.YURINA_CHAM
+        cardNumberHashmap[NUMBER_YURINA_ILSUM] = CardName.YURINA_ILSUM
+        cardNumberHashmap[NUMBER_YURINA_JARUCHIGI] = CardName.YURINA_JARUCHIGI
+        cardNumberHashmap[NUMBER_YURINA_GUHAB] = CardName.YURINA_GUHAB
+        cardNumberHashmap[NUMBER_YURINA_GIBACK] = CardName.YURINA_GIBACK
+        cardNumberHashmap[NUMBER_YURINA_APDO] = CardName.YURINA_APDO
+        cardNumberHashmap[NUMBER_YURINA_GIYENBANJO] = CardName.YURINA_GIYENBANJO
+        cardNumberHashmap[NUMBER_YURINA_WOLYUNGNACK] = CardName.YURINA_WOLYUNGNACK
+        cardNumberHashmap[NUMBER_YURINA_POBARAM] = CardName.YURINA_POBARAM
+        cardNumberHashmap[NUMBER_YURINA_JJOCKBAE] = CardName.YURINA_JJOCKBAE
+        cardNumberHashmap[NUMBER_YURINA_JURUCK] = CardName.YURINA_JURUCK
+        cardNumberHashmap[NUMBER_YURINA_NAN_TA] = CardName.YURINA_NAN_TA
+        cardNumberHashmap[NUMBER_YURINA_BEAN_BULLET] = CardName.YURINA_BEAN_BULLET
+        cardNumberHashmap[NUMBER_YURINA_NOT_COMPLETE_POBARAM] = CardName.YURINA_NOT_COMPLETE_POBARAM
 
-        cardNumberHashmap[300] = CardName.HIMIKA_SHOOT
-        cardNumberHashmap[301] = CardName.HIMIKA_RAPIDFIRE
-        cardNumberHashmap[302] = CardName.HIMIKA_MAGNUMCANON
-        cardNumberHashmap[303] = CardName.HIMIKA_FULLBURST
-        cardNumberHashmap[304] = CardName.HIMIKA_BACKSTEP
-        cardNumberHashmap[305] = CardName.HIMIKA_BACKDRAFT
-        cardNumberHashmap[306] = CardName.HIMIKA_SMOKE
-        cardNumberHashmap[307] = CardName.HIMIKA_REDBULLET
-        cardNumberHashmap[308] = CardName.HIMIKA_CRIMSONZERO
-        cardNumberHashmap[309] = CardName.HIMIKA_SCARLETIMAGINE
-        cardNumberHashmap[310] = CardName.HIMIKA_BURMILIONFIELD
-        cardNumberHashmap[311] = CardName.HIMIKA_FIRE_WAVE
-        cardNumberHashmap[312] = CardName.HIMIKA_SAT_SUI
-        cardNumberHashmap[313] = CardName.HIMIKA_EN_TEN_HIMIKA
+        cardNumberHashmap[NUMBER_SAINE_DOUBLEBEGI] = CardName.SAINE_DOUBLEBEGI
+        cardNumberHashmap[NUMBER_SAINE_HURUBEGI] = CardName.SAINE_HURUBEGI
+        cardNumberHashmap[NUMBER_SAINE_MOOGECHOO] = CardName.SAINE_MOOGECHOO
+        cardNumberHashmap[NUMBER_SAINE_GANPA] = CardName.SAINE_GANPA
+        cardNumberHashmap[NUMBER_SAINE_GWONYUCK] = CardName.SAINE_GWONYUCK
+        cardNumberHashmap[NUMBER_SAINE_CHOONGEMJUNG] = CardName.SAINE_CHOONGEMJUNG
+        cardNumberHashmap[NUMBER_SAINE_MOOEMBUCK] = CardName.SAINE_MOOEMBUCK
+        cardNumberHashmap[NUMBER_SAINE_YULDONGHOGEK] = CardName.SAINE_YULDONGHOGEK
+        cardNumberHashmap[NUMBER_SAINE_HANGMUNGGONGJIN] = CardName.SAINE_HANGMUNGGONGJIN
+        cardNumberHashmap[NUMBER_SAINE_EMMOOSHOEBING] = CardName.SAINE_EMMOOSHOEBING
+        cardNumberHashmap[NUMBER_SAINE_JONGGEK] = CardName.SAINE_JONGGEK
+        cardNumberHashmap[NUMBER_SAINE_SOUND_OF_ICE] = CardName.SAINE_SOUND_OF_ICE
+        cardNumberHashmap[NUMBER_SAINE_ACCOMPANIMENT] = CardName.SAINE_ACCOMPANIMENT
+        cardNumberHashmap[NUMBER_SAINE_DUET_TAN_JU_BING_MYEONG] = CardName.SAINE_DUET_TAN_JU_BING_MYEONG
+        cardNumberHashmap[NUMBER_SAINE_BETRAYAL] = CardName.SAINE_BETRAYAL
+        cardNumberHashmap[NUMBER_SAINE_FLOWING_WALL] = CardName.SAINE_FLOWING_WALL
+        cardNumberHashmap[NUMBER_SAINE_JEOL_CHANG_JEOL_HWA] = CardName.SAINE_JEOL_CHANG_JEOL_HWA
 
-        cardNumberHashmap[400] = CardName.TOKOYO_BITSUNERIGI
-        cardNumberHashmap[401] = CardName.TOKOYO_WOOAHHANTAGUCK
-        cardNumberHashmap[402] = CardName.TOKOYO_RUNNINGRABIT
-        cardNumberHashmap[403] = CardName.TOKOYO_POETDANCE
-        cardNumberHashmap[404] = CardName.TOKOYO_FLIPFAN
-        cardNumberHashmap[405] = CardName.TOKOYO_WINDSTAGE
-        cardNumberHashmap[406] = CardName.TOKOYO_SUNSTAGE
-        cardNumberHashmap[407] = CardName.TOKOYO_KUON
-        cardNumberHashmap[408] = CardName.TOKOYO_THOUSANDBIRD
-        cardNumberHashmap[409] = CardName.TOKOYO_ENDLESSWIND
-        cardNumberHashmap[410] = CardName.TOKOYO_TOKOYOMOON
-        cardNumberHashmap[411] = CardName.TOKOYO_FLOWING_PLAY
-        cardNumberHashmap[412] = CardName.TOKOYO_SOUND_OF_SUN
-        cardNumberHashmap[413] = CardName.TOKOYO_DUET_CHI_TAN_YANG_MYEONG
-        cardNumberHashmap[414] = CardName.TOKOYO_PASSING_FEAR
-        cardNumberHashmap[415] = CardName.TOKOYO_RELIC_EYE
-        cardNumberHashmap[416] = CardName.TOKOYO_EIGHT_SAKURA_IN_VAIN
+        cardNumberHashmap[NUMBER_HIMIKA_SHOOT] = CardName.HIMIKA_SHOOT
+        cardNumberHashmap[NUMBER_HIMIKA_RAPIDFIRE] = CardName.HIMIKA_RAPIDFIRE
+        cardNumberHashmap[NUMBER_HIMIKA_MAGNUMCANON] = CardName.HIMIKA_MAGNUMCANON
+        cardNumberHashmap[NUMBER_HIMIKA_FULLBURST] = CardName.HIMIKA_FULLBURST
+        cardNumberHashmap[NUMBER_HIMIKA_BACKSTEP] = CardName.HIMIKA_BACKSTEP
+        cardNumberHashmap[NUMBER_HIMIKA_BACKDRAFT] = CardName.HIMIKA_BACKDRAFT
+        cardNumberHashmap[NUMBER_HIMIKA_SMOKE] = CardName.HIMIKA_SMOKE
+        cardNumberHashmap[NUMBER_HIMIKA_REDBULLET] = CardName.HIMIKA_REDBULLET
+        cardNumberHashmap[NUMBER_HIMIKA_CRIMSONZERO] = CardName.HIMIKA_CRIMSONZERO
+        cardNumberHashmap[NUMBER_HIMIKA_SCARLETIMAGINE] = CardName.HIMIKA_SCARLETIMAGINE
+        cardNumberHashmap[NUMBER_HIMIKA_BURMILIONFIELD] = CardName.HIMIKA_BURMILIONFIELD
+        cardNumberHashmap[NUMBER_HIMIKA_FIRE_WAVE] = CardName.HIMIKA_FIRE_WAVE
+        cardNumberHashmap[NUMBER_HIMIKA_SAT_SUI] = CardName.HIMIKA_SAT_SUI
+        cardNumberHashmap[NUMBER_HIMIKA_EN_TEN_HIMIKA] = CardName.HIMIKA_EN_TEN_HIMIKA
 
-        cardNumberHashmap[500] = CardName.OBORO_WIRE
-        cardNumberHashmap[501] = CardName.OBORO_SHADOWCALTROP
-        cardNumberHashmap[502] = CardName.OBORO_ZANGEKIRANBU
-        cardNumberHashmap[503] = CardName.OBORO_NINJAWALK
-        cardNumberHashmap[504] = CardName.OBORO_INDUCE
-        cardNumberHashmap[505] = CardName.OBORO_CLONE
-        cardNumberHashmap[506] = CardName.OBORO_BIOACTIVITY
-        cardNumberHashmap[507] = CardName.OBORO_KUMASUKE
-        cardNumberHashmap[508] = CardName.OBORO_TOBIKAGE
-        cardNumberHashmap[509] = CardName.OBORO_ULOO
-        cardNumberHashmap[510] = CardName.OBORO_MIKAZRA
-        cardNumberHashmap[511] = CardName.OBORO_SHURIKEN
-        cardNumberHashmap[512] = CardName.OBORO_AMBUSH
-        cardNumberHashmap[513] = CardName.OBORO_BRANCH_OF_DIVINE
-        cardNumberHashmap[514] = CardName.OBORO_LAST_CRYSTAL
+        cardNumberHashmap[NUMBER_TOKOYO_BITSUNERIGI] = CardName.TOKOYO_BITSUNERIGI
+        cardNumberHashmap[NUMBER_TOKOYO_WOOAHHANTAGUCK] = CardName.TOKOYO_WOOAHHANTAGUCK
+        cardNumberHashmap[NUMBER_TOKOYO_RUNNINGRABIT] = CardName.TOKOYO_RUNNINGRABIT
+        cardNumberHashmap[NUMBER_TOKOYO_POETDANCE] = CardName.TOKOYO_POETDANCE
+        cardNumberHashmap[NUMBER_TOKOYO_FLIPFAN] = CardName.TOKOYO_FLIPFAN
+        cardNumberHashmap[NUMBER_TOKOYO_WINDSTAGE] = CardName.TOKOYO_WINDSTAGE
+        cardNumberHashmap[NUMBER_TOKOYO_SUNSTAGE] = CardName.TOKOYO_SUNSTAGE
+        cardNumberHashmap[NUMBER_TOKOYO_KUON] = CardName.TOKOYO_KUON
+        cardNumberHashmap[NUMBER_TOKOYO_THOUSANDBIRD] = CardName.TOKOYO_THOUSANDBIRD
+        cardNumberHashmap[NUMBER_TOKOYO_ENDLESSWIND] = CardName.TOKOYO_ENDLESSWIND
+        cardNumberHashmap[NUMBER_TOKOYO_TOKOYOMOON] = CardName.TOKOYO_TOKOYOMOON
+        cardNumberHashmap[NUMBER_TOKOYO_FLOWING_PLAY] = CardName.TOKOYO_FLOWING_PLAY
+        cardNumberHashmap[NUMBER_TOKOYO_SOUND_OF_SUN] = CardName.TOKOYO_SOUND_OF_SUN
+        cardNumberHashmap[NUMBER_TOKOYO_DUET_CHI_TAN_YANG_MYEONG] = CardName.TOKOYO_DUET_CHI_TAN_YANG_MYEONG
+        cardNumberHashmap[NUMBER_TOKOYO_PASSING_FEAR] = CardName.TOKOYO_PASSING_FEAR
+        cardNumberHashmap[NUMBER_TOKOYO_RELIC_EYE] = CardName.TOKOYO_RELIC_EYE
+        cardNumberHashmap[NUMBER_TOKOYO_EIGHT_SAKURA_IN_VAIN] = CardName.TOKOYO_EIGHT_SAKURA_IN_VAIN
 
-        cardNumberHashmap[9999] = CardName.YUKIHI_YUKIHI
-        cardNumberHashmap[600] = CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE
-        cardNumberHashmap[601] = CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS
-        cardNumberHashmap[602] = CardName.YUKIHI_PUSH_OUT_SLASH_PULL
-        cardNumberHashmap[603] = CardName.YUKIHI_SWING_SLASH_STAB
-        cardNumberHashmap[604] = CardName.YUKIHI_TURN_UMBRELLA
-        cardNumberHashmap[605] = CardName.YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN
-        cardNumberHashmap[606] = CardName.YUKIHI_MAKE_CONNECTION
-        cardNumberHashmap[607] = CardName.YUKIHI_FLUTTERING_SNOWFLAKE
-        cardNumberHashmap[608] = CardName.YUKIHI_SWAYING_LAMPLIGHT
-        cardNumberHashmap[609] = CardName.YUKIHI_CLINGY_MIND
-        cardNumberHashmap[610] = CardName.YUKIHI_SWIRLING_GESTURE
-        cardNumberHashmap[611] = CardName.YUKIHI_HELP_SLASH_THREAT
-        cardNumberHashmap[612] = CardName.YUKIHI_THREAD_SLASH_RAW_THREAD
-        cardNumberHashmap[613] = CardName.YUKIHI_FLUTTERING_COLLAR
+        cardNumberHashmap[NUMBER_OBORO_WIRE] = CardName.OBORO_WIRE
+        cardNumberHashmap[NUMBER_OBORO_SHADOWCALTROP] = CardName.OBORO_SHADOWCALTROP
+        cardNumberHashmap[NUMBER_OBORO_ZANGEKIRANBU] = CardName.OBORO_ZANGEKIRANBU
+        cardNumberHashmap[NUMBER_OBORO_NINJAWALK] = CardName.OBORO_NINJAWALK
+        cardNumberHashmap[NUMBER_OBORO_INDUCE] = CardName.OBORO_INDUCE
+        cardNumberHashmap[NUMBER_OBORO_CLONE] = CardName.OBORO_CLONE
+        cardNumberHashmap[NUMBER_OBORO_BIOACTIVITY] = CardName.OBORO_BIOACTIVITY
+        cardNumberHashmap[NUMBER_OBORO_KUMASUKE] = CardName.OBORO_KUMASUKE
+        cardNumberHashmap[NUMBER_OBORO_TOBIKAGE] = CardName.OBORO_TOBIKAGE
+        cardNumberHashmap[NUMBER_OBORO_ULOO] = CardName.OBORO_ULOO
+        cardNumberHashmap[NUMBER_OBORO_MIKAZRA] = CardName.OBORO_MIKAZRA
+        cardNumberHashmap[NUMBER_OBORO_SHURIKEN] = CardName.OBORO_SHURIKEN
+        cardNumberHashmap[NUMBER_OBORO_AMBUSH] = CardName.OBORO_AMBUSH
+        cardNumberHashmap[NUMBER_OBORO_BRANCH_OF_DIVINE] = CardName.OBORO_BRANCH_OF_DIVINE
+        cardNumberHashmap[NUMBER_OBORO_LAST_CRYSTAL] = CardName.OBORO_LAST_CRYSTAL
 
-        cardNumberHashmap[SHINRA_SHINRA_CARD_NUMBER] = CardName.SHINRA_SHINRA
-        cardNumberHashmap[700] = CardName.SHINRA_IBLON
-        cardNumberHashmap[701] = CardName.SHINRA_BANLON
-        cardNumberHashmap[702] = CardName.SHINRA_KIBEN
-        cardNumberHashmap[703] = CardName.SHINRA_INYONG
-        cardNumberHashmap[704] = CardName.SHINRA_SEONDONG
-        cardNumberHashmap[705] = CardName.SHINRA_JANGDAM
-        cardNumberHashmap[706] = CardName.SHINRA_NONPA
-        cardNumberHashmap[707] = CardName.SHINRA_WANJEON_NONPA
-        cardNumberHashmap[708] = CardName.SHINRA_DASIG_IHAE
-        cardNumberHashmap[709] = CardName.SHINRA_CHEONJI_BANBAG
-        cardNumberHashmap[710] = CardName.SHINRA_SAMRA_BAN_SHO
-        cardNumberHashmap[711] = CardName.SHINRA_ZHEN_YEN
-        cardNumberHashmap[712] = CardName.SHINRA_SA_DO
-        cardNumberHashmap[713] = CardName.SHINRA_ZEN_CHI_KYO_TEN
+        cardNumberHashmap[NUMBER_YUKIHI_YUKIHI] = CardName.YUKIHI_YUKIHI
+        cardNumberHashmap[NUMBER_YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE] = CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE
+        cardNumberHashmap[NUMBER_YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS] = CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS
+        cardNumberHashmap[NUMBER_YUKIHI_PUSH_OUT_SLASH_PULL] = CardName.YUKIHI_PUSH_OUT_SLASH_PULL
+        cardNumberHashmap[NUMBER_YUKIHI_SWING_SLASH_STAB] = CardName.YUKIHI_SWING_SLASH_STAB
+        cardNumberHashmap[NUMBER_YUKIHI_TURN_UMBRELLA] = CardName.YUKIHI_TURN_UMBRELLA
+        cardNumberHashmap[NUMBER_YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN] = CardName.YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN
+        cardNumberHashmap[NUMBER_YUKIHI_MAKE_CONNECTION] = CardName.YUKIHI_MAKE_CONNECTION
+        cardNumberHashmap[NUMBER_YUKIHI_FLUTTERING_SNOWFLAKE] = CardName.YUKIHI_FLUTTERING_SNOWFLAKE
+        cardNumberHashmap[NUMBER_YUKIHI_SWAYING_LAMPLIGHT] = CardName.YUKIHI_SWAYING_LAMPLIGHT
+        cardNumberHashmap[NUMBER_YUKIHI_CLINGY_MIND] = CardName.YUKIHI_CLINGY_MIND
+        cardNumberHashmap[NUMBER_YUKIHI_SWIRLING_GESTURE] = CardName.YUKIHI_SWIRLING_GESTURE
+        cardNumberHashmap[NUMBER_YUKIHI_HELP_SLASH_THREAT] = CardName.YUKIHI_HELP_SLASH_THREAT
+        cardNumberHashmap[NUMBER_YUKIHI_THREAD_SLASH_RAW_THREAD] = CardName.YUKIHI_THREAD_SLASH_RAW_THREAD
+        cardNumberHashmap[NUMBER_YUKIHI_FLUTTERING_COLLAR] = CardName.YUKIHI_FLUTTERING_COLLAR
 
-        cardNumberHashmap[800] = CardName.HAGANE_CENTRIFUGAL_ATTACK
-        cardNumberHashmap[801] = CardName.HAGANE_FOUR_WINDED_EARTHQUAKE
-        cardNumberHashmap[802] = CardName.HAGANE_GROUND_BREAKING
-        cardNumberHashmap[803] = CardName.HAGANE_HYPER_RECOIL
-        cardNumberHashmap[804] = CardName.HAGANE_WON_MU_RUYN
-        cardNumberHashmap[805] = CardName.HAGANE_RING_A_BELL
-        cardNumberHashmap[806] = CardName.HAGANE_GRAVITATION_FIELD
-        cardNumberHashmap[807] = CardName.HAGANE_GRAND_SKY_HOLE_CRASH
-        cardNumberHashmap[808] = CardName.HAGANE_GRAND_BELL_MEGALOBEL
-        cardNumberHashmap[809] = CardName.HAGANE_GRAND_GRAVITATION_ATTRACT
-        cardNumberHashmap[810] = CardName.HAGANE_GRAND_MOUNTAIN_RESPECT
-        cardNumberHashmap[811] = CardName.HAGANE_BONFIRE
-        cardNumberHashmap[812] = CardName.HAGANE_WHEEL_SKILL
-        cardNumberHashmap[813] = CardName.HAGANE_GRAND_SOFT_MATERIAL
-        cardNumberHashmap[814] = CardName.HAGANE_SOFT_ATTACK
+        cardNumberHashmap[NUMBER_SHINRA_SHINRA] = CardName.SHINRA_SHINRA
+        cardNumberHashmap[NUMBER_SHINRA_IBLON] = CardName.SHINRA_IBLON
+        cardNumberHashmap[NUMBER_SHINRA_BANLON] = CardName.SHINRA_BANLON
+        cardNumberHashmap[NUMBER_SHINRA_KIBEN] = CardName.SHINRA_KIBEN
+        cardNumberHashmap[NUMBER_SHINRA_INYONG] = CardName.SHINRA_INYONG
+        cardNumberHashmap[NUMBER_SHINRA_SEONDONG] = CardName.SHINRA_SEONDONG
+        cardNumberHashmap[NUMBER_SHINRA_JANGDAM] = CardName.SHINRA_JANGDAM
+        cardNumberHashmap[NUMBER_SHINRA_NONPA] = CardName.SHINRA_NONPA
+        cardNumberHashmap[NUMBER_SHINRA_WANJEON_NONPA] = CardName.SHINRA_WANJEON_NONPA
+        cardNumberHashmap[NUMBER_SHINRA_DASIG_IHAE] = CardName.SHINRA_DASIG_IHAE
+        cardNumberHashmap[NUMBER_SHINRA_CHEONJI_BANBAG] = CardName.SHINRA_CHEONJI_BANBAG
+        cardNumberHashmap[NUMBER_SHINRA_SAMRA_BAN_SHO] = CardName.SHINRA_SAMRA_BAN_SHO
+        cardNumberHashmap[NUMBER_SHINRA_ZHEN_YEN] = CardName.SHINRA_ZHEN_YEN
+        cardNumberHashmap[NUMBER_SHINRA_SA_DO] = CardName.SHINRA_SA_DO
+        cardNumberHashmap[NUMBER_SHINRA_ZEN_CHI_KYO_TEN] = CardName.SHINRA_ZEN_CHI_KYO_TEN
 
-        cardNumberHashmap[900] = CardName.CHIKAGE_THROW_KUNAI
-        cardNumberHashmap[901] = CardName.CHIKAGE_POISON_NEEDLE
-        cardNumberHashmap[902] = CardName.CHIKAGE_TO_ZU_CHU
-        cardNumberHashmap[903] = CardName.CHIKAGE_CUTTING_NECK
-        cardNumberHashmap[904] = CardName.CHIKAGE_POISON_SMOKE
-        cardNumberHashmap[905] = CardName.CHIKAGE_TIP_TOEING
-        cardNumberHashmap[906] = CardName.CHIKAGE_MUDDLE
-        cardNumberHashmap[907] = CardName.CHIKAGE_DEADLY_POISON
-        cardNumberHashmap[908] = CardName.CHIKAGE_HAN_KI_POISON
-        cardNumberHashmap[909] = CardName.CHIKAGE_REINCARNATION_POISON
-        cardNumberHashmap[910] = CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE
-        cardNumberHashmap[911] = CardName.CHIKAGE_TRICK_UMBRELLA
-        cardNumberHashmap[912] = CardName.CHIKAGE_STRUGGLE
-        cardNumberHashmap[913] = CardName.CHIKAGE_ZAN_ZE_NO_CONNECTION_POISON
-        cardNumberHashmap[995] = CardName.POISON_PARALYTIC
-        cardNumberHashmap[996] = CardName.POISON_HALLUCINOGENIC
-        cardNumberHashmap[997] = CardName.POISON_RELAXATION
-        cardNumberHashmap[998] = CardName.POISON_DEADLY_1
-        cardNumberHashmap[999] = CardName.POISON_DEADLY_2
+        cardNumberHashmap[NUMBER_HAGANE_CENTRIFUGAL_ATTACK] = CardName.HAGANE_CENTRIFUGAL_ATTACK
+        cardNumberHashmap[NUMBER_HAGANE_FOUR_WINDED_EARTHQUAKE] = CardName.HAGANE_FOUR_WINDED_EARTHQUAKE
+        cardNumberHashmap[NUMBER_HAGANE_GROUND_BREAKING] = CardName.HAGANE_GROUND_BREAKING
+        cardNumberHashmap[NUMBER_HAGANE_HYPER_RECOIL] = CardName.HAGANE_HYPER_RECOIL
+        cardNumberHashmap[NUMBER_HAGANE_WON_MU_RUYN] = CardName.HAGANE_WON_MU_RUYN
+        cardNumberHashmap[NUMBER_HAGANE_RING_A_BELL] = CardName.HAGANE_RING_A_BELL
+        cardNumberHashmap[NUMBER_HAGANE_GRAVITATION_FIELD] = CardName.HAGANE_GRAVITATION_FIELD
+        cardNumberHashmap[NUMBER_HAGANE_GRAND_SKY_HOLE_CRASH] = CardName.HAGANE_GRAND_SKY_HOLE_CRASH
+        cardNumberHashmap[NUMBER_HAGANE_GRAND_BELL_MEGALOBEL] = CardName.HAGANE_GRAND_BELL_MEGALOBEL
+        cardNumberHashmap[NUMBER_HAGANE_GRAND_GRAVITATION_ATTRACT] = CardName.HAGANE_GRAND_GRAVITATION_ATTRACT
+        cardNumberHashmap[NUMBER_HAGANE_GRAND_MOUNTAIN_RESPECT] = CardName.HAGANE_GRAND_MOUNTAIN_RESPECT
+        cardNumberHashmap[NUMBER_HAGANE_BONFIRE] = CardName.HAGANE_BONFIRE
+        cardNumberHashmap[NUMBER_HAGANE_WHEEL_SKILL] = CardName.HAGANE_WHEEL_SKILL
+        cardNumberHashmap[NUMBER_HAGANE_GRAND_SOFT_MATERIAL] = CardName.HAGANE_GRAND_SOFT_MATERIAL
+        cardNumberHashmap[NUMBER_HAGANE_SOFT_ATTACK] = CardName.HAGANE_SOFT_ATTACK
 
-        cardNumberHashmap[1000] = CardName.KURURU_ELEKITTEL
-        cardNumberHashmap[1001] = CardName.KURURU_ACCELERATOR
-        cardNumberHashmap[1002] = CardName.KURURU_KURURUOONG
-        cardNumberHashmap[1003] = CardName.KURURU_TORNADO
-        cardNumberHashmap[1004] = CardName.KURURU_REGAINER
-        cardNumberHashmap[1005] = CardName.KURURU_MODULE
-        cardNumberHashmap[1006] = CardName.KURURU_REFLECTOR
-        cardNumberHashmap[1007] = CardName.KURURU_DRAIN_DEVIL
-        cardNumberHashmap[1008] = CardName.KURURU_BIG_GOLEM
-        cardNumberHashmap[1009] = CardName.KURURU_INDUSTRIA
-        cardNumberHashmap[1010] = CardName.KURURU_DUPLICATED_GEAR_1
-        cardNumberHashmap[1011] = CardName.KURURU_DUPLICATED_GEAR_2
-        cardNumberHashmap[1012] = CardName.KURURU_DUPLICATED_GEAR_3
-        cardNumberHashmap[1013] = CardName.KURURU_KANSHOUSOUCHI_KURURUSIK
-        cardNumberHashmap[1014] = CardName.KURURU_ANALYZE
-        cardNumberHashmap[1015] = CardName.KURURU_DAUZING
-        cardNumberHashmap[1016] = CardName.KURURU_LAST_RESEARCH
-        cardNumberHashmap[1017] = CardName.KURURU_GRAND_GULLIVER
-        cardNumberHashmap[1018] = CardName.KURURU_BLASTER
-        cardNumberHashmap[1019] = CardName.KURURU_RAILGUN
-        cardNumberHashmap[1020] = CardName.KURURU_CONNECT_DIVE
+        cardNumberHashmap[NUMBER_CHIKAGE_THROW_KUNAI] = CardName.CHIKAGE_THROW_KUNAI
+        cardNumberHashmap[NUMBER_CHIKAGE_POISON_NEEDLE] = CardName.CHIKAGE_POISON_NEEDLE
+        cardNumberHashmap[NUMBER_CHIKAGE_TO_ZU_CHU] = CardName.CHIKAGE_TO_ZU_CHU
+        cardNumberHashmap[NUMBER_CHIKAGE_CUTTING_NECK] = CardName.CHIKAGE_CUTTING_NECK
+        cardNumberHashmap[NUMBER_CHIKAGE_POISON_SMOKE] = CardName.CHIKAGE_POISON_SMOKE
+        cardNumberHashmap[NUMBER_CHIKAGE_TIP_TOEING] = CardName.CHIKAGE_TIP_TOEING
+        cardNumberHashmap[NUMBER_CHIKAGE_MUDDLE] = CardName.CHIKAGE_MUDDLE
+        cardNumberHashmap[NUMBER_CHIKAGE_DEADLY_POISON] = CardName.CHIKAGE_DEADLY_POISON
+        cardNumberHashmap[NUMBER_CHIKAGE_HAN_KI_POISON] = CardName.CHIKAGE_HAN_KI_POISON
+        cardNumberHashmap[NUMBER_CHIKAGE_REINCARNATION_POISON] = CardName.CHIKAGE_REINCARNATION_POISON
+        cardNumberHashmap[NUMBER_CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE] = CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE
+        cardNumberHashmap[NUMBER_CHIKAGE_TRICK_UMBRELLA] = CardName.CHIKAGE_TRICK_UMBRELLA
+        cardNumberHashmap[NUMBER_CHIKAGE_STRUGGLE] = CardName.CHIKAGE_STRUGGLE
+        cardNumberHashmap[NUMBER_CHIKAGE_ZAN_ZE_NO_CONNECTION_POISON] = CardName.CHIKAGE_ZAN_ZE_NO_CONNECTION_POISON
+        cardNumberHashmap[NUMBER_POISON_PARALYTIC] = CardName.POISON_PARALYTIC
+        cardNumberHashmap[NUMBER_POISON_HALLUCINOGENIC] = CardName.POISON_HALLUCINOGENIC
+        cardNumberHashmap[NUMBER_POISON_RELAXATION] = CardName.POISON_RELAXATION
+        cardNumberHashmap[NUMBER_POISON_DEADLY_1] = CardName.POISON_DEADLY_1
+        cardNumberHashmap[NUMBER_POISON_DEADLY_2] = CardName.POISON_DEADLY_2
 
-        cardNumberHashmap[1100] = CardName.THALLYA_BURNING_STEAM
-        cardNumberHashmap[1101] = CardName.THALLYA_WAVING_EDGE
-        cardNumberHashmap[1102] = CardName.THALLYA_SHIELD_CHARGE
-        cardNumberHashmap[1103] = CardName.THALLYA_STEAM_CANNON
-        cardNumberHashmap[1104] = CardName.THALLYA_STUNT
-        cardNumberHashmap[1105] = CardName.THALLYA_ROARING
-        cardNumberHashmap[1106] = CardName.THALLYA_TURBO_SWITCH
-        cardNumberHashmap[1107] = CardName.THALLYA_ALPHA_EDGE
-        cardNumberHashmap[1108] = CardName.THALLYA_OMEGA_BURST
-        cardNumberHashmap[1109] = CardName.THALLYA_THALLYA_MASTERPIECE
-        cardNumberHashmap[1110] = CardName.THALLYA_JULIA_BLACKBOX
-        cardNumberHashmap[1111] = CardName.FORM_YAKSHA
-        cardNumberHashmap[1112] = CardName.FORM_NAGA
-        cardNumberHashmap[1113] = CardName.FORM_GARUDA
-        cardNumberHashmap[1114] = CardName.THALLYA_QUICK_CHANGE
-        cardNumberHashmap[1115] = CardName.THALLYA_BLACKBOX_NEO
-        cardNumberHashmap[1116] = CardName.THALLYA_OMNIS_BLASTER
-        cardNumberHashmap[1117] = CardName.FORM_KINNARI
-        cardNumberHashmap[1118] = CardName.FORM_ASURA
-        cardNumberHashmap[1119] = CardName.FORM_DEVA
+        cardNumberHashmap[NUMBER_KURURU_ELEKITTEL] = CardName.KURURU_ELEKITTEL
+        cardNumberHashmap[NUMBER_KURURU_ACCELERATOR] = CardName.KURURU_ACCELERATOR
+        cardNumberHashmap[NUMBER_KURURU_KURURUOONG] = CardName.KURURU_KURURUOONG
+        cardNumberHashmap[NUMBER_KURURU_TORNADO] = CardName.KURURU_TORNADO
+        cardNumberHashmap[NUMBER_KURURU_REGAINER] = CardName.KURURU_REGAINER
+        cardNumberHashmap[NUMBER_KURURU_MODULE] = CardName.KURURU_MODULE
+        cardNumberHashmap[NUMBER_KURURU_REFLECTOR] = CardName.KURURU_REFLECTOR
+        cardNumberHashmap[NUMBER_KURURU_DRAIN_DEVIL] = CardName.KURURU_DRAIN_DEVIL
+        cardNumberHashmap[NUMBER_KURURU_BIG_GOLEM] = CardName.KURURU_BIG_GOLEM
+        cardNumberHashmap[NUMBER_KURURU_INDUSTRIA] = CardName.KURURU_INDUSTRIA
+        cardNumberHashmap[NUMBER_KURURU_DUPLICATED_GEAR_1] = CardName.KURURU_DUPLICATED_GEAR_1
+        cardNumberHashmap[NUMBER_KURURU_DUPLICATED_GEAR_2] = CardName.KURURU_DUPLICATED_GEAR_2
+        cardNumberHashmap[NUMBER_KURURU_DUPLICATED_GEAR_3] = CardName.KURURU_DUPLICATED_GEAR_3
+        cardNumberHashmap[NUMBER_KURURU_KANSHOUSOUCHI_KURURUSIK] = CardName.KURURU_KANSHOUSOUCHI_KURURUSIK
+        cardNumberHashmap[NUMBER_KURURU_ANALYZE] = CardName.KURURU_ANALYZE
+        cardNumberHashmap[NUMBER_KURURU_DAUZING] = CardName.KURURU_DAUZING
+        cardNumberHashmap[NUMBER_KURURU_LAST_RESEARCH] = CardName.KURURU_LAST_RESEARCH
+        cardNumberHashmap[NUMBER_KURURU_GRAND_GULLIVER] = CardName.KURURU_GRAND_GULLIVER
+        cardNumberHashmap[NUMBER_KURURU_BLASTER] = CardName.KURURU_BLASTER
+        cardNumberHashmap[NUMBER_KURURU_RAILGUN] = CardName.KURURU_RAILGUN
+        cardNumberHashmap[NUMBER_KURURU_CONNECT_DIVE] = CardName.KURURU_CONNECT_DIVE
 
-        cardNumberHashmap[1200] = CardName.RAIRA_BEAST_NAIL
-        cardNumberHashmap[1201] = CardName.RAIRA_STORM_SURGE_ATTACK
-        cardNumberHashmap[1202] = CardName.RAIRA_REINCARNATION_NAIL
-        cardNumberHashmap[1203] = CardName.RAIRA_WIND_RUN
-        cardNumberHashmap[1204] = CardName.RAIRA_WISDOM_OF_STORM_SURGE
-        cardNumberHashmap[1205] = CardName.RAIRA_HOWLING
-        cardNumberHashmap[1206] = CardName.RAIRA_WIND_KICK
-        cardNumberHashmap[1207] = CardName.RAIRA_THUNDER_WIND_PUNCH
-        cardNumberHashmap[1208] = CardName.RAIRA_SUMMON_THUNDER
-        cardNumberHashmap[1209] = CardName.RAIRA_WIND_CONSEQUENCE_BALL
-        cardNumberHashmap[1210] = CardName.RAIRA_CIRCULAR_CIRCUIT
-        cardNumberHashmap[1211] = CardName.RAIRA_WIND_ATTACK
-        cardNumberHashmap[1212] = CardName.RAIRA_WIND_ZEN_KAI
-        cardNumberHashmap[1213] = CardName.RAIRA_WIND_CELESTIAL_SPHERE
-        cardNumberHashmap[1214] = CardName.RAIRA_STORM
-        cardNumberHashmap[1215] = CardName.RAIRA_FURIOUS_STORM
-        cardNumberHashmap[1216] = CardName.RAIRA_JIN_PUNG_JE_CHEON_UI
+        cardNumberHashmap[NUMBER_THALLYA_BURNING_STEAM] = CardName.THALLYA_BURNING_STEAM
+        cardNumberHashmap[NUMBER_THALLYA_WAVING_EDGE] = CardName.THALLYA_WAVING_EDGE
+        cardNumberHashmap[NUMBER_THALLYA_SHIELD_CHARGE] = CardName.THALLYA_SHIELD_CHARGE
+        cardNumberHashmap[NUMBER_THALLYA_STEAM_CANNON] = CardName.THALLYA_STEAM_CANNON
+        cardNumberHashmap[NUMBER_THALLYA_STUNT] = CardName.THALLYA_STUNT
+        cardNumberHashmap[NUMBER_THALLYA_ROARING] = CardName.THALLYA_ROARING
+        cardNumberHashmap[NUMBER_THALLYA_TURBO_SWITCH] = CardName.THALLYA_TURBO_SWITCH
+        cardNumberHashmap[NUMBER_THALLYA_ALPHA_EDGE] = CardName.THALLYA_ALPHA_EDGE
+        cardNumberHashmap[NUMBER_THALLYA_OMEGA_BURST] = CardName.THALLYA_OMEGA_BURST
+        cardNumberHashmap[NUMBER_THALLYA_THALLYA_MASTERPIECE] = CardName.THALLYA_THALLYA_MASTERPIECE
+        cardNumberHashmap[NUMBER_THALLYA_JULIA_BLACKBOX] = CardName.THALLYA_JULIA_BLACKBOX
+        cardNumberHashmap[NUMBER_FORM_YAKSHA] = CardName.FORM_YAKSHA
+        cardNumberHashmap[NUMBER_FORM_NAGA] = CardName.FORM_NAGA
+        cardNumberHashmap[NUMBER_FORM_GARUDA] = CardName.FORM_GARUDA
+        cardNumberHashmap[NUMBER_THALLYA_QUICK_CHANGE] = CardName.THALLYA_QUICK_CHANGE
+        cardNumberHashmap[NUMBER_THALLYA_BLACKBOX_NEO] = CardName.THALLYA_BLACKBOX_NEO
+        cardNumberHashmap[NUMBER_THALLYA_OMNIS_BLASTER] = CardName.THALLYA_OMNIS_BLASTER
+        cardNumberHashmap[NUMBER_FORM_KINNARI] = CardName.FORM_KINNARI
+        cardNumberHashmap[NUMBER_FORM_ASURA] = CardName.FORM_ASURA
+        cardNumberHashmap[NUMBER_FORM_DEVA] = CardName.FORM_DEVA
 
-        cardNumberHashmap[1300] = CardName.UTSURO_WON_WOL
-        cardNumberHashmap[1301] = CardName.UTSURO_BLACK_WAVE
-        cardNumberHashmap[1302] = CardName.UTSURO_HARVEST
-        cardNumberHashmap[1303] = CardName.UTSURO_PRESSURE
-        cardNumberHashmap[1304] = CardName.UTSURO_SHADOW_WING
-        cardNumberHashmap[1305] = CardName.UTSURO_SHADOW_WALL
-        cardNumberHashmap[1306] = CardName.UTSURO_YUE_HOE_JU
-        cardNumberHashmap[1307] = CardName.UTSURO_HOE_MYEOL
-        cardNumberHashmap[1308] = CardName.UTSURO_HEO_WI
-        cardNumberHashmap[1309] = CardName.UTSURO_JONG_MAL
-        cardNumberHashmap[1310] = CardName.UTSURO_MA_SIG
-        cardNumberHashmap[1311] = CardName.UTSURO_BITE_DUST
-        cardNumberHashmap[1312] = CardName.UTSURO_REVERBERATE_DEVICE_KURURUSIK
-        cardNumberHashmap[1313] = CardName.UTSURO_MANG_A
-        cardNumberHashmap[1314] = CardName.UTSURO_ANNIHILATION_SHADOW
-        cardNumberHashmap[1315] = CardName.UTSURO_SILENT_WALK
-        cardNumberHashmap[1316] = CardName.UTSURO_DE_MISE
+        cardNumberHashmap[NUMBER_RAIRA_BEAST_NAIL] = CardName.RAIRA_BEAST_NAIL
+        cardNumberHashmap[NUMBER_RAIRA_STORM_SURGE_ATTACK] = CardName.RAIRA_STORM_SURGE_ATTACK
+        cardNumberHashmap[NUMBER_RAIRA_REINCARNATION_NAIL] = CardName.RAIRA_REINCARNATION_NAIL
+        cardNumberHashmap[NUMBER_RAIRA_WIND_RUN] = CardName.RAIRA_WIND_RUN
+        cardNumberHashmap[NUMBER_RAIRA_WISDOM_OF_STORM_SURGE] = CardName.RAIRA_WISDOM_OF_STORM_SURGE
+        cardNumberHashmap[NUMBER_RAIRA_HOWLING] = CardName.RAIRA_HOWLING
+        cardNumberHashmap[NUMBER_RAIRA_WIND_KICK] = CardName.RAIRA_WIND_KICK
+        cardNumberHashmap[NUMBER_RAIRA_THUNDER_WIND_PUNCH] = CardName.RAIRA_THUNDER_WIND_PUNCH
+        cardNumberHashmap[NUMBER_RAIRA_SUMMON_THUNDER] = CardName.RAIRA_SUMMON_THUNDER
+        cardNumberHashmap[NUMBER_RAIRA_WIND_CONSEQUENCE_BALL] = CardName.RAIRA_WIND_CONSEQUENCE_BALL
+        cardNumberHashmap[NUMBER_RAIRA_CIRCULAR_CIRCUIT] = CardName.RAIRA_CIRCULAR_CIRCUIT
+        cardNumberHashmap[NUMBER_RAIRA_WIND_ATTACK] = CardName.RAIRA_WIND_ATTACK
+        cardNumberHashmap[NUMBER_RAIRA_WIND_ZEN_KAI] = CardName.RAIRA_WIND_ZEN_KAI
+        cardNumberHashmap[NUMBER_RAIRA_WIND_CELESTIAL_SPHERE] = CardName.RAIRA_WIND_CELESTIAL_SPHERE
+        cardNumberHashmap[NUMBER_RAIRA_STORM] = CardName.RAIRA_STORM
+        cardNumberHashmap[NUMBER_RAIRA_FURIOUS_STORM] = CardName.RAIRA_FURIOUS_STORM
+        cardNumberHashmap[NUMBER_RAIRA_JIN_PUNG_JE_CHEON_UI] = CardName.RAIRA_JIN_PUNG_JE_CHEON_UI
 
-        cardNumberHashmap[1400] = CardName.HONOKA_SPIRIT_SIK
-        cardNumberHashmap[1401] = CardName.HONOKA_GUARDIAN_SPIRIT_SIK
-        cardNumberHashmap[1402] = CardName.HONOKA_ASSAULT_SPIRIT_SIK
-        cardNumberHashmap[1403] = CardName.HONOKA_DIVINE_OUKA
-        cardNumberHashmap[1404] = CardName.HONOKA_SAKURA_BLIZZARD
-        cardNumberHashmap[1405] = CardName.HONOKA_UI_GI_GONG_JIN
-        cardNumberHashmap[1406] = CardName.HONOKA_SAKURA_WING
-        cardNumberHashmap[1407] = CardName.HONOKA_REGENERATION
-        cardNumberHashmap[1408] = CardName.HONOKA_SAKURA_AMULET
-        cardNumberHashmap[1409] = CardName.HONOKA_HONOKA_SPARKLE
-        cardNumberHashmap[1410] = CardName.HONOKA_COMMAND
-        cardNumberHashmap[1411] = CardName.HONOKA_TAIL_WIND
-        cardNumberHashmap[1412] = CardName.HONOKA_CHEST_WILLINGNESS
-        cardNumberHashmap[1413] = CardName.HONOKA_HAND_FLOWER
-        cardNumberHashmap[1414] = CardName.HONOKA_A_NEW_OPENING
-        cardNumberHashmap[1415] = CardName.HONOKA_UNDER_THE_NAME_OF_FLAG
-        cardNumberHashmap[1416] = CardName.HONOKA_FOUR_SEASON_BACK
-        cardNumberHashmap[1417] = CardName.HONOKA_FULL_BLOOM_PATH
-        cardNumberHashmap[1418] = CardName.HONOKA_SAKURA_SWORD
-        cardNumberHashmap[1419] = CardName.HONOKA_SHADOW_HAND
-        cardNumberHashmap[1420] = CardName.HONOKA_EYE_OPEN_ALONE
-        cardNumberHashmap[1421] = CardName.HONOKA_FOLLOW_TRACE
-        cardNumberHashmap[1422] = CardName.HONOKA_FACING_SHADOW
-        cardNumberHashmap[1423] = CardName.HONOKA_SAKURA_SHINING_BRIGHTLY
-        cardNumberHashmap[1424] = CardName.HONOKA_HOLD_HANDS
-        cardNumberHashmap[1425] = CardName.HONOKA_WALK_OLD_LOAD
+        cardNumberHashmap[NUMBER_UTSURO_WON_WOL] = CardName.UTSURO_WON_WOL
+        cardNumberHashmap[NUMBER_UTSURO_BLACK_WAVE] = CardName.UTSURO_BLACK_WAVE
+        cardNumberHashmap[NUMBER_UTSURO_HARVEST] = CardName.UTSURO_HARVEST
+        cardNumberHashmap[NUMBER_UTSURO_PRESSURE] = CardName.UTSURO_PRESSURE
+        cardNumberHashmap[NUMBER_UTSURO_SHADOW_WING] = CardName.UTSURO_SHADOW_WING
+        cardNumberHashmap[NUMBER_UTSURO_SHADOW_WALL] = CardName.UTSURO_SHADOW_WALL
+        cardNumberHashmap[NUMBER_UTSURO_YUE_HOE_JU] = CardName.UTSURO_YUE_HOE_JU
+        cardNumberHashmap[NUMBER_UTSURO_HOE_MYEOL] = CardName.UTSURO_HOE_MYEOL
+        cardNumberHashmap[NUMBER_UTSURO_HEO_WI] = CardName.UTSURO_HEO_WI
+        cardNumberHashmap[NUMBER_UTSURO_JONG_MAL] = CardName.UTSURO_JONG_MAL
+        cardNumberHashmap[NUMBER_UTSURO_MA_SIG] = CardName.UTSURO_MA_SIG
+        cardNumberHashmap[NUMBER_UTSURO_BITE_DUST] = CardName.UTSURO_BITE_DUST
+        cardNumberHashmap[NUMBER_UTSURO_REVERBERATE_DEVICE_KURURUSIK] = CardName.UTSURO_REVERBERATE_DEVICE_KURURUSIK
+        cardNumberHashmap[NUMBER_UTSURO_MANG_A] = CardName.UTSURO_MANG_A
+        cardNumberHashmap[NUMBER_UTSURO_ANNIHILATION_SHADOW] = CardName.UTSURO_ANNIHILATION_SHADOW
+        cardNumberHashmap[NUMBER_UTSURO_SILENT_WALK] = CardName.UTSURO_SILENT_WALK
+        cardNumberHashmap[NUMBER_UTSURO_DE_MISE] = CardName.UTSURO_DE_MISE
 
-        cardNumberHashmap[1500] = CardName.KORUNU_SNOW_BLADE
-        cardNumberHashmap[1501] = CardName.KORUNU_REVOLVING_BLADE
-        cardNumberHashmap[1502] = CardName.KORUNU_BLADE_DANCE
-        cardNumberHashmap[1503] = CardName.KORUNU_RIDE_SNOW
-        cardNumberHashmap[1504] = CardName.KORUNU_ABSOLUTE_ZERO
-        cardNumberHashmap[1505] = CardName.KORUNU_FROSTBITE
-        cardNumberHashmap[1506] = CardName.KORUNU_FROST_THORN_BUSH
-        cardNumberHashmap[1507] = CardName.KORUNU_CONLU_RUYANPEH
-        cardNumberHashmap[1508] = CardName.KORUNU_LETAR_LERA
-        cardNumberHashmap[1509] = CardName.KORUNU_UPASTUM
-        cardNumberHashmap[1510] = CardName.KORUNU_PORUCHARTO
+        cardNumberHashmap[NUMBER_HONOKA_SPIRIT_SIK] = CardName.HONOKA_SPIRIT_SIK
+        cardNumberHashmap[NUMBER_HONOKA_GUARDIAN_SPIRIT_SIK] = CardName.HONOKA_GUARDIAN_SPIRIT_SIK
+        cardNumberHashmap[NUMBER_HONOKA_ASSAULT_SPIRIT_SIK] = CardName.HONOKA_ASSAULT_SPIRIT_SIK
+        cardNumberHashmap[NUMBER_HONOKA_DIVINE_OUKA] = CardName.HONOKA_DIVINE_OUKA
+        cardNumberHashmap[NUMBER_HONOKA_SAKURA_BLIZZARD] = CardName.HONOKA_SAKURA_BLIZZARD
+        cardNumberHashmap[NUMBER_HONOKA_UI_GI_GONG_JIN] = CardName.HONOKA_UI_GI_GONG_JIN
+        cardNumberHashmap[NUMBER_HONOKA_SAKURA_WING] = CardName.HONOKA_SAKURA_WING
+        cardNumberHashmap[NUMBER_HONOKA_REGENERATION] = CardName.HONOKA_REGENERATION
+        cardNumberHashmap[NUMBER_HONOKA_SAKURA_AMULET] = CardName.HONOKA_SAKURA_AMULET
+        cardNumberHashmap[NUMBER_HONOKA_HONOKA_SPARKLE] = CardName.HONOKA_HONOKA_SPARKLE
+        cardNumberHashmap[NUMBER_HONOKA_COMMAND] = CardName.HONOKA_COMMAND
+        cardNumberHashmap[NUMBER_HONOKA_TAIL_WIND] = CardName.HONOKA_TAIL_WIND
+        cardNumberHashmap[NUMBER_HONOKA_CHEST_WILLINGNESS] = CardName.HONOKA_CHEST_WILLINGNESS
+        cardNumberHashmap[NUMBER_HONOKA_HAND_FLOWER] = CardName.HONOKA_HAND_FLOWER
+        cardNumberHashmap[NUMBER_HONOKA_A_NEW_OPENING] = CardName.HONOKA_A_NEW_OPENING
+        cardNumberHashmap[NUMBER_HONOKA_UNDER_THE_NAME_OF_FLAG] = CardName.HONOKA_UNDER_THE_NAME_OF_FLAG
+        cardNumberHashmap[NUMBER_HONOKA_FOUR_SEASON_BACK] = CardName.HONOKA_FOUR_SEASON_BACK
+        cardNumberHashmap[NUMBER_HONOKA_FULL_BLOOM_PATH] = CardName.HONOKA_FULL_BLOOM_PATH
+        cardNumberHashmap[NUMBER_HONOKA_SAKURA_SWORD] = CardName.HONOKA_SAKURA_SWORD
+        cardNumberHashmap[NUMBER_HONOKA_SHADOW_HAND] = CardName.HONOKA_SHADOW_HAND
+        cardNumberHashmap[NUMBER_HONOKA_EYE_OPEN_ALONE] = CardName.HONOKA_EYE_OPEN_ALONE
+        cardNumberHashmap[NUMBER_HONOKA_FOLLOW_TRACE] = CardName.HONOKA_FOLLOW_TRACE
+        cardNumberHashmap[NUMBER_HONOKA_FACING_SHADOW] = CardName.HONOKA_FACING_SHADOW
+        cardNumberHashmap[NUMBER_HONOKA_SAKURA_SHINING_BRIGHTLY] = CardName.HONOKA_SAKURA_SHINING_BRIGHTLY
+        cardNumberHashmap[NUMBER_HONOKA_HOLD_HANDS] = CardName.HONOKA_HOLD_HANDS
+        cardNumberHashmap[NUMBER_HONOKA_WALK_OLD_LOAD] = CardName.HONOKA_WALK_OLD_LOAD
 
-        cardNumberHashmap[1600] = CardName.YATSUHA_STAR_NAIL
-        cardNumberHashmap[1601] = CardName.YATSUHA_DARKNESS_GILL
-        cardNumberHashmap[1602] = CardName.YATSUHA_MIRROR_DEVIL
-        cardNumberHashmap[1603] = CardName.YATSUHA_GHOST_STEP
-        cardNumberHashmap[1604] = CardName.YATSUHA_WILLING
-        cardNumberHashmap[1605] = CardName.YATSUHA_CONTRACT
-        cardNumberHashmap[1606] = CardName.YATSUHA_CLINGY_FLOWER
-        cardNumberHashmap[1607] = CardName.YATSUHA_TWO_LEAP_MIRROR_DIVINE
-        cardNumberHashmap[1608] = CardName.YATSUHA_FOUR_LEAP_SONG
-        cardNumberHashmap[1609] = CardName.YATSUHA_SIX_STAR_SEA
-        cardNumberHashmap[1610] = CardName.YATSUHA_EIGHT_MIRROR_OTHER_SIDE
-        cardNumberHashmap[1611] = CardName.YATSUHA_HOLY_RAKE_HANDS
-        cardNumberHashmap[1612] = CardName.YATSUHA_ENTRANCE_OF_ABYSS
-        cardNumberHashmap[1613] = CardName.YATSUHA_TRUE_MONSTER
-        cardNumberHashmap[1614] = CardName.YATSUHA_GHOST_LINK
-        cardNumberHashmap[1615] = CardName.YATSUHA_RESOLUTION
-        cardNumberHashmap[1616] = CardName.YATSUHA_PLEDGE
-        cardNumberHashmap[1617] = CardName.YATSUHA_VAIN_FLOWER
-        cardNumberHashmap[1618] = CardName.YATSUHA_EIGHT_MIRROR_VAIN_SAKURA
+        cardNumberHashmap[NUMBER_KORUNU_SNOW_BLADE] = CardName.KORUNU_SNOW_BLADE
+        cardNumberHashmap[NUMBER_KORUNU_REVOLVING_BLADE] = CardName.KORUNU_REVOLVING_BLADE
+        cardNumberHashmap[NUMBER_KORUNU_BLADE_DANCE] = CardName.KORUNU_BLADE_DANCE
+        cardNumberHashmap[NUMBER_KORUNU_RIDE_SNOW] = CardName.KORUNU_RIDE_SNOW
+        cardNumberHashmap[NUMBER_KORUNU_ABSOLUTE_ZERO] = CardName.KORUNU_ABSOLUTE_ZERO
+        cardNumberHashmap[NUMBER_KORUNU_FROSTBITE] = CardName.KORUNU_FROSTBITE
+        cardNumberHashmap[NUMBER_KORUNU_FROST_THORN_BUSH] = CardName.KORUNU_FROST_THORN_BUSH
+        cardNumberHashmap[NUMBER_KORUNU_CONLU_RUYANPEH] = CardName.KORUNU_CONLU_RUYANPEH
+        cardNumberHashmap[NUMBER_KORUNU_LETAR_LERA] = CardName.KORUNU_LETAR_LERA
+        cardNumberHashmap[NUMBER_KORUNU_UPASTUM] = CardName.KORUNU_UPASTUM
+        cardNumberHashmap[NUMBER_KORUNU_PORUCHARTO] = CardName.KORUNU_PORUCHARTO
 
-        cardNumberHashmap[1700] = CardName.HATSUMI_WATER_BALL
-        cardNumberHashmap[1701] = CardName.HATSUMI_WATER_CURRENT
-        cardNumberHashmap[1702] = CardName.HATSUMI_STRONG_ACID
-        cardNumberHashmap[1703] = CardName.HATSUMI_TSUNAMI
-        cardNumberHashmap[1704] = CardName.HATSUMI_JUN_BI_MAN_TAN
-        cardNumberHashmap[1705] = CardName.HATSUMI_COMPASS
-        cardNumberHashmap[1706] = CardName.HATSUMI_CALL_WAVE
-        cardNumberHashmap[1707] = CardName.HATSUMI_ISANA_HAIL
-        cardNumberHashmap[1708] = CardName.HATSUMI_OYOGIBI_FIRE
-        cardNumberHashmap[1709] = CardName.HATSUMI_KIRAHARI_LIGHTHOUSE
-        cardNumberHashmap[1710] = CardName.HATSUMI_MIOBIKI_ROUTE
-        cardNumberHashmap[1711] = CardName.HATSUMI_TORPEDO
-        cardNumberHashmap[1712] = CardName.HATSUMI_SAGIRI_HAIL
-        cardNumberHashmap[1713] = CardName.HATSUMI_WADANAKA_ROUTE
+        cardNumberHashmap[NUMBER_YATSUHA_STAR_NAIL] = CardName.YATSUHA_STAR_NAIL
+        cardNumberHashmap[NUMBER_YATSUHA_DARKNESS_GILL] = CardName.YATSUHA_DARKNESS_GILL
+        cardNumberHashmap[NUMBER_YATSUHA_MIRROR_DEVIL] = CardName.YATSUHA_MIRROR_DEVIL
+        cardNumberHashmap[NUMBER_YATSUHA_GHOST_STEP] = CardName.YATSUHA_GHOST_STEP
+        cardNumberHashmap[NUMBER_YATSUHA_WILLING] = CardName.YATSUHA_WILLING
+        cardNumberHashmap[NUMBER_YATSUHA_CONTRACT] = CardName.YATSUHA_CONTRACT
+        cardNumberHashmap[NUMBER_YATSUHA_CLINGY_FLOWER] = CardName.YATSUHA_CLINGY_FLOWER
+        cardNumberHashmap[NUMBER_YATSUHA_TWO_LEAP_MIRROR_DIVINE] = CardName.YATSUHA_TWO_LEAP_MIRROR_DIVINE
+        cardNumberHashmap[NUMBER_YATSUHA_FOUR_LEAP_SONG] = CardName.YATSUHA_FOUR_LEAP_SONG
+        cardNumberHashmap[NUMBER_YATSUHA_SIX_STAR_SEA] = CardName.YATSUHA_SIX_STAR_SEA
+        cardNumberHashmap[NUMBER_YATSUHA_EIGHT_MIRROR_OTHER_SIDE] = CardName.YATSUHA_EIGHT_MIRROR_OTHER_SIDE
+        cardNumberHashmap[NUMBER_YATSUHA_HOLY_RAKE_HANDS] = CardName.YATSUHA_HOLY_RAKE_HANDS
+        cardNumberHashmap[NUMBER_YATSUHA_ENTRANCE_OF_ABYSS] = CardName.YATSUHA_ENTRANCE_OF_ABYSS
+        cardNumberHashmap[NUMBER_YATSUHA_TRUE_MONSTER] = CardName.YATSUHA_TRUE_MONSTER
+        cardNumberHashmap[NUMBER_YATSUHA_GHOST_LINK] = CardName.YATSUHA_GHOST_LINK
+        cardNumberHashmap[NUMBER_YATSUHA_RESOLUTION] = CardName.YATSUHA_RESOLUTION
+        cardNumberHashmap[NUMBER_YATSUHA_PLEDGE] = CardName.YATSUHA_PLEDGE
+        cardNumberHashmap[NUMBER_YATSUHA_VAIN_FLOWER] = CardName.YATSUHA_VAIN_FLOWER
+        cardNumberHashmap[NUMBER_YATSUHA_EIGHT_MIRROR_VAIN_SAKURA] = CardName.YATSUHA_EIGHT_MIRROR_VAIN_SAKURA
 
-        cardNumberHashmap[1800] = CardName.MIZUKI_JIN_DU
-        cardNumberHashmap[1801] = CardName.MIZUKI_BAN_GONG
-        cardNumberHashmap[1802] = CardName.MIZUKI_SHOOTING_DOWN
-        cardNumberHashmap[1803] = CardName.MIZUKI_HO_LYEONG
-        cardNumberHashmap[1804] = CardName.MIZUKI_BANG_BYEOG
-        cardNumberHashmap[1805] = CardName.MIZUKI_OVERPOWERING_GO_FORWARD
-        cardNumberHashmap[1806] = CardName.MIZUKI_JEON_JANG
-        cardNumberHashmap[1807] = CardName.MIZUKI_HACHIRYU_CHEONJUGAK
-        cardNumberHashmap[1808] = CardName.MIZUKI_HIJAMARU_TRIPLET
-        cardNumberHashmap[1809] = CardName.MIZUKI_TARTENASHI_DAESUMUN
-        cardNumberHashmap[1810] = CardName.MIZUKI_MIZUKI_BATTLE_CRY
-        cardNumberHashmap[1811] = CardName.KODAMA_TU_SIN
-        cardNumberHashmap[1812] = CardName.SOLDIER_SPEAR_1
-        cardNumberHashmap[1813] = CardName.SOLDIER_SPEAR_2
-        cardNumberHashmap[1814] = CardName.SOLDIER_SHIELD
-        cardNumberHashmap[1815] = CardName.SOLDIER_HORSE
+        cardNumberHashmap[NUMBER_HATSUMI_WATER_BALL] = CardName.HATSUMI_WATER_BALL
+        cardNumberHashmap[NUMBER_HATSUMI_WATER_CURRENT] = CardName.HATSUMI_WATER_CURRENT
+        cardNumberHashmap[NUMBER_HATSUMI_STRONG_ACID] = CardName.HATSUMI_STRONG_ACID
+        cardNumberHashmap[NUMBER_HATSUMI_TSUNAMI] = CardName.HATSUMI_TSUNAMI
+        cardNumberHashmap[NUMBER_HATSUMI_JUN_BI_MAN_TAN] = CardName.HATSUMI_JUN_BI_MAN_TAN
+        cardNumberHashmap[NUMBER_HATSUMI_COMPASS] = CardName.HATSUMI_COMPASS
+        cardNumberHashmap[NUMBER_HATSUMI_CALL_WAVE] = CardName.HATSUMI_CALL_WAVE
+        cardNumberHashmap[NUMBER_HATSUMI_ISANA_HAIL] = CardName.HATSUMI_ISANA_HAIL
+        cardNumberHashmap[NUMBER_HATSUMI_OYOGIBI_FIRE] = CardName.HATSUMI_OYOGIBI_FIRE
+        cardNumberHashmap[NUMBER_HATSUMI_KIRAHARI_LIGHTHOUSE] = CardName.HATSUMI_KIRAHARI_LIGHTHOUSE
+        cardNumberHashmap[NUMBER_HATSUMI_MIOBIKI_ROUTE] = CardName.HATSUMI_MIOBIKI_ROUTE
+        cardNumberHashmap[NUMBER_HATSUMI_TORPEDO] = CardName.HATSUMI_TORPEDO
+        cardNumberHashmap[NUMBER_HATSUMI_SAGIRI_HAIL] = CardName.HATSUMI_SAGIRI_HAIL
+        cardNumberHashmap[NUMBER_HATSUMI_WADANAKA_ROUTE] = CardName.HATSUMI_WADANAKA_ROUTE
 
-        cardNumberHashmap[1900] = CardName.MEGUMI_GONG_SUM
-        cardNumberHashmap[1901] = CardName.MEGUMI_TA_CHEOG
-        cardNumberHashmap[1902] = CardName.MEGUMI_SHELL_ATTACK
-        cardNumberHashmap[1903] = CardName.MEGUMI_POLE_THRUST
-        cardNumberHashmap[1904] = CardName.MEGUMI_REED
-        cardNumberHashmap[1905] = CardName.MEGUMI_BALSAM
-        cardNumberHashmap[1906] = CardName.MEGUMI_WILD_ROSE
-        cardNumberHashmap[1907] = CardName.MEGUMI_ROOT_OF_CAUSALITY
-        cardNumberHashmap[1908] = CardName.MEGUMI_BRANCH_OF_POSSIBILITY
-        cardNumberHashmap[1909] = CardName.MEGUMI_FRUIT_OF_END
-        cardNumberHashmap[1910] = CardName.MEGUMI_MEGUMI_PALM
+        cardNumberHashmap[NUMBER_MIZUKI_JIN_DU] = CardName.MIZUKI_JIN_DU
+        cardNumberHashmap[NUMBER_MIZUKI_BAN_GONG] = CardName.MIZUKI_BAN_GONG
+        cardNumberHashmap[NUMBER_MIZUKI_SHOOTING_DOWN] = CardName.MIZUKI_SHOOTING_DOWN
+        cardNumberHashmap[NUMBER_MIZUKI_HO_LYEONG] = CardName.MIZUKI_HO_LYEONG
+        cardNumberHashmap[NUMBER_MIZUKI_BANG_BYEOG] = CardName.MIZUKI_BANG_BYEOG
+        cardNumberHashmap[NUMBER_MIZUKI_OVERPOWERING_GO_FORWARD] = CardName.MIZUKI_OVERPOWERING_GO_FORWARD
+        cardNumberHashmap[NUMBER_MIZUKI_JEON_JANG] = CardName.MIZUKI_JEON_JANG
+        cardNumberHashmap[NUMBER_MIZUKI_HACHIRYU_CHEONJUGAK] = CardName.MIZUKI_HACHIRYU_CHEONJUGAK
+        cardNumberHashmap[NUMBER_MIZUKI_HIJAMARU_TRIPLET] = CardName.MIZUKI_HIJAMARU_TRIPLET
+        cardNumberHashmap[NUMBER_MIZUKI_TARTENASHI_DAESUMUN] = CardName.MIZUKI_TARTENASHI_DAESUMUN
+        cardNumberHashmap[NUMBER_MIZUKI_MIZUKI_BATTLE_CRY] = CardName.MIZUKI_MIZUKI_BATTLE_CRY
+        cardNumberHashmap[NUMBER_KODAMA_TU_SIN] = CardName.KODAMA_TU_SIN
+        cardNumberHashmap[NUMBER_SOLDIER_SPEAR_1] = CardName.SOLDIER_SPEAR_1
+        cardNumberHashmap[NUMBER_SOLDIER_SPEAR_2] = CardName.SOLDIER_SPEAR_2
+        cardNumberHashmap[NUMBER_SOLDIER_SHIELD] = CardName.SOLDIER_SHIELD
+        cardNumberHashmap[NUMBER_SOLDIER_HORSE] = CardName.SOLDIER_HORSE
 
-        cardNumberHashmap[2000] = CardName.KANAWE_IMAGE
-        cardNumberHashmap[2001] = CardName.KANAWE_SCREENPLAY
-        cardNumberHashmap[2002] = CardName.KANAWE_PRODUCTION
-        cardNumberHashmap[2003] = CardName.KANAWE_PUBLISH
-        cardNumberHashmap[2004] = CardName.KANAWE_AFTERGLOW
-        cardNumberHashmap[2005] = CardName.KANAWE_IMPROMPTU
-        cardNumberHashmap[2006] = CardName.KANAWE_SEAL
-        cardNumberHashmap[2007] = CardName.KANAWE_VAGUE_STORY
-        cardNumberHashmap[2008] = CardName.KANAWE_INFINITE_STARLIGHT
-        cardNumberHashmap[2009] = CardName.KANAWE_BEND_OVER_THIS_NIGHT
-        cardNumberHashmap[2010] = CardName.KANAWE_DISTANT_SKY
-        cardNumberHashmap[2011] = CardName.KANAWE_KANAWE
+        cardNumberHashmap[NUMBER_MEGUMI_GONG_SUM] = CardName.MEGUMI_GONG_SUM
+        cardNumberHashmap[NUMBER_MEGUMI_TA_CHEOG] = CardName.MEGUMI_TA_CHEOG
+        cardNumberHashmap[NUMBER_MEGUMI_SHELL_ATTACK] = CardName.MEGUMI_SHELL_ATTACK
+        cardNumberHashmap[NUMBER_MEGUMI_POLE_THRUST] = CardName.MEGUMI_POLE_THRUST
+        cardNumberHashmap[NUMBER_MEGUMI_REED] = CardName.MEGUMI_REED
+        cardNumberHashmap[NUMBER_MEGUMI_BALSAM] = CardName.MEGUMI_BALSAM
+        cardNumberHashmap[NUMBER_MEGUMI_WILD_ROSE] = CardName.MEGUMI_WILD_ROSE
+        cardNumberHashmap[NUMBER_MEGUMI_ROOT_OF_CAUSALITY] = CardName.MEGUMI_ROOT_OF_CAUSALITY
+        cardNumberHashmap[NUMBER_MEGUMI_BRANCH_OF_POSSIBILITY] = CardName.MEGUMI_BRANCH_OF_POSSIBILITY
+        cardNumberHashmap[NUMBER_MEGUMI_FRUIT_OF_END] = CardName.MEGUMI_FRUIT_OF_END
+        cardNumberHashmap[NUMBER_MEGUMI_MEGUMI_PALM] = CardName.MEGUMI_MEGUMI_PALM
 
-        cardNumberHashmap[9000] = CardName.IDEA_SAL_JIN
-        cardNumberHashmap[9001] = CardName.IDEA_SAKURA_WAVE
-        cardNumberHashmap[9002] = CardName.IDEA_WHISTLE
-        cardNumberHashmap[9003] = CardName.IDEA_MYEONG_JEON
-        cardNumberHashmap[9004] = CardName.IDEA_EMPHASIZING
-        cardNumberHashmap[9005] = CardName.IDEA_POSITIONING
+        cardNumberHashmap[NUMBER_KANAWE_IMAGE] = CardName.KANAWE_IMAGE
+        cardNumberHashmap[NUMBER_KANAWE_SCREENPLAY] = CardName.KANAWE_SCREENPLAY
+        cardNumberHashmap[NUMBER_KANAWE_PRODUCTION] = CardName.KANAWE_PRODUCTION
+        cardNumberHashmap[NUMBER_KANAWE_PUBLISH] = CardName.KANAWE_PUBLISH
+        cardNumberHashmap[NUMBER_KANAWE_AFTERGLOW] = CardName.KANAWE_AFTERGLOW
+        cardNumberHashmap[NUMBER_KANAWE_IMPROMPTU] = CardName.KANAWE_IMPROMPTU
+        cardNumberHashmap[NUMBER_KANAWE_SEAL] = CardName.KANAWE_SEAL
+        cardNumberHashmap[NUMBER_KANAWE_VAGUE_STORY] = CardName.KANAWE_VAGUE_STORY
+        cardNumberHashmap[NUMBER_KANAWE_INFINITE_STARLIGHT] = CardName.KANAWE_INFINITE_STARLIGHT
+        cardNumberHashmap[NUMBER_KANAWE_BEND_OVER_THIS_NIGHT] = CardName.KANAWE_BEND_OVER_THIS_NIGHT
+        cardNumberHashmap[NUMBER_KANAWE_DISTANT_SKY] = CardName.KANAWE_DISTANT_SKY
+        cardNumberHashmap[NUMBER_KANAWE_KANAWE] = CardName.KANAWE_KANAWE
 
-        cardNumberHashmap[2100] = CardName.KAMUWI_RED_BLADE
-        cardNumberHashmap[2101] = CardName.KAMUWI_FLUTTERING_BLADE
-        cardNumberHashmap[2102] = CardName.KAMUWI_SI_KEN_LAN_JIN
-        cardNumberHashmap[2103] = CardName.KAMUWI_CUT_DOWN
-        cardNumberHashmap[2104] = CardName.KAMUWI_THREADING_THORN
-        cardNumberHashmap[2105] = CardName.KAMUWI_KE_SYO_LAN_LYU
-        cardNumberHashmap[2106] = CardName.KAMUWI_BLOOD_WAVE
-        cardNumberHashmap[2107] = CardName.KAMUWI_LAMP
-        cardNumberHashmap[2108] = CardName.KAMUWI_DAWN
-        cardNumberHashmap[2109] = CardName.KAMUWI_GRAVEYARD
-        cardNumberHashmap[2110] = CardName.KAMUWI_KATA_SHIRO
-        cardNumberHashmap[2111] = CardName.KAMUWI_LOGIC
+        cardNumberHashmap[NUMBER_IDEA_SAL_JIN] = CardName.IDEA_SAL_JIN
+        cardNumberHashmap[NUMBER_IDEA_SAKURA_WAVE] = CardName.IDEA_SAKURA_WAVE
+        cardNumberHashmap[NUMBER_IDEA_WHISTLE] = CardName.IDEA_WHISTLE
+        cardNumberHashmap[NUMBER_IDEA_MYEONG_JEON] = CardName.IDEA_MYEONG_JEON
+        cardNumberHashmap[NUMBER_IDEA_EMPHASIZING] = CardName.IDEA_EMPHASIZING
+        cardNumberHashmap[NUMBER_IDEA_POSITIONING] = CardName.IDEA_POSITIONING
 
-        cardNumberHashmap[2200] = CardName.RENRI_FALSE_STAB
-        cardNumberHashmap[2201] = CardName.RENRI_TEMPORARY_EXPEDIENT
-        cardNumberHashmap[2202] = CardName.RENRI_BLACK_AND_WHITE
-        cardNumberHashmap[2203] = CardName.RENRI_IRRITATING_GESTURE
-        cardNumberHashmap[2204] = CardName.RENRI_FLOATING_CLOUDS
-        cardNumberHashmap[2205] = CardName.RENRI_FISHING
-        cardNumberHashmap[2206] = CardName.RENRI_PULLING_FISHING
-        cardNumberHashmap[2207] = CardName.RENRI_RU_RU_RA_RA_RI
-        cardNumberHashmap[2208] = CardName.RENRI_RA_NA_RA_RO_MI_RE_RI_RA
-        cardNumberHashmap[2209] = CardName.RENRI_O_RI_RE_TE_RA_RE_RU
-        cardNumberHashmap[2210] = CardName.RENRI_RENRI_THE_END
-        cardNumberHashmap[2211] = CardName.RENRI_ENGRAVED_GARMENT
-        cardNumberHashmap[2212] = CardName.KIRIKO_SHAMANISTIC_MUSIC
+        cardNumberHashmap[NUMBER_KAMUWI_RED_BLADE] = CardName.KAMUWI_RED_BLADE
+        cardNumberHashmap[NUMBER_KAMUWI_FLUTTERING_BLADE] = CardName.KAMUWI_FLUTTERING_BLADE
+        cardNumberHashmap[NUMBER_KAMUWI_SI_KEN_LAN_JIN] = CardName.KAMUWI_SI_KEN_LAN_JIN
+        cardNumberHashmap[NUMBER_KAMUWI_CUT_DOWN] = CardName.KAMUWI_CUT_DOWN
+        cardNumberHashmap[NUMBER_KAMUWI_THREADING_THORN] = CardName.KAMUWI_THREADING_THORN
+        cardNumberHashmap[NUMBER_KAMUWI_KE_SYO_LAN_LYU] = CardName.KAMUWI_KE_SYO_LAN_LYU
+        cardNumberHashmap[NUMBER_KAMUWI_BLOOD_WAVE] = CardName.KAMUWI_BLOOD_WAVE
+        cardNumberHashmap[NUMBER_KAMUWI_LAMP] = CardName.KAMUWI_LAMP
+        cardNumberHashmap[NUMBER_KAMUWI_DAWN] = CardName.KAMUWI_DAWN
+        cardNumberHashmap[NUMBER_KAMUWI_GRAVEYARD] = CardName.KAMUWI_GRAVEYARD
+        cardNumberHashmap[NUMBER_KAMUWI_KATA_SHIRO] = CardName.KAMUWI_KATA_SHIRO
+        cardNumberHashmap[NUMBER_KAMUWI_LOGIC] = CardName.KAMUWI_LOGIC
+
+        cardNumberHashmap[NUMBER_RENRI_FALSE_STAB] = CardName.RENRI_FALSE_STAB
+        cardNumberHashmap[NUMBER_RENRI_TEMPORARY_EXPEDIENT] = CardName.RENRI_TEMPORARY_EXPEDIENT
+        cardNumberHashmap[NUMBER_RENRI_BLACK_AND_WHITE] = CardName.RENRI_BLACK_AND_WHITE
+        cardNumberHashmap[NUMBER_RENRI_IRRITATING_GESTURE] = CardName.RENRI_IRRITATING_GESTURE
+        cardNumberHashmap[NUMBER_RENRI_FLOATING_CLOUDS] = CardName.RENRI_FLOATING_CLOUDS
+        cardNumberHashmap[NUMBER_RENRI_FISHING] = CardName.RENRI_FISHING
+        cardNumberHashmap[NUMBER_RENRI_PULLING_FISHING] = CardName.RENRI_PULLING_FISHING
+        cardNumberHashmap[NUMBER_RENRI_RU_RU_RA_RA_RI] = CardName.RENRI_RU_RU_RA_RA_RI
+        cardNumberHashmap[NUMBER_RENRI_RA_NA_RA_RO_MI_RE_RI_RA] = CardName.RENRI_RA_NA_RA_RO_MI_RE_RI_RA
+        cardNumberHashmap[NUMBER_RENRI_O_RI_RE_TE_RA_RE_RU] = CardName.RENRI_O_RI_RE_TE_RA_RE_RU
+        cardNumberHashmap[NUMBER_RENRI_RENRI_THE_END] = CardName.RENRI_RENRI_THE_END
+        cardNumberHashmap[NUMBER_RENRI_ENGRAVED_GARMENT] = CardName.RENRI_ENGRAVED_GARMENT
+        cardNumberHashmap[NUMBER_KIRIKO_SHAMANISTIC_MUSIC] = CardName.KIRIKO_SHAMANISTIC_MUSIC
 
 
-        cardNumberHashmap[10100] = CardName.YURINA_CHAM
-        cardNumberHashmap[10101] = CardName.YURINA_ILSUM
-        cardNumberHashmap[10102] = CardName.YURINA_JARUCHIGI
-        cardNumberHashmap[10103] = CardName.YURINA_GUHAB
-        cardNumberHashmap[10104] = CardName.YURINA_GIBACK
-        cardNumberHashmap[10105] = CardName.YURINA_APDO
-        cardNumberHashmap[10106] = CardName.YURINA_GIYENBANJO
-        cardNumberHashmap[10107] = CardName.YURINA_WOLYUNGNACK
-        cardNumberHashmap[10108] = CardName.YURINA_POBARAM
-        cardNumberHashmap[10109] = CardName.YURINA_JJOCKBAE
-        cardNumberHashmap[10110] = CardName.YURINA_JURUCK
-        cardNumberHashmap[10111] = CardName.YURINA_NAN_TA
-        cardNumberHashmap[10112] = CardName.YURINA_BEAN_BULLET
-        cardNumberHashmap[10113] = CardName.YURINA_NOT_COMPLETE_POBARAM
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CARD_UNAME] = CardName.CARD_UNNAME
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_POISON_ANYTHING] = CardName.POISON_ANYTHING
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_ANYTHING] = CardName.SOLDIER_ANYTHING
 
-        cardNumberHashmap[10200] = CardName.SAINE_DOUBLEBEGI
-        cardNumberHashmap[10201] = CardName.SAINE_HURUBEGI
-        cardNumberHashmap[10202] = CardName.SAINE_MOOGECHOO
-        cardNumberHashmap[10203] = CardName.SAINE_GANPA
-        cardNumberHashmap[10204] = CardName.SAINE_GWONYUCK
-        cardNumberHashmap[10205] = CardName.SAINE_CHOONGEMJUNG
-        cardNumberHashmap[10206] = CardName.SAINE_MOOEMBUCK
-        cardNumberHashmap[10207] = CardName.SAINE_YULDONGHOGEK
-        cardNumberHashmap[10208] = CardName.SAINE_HANGMUNGGONGJIN
-        cardNumberHashmap[10209] = CardName.SAINE_EMMOOSHOEBING
-        cardNumberHashmap[10210] = CardName.SAINE_JONGGEK
-        cardNumberHashmap[10211] = CardName.SAINE_SOUND_OF_ICE
-        cardNumberHashmap[10212] = CardName.SAINE_ACCOMPANIMENT
-        cardNumberHashmap[10213] = CardName.SAINE_DUET_TAN_JU_BING_MYEONG
-        cardNumberHashmap[10214] = CardName.SAINE_BETRAYAL
-        cardNumberHashmap[10215] = CardName.SAINE_FLOWING_WALL
-        cardNumberHashmap[10216] = CardName.SAINE_JEOL_CHANG_JEOL_HWA
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_CHAM] = CardName.YURINA_CHAM
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_ILSUM] = CardName.YURINA_ILSUM
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_JARUCHIGI] = CardName.YURINA_JARUCHIGI
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_GUHAB] = CardName.YURINA_GUHAB
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_GIBACK] = CardName.YURINA_GIBACK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_APDO] = CardName.YURINA_APDO
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_GIYENBANJO] = CardName.YURINA_GIYENBANJO
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_WOLYUNGNACK] = CardName.YURINA_WOLYUNGNACK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_POBARAM] = CardName.YURINA_POBARAM
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_JJOCKBAE] = CardName.YURINA_JJOCKBAE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_JURUCK] = CardName.YURINA_JURUCK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_NAN_TA] = CardName.YURINA_NAN_TA
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_BEAN_BULLET] = CardName.YURINA_BEAN_BULLET
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_NOT_COMPLETE_POBARAM] = CardName.YURINA_NOT_COMPLETE_POBARAM
 
-        cardNumberHashmap[10300] = CardName.HIMIKA_SHOOT
-        cardNumberHashmap[10301] = CardName.HIMIKA_RAPIDFIRE
-        cardNumberHashmap[10302] = CardName.HIMIKA_MAGNUMCANON
-        cardNumberHashmap[10303] = CardName.HIMIKA_FULLBURST
-        cardNumberHashmap[10304] = CardName.HIMIKA_BACKSTEP
-        cardNumberHashmap[10305] = CardName.HIMIKA_BACKDRAFT
-        cardNumberHashmap[10306] = CardName.HIMIKA_SMOKE
-        cardNumberHashmap[10307] = CardName.HIMIKA_REDBULLET
-        cardNumberHashmap[10308] = CardName.HIMIKA_CRIMSONZERO
-        cardNumberHashmap[10309] = CardName.HIMIKA_SCARLETIMAGINE
-        cardNumberHashmap[10310] = CardName.HIMIKA_BURMILIONFIELD
-        cardNumberHashmap[10311] = CardName.HIMIKA_FIRE_WAVE
-        cardNumberHashmap[10312] = CardName.HIMIKA_SAT_SUI
-        cardNumberHashmap[10313] = CardName.HIMIKA_EN_TEN_HIMIKA
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_DOUBLEBEGI] = CardName.SAINE_DOUBLEBEGI
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_HURUBEGI] = CardName.SAINE_HURUBEGI
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_MOOGECHOO] = CardName.SAINE_MOOGECHOO
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_GANPA] = CardName.SAINE_GANPA
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_GWONYUCK] = CardName.SAINE_GWONYUCK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_CHOONGEMJUNG] = CardName.SAINE_CHOONGEMJUNG
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_MOOEMBUCK] = CardName.SAINE_MOOEMBUCK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_YULDONGHOGEK] = CardName.SAINE_YULDONGHOGEK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_HANGMUNGGONGJIN] = CardName.SAINE_HANGMUNGGONGJIN
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_EMMOOSHOEBING] = CardName.SAINE_EMMOOSHOEBING
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_JONGGEK] = CardName.SAINE_JONGGEK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_SOUND_OF_ICE] = CardName.SAINE_SOUND_OF_ICE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_ACCOMPANIMENT] = CardName.SAINE_ACCOMPANIMENT
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_DUET_TAN_JU_BING_MYEONG] = CardName.SAINE_DUET_TAN_JU_BING_MYEONG
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_BETRAYAL] = CardName.SAINE_BETRAYAL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_FLOWING_WALL] = CardName.SAINE_FLOWING_WALL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_JEOL_CHANG_JEOL_HWA] = CardName.SAINE_JEOL_CHANG_JEOL_HWA
 
-        cardNumberHashmap[10400] = CardName.TOKOYO_BITSUNERIGI
-        cardNumberHashmap[10401] = CardName.TOKOYO_WOOAHHANTAGUCK
-        cardNumberHashmap[10402] = CardName.TOKOYO_RUNNINGRABIT
-        cardNumberHashmap[10403] = CardName.TOKOYO_POETDANCE
-        cardNumberHashmap[10404] = CardName.TOKOYO_FLIPFAN
-        cardNumberHashmap[10405] = CardName.TOKOYO_WINDSTAGE
-        cardNumberHashmap[10406] = CardName.TOKOYO_SUNSTAGE
-        cardNumberHashmap[10407] = CardName.TOKOYO_KUON
-        cardNumberHashmap[10408] = CardName.TOKOYO_THOUSANDBIRD
-        cardNumberHashmap[10409] = CardName.TOKOYO_ENDLESSWIND
-        cardNumberHashmap[10410] = CardName.TOKOYO_TOKOYOMOON
-        cardNumberHashmap[10411] = CardName.TOKOYO_FLOWING_PLAY
-        cardNumberHashmap[10412] = CardName.TOKOYO_SOUND_OF_SUN
-        cardNumberHashmap[10413] = CardName.TOKOYO_DUET_CHI_TAN_YANG_MYEONG
-        cardNumberHashmap[10414] = CardName.TOKOYO_PASSING_FEAR
-        cardNumberHashmap[10415] = CardName.TOKOYO_RELIC_EYE
-        cardNumberHashmap[10416] = CardName.TOKOYO_EIGHT_SAKURA_IN_VAIN
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_SHOOT] = CardName.HIMIKA_SHOOT
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_RAPIDFIRE] = CardName.HIMIKA_RAPIDFIRE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_MAGNUMCANON] = CardName.HIMIKA_MAGNUMCANON
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_FULLBURST] = CardName.HIMIKA_FULLBURST
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_BACKSTEP] = CardName.HIMIKA_BACKSTEP
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_BACKDRAFT] = CardName.HIMIKA_BACKDRAFT
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_SMOKE] = CardName.HIMIKA_SMOKE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_REDBULLET] = CardName.HIMIKA_REDBULLET
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_CRIMSONZERO] = CardName.HIMIKA_CRIMSONZERO
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_SCARLETIMAGINE] = CardName.HIMIKA_SCARLETIMAGINE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_BURMILIONFIELD] = CardName.HIMIKA_BURMILIONFIELD
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_FIRE_WAVE] = CardName.HIMIKA_FIRE_WAVE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_SAT_SUI] = CardName.HIMIKA_SAT_SUI
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_EN_TEN_HIMIKA] = CardName.HIMIKA_EN_TEN_HIMIKA
 
-        cardNumberHashmap[10500] = CardName.OBORO_WIRE
-        cardNumberHashmap[10501] = CardName.OBORO_SHADOWCALTROP
-        cardNumberHashmap[10502] = CardName.OBORO_ZANGEKIRANBU
-        cardNumberHashmap[10503] = CardName.OBORO_NINJAWALK
-        cardNumberHashmap[10504] = CardName.OBORO_INDUCE
-        cardNumberHashmap[10505] = CardName.OBORO_CLONE
-        cardNumberHashmap[10506] = CardName.OBORO_BIOACTIVITY
-        cardNumberHashmap[10507] = CardName.OBORO_KUMASUKE
-        cardNumberHashmap[10508] = CardName.OBORO_TOBIKAGE
-        cardNumberHashmap[10509] = CardName.OBORO_ULOO
-        cardNumberHashmap[10510] = CardName.OBORO_MIKAZRA
-        cardNumberHashmap[10511] = CardName.OBORO_SHURIKEN
-        cardNumberHashmap[10512] = CardName.OBORO_AMBUSH
-        cardNumberHashmap[10513] = CardName.OBORO_BRANCH_OF_DIVINE
-        cardNumberHashmap[10514] = CardName.OBORO_LAST_CRYSTAL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_BITSUNERIGI] = CardName.TOKOYO_BITSUNERIGI
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_WOOAHHANTAGUCK] = CardName.TOKOYO_WOOAHHANTAGUCK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_RUNNINGRABIT] = CardName.TOKOYO_RUNNINGRABIT
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_POETDANCE] = CardName.TOKOYO_POETDANCE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_FLIPFAN] = CardName.TOKOYO_FLIPFAN
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_WINDSTAGE] = CardName.TOKOYO_WINDSTAGE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_SUNSTAGE] = CardName.TOKOYO_SUNSTAGE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_KUON] = CardName.TOKOYO_KUON
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_THOUSANDBIRD] = CardName.TOKOYO_THOUSANDBIRD
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_ENDLESSWIND] = CardName.TOKOYO_ENDLESSWIND
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_TOKOYOMOON] = CardName.TOKOYO_TOKOYOMOON
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_FLOWING_PLAY] = CardName.TOKOYO_FLOWING_PLAY
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_SOUND_OF_SUN] = CardName.TOKOYO_SOUND_OF_SUN
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_DUET_CHI_TAN_YANG_MYEONG] = CardName.TOKOYO_DUET_CHI_TAN_YANG_MYEONG
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_PASSING_FEAR] = CardName.TOKOYO_PASSING_FEAR
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_RELIC_EYE] = CardName.TOKOYO_RELIC_EYE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_EIGHT_SAKURA_IN_VAIN] = CardName.TOKOYO_EIGHT_SAKURA_IN_VAIN
 
-        cardNumberHashmap[19999] = CardName.YUKIHI_YUKIHI
-        cardNumberHashmap[10600] = CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE
-        cardNumberHashmap[10601] = CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS
-        cardNumberHashmap[10602] = CardName.YUKIHI_PUSH_OUT_SLASH_PULL
-        cardNumberHashmap[10603] = CardName.YUKIHI_SWING_SLASH_STAB
-        cardNumberHashmap[10604] = CardName.YUKIHI_TURN_UMBRELLA
-        cardNumberHashmap[10605] = CardName.YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN
-        cardNumberHashmap[10606] = CardName.YUKIHI_MAKE_CONNECTION
-        cardNumberHashmap[10607] = CardName.YUKIHI_FLUTTERING_SNOWFLAKE
-        cardNumberHashmap[10608] = CardName.YUKIHI_SWAYING_LAMPLIGHT
-        cardNumberHashmap[10609] = CardName.YUKIHI_CLINGY_MIND
-        cardNumberHashmap[10610] = CardName.YUKIHI_SWIRLING_GESTURE
-        cardNumberHashmap[10611] = CardName.YUKIHI_HELP_SLASH_THREAT
-        cardNumberHashmap[10612] = CardName.YUKIHI_THREAD_SLASH_RAW_THREAD
-        cardNumberHashmap[10613] = CardName.YUKIHI_FLUTTERING_COLLAR
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_WIRE] = CardName.OBORO_WIRE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_SHADOWCALTROP] = CardName.OBORO_SHADOWCALTROP
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_ZANGEKIRANBU] = CardName.OBORO_ZANGEKIRANBU
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_NINJAWALK] = CardName.OBORO_NINJAWALK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_INDUCE] = CardName.OBORO_INDUCE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_CLONE] = CardName.OBORO_CLONE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_BIOACTIVITY] = CardName.OBORO_BIOACTIVITY
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_KUMASUKE] = CardName.OBORO_KUMASUKE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_TOBIKAGE] = CardName.OBORO_TOBIKAGE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_ULOO] = CardName.OBORO_ULOO
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_MIKAZRA] = CardName.OBORO_MIKAZRA
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_SHURIKEN] = CardName.OBORO_SHURIKEN
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_AMBUSH] = CardName.OBORO_AMBUSH
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_BRANCH_OF_DIVINE] = CardName.OBORO_BRANCH_OF_DIVINE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_LAST_CRYSTAL] = CardName.OBORO_LAST_CRYSTAL
 
-        cardNumberHashmap[SHINRA_SHINRA_CARD_NUMBER] = CardName.SHINRA_SHINRA
-        cardNumberHashmap[10700] = CardName.SHINRA_IBLON
-        cardNumberHashmap[10701] = CardName.SHINRA_BANLON
-        cardNumberHashmap[10702] = CardName.SHINRA_KIBEN
-        cardNumberHashmap[10703] = CardName.SHINRA_INYONG
-        cardNumberHashmap[10704] = CardName.SHINRA_SEONDONG
-        cardNumberHashmap[10705] = CardName.SHINRA_JANGDAM
-        cardNumberHashmap[10706] = CardName.SHINRA_NONPA
-        cardNumberHashmap[10707] = CardName.SHINRA_WANJEON_NONPA
-        cardNumberHashmap[10708] = CardName.SHINRA_DASIG_IHAE
-        cardNumberHashmap[10709] = CardName.SHINRA_CHEONJI_BANBAG
-        cardNumberHashmap[10710] = CardName.SHINRA_SAMRA_BAN_SHO
-        cardNumberHashmap[10711] = CardName.SHINRA_ZHEN_YEN
-        cardNumberHashmap[10712] = CardName.SHINRA_SA_DO
-        cardNumberHashmap[10713] = CardName.SHINRA_ZEN_CHI_KYO_TEN
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_YUKIHI] = CardName.YUKIHI_YUKIHI
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE] = CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS] = CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_PUSH_OUT_SLASH_PULL] = CardName.YUKIHI_PUSH_OUT_SLASH_PULL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_SWING_SLASH_STAB] = CardName.YUKIHI_SWING_SLASH_STAB
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_TURN_UMBRELLA] = CardName.YUKIHI_TURN_UMBRELLA
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN] = CardName.YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_MAKE_CONNECTION] = CardName.YUKIHI_MAKE_CONNECTION
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_FLUTTERING_SNOWFLAKE] = CardName.YUKIHI_FLUTTERING_SNOWFLAKE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_SWAYING_LAMPLIGHT] = CardName.YUKIHI_SWAYING_LAMPLIGHT
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_CLINGY_MIND] = CardName.YUKIHI_CLINGY_MIND
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_SWIRLING_GESTURE] = CardName.YUKIHI_SWIRLING_GESTURE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_HELP_SLASH_THREAT] = CardName.YUKIHI_HELP_SLASH_THREAT
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_THREAD_SLASH_RAW_THREAD] = CardName.YUKIHI_THREAD_SLASH_RAW_THREAD
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_FLUTTERING_COLLAR] = CardName.YUKIHI_FLUTTERING_COLLAR
 
-        cardNumberHashmap[10800] = CardName.HAGANE_CENTRIFUGAL_ATTACK
-        cardNumberHashmap[10801] = CardName.HAGANE_FOUR_WINDED_EARTHQUAKE
-        cardNumberHashmap[10802] = CardName.HAGANE_GROUND_BREAKING
-        cardNumberHashmap[10803] = CardName.HAGANE_HYPER_RECOIL
-        cardNumberHashmap[10804] = CardName.HAGANE_WON_MU_RUYN
-        cardNumberHashmap[10805] = CardName.HAGANE_RING_A_BELL
-        cardNumberHashmap[10806] = CardName.HAGANE_GRAVITATION_FIELD
-        cardNumberHashmap[10807] = CardName.HAGANE_GRAND_SKY_HOLE_CRASH
-        cardNumberHashmap[10808] = CardName.HAGANE_GRAND_BELL_MEGALOBEL
-        cardNumberHashmap[10809] = CardName.HAGANE_GRAND_GRAVITATION_ATTRACT
-        cardNumberHashmap[10810] = CardName.HAGANE_GRAND_MOUNTAIN_RESPECT
-        cardNumberHashmap[10811] = CardName.HAGANE_BONFIRE
-        cardNumberHashmap[10812] = CardName.HAGANE_WHEEL_SKILL
-        cardNumberHashmap[10813] = CardName.HAGANE_GRAND_SOFT_MATERIAL
-        cardNumberHashmap[10814] = CardName.HAGANE_SOFT_ATTACK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_SHINRA] = CardName.SHINRA_SHINRA
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_IBLON] = CardName.SHINRA_IBLON
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_BANLON] = CardName.SHINRA_BANLON
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_KIBEN] = CardName.SHINRA_KIBEN
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_INYONG] = CardName.SHINRA_INYONG
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_SEONDONG] = CardName.SHINRA_SEONDONG
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_JANGDAM] = CardName.SHINRA_JANGDAM
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_NONPA] = CardName.SHINRA_NONPA
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_WANJEON_NONPA] = CardName.SHINRA_WANJEON_NONPA
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_DASIG_IHAE] = CardName.SHINRA_DASIG_IHAE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_CHEONJI_BANBAG] = CardName.SHINRA_CHEONJI_BANBAG
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_SAMRA_BAN_SHO] = CardName.SHINRA_SAMRA_BAN_SHO
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_ZHEN_YEN] = CardName.SHINRA_ZHEN_YEN
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_SA_DO] = CardName.SHINRA_SA_DO
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_ZEN_CHI_KYO_TEN] = CardName.SHINRA_ZEN_CHI_KYO_TEN
 
-        cardNumberHashmap[10900] = CardName.CHIKAGE_THROW_KUNAI
-        cardNumberHashmap[10901] = CardName.CHIKAGE_POISON_NEEDLE
-        cardNumberHashmap[10902] = CardName.CHIKAGE_TO_ZU_CHU
-        cardNumberHashmap[10903] = CardName.CHIKAGE_CUTTING_NECK
-        cardNumberHashmap[10904] = CardName.CHIKAGE_POISON_SMOKE
-        cardNumberHashmap[10905] = CardName.CHIKAGE_TIP_TOEING
-        cardNumberHashmap[10906] = CardName.CHIKAGE_MUDDLE
-        cardNumberHashmap[10907] = CardName.CHIKAGE_DEADLY_POISON
-        cardNumberHashmap[10908] = CardName.CHIKAGE_HAN_KI_POISON
-        cardNumberHashmap[10909] = CardName.CHIKAGE_REINCARNATION_POISON
-        cardNumberHashmap[10910] = CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE
-        cardNumberHashmap[10911] = CardName.CHIKAGE_TRICK_UMBRELLA
-        cardNumberHashmap[10912] = CardName.CHIKAGE_STRUGGLE
-        cardNumberHashmap[10913] = CardName.CHIKAGE_ZAN_ZE_NO_CONNECTION_POISON
-        cardNumberHashmap[10995] = CardName.POISON_PARALYTIC
-        cardNumberHashmap[10996] = CardName.POISON_HALLUCINOGENIC
-        cardNumberHashmap[10997] = CardName.POISON_RELAXATION
-        cardNumberHashmap[10998] = CardName.POISON_DEADLY_1
-        cardNumberHashmap[10999] = CardName.POISON_DEADLY_2
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_CENTRIFUGAL_ATTACK] = CardName.HAGANE_CENTRIFUGAL_ATTACK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_FOUR_WINDED_EARTHQUAKE] = CardName.HAGANE_FOUR_WINDED_EARTHQUAKE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_GROUND_BREAKING] = CardName.HAGANE_GROUND_BREAKING
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_HYPER_RECOIL] = CardName.HAGANE_HYPER_RECOIL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_WON_MU_RUYN] = CardName.HAGANE_WON_MU_RUYN
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_RING_A_BELL] = CardName.HAGANE_RING_A_BELL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_GRAVITATION_FIELD] = CardName.HAGANE_GRAVITATION_FIELD
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_GRAND_SKY_HOLE_CRASH] = CardName.HAGANE_GRAND_SKY_HOLE_CRASH
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_GRAND_BELL_MEGALOBEL] = CardName.HAGANE_GRAND_BELL_MEGALOBEL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_GRAND_GRAVITATION_ATTRACT] = CardName.HAGANE_GRAND_GRAVITATION_ATTRACT
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_GRAND_MOUNTAIN_RESPECT] = CardName.HAGANE_GRAND_MOUNTAIN_RESPECT
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_BONFIRE] = CardName.HAGANE_BONFIRE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_WHEEL_SKILL] = CardName.HAGANE_WHEEL_SKILL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_GRAND_SOFT_MATERIAL] = CardName.HAGANE_GRAND_SOFT_MATERIAL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_SOFT_ATTACK] = CardName.HAGANE_SOFT_ATTACK
 
-        cardNumberHashmap[11000] = CardName.KURURU_ELEKITTEL
-        cardNumberHashmap[11001] = CardName.KURURU_ACCELERATOR
-        cardNumberHashmap[11002] = CardName.KURURU_KURURUOONG
-        cardNumberHashmap[11003] = CardName.KURURU_TORNADO
-        cardNumberHashmap[11004] = CardName.KURURU_REGAINER
-        cardNumberHashmap[11005] = CardName.KURURU_MODULE
-        cardNumberHashmap[11006] = CardName.KURURU_REFLECTOR
-        cardNumberHashmap[11007] = CardName.KURURU_DRAIN_DEVIL
-        cardNumberHashmap[11008] = CardName.KURURU_BIG_GOLEM
-        cardNumberHashmap[11009] = CardName.KURURU_INDUSTRIA
-        cardNumberHashmap[11010] = CardName.KURURU_DUPLICATED_GEAR_1
-        cardNumberHashmap[11011] = CardName.KURURU_DUPLICATED_GEAR_2
-        cardNumberHashmap[11012] = CardName.KURURU_DUPLICATED_GEAR_3
-        cardNumberHashmap[11013] = CardName.KURURU_KANSHOUSOUCHI_KURURUSIK
-        cardNumberHashmap[11014] = CardName.KURURU_ANALYZE
-        cardNumberHashmap[11015] = CardName.KURURU_DAUZING
-        cardNumberHashmap[11016] = CardName.KURURU_LAST_RESEARCH
-        cardNumberHashmap[11017] = CardName.KURURU_GRAND_GULLIVER
-        cardNumberHashmap[11018] = CardName.KURURU_BLASTER
-        cardNumberHashmap[11019] = CardName.KURURU_RAILGUN
-        cardNumberHashmap[11020] = CardName.KURURU_CONNECT_DIVE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_THROW_KUNAI] = CardName.CHIKAGE_THROW_KUNAI
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_POISON_NEEDLE] = CardName.CHIKAGE_POISON_NEEDLE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_TO_ZU_CHU] = CardName.CHIKAGE_TO_ZU_CHU
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_CUTTING_NECK] = CardName.CHIKAGE_CUTTING_NECK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_POISON_SMOKE] = CardName.CHIKAGE_POISON_SMOKE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_TIP_TOEING] = CardName.CHIKAGE_TIP_TOEING
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_MUDDLE] = CardName.CHIKAGE_MUDDLE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_DEADLY_POISON] = CardName.CHIKAGE_DEADLY_POISON
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_HAN_KI_POISON] = CardName.CHIKAGE_HAN_KI_POISON
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_REINCARNATION_POISON] = CardName.CHIKAGE_REINCARNATION_POISON
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE] = CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_TRICK_UMBRELLA] = CardName.CHIKAGE_TRICK_UMBRELLA
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_STRUGGLE] = CardName.CHIKAGE_STRUGGLE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_ZAN_ZE_NO_CONNECTION_POISON] = CardName.CHIKAGE_ZAN_ZE_NO_CONNECTION_POISON
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_POISON_PARALYTIC] = CardName.POISON_PARALYTIC
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_POISON_HALLUCINOGENIC] = CardName.POISON_HALLUCINOGENIC
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_POISON_RELAXATION] = CardName.POISON_RELAXATION
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_POISON_DEADLY_1] = CardName.POISON_DEADLY_1
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_POISON_DEADLY_2] = CardName.POISON_DEADLY_2
 
-        cardNumberHashmap[11100] = CardName.THALLYA_BURNING_STEAM
-        cardNumberHashmap[11101] = CardName.THALLYA_WAVING_EDGE
-        cardNumberHashmap[11102] = CardName.THALLYA_SHIELD_CHARGE
-        cardNumberHashmap[11103] = CardName.THALLYA_STEAM_CANNON
-        cardNumberHashmap[11104] = CardName.THALLYA_STUNT
-        cardNumberHashmap[11105] = CardName.THALLYA_ROARING
-        cardNumberHashmap[11106] = CardName.THALLYA_TURBO_SWITCH
-        cardNumberHashmap[11107] = CardName.THALLYA_ALPHA_EDGE
-        cardNumberHashmap[11108] = CardName.THALLYA_OMEGA_BURST
-        cardNumberHashmap[11109] = CardName.THALLYA_THALLYA_MASTERPIECE
-        cardNumberHashmap[11110] = CardName.THALLYA_JULIA_BLACKBOX
-        cardNumberHashmap[11111] = CardName.FORM_YAKSHA
-        cardNumberHashmap[11112] = CardName.FORM_NAGA
-        cardNumberHashmap[11113] = CardName.FORM_GARUDA
-        cardNumberHashmap[11114] = CardName.THALLYA_QUICK_CHANGE
-        cardNumberHashmap[11115] = CardName.THALLYA_BLACKBOX_NEO
-        cardNumberHashmap[11116] = CardName.THALLYA_OMNIS_BLASTER
-        cardNumberHashmap[11117] = CardName.FORM_KINNARI
-        cardNumberHashmap[11118] = CardName.FORM_ASURA
-        cardNumberHashmap[11119] = CardName.FORM_DEVA
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_ELEKITTEL] = CardName.KURURU_ELEKITTEL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_ACCELERATOR] = CardName.KURURU_ACCELERATOR
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_KURURUOONG] = CardName.KURURU_KURURUOONG
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_TORNADO] = CardName.KURURU_TORNADO
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_REGAINER] = CardName.KURURU_REGAINER
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_MODULE] = CardName.KURURU_MODULE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_REFLECTOR] = CardName.KURURU_REFLECTOR
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_DRAIN_DEVIL] = CardName.KURURU_DRAIN_DEVIL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_BIG_GOLEM] = CardName.KURURU_BIG_GOLEM
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_INDUSTRIA] = CardName.KURURU_INDUSTRIA
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_DUPLICATED_GEAR_1] = CardName.KURURU_DUPLICATED_GEAR_1
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_DUPLICATED_GEAR_2] = CardName.KURURU_DUPLICATED_GEAR_2
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_DUPLICATED_GEAR_3] = CardName.KURURU_DUPLICATED_GEAR_3
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_KANSHOUSOUCHI_KURURUSIK] = CardName.KURURU_KANSHOUSOUCHI_KURURUSIK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_ANALYZE] = CardName.KURURU_ANALYZE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_DAUZING] = CardName.KURURU_DAUZING
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_LAST_RESEARCH] = CardName.KURURU_LAST_RESEARCH
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_GRAND_GULLIVER] = CardName.KURURU_GRAND_GULLIVER
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_BLASTER] = CardName.KURURU_BLASTER
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_RAILGUN] = CardName.KURURU_RAILGUN
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_CONNECT_DIVE] = CardName.KURURU_CONNECT_DIVE
 
-        cardNumberHashmap[11200] = CardName.RAIRA_BEAST_NAIL
-        cardNumberHashmap[11201] = CardName.RAIRA_STORM_SURGE_ATTACK
-        cardNumberHashmap[11202] = CardName.RAIRA_REINCARNATION_NAIL
-        cardNumberHashmap[11203] = CardName.RAIRA_WIND_RUN
-        cardNumberHashmap[11204] = CardName.RAIRA_WISDOM_OF_STORM_SURGE
-        cardNumberHashmap[11205] = CardName.RAIRA_HOWLING
-        cardNumberHashmap[11206] = CardName.RAIRA_WIND_KICK
-        cardNumberHashmap[11207] = CardName.RAIRA_THUNDER_WIND_PUNCH
-        cardNumberHashmap[11208] = CardName.RAIRA_SUMMON_THUNDER
-        cardNumberHashmap[11209] = CardName.RAIRA_WIND_CONSEQUENCE_BALL
-        cardNumberHashmap[11210] = CardName.RAIRA_CIRCULAR_CIRCUIT
-        cardNumberHashmap[11211] = CardName.RAIRA_WIND_ATTACK
-        cardNumberHashmap[11212] = CardName.RAIRA_WIND_ZEN_KAI
-        cardNumberHashmap[11213] = CardName.RAIRA_WIND_CELESTIAL_SPHERE
-        cardNumberHashmap[11214] = CardName.RAIRA_STORM
-        cardNumberHashmap[11215] = CardName.RAIRA_FURIOUS_STORM
-        cardNumberHashmap[11216] = CardName.RAIRA_JIN_PUNG_JE_CHEON_UI
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_BURNING_STEAM] = CardName.THALLYA_BURNING_STEAM
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_WAVING_EDGE] = CardName.THALLYA_WAVING_EDGE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_SHIELD_CHARGE] = CardName.THALLYA_SHIELD_CHARGE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_STEAM_CANNON] = CardName.THALLYA_STEAM_CANNON
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_STUNT] = CardName.THALLYA_STUNT
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_ROARING] = CardName.THALLYA_ROARING
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_TURBO_SWITCH] = CardName.THALLYA_TURBO_SWITCH
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_ALPHA_EDGE] = CardName.THALLYA_ALPHA_EDGE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_OMEGA_BURST] = CardName.THALLYA_OMEGA_BURST
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_THALLYA_MASTERPIECE] = CardName.THALLYA_THALLYA_MASTERPIECE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_JULIA_BLACKBOX] = CardName.THALLYA_JULIA_BLACKBOX
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_FORM_YAKSHA] = CardName.FORM_YAKSHA
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_FORM_NAGA] = CardName.FORM_NAGA
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_FORM_GARUDA] = CardName.FORM_GARUDA
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_QUICK_CHANGE] = CardName.THALLYA_QUICK_CHANGE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_BLACKBOX_NEO] = CardName.THALLYA_BLACKBOX_NEO
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_OMNIS_BLASTER] = CardName.THALLYA_OMNIS_BLASTER
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_FORM_KINNARI] = CardName.FORM_KINNARI
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_FORM_ASURA] = CardName.FORM_ASURA
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_FORM_DEVA] = CardName.FORM_DEVA
 
-        cardNumberHashmap[11300] = CardName.UTSURO_WON_WOL
-        cardNumberHashmap[11301] = CardName.UTSURO_BLACK_WAVE
-        cardNumberHashmap[11302] = CardName.UTSURO_HARVEST
-        cardNumberHashmap[11303] = CardName.UTSURO_PRESSURE
-        cardNumberHashmap[11304] = CardName.UTSURO_SHADOW_WING
-        cardNumberHashmap[11305] = CardName.UTSURO_SHADOW_WALL
-        cardNumberHashmap[11306] = CardName.UTSURO_YUE_HOE_JU
-        cardNumberHashmap[11307] = CardName.UTSURO_HOE_MYEOL
-        cardNumberHashmap[11308] = CardName.UTSURO_HEO_WI
-        cardNumberHashmap[11309] = CardName.UTSURO_JONG_MAL
-        cardNumberHashmap[11310] = CardName.UTSURO_MA_SIG
-        cardNumberHashmap[11311] = CardName.UTSURO_BITE_DUST
-        cardNumberHashmap[11312] = CardName.UTSURO_REVERBERATE_DEVICE_KURURUSIK
-        cardNumberHashmap[11313] = CardName.UTSURO_MANG_A
-        cardNumberHashmap[11314] = CardName.UTSURO_ANNIHILATION_SHADOW
-        cardNumberHashmap[11315] = CardName.UTSURO_SILENT_WALK
-        cardNumberHashmap[11316] = CardName.UTSURO_DE_MISE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_BEAST_NAIL] = CardName.RAIRA_BEAST_NAIL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_STORM_SURGE_ATTACK] = CardName.RAIRA_STORM_SURGE_ATTACK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_REINCARNATION_NAIL] = CardName.RAIRA_REINCARNATION_NAIL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_WIND_RUN] = CardName.RAIRA_WIND_RUN
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_WISDOM_OF_STORM_SURGE] = CardName.RAIRA_WISDOM_OF_STORM_SURGE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_HOWLING] = CardName.RAIRA_HOWLING
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_WIND_KICK] = CardName.RAIRA_WIND_KICK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_THUNDER_WIND_PUNCH] = CardName.RAIRA_THUNDER_WIND_PUNCH
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_SUMMON_THUNDER] = CardName.RAIRA_SUMMON_THUNDER
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_WIND_CONSEQUENCE_BALL] = CardName.RAIRA_WIND_CONSEQUENCE_BALL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_CIRCULAR_CIRCUIT] = CardName.RAIRA_CIRCULAR_CIRCUIT
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_WIND_ATTACK] = CardName.RAIRA_WIND_ATTACK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_WIND_ZEN_KAI] = CardName.RAIRA_WIND_ZEN_KAI
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_WIND_CELESTIAL_SPHERE] = CardName.RAIRA_WIND_CELESTIAL_SPHERE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_STORM] = CardName.RAIRA_STORM
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_FURIOUS_STORM] = CardName.RAIRA_FURIOUS_STORM
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_JIN_PUNG_JE_CHEON_UI] = CardName.RAIRA_JIN_PUNG_JE_CHEON_UI
 
-        cardNumberHashmap[11400] = CardName.HONOKA_SPIRIT_SIK
-        cardNumberHashmap[11401] = CardName.HONOKA_GUARDIAN_SPIRIT_SIK
-        cardNumberHashmap[11402] = CardName.HONOKA_ASSAULT_SPIRIT_SIK
-        cardNumberHashmap[11403] = CardName.HONOKA_DIVINE_OUKA
-        cardNumberHashmap[11404] = CardName.HONOKA_SAKURA_BLIZZARD
-        cardNumberHashmap[11405] = CardName.HONOKA_UI_GI_GONG_JIN
-        cardNumberHashmap[11406] = CardName.HONOKA_SAKURA_WING
-        cardNumberHashmap[11407] = CardName.HONOKA_REGENERATION
-        cardNumberHashmap[11408] = CardName.HONOKA_SAKURA_AMULET
-        cardNumberHashmap[11409] = CardName.HONOKA_HONOKA_SPARKLE
-        cardNumberHashmap[11410] = CardName.HONOKA_COMMAND
-        cardNumberHashmap[11411] = CardName.HONOKA_TAIL_WIND
-        cardNumberHashmap[11412] = CardName.HONOKA_CHEST_WILLINGNESS
-        cardNumberHashmap[11413] = CardName.HONOKA_HAND_FLOWER
-        cardNumberHashmap[11414] = CardName.HONOKA_A_NEW_OPENING
-        cardNumberHashmap[11415] = CardName.HONOKA_UNDER_THE_NAME_OF_FLAG
-        cardNumberHashmap[11416] = CardName.HONOKA_FOUR_SEASON_BACK
-        cardNumberHashmap[11417] = CardName.HONOKA_FULL_BLOOM_PATH
-        cardNumberHashmap[11418] = CardName.HONOKA_SAKURA_SWORD
-        cardNumberHashmap[11419] = CardName.HONOKA_SHADOW_HAND
-        cardNumberHashmap[11420] = CardName.HONOKA_EYE_OPEN_ALONE
-        cardNumberHashmap[11421] = CardName.HONOKA_FOLLOW_TRACE
-        cardNumberHashmap[11422] = CardName.HONOKA_FACING_SHADOW
-        cardNumberHashmap[11423] = CardName.HONOKA_SAKURA_SHINING_BRIGHTLY
-        cardNumberHashmap[11424] = CardName.HONOKA_HOLD_HANDS
-        cardNumberHashmap[11425] = CardName.HONOKA_WALK_OLD_LOAD
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_WON_WOL] = CardName.UTSURO_WON_WOL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_BLACK_WAVE] = CardName.UTSURO_BLACK_WAVE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_HARVEST] = CardName.UTSURO_HARVEST
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_PRESSURE] = CardName.UTSURO_PRESSURE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_SHADOW_WING] = CardName.UTSURO_SHADOW_WING
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_SHADOW_WALL] = CardName.UTSURO_SHADOW_WALL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_YUE_HOE_JU] = CardName.UTSURO_YUE_HOE_JU
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_HOE_MYEOL] = CardName.UTSURO_HOE_MYEOL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_HEO_WI] = CardName.UTSURO_HEO_WI
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_JONG_MAL] = CardName.UTSURO_JONG_MAL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_MA_SIG] = CardName.UTSURO_MA_SIG
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_BITE_DUST] = CardName.UTSURO_BITE_DUST
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_REVERBERATE_DEVICE_KURURUSIK] = CardName.UTSURO_REVERBERATE_DEVICE_KURURUSIK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_MANG_A] = CardName.UTSURO_MANG_A
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_ANNIHILATION_SHADOW] = CardName.UTSURO_ANNIHILATION_SHADOW
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_SILENT_WALK] = CardName.UTSURO_SILENT_WALK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_DE_MISE] = CardName.UTSURO_DE_MISE
 
-        cardNumberHashmap[11500] = CardName.KORUNU_SNOW_BLADE
-        cardNumberHashmap[11501] = CardName.KORUNU_REVOLVING_BLADE
-        cardNumberHashmap[11502] = CardName.KORUNU_BLADE_DANCE
-        cardNumberHashmap[11503] = CardName.KORUNU_RIDE_SNOW
-        cardNumberHashmap[11504] = CardName.KORUNU_ABSOLUTE_ZERO
-        cardNumberHashmap[11505] = CardName.KORUNU_FROSTBITE
-        cardNumberHashmap[11506] = CardName.KORUNU_FROST_THORN_BUSH
-        cardNumberHashmap[11507] = CardName.KORUNU_CONLU_RUYANPEH
-        cardNumberHashmap[11508] = CardName.KORUNU_LETAR_LERA
-        cardNumberHashmap[11509] = CardName.KORUNU_UPASTUM
-        cardNumberHashmap[11510] = CardName.KORUNU_PORUCHARTO
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_SPIRIT_SIK] = CardName.HONOKA_SPIRIT_SIK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_GUARDIAN_SPIRIT_SIK] = CardName.HONOKA_GUARDIAN_SPIRIT_SIK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_ASSAULT_SPIRIT_SIK] = CardName.HONOKA_ASSAULT_SPIRIT_SIK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_DIVINE_OUKA] = CardName.HONOKA_DIVINE_OUKA
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_SAKURA_BLIZZARD] = CardName.HONOKA_SAKURA_BLIZZARD
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_UI_GI_GONG_JIN] = CardName.HONOKA_UI_GI_GONG_JIN
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_SAKURA_WING] = CardName.HONOKA_SAKURA_WING
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_REGENERATION] = CardName.HONOKA_REGENERATION
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_SAKURA_AMULET] = CardName.HONOKA_SAKURA_AMULET
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_HONOKA_SPARKLE] = CardName.HONOKA_HONOKA_SPARKLE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_COMMAND] = CardName.HONOKA_COMMAND
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_TAIL_WIND] = CardName.HONOKA_TAIL_WIND
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_CHEST_WILLINGNESS] = CardName.HONOKA_CHEST_WILLINGNESS
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_HAND_FLOWER] = CardName.HONOKA_HAND_FLOWER
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_A_NEW_OPENING] = CardName.HONOKA_A_NEW_OPENING
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_UNDER_THE_NAME_OF_FLAG] = CardName.HONOKA_UNDER_THE_NAME_OF_FLAG
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_FOUR_SEASON_BACK] = CardName.HONOKA_FOUR_SEASON_BACK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_FULL_BLOOM_PATH] = CardName.HONOKA_FULL_BLOOM_PATH
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_SAKURA_SWORD] = CardName.HONOKA_SAKURA_SWORD
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_SHADOW_HAND] = CardName.HONOKA_SHADOW_HAND
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_EYE_OPEN_ALONE] = CardName.HONOKA_EYE_OPEN_ALONE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_FOLLOW_TRACE] = CardName.HONOKA_FOLLOW_TRACE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_FACING_SHADOW] = CardName.HONOKA_FACING_SHADOW
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_SAKURA_SHINING_BRIGHTLY] = CardName.HONOKA_SAKURA_SHINING_BRIGHTLY
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_HOLD_HANDS] = CardName.HONOKA_HOLD_HANDS
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_WALK_OLD_LOAD] = CardName.HONOKA_WALK_OLD_LOAD
 
-        cardNumberHashmap[11600] = CardName.YATSUHA_STAR_NAIL
-        cardNumberHashmap[11601] = CardName.YATSUHA_DARKNESS_GILL
-        cardNumberHashmap[11602] = CardName.YATSUHA_MIRROR_DEVIL
-        cardNumberHashmap[11603] = CardName.YATSUHA_GHOST_STEP
-        cardNumberHashmap[11604] = CardName.YATSUHA_WILLING
-        cardNumberHashmap[11605] = CardName.YATSUHA_CONTRACT
-        cardNumberHashmap[11606] = CardName.YATSUHA_CLINGY_FLOWER
-        cardNumberHashmap[11607] = CardName.YATSUHA_TWO_LEAP_MIRROR_DIVINE
-        cardNumberHashmap[11608] = CardName.YATSUHA_FOUR_LEAP_SONG
-        cardNumberHashmap[11609] = CardName.YATSUHA_SIX_STAR_SEA
-        cardNumberHashmap[11610] = CardName.YATSUHA_EIGHT_MIRROR_OTHER_SIDE
-        cardNumberHashmap[11611] = CardName.YATSUHA_HOLY_RAKE_HANDS
-        cardNumberHashmap[11612] = CardName.YATSUHA_ENTRANCE_OF_ABYSS
-        cardNumberHashmap[11613] = CardName.YATSUHA_TRUE_MONSTER
-        cardNumberHashmap[11614] = CardName.YATSUHA_GHOST_LINK
-        cardNumberHashmap[11615] = CardName.YATSUHA_RESOLUTION
-        cardNumberHashmap[11616] = CardName.YATSUHA_PLEDGE
-        cardNumberHashmap[11617] = CardName.YATSUHA_VAIN_FLOWER
-        cardNumberHashmap[11618] = CardName.YATSUHA_EIGHT_MIRROR_VAIN_SAKURA
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_SNOW_BLADE] = CardName.KORUNU_SNOW_BLADE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_REVOLVING_BLADE] = CardName.KORUNU_REVOLVING_BLADE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_BLADE_DANCE] = CardName.KORUNU_BLADE_DANCE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_RIDE_SNOW] = CardName.KORUNU_RIDE_SNOW
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_ABSOLUTE_ZERO] = CardName.KORUNU_ABSOLUTE_ZERO
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_FROSTBITE] = CardName.KORUNU_FROSTBITE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_FROST_THORN_BUSH] = CardName.KORUNU_FROST_THORN_BUSH
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_CONLU_RUYANPEH] = CardName.KORUNU_CONLU_RUYANPEH
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_LETAR_LERA] = CardName.KORUNU_LETAR_LERA
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_UPASTUM] = CardName.KORUNU_UPASTUM
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_PORUCHARTO] = CardName.KORUNU_PORUCHARTO
 
-        cardNumberHashmap[11700] = CardName.HATSUMI_WATER_BALL
-        cardNumberHashmap[11701] = CardName.HATSUMI_WATER_CURRENT
-        cardNumberHashmap[11702] = CardName.HATSUMI_STRONG_ACID
-        cardNumberHashmap[11703] = CardName.HATSUMI_TSUNAMI
-        cardNumberHashmap[11704] = CardName.HATSUMI_JUN_BI_MAN_TAN
-        cardNumberHashmap[11705] = CardName.HATSUMI_COMPASS
-        cardNumberHashmap[11706] = CardName.HATSUMI_CALL_WAVE
-        cardNumberHashmap[11707] = CardName.HATSUMI_ISANA_HAIL
-        cardNumberHashmap[11708] = CardName.HATSUMI_OYOGIBI_FIRE
-        cardNumberHashmap[11709] = CardName.HATSUMI_KIRAHARI_LIGHTHOUSE
-        cardNumberHashmap[11710] = CardName.HATSUMI_MIOBIKI_ROUTE
-        cardNumberHashmap[11711] = CardName.HATSUMI_TORPEDO
-        cardNumberHashmap[11712] = CardName.HATSUMI_SAGIRI_HAIL
-        cardNumberHashmap[11713] = CardName.HATSUMI_WADANAKA_ROUTE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_STAR_NAIL] = CardName.YATSUHA_STAR_NAIL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_DARKNESS_GILL] = CardName.YATSUHA_DARKNESS_GILL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_MIRROR_DEVIL] = CardName.YATSUHA_MIRROR_DEVIL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_GHOST_STEP] = CardName.YATSUHA_GHOST_STEP
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_WILLING] = CardName.YATSUHA_WILLING
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_CONTRACT] = CardName.YATSUHA_CONTRACT
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_CLINGY_FLOWER] = CardName.YATSUHA_CLINGY_FLOWER
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_TWO_LEAP_MIRROR_DIVINE] = CardName.YATSUHA_TWO_LEAP_MIRROR_DIVINE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_FOUR_LEAP_SONG] = CardName.YATSUHA_FOUR_LEAP_SONG
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_SIX_STAR_SEA] = CardName.YATSUHA_SIX_STAR_SEA
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_EIGHT_MIRROR_OTHER_SIDE] = CardName.YATSUHA_EIGHT_MIRROR_OTHER_SIDE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_HOLY_RAKE_HANDS] = CardName.YATSUHA_HOLY_RAKE_HANDS
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_ENTRANCE_OF_ABYSS] = CardName.YATSUHA_ENTRANCE_OF_ABYSS
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_TRUE_MONSTER] = CardName.YATSUHA_TRUE_MONSTER
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_GHOST_LINK] = CardName.YATSUHA_GHOST_LINK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_RESOLUTION] = CardName.YATSUHA_RESOLUTION
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_PLEDGE] = CardName.YATSUHA_PLEDGE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_VAIN_FLOWER] = CardName.YATSUHA_VAIN_FLOWER
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_EIGHT_MIRROR_VAIN_SAKURA] = CardName.YATSUHA_EIGHT_MIRROR_VAIN_SAKURA
 
-        cardNumberHashmap[11800] = CardName.MIZUKI_JIN_DU
-        cardNumberHashmap[11801] = CardName.MIZUKI_BAN_GONG
-        cardNumberHashmap[11802] = CardName.MIZUKI_SHOOTING_DOWN
-        cardNumberHashmap[11803] = CardName.MIZUKI_HO_LYEONG
-        cardNumberHashmap[11804] = CardName.MIZUKI_BANG_BYEOG
-        cardNumberHashmap[11805] = CardName.MIZUKI_OVERPOWERING_GO_FORWARD
-        cardNumberHashmap[11806] = CardName.MIZUKI_JEON_JANG
-        cardNumberHashmap[11807] = CardName.MIZUKI_HACHIRYU_CHEONJUGAK
-        cardNumberHashmap[11808] = CardName.MIZUKI_HIJAMARU_TRIPLET
-        cardNumberHashmap[11809] = CardName.MIZUKI_TARTENASHI_DAESUMUN
-        cardNumberHashmap[11810] = CardName.MIZUKI_MIZUKI_BATTLE_CRY
-        cardNumberHashmap[11811] = CardName.KODAMA_TU_SIN
-        cardNumberHashmap[11812] = CardName.SOLDIER_SPEAR_1
-        cardNumberHashmap[11813] = CardName.SOLDIER_SPEAR_2
-        cardNumberHashmap[11814] = CardName.SOLDIER_SHIELD
-        cardNumberHashmap[11815] = CardName.SOLDIER_HORSE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_WATER_BALL] = CardName.HATSUMI_WATER_BALL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_WATER_CURRENT] = CardName.HATSUMI_WATER_CURRENT
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_STRONG_ACID] = CardName.HATSUMI_STRONG_ACID
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_TSUNAMI] = CardName.HATSUMI_TSUNAMI
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_JUN_BI_MAN_TAN] = CardName.HATSUMI_JUN_BI_MAN_TAN
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_COMPASS] = CardName.HATSUMI_COMPASS
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_CALL_WAVE] = CardName.HATSUMI_CALL_WAVE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_ISANA_HAIL] = CardName.HATSUMI_ISANA_HAIL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_OYOGIBI_FIRE] = CardName.HATSUMI_OYOGIBI_FIRE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_KIRAHARI_LIGHTHOUSE] = CardName.HATSUMI_KIRAHARI_LIGHTHOUSE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_MIOBIKI_ROUTE] = CardName.HATSUMI_MIOBIKI_ROUTE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_TORPEDO] = CardName.HATSUMI_TORPEDO
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_SAGIRI_HAIL] = CardName.HATSUMI_SAGIRI_HAIL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_WADANAKA_ROUTE] = CardName.HATSUMI_WADANAKA_ROUTE
 
-        cardNumberHashmap[11900] = CardName.MEGUMI_GONG_SUM
-        cardNumberHashmap[11901] = CardName.MEGUMI_TA_CHEOG
-        cardNumberHashmap[11902] = CardName.MEGUMI_SHELL_ATTACK
-        cardNumberHashmap[11903] = CardName.MEGUMI_POLE_THRUST
-        cardNumberHashmap[11904] = CardName.MEGUMI_REED
-        cardNumberHashmap[11905] = CardName.MEGUMI_BALSAM
-        cardNumberHashmap[11906] = CardName.MEGUMI_WILD_ROSE
-        cardNumberHashmap[11907] = CardName.MEGUMI_ROOT_OF_CAUSALITY
-        cardNumberHashmap[11908] = CardName.MEGUMI_BRANCH_OF_POSSIBILITY
-        cardNumberHashmap[11909] = CardName.MEGUMI_FRUIT_OF_END
-        cardNumberHashmap[11910] = CardName.MEGUMI_MEGUMI_PALM
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_JIN_DU] = CardName.MIZUKI_JIN_DU
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_BAN_GONG] = CardName.MIZUKI_BAN_GONG
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_SHOOTING_DOWN] = CardName.MIZUKI_SHOOTING_DOWN
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_HO_LYEONG] = CardName.MIZUKI_HO_LYEONG
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_BANG_BYEOG] = CardName.MIZUKI_BANG_BYEOG
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_OVERPOWERING_GO_FORWARD] = CardName.MIZUKI_OVERPOWERING_GO_FORWARD
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_JEON_JANG] = CardName.MIZUKI_JEON_JANG
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_HACHIRYU_CHEONJUGAK] = CardName.MIZUKI_HACHIRYU_CHEONJUGAK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_HIJAMARU_TRIPLET] = CardName.MIZUKI_HIJAMARU_TRIPLET
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_TARTENASHI_DAESUMUN] = CardName.MIZUKI_TARTENASHI_DAESUMUN
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_MIZUKI_BATTLE_CRY] = CardName.MIZUKI_MIZUKI_BATTLE_CRY
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KODAMA_TU_SIN] = CardName.KODAMA_TU_SIN
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_SPEAR_1] = CardName.SOLDIER_SPEAR_1
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_SPEAR_2] = CardName.SOLDIER_SPEAR_2
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_SHIELD] = CardName.SOLDIER_SHIELD
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_HORSE] = CardName.SOLDIER_HORSE
 
-        cardNumberHashmap[12000] = CardName.KANAWE_IMAGE
-        cardNumberHashmap[12001] = CardName.KANAWE_SCREENPLAY
-        cardNumberHashmap[12002] = CardName.KANAWE_PRODUCTION
-        cardNumberHashmap[12003] = CardName.KANAWE_PUBLISH
-        cardNumberHashmap[12004] = CardName.KANAWE_AFTERGLOW
-        cardNumberHashmap[12005] = CardName.KANAWE_IMPROMPTU
-        cardNumberHashmap[12006] = CardName.KANAWE_SEAL
-        cardNumberHashmap[12007] = CardName.KANAWE_VAGUE_STORY
-        cardNumberHashmap[12008] = CardName.KANAWE_INFINITE_STARLIGHT
-        cardNumberHashmap[12009] = CardName.KANAWE_BEND_OVER_THIS_NIGHT
-        cardNumberHashmap[12010] = CardName.KANAWE_DISTANT_SKY
-        cardNumberHashmap[12011] = CardName.KANAWE_KANAWE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_GONG_SUM] = CardName.MEGUMI_GONG_SUM
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_TA_CHEOG] = CardName.MEGUMI_TA_CHEOG
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_SHELL_ATTACK] = CardName.MEGUMI_SHELL_ATTACK
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_POLE_THRUST] = CardName.MEGUMI_POLE_THRUST
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_REED] = CardName.MEGUMI_REED
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_BALSAM] = CardName.MEGUMI_BALSAM
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_WILD_ROSE] = CardName.MEGUMI_WILD_ROSE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_ROOT_OF_CAUSALITY] = CardName.MEGUMI_ROOT_OF_CAUSALITY
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_BRANCH_OF_POSSIBILITY] = CardName.MEGUMI_BRANCH_OF_POSSIBILITY
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_FRUIT_OF_END] = CardName.MEGUMI_FRUIT_OF_END
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_MEGUMI_PALM] = CardName.MEGUMI_MEGUMI_PALM
 
-        cardNumberHashmap[19000] = CardName.IDEA_SAL_JIN
-        cardNumberHashmap[19001] = CardName.IDEA_SAKURA_WAVE
-        cardNumberHashmap[19002] = CardName.IDEA_WHISTLE
-        cardNumberHashmap[19003] = CardName.IDEA_MYEONG_JEON
-        cardNumberHashmap[19004] = CardName.IDEA_EMPHASIZING
-        cardNumberHashmap[19005] = CardName.IDEA_POSITIONING
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_IMAGE] = CardName.KANAWE_IMAGE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_SCREENPLAY] = CardName.KANAWE_SCREENPLAY
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_PRODUCTION] = CardName.KANAWE_PRODUCTION
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_PUBLISH] = CardName.KANAWE_PUBLISH
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_AFTERGLOW] = CardName.KANAWE_AFTERGLOW
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_IMPROMPTU] = CardName.KANAWE_IMPROMPTU
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_SEAL] = CardName.KANAWE_SEAL
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_VAGUE_STORY] = CardName.KANAWE_VAGUE_STORY
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_INFINITE_STARLIGHT] = CardName.KANAWE_INFINITE_STARLIGHT
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_BEND_OVER_THIS_NIGHT] = CardName.KANAWE_BEND_OVER_THIS_NIGHT
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_DISTANT_SKY] = CardName.KANAWE_DISTANT_SKY
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_KANAWE] = CardName.KANAWE_KANAWE
 
-        cardNumberHashmap[12100] = CardName.KAMUWI_RED_BLADE
-        cardNumberHashmap[12101] = CardName.KAMUWI_FLUTTERING_BLADE
-        cardNumberHashmap[12102] = CardName.KAMUWI_SI_KEN_LAN_JIN
-        cardNumberHashmap[12103] = CardName.KAMUWI_CUT_DOWN
-        cardNumberHashmap[12104] = CardName.KAMUWI_THREADING_THORN
-        cardNumberHashmap[12105] = CardName.KAMUWI_KE_SYO_LAN_LYU
-        cardNumberHashmap[12106] = CardName.KAMUWI_BLOOD_WAVE
-        cardNumberHashmap[12107] = CardName.KAMUWI_LAMP
-        cardNumberHashmap[12108] = CardName.KAMUWI_DAWN
-        cardNumberHashmap[12109] = CardName.KAMUWI_GRAVEYARD
-        cardNumberHashmap[12110] = CardName.KAMUWI_KATA_SHIRO
-        cardNumberHashmap[12111] = CardName.KAMUWI_LOGIC
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_IDEA_SAL_JIN] = CardName.IDEA_SAL_JIN
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_IDEA_SAKURA_WAVE] = CardName.IDEA_SAKURA_WAVE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_IDEA_WHISTLE] = CardName.IDEA_WHISTLE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_IDEA_MYEONG_JEON] = CardName.IDEA_MYEONG_JEON
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_IDEA_EMPHASIZING] = CardName.IDEA_EMPHASIZING
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_IDEA_POSITIONING] = CardName.IDEA_POSITIONING
 
-        cardNumberHashmap[12200] = CardName.RENRI_FALSE_STAB
-        cardNumberHashmap[12201] = CardName.RENRI_TEMPORARY_EXPEDIENT
-        cardNumberHashmap[12202] = CardName.RENRI_BLACK_AND_WHITE
-        cardNumberHashmap[12203] = CardName.RENRI_IRRITATING_GESTURE
-        cardNumberHashmap[12204] = CardName.RENRI_FLOATING_CLOUDS
-        cardNumberHashmap[12205] = CardName.RENRI_FISHING
-        cardNumberHashmap[12206] = CardName.RENRI_PULLING_FISHING
-        cardNumberHashmap[12207] = CardName.RENRI_RU_RU_RA_RA_RI
-        cardNumberHashmap[12208] = CardName.RENRI_RA_NA_RA_RO_MI_RE_RI_RA
-        cardNumberHashmap[12209] = CardName.RENRI_O_RI_RE_TE_RA_RE_RU
-        cardNumberHashmap[12210] = CardName.RENRI_RENRI_THE_END
-        cardNumberHashmap[12211] = CardName.RENRI_ENGRAVED_GARMENT
-        cardNumberHashmap[12212] = CardName.KIRIKO_SHAMANISTIC_MUSIC
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_RED_BLADE] = CardName.KAMUWI_RED_BLADE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_FLUTTERING_BLADE] = CardName.KAMUWI_FLUTTERING_BLADE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_SI_KEN_LAN_JIN] = CardName.KAMUWI_SI_KEN_LAN_JIN
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_CUT_DOWN] = CardName.KAMUWI_CUT_DOWN
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_THREADING_THORN] = CardName.KAMUWI_THREADING_THORN
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_KE_SYO_LAN_LYU] = CardName.KAMUWI_KE_SYO_LAN_LYU
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_BLOOD_WAVE] = CardName.KAMUWI_BLOOD_WAVE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_LAMP] = CardName.KAMUWI_LAMP
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_DAWN] = CardName.KAMUWI_DAWN
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_GRAVEYARD] = CardName.KAMUWI_GRAVEYARD
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_KATA_SHIRO] = CardName.KAMUWI_KATA_SHIRO
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_LOGIC] = CardName.KAMUWI_LOGIC
 
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_FALSE_STAB] = CardName.RENRI_FALSE_STAB
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_TEMPORARY_EXPEDIENT] = CardName.RENRI_TEMPORARY_EXPEDIENT
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_BLACK_AND_WHITE] = CardName.RENRI_BLACK_AND_WHITE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_IRRITATING_GESTURE] = CardName.RENRI_IRRITATING_GESTURE
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_FLOATING_CLOUDS] = CardName.RENRI_FLOATING_CLOUDS
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_FISHING] = CardName.RENRI_FISHING
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_PULLING_FISHING] = CardName.RENRI_PULLING_FISHING
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_RU_RU_RA_RA_RI] = CardName.RENRI_RU_RU_RA_RA_RI
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_RA_NA_RA_RO_MI_RE_RI_RA] = CardName.RENRI_RA_NA_RA_RO_MI_RE_RI_RA
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_O_RI_RE_TE_RA_RE_RU] = CardName.RENRI_O_RI_RE_TE_RA_RE_RU
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_RENRI_THE_END] = CardName.RENRI_RENRI_THE_END
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_ENGRAVED_GARMENT] = CardName.RENRI_ENGRAVED_GARMENT
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KIRIKO_SHAMANISTIC_MUSIC] = CardName.KIRIKO_SHAMANISTIC_MUSIC
 
         cardDataHashmap[CardName.CARD_UNNAME] = unused
         cardDataHashmap[CardName.POISON_ANYTHING] = unused
@@ -1413,7 +1419,7 @@ object CardSet {
         })
         ganpa.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
             while(true){
-                val nowCommand = game_status.receiveCardEffectSelect(player, 203)
+                val nowCommand = game_status.receiveCardEffectSelect(player, NUMBER_SAINE_GANPA)
                 if(selectDustToDistance(nowCommand, game_status, player, game_status.getCardOwner(card_number), card_number)) break
             }
             null
@@ -1685,7 +1691,7 @@ object CardSet {
         })
         poetdance.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _->
             while(true){
-                val nowCommand = game_status.receiveCardEffectSelect(player, 403)
+                val nowCommand = game_status.receiveCardEffectSelect(player, NUMBER_TOKOYO_POETDANCE)
                 if(nowCommand == CommandEnum.SELECT_ONE){
                     game_status.flareToAura(player, player, 1, Arrow.ONE_DIRECTION, player,
                         game_status.getCardOwner(card_number), card_number)
@@ -1703,7 +1709,7 @@ object CardSet {
             while (true){
                 val set = mutableSetOf<Int>()
                 val list = game_status.selectCardFrom(player, player, player,
-                    listOf(LocationEnum.COVER_CARD, LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 404
+                    listOf(LocationEnum.COVER_CARD, LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_TOKOYO_FLIPFAN
                 ) {card, from -> !(from == LocationEnum.DISCARD_YOUR && card.isSoftAttack)}?: break
                 set.addAll(list)
                 if (set.size <= 2){
@@ -1773,7 +1779,7 @@ object CardSet {
         endlesswind.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) {_, player, game_status, _ ->
             while (true){
                 val list = game_status.selectCardFrom(player.opposite(), player.opposite(), player,
-                    listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 409)
+                    listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_TOKOYO_ENDLESSWIND)
                 { card, _ -> card.card_data.card_type != CardType.ATTACK && card.card_data.canDiscard}
                 if(list == null){
                     game_status.showSome(player.opposite(), CommandEnum.SHOW_HAND_ALL_YOUR, -1)
@@ -1859,7 +1865,7 @@ object CardSet {
         induce.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.INSTALLATION, null))
         induce.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
             while(true){
-                val nowCommand = game_status.receiveCardEffectSelect(player, 504)
+                val nowCommand = game_status.receiveCardEffectSelect(player, NUMBER_OBORO_INDUCE)
                 if(nowCommand == CommandEnum.SELECT_ONE){
                     game_status.distanceToAura(player.opposite(), 1, Arrow.ONE_DIRECTION, player,
                         game_status.getCardOwner(card_number), card_number)
@@ -1876,7 +1882,7 @@ object CardSet {
         clone.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) {_, player, game_status, _ ->
             while(true){
                 val selected = game_status.selectCardFrom(player, player, player,
-                    listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 505)
+                    listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_OBORO_CLONE)
                 {card, _ -> card.card_data.sub_type != SubType.FULL_POWER}
                 if(selected == null){
                     game_status.showSome(player, CommandEnum.SHOW_COVER_YOUR, -1)
@@ -1905,7 +1911,7 @@ object CardSet {
             while(true) {
                 val selected = game_status.selectCardFrom(player, player, player,
                     listOf(LocationEnum.YOUR_USED_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
-                    506) { _, _ -> true }?: break
+                    NUMBER_OBORO_BIOACTIVITY) { _, _ -> true }?: break
                 if(selected.size == 1){
                     game_status.returnSpecialCard(player, selected[0])
                     break
@@ -1930,8 +1936,8 @@ object CardSet {
         tobikage.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) ret@{_, player, game_status, react_attack ->
             while(true){
                 val selected = game_status.selectCardFrom(player, player, player,
-                    listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 508)
-                {card, _ -> card.card_data.sub_type != SubType.FULL_POWER}?: run {
+                    listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_OBORO_TOBIKAGE)
+                {card, _ -> card.card_data.sub_type != SubType.FULL_POWER} ?: run {
                     return@ret null
                 }
                 if(selected.size == 1){
@@ -1979,7 +1985,7 @@ object CardSet {
 
     private val changeUmbrellaText = Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_END_PHASE_YOUR) { _, player, game_status, _ ->
         while(true){
-            val nowCommand = game_status.receiveCardEffectSelect(player, 200000)
+            val nowCommand = game_status.receiveCardEffectSelect(player, NUMBER_YUKIHI_YUKIHI)
             if(nowCommand == CommandEnum.SELECT_ONE){
                 game_status.changeUmbrella(player)
                 break
@@ -2013,7 +2019,7 @@ object CardSet {
         pushOut.setAttackUnfold(DistanceType.CONTINUOUS, Pair(0, 2), null, 1, 1)
         pushOut.addTextFold(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _->
             while(true){
-                val nowCommand = game_status.receiveCardEffectSelect(player, 602)
+                val nowCommand = game_status.receiveCardEffectSelect(player, NUMBER_YUKIHI_PUSH_OUT_SLASH_PULL)
                 if(selectDustToDistance(nowCommand, game_status, player, game_status.getCardOwner(card_number), card_number)) break
             }
             null
@@ -2027,7 +2033,7 @@ object CardSet {
         swing.setAttackUnfold(DistanceType.CONTINUOUS, Pair(0, 2), null, 999, 2)
         turnUmbrella.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.SHOW_HAND_WHEN_CHANGE_UMBRELLA) {card_number, player, game_status, _->
             while(true){
-                val nowCommand = game_status.receiveCardEffectSelect(player, 604)
+                val nowCommand = game_status.receiveCardEffectSelect(player, NUMBER_YUKIHI_TURN_UMBRELLA)
                 if(nowCommand == CommandEnum.SELECT_ONE){
                     game_status.showSome(player, CommandEnum.SHOW_HAND_YOUR, card_number)
                     game_status.dustToAura(player, 1, Arrow.ONE_DIRECTION, player,
@@ -2279,7 +2285,7 @@ object CardSet {
 
     private suspend fun setStratagemByUser(game_status: GameStatus, player: PlayerEnum){
         while(true){
-            val nowCommand = game_status.receiveCardEffectSelect(player, SHINRA_SHINRA_CARD_NUMBER)
+            val nowCommand = game_status.receiveCardEffectSelect(player, NUMBER_SHINRA_SHINRA)
             if(nowCommand == CommandEnum.SELECT_ONE){
                 game_status.setStratagem(player, Stratagem.SHIN_SAN)
                 break
@@ -2343,20 +2349,7 @@ object CardSet {
         kiben.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.RUN_STRATAGEM){_, player, game_status, _ ->
             when(game_status.getStratagem(player)){
                 Stratagem.SHIN_SAN -> {
-                    var index = 0
-                    for(i in 1..3){
-                        game_status.getPlayer(player.opposite()).normalCardDeck.getOrNull(index)?.let let@{
-                            if(it.card_data.canCover) {
-                                val card = game_status.popCardFrom(player.opposite(), it.card_number, LocationEnum.DECK, false)?: return@let
-                                game_status.insertCardTo(player.opposite(), card, LocationEnum.COVER_CARD, false)
-                            }
-                            else {
-                                index += 1
-                                return@let
-                            }
-
-                        }?: break
-                    }
+                    game_status.getPlayer(player.opposite()).deckToCoverCard(game_status, 3)
                     if(!game_status.getPlayer(player).justRunNoCondition){
                         setStratagemByUser(game_status, player)
                     }
@@ -2365,7 +2358,8 @@ object CardSet {
                     val beforeJustRunNoCondition = game_status.getPlayer(player).justRunNoCondition
                     while (true){
                         val list = game_status.selectCardFrom(player.opposite(), player, player,
-                            listOf(LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 702)
+                            listOf(LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                        NUMBER_SHINRA_KIBEN)
                         { _, _ -> true }?: break
                         if (list.isNotEmpty()){
                             game_status.getPlayer(player).justRunNoCondition = true
@@ -2393,7 +2387,7 @@ object CardSet {
         inyong.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) {_, player, game_status, _->
             while(true){
                 val selected = game_status.selectCardFrom(player.opposite(), player, player,
-                    listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 703)
+                    listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_SHINRA_INYONG)
                 {_, _ -> true} ?: break
                 if(selected.size == 0) break
                 if(selected.size == 1){
@@ -2401,7 +2395,7 @@ object CardSet {
                     val card = game_status.getCardFrom(player.opposite(), selectNumber, LocationEnum.HAND)?: continue
                     if(card.card_data.card_type != CardType.ATTACK) continue
                     while(true){
-                        val nowCommand = game_status.receiveCardEffectSelect(player, 703)
+                        val nowCommand = game_status.receiveCardEffectSelect(player, NUMBER_SHINRA_INYONG)
                         if(nowCommand == CommandEnum.SELECT_ONE){
                             game_status.useCardFrom(player, card, LocationEnum.HAND_OTHER, false, null,
                                 isCost = true, isConsume = true)
@@ -2456,7 +2450,8 @@ object CardSet {
                         game_status.setShrink(player.opposite())
                         game_status.drawCard(player.opposite(), 3)
                         game_status.selectCardFrom(player.opposite(), player.opposite(), player,
-                            listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 705, 2)
+                            listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                            NUMBER_SHINRA_JANGDAM, 2)
                         {_, _ -> true}?.let { selected ->
                             if(selected.size == 1){
                                 game_status.popCardFrom(player.opposite(), selected[0], LocationEnum.HAND, true)?.let {
@@ -2485,7 +2480,7 @@ object CardSet {
         nonpa.setEnchantment(4)
         nonpa.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.SEAL_CARD) {card_number, player, game_status, _ ->
             game_status.selectCardFrom(player.opposite(), player, player, listOf(LocationEnum.DISCARD_YOUR),
-                CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 706, 1)
+                CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_SHINRA_NONPA, 1)
             {card, _ -> !(card.isSoftAttack)}?.let {selected ->
                 val nowPlayer = game_status.getPlayer(player)
                 game_status.popCardFrom(player.opposite(), selected[0], LocationEnum.DISCARD_YOUR, true)?.let {
@@ -2522,7 +2517,7 @@ object CardSet {
         wanjeonNonpa.setSpecial(2)
         wanjeonNonpa.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.SEAL_CARD){card_number, player, game_status, _ ->
             game_status.selectCardFrom(player.opposite(), player, player, listOf(LocationEnum.DISCARD_YOUR),
-                CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 707, 1)
+                CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_SHINRA_WANJEON_NONPA, 1)
             {card, _ -> !(card.isSoftAttack)}?.let {selected ->
                 val nowPlayer = game_status.getPlayer(player)
                 game_status.popCardFrom(player.opposite(), selected[0], LocationEnum.DISCARD_YOUR, true)?.let {
@@ -2539,7 +2534,7 @@ object CardSet {
             when(game_status.getStratagem(player)){
                 Stratagem.SHIN_SAN -> {
                     game_status.selectCardFrom(player, player, player, listOf(LocationEnum.DISCARD_YOUR, LocationEnum.YOUR_USED_CARD),
-                        CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 708, 1)
+                        CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_SHINRA_DASIG_IHAE, 1)
                         {card, _ -> card.card_data.card_type == CardType.ENCHANTMENT}?.let { selected ->
                         game_status.getCardFrom(player, selected[0], LocationEnum.DISCARD_YOUR)?.also {
                             game_status.useCardFrom(player, it, LocationEnum.DISCARD_YOUR, false, null,
@@ -2561,7 +2556,8 @@ object CardSet {
                 }
                 Stratagem.GUE_MO -> {
                     game_status.selectCardFrom(player.opposite(), player, player,
-                        listOf(LocationEnum.ENCHANTMENT_ZONE), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 709, 1)
+                        listOf(LocationEnum.ENCHANTMENT_ZONE), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                        NUMBER_SHINRA_CHEONJI_BANBAG, 1)
                     {card, _ -> card.card_data.card_class != CardClass.SPECIAL}?.let { selected ->
                         game_status.getCardFrom(player.opposite(), selected[0], LocationEnum.ENCHANTMENT_ZONE)?.let { card ->
                             game_status.cardToDust(player.opposite(), card.getNap(), card, false, card_number)
@@ -2738,7 +2734,7 @@ object CardSet {
         })
         ringABell.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
             while(true){
-                val nowCommand = game_status.receiveCardEffectSelect(player, 805)
+                val nowCommand = game_status.receiveCardEffectSelect(player, NUMBER_HAGANE_RING_A_BELL)
                 if(nowCommand == CommandEnum.SELECT_ONE){
                     game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS, {_, _, _ ->
                     true}, {_, _, attack ->
@@ -2821,7 +2817,8 @@ object CardSet {
         grandMountainRespect.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) {_, player, game_status, _ ->
             while(true){
                 val selected = game_status.selectCardFrom(player, player, player,
-                    listOf(LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 810)
+                    listOf(LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_HAGANE_GRAND_MOUNTAIN_RESPECT)
                 {card, _ -> card.card_data.sub_type != SubType.FULL_POWER}?: break
                 if(selected.size == 0) break
                 else if(selected.size <= 2){
@@ -2884,7 +2881,8 @@ object CardSet {
         poisonNeedle.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.INSERT_POISON) {_, player, game_status, _ ->
             val cardList = makePoisonList(player, game_status)
             if(cardList.size != 0){
-                val get = game_status.selectCardFrom(player, cardList, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 901, 1)[0]
+                val get = game_status.selectCardFrom(player, cardList, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_CHIKAGE_POISON_NEEDLE, 1)[0]
                 game_status.popCardFrom(player, get, LocationEnum.POISON_BAG, false)?.let {
                     game_status.insertCardTo(player.opposite(), it, LocationEnum.YOUR_DECK_TOP, publicForOther = true, publicForYour = false)
                 }
@@ -2906,7 +2904,8 @@ object CardSet {
         cuttingNeck.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.INSERT_POISON) {_, player, game_status, _ ->
             if(game_status.getPlayer(player.opposite()).hand.size >= 2){
                 game_status.selectCardFrom(player.opposite(), player.opposite(), player,
-                    listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 903, 1
+                    listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_CHIKAGE_CUTTING_NECK, 1
                 ) {_, _ -> true}?.let { selected ->
                     game_status.popCardFrom(player.opposite(), selected[0], LocationEnum.HAND, true)?.let {
                         game_status.insertCardTo(player.opposite(), it, LocationEnum.DISCARD_YOUR, true)
@@ -2919,7 +2918,8 @@ object CardSet {
         poisonSmoke.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.INSERT_POISON) {_, player, game_status, _->
             val cardList = makePoisonList(player, game_status)
             if(cardList.size != 0){
-                val get = game_status.selectCardFrom(player, cardList, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 904, 1)[0]
+                val get = game_status.selectCardFrom(player, cardList, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_CHIKAGE_POISON_SMOKE, 1)[0]
                 game_status.popCardFrom(player, get, LocationEnum.POISON_BAG, true)?.let {
                     game_status.insertCardTo(player.opposite(), it, LocationEnum.HAND, true)
                 }
@@ -3083,11 +3083,11 @@ object CardSet {
         val kikou = getKikou(player, game_status)
         if(kikou.reaction >= 1 && kikou.fullPower >= 2){
             while(true){
-                when(game_status.receiveCardEffectSelect(player, 1008)){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_KURURU_BIG_GOLEM)){
                     CommandEnum.SELECT_ONE -> {
                         var connectDive = 0
                         for(card in game_status.getPlayer(player).usedSpecialCard.values){
-                            connectDive += card.effectAllValidEffect(4, player, game_status, TextEffectTag.WHEN_RESOLVE_COG_EFFECT)
+                            connectDive += card.effectAllValidEffect(card.card_number * 10 + 4, player, game_status, TextEffectTag.WHEN_RESOLVE_COG_EFFECT)
                         }
                         if(connectDive > 0){
                             if(game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 2), false,
@@ -3158,7 +3158,8 @@ object CardSet {
             }
             CommandEnum.SELECT_TWO -> {
                 val list = game_status.selectCardFrom(player, player, player,
-                    listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1002, 1
+                    listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_KURURU_KURURUOONG, 1
                 ) { _, _ -> true }?: return
                 game_status.popCardFrom(player, list[0], LocationEnum.COVER_CARD, false)?.let {
                     game_status.insertCardTo(player, it, LocationEnum.YOUR_DECK_BELOW, false)
@@ -3166,7 +3167,8 @@ object CardSet {
             }
             CommandEnum.SELECT_THREE -> {
                 val list = game_status.selectCardFrom(player.opposite(), player.opposite(), player,
-                    listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1003, 1
+                    listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_KURURU_TORNADO, 1
                 ) { _, _ -> true }?: return
                 game_status.popCardFrom(player.opposite(), list[0], LocationEnum.HAND, true)?.let {
                     game_status.insertCardTo(player.opposite(), it, LocationEnum.DISCARD_YOUR, true)
@@ -3180,7 +3182,7 @@ object CardSet {
         while(true){
             val list = game_status.selectCardFrom(player, player, player,
                 listOf(LocationEnum.COVER_CARD, LocationEnum.YOUR_USED_CARD, LocationEnum.DISCARD_YOUR),
-                CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1004)
+                CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_KURURU_REGAINER)
             { card, _ -> card.card_data.sub_type != SubType.FULL_POWER && card.special_card_state != SpecialCardEnum.UNUSED &&
                     card.card_data.megami != MegamiEnum.KURURU}?: break
             if(list.size == 0) {
@@ -3352,12 +3354,13 @@ object CardSet {
             }
             null
         })
-        accelerator.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) {card_number, player, game_status, _ ->
+        accelerator.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) {_, player, game_status, _ ->
             val kikou = getKikou(player, game_status)
             if(kikou.enchantment >= 1 && kikou.behavior >= 2) {
                 while(true){
                     val list = game_status.selectCardFrom(player, player, player,
-                        listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1001
+                        listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                        NUMBER_KURURU_ACCELERATOR
                     ) { card, _ -> card.card_data.sub_type == SubType.FULL_POWER }?: break
                     if(list.size == 1){
                         val card = game_status.getCardFrom(player, list[0], LocationEnum.HAND)?: continue
@@ -3377,11 +3380,11 @@ object CardSet {
             else 1
         })
         kururuoong.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {_, player, game_status, _ ->
-            val firstCommand = game_status.receiveCardEffectSelect(player, 1002)
+            val firstCommand = game_status.receiveCardEffectSelect(player, NUMBER_KURURU_KURURUOONG)
             if(firstCommand != CommandEnum.SELECT_NOT){
                 kururuoong(player, firstCommand, game_status)
                 while(true){
-                    val secondCommand = game_status.receiveCardEffectSelect(player, 1002)
+                    val secondCommand = game_status.receiveCardEffectSelect(player, NUMBER_KURURU_KURURUOONG)
                     if(firstCommand == secondCommand) continue
                     kururuoong(player, secondCommand, game_status)
                     break
@@ -3394,7 +3397,7 @@ object CardSet {
             if(kikou.attack >= 2) {
                 var connectDive = 0
                 for(card in game_status.getPlayer(player).usedSpecialCard.values){
-                    connectDive += card.effectAllValidEffect(0, player, game_status, TextEffectTag.WHEN_RESOLVE_COG_EFFECT)
+                    connectDive += card.effectAllValidEffect(card.card_number * 10, player, game_status, TextEffectTag.WHEN_RESOLVE_COG_EFFECT)
                 }
                 if(connectDive > 0){
                     game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_AURA, Pair(10, 999), false,
@@ -3409,7 +3412,7 @@ object CardSet {
             if(kikou.enchantment >= 2){
                 var connectDive = 0
                 for(card in game_status.getPlayer(player).usedSpecialCard.values){
-                    connectDive += card.effectAllValidEffect(1, player, game_status, TextEffectTag.WHEN_RESOLVE_COG_EFFECT)
+                    connectDive += card.effectAllValidEffect(card.card_number * 10 + 1, player, game_status, TextEffectTag.WHEN_RESOLVE_COG_EFFECT)
                 }
                 if(connectDive > 0){
                     game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_LIFE, Pair(999, 2), false,
@@ -3426,7 +3429,7 @@ object CardSet {
             if(kikou.enchantment >= 1 && kikou.reaction >= 1) {
                 var connectDive = 0
                 for(card in game_status.getPlayer(player).usedSpecialCard.values){
-                    connectDive += card.effectAllValidEffect(2, player, game_status, TextEffectTag.WHEN_RESOLVE_COG_EFFECT)
+                    connectDive += card.effectAllValidEffect(card.card_number * 10 + 2, player, game_status, TextEffectTag.WHEN_RESOLVE_COG_EFFECT)
                 }
                 if(connectDive > 0){
                     regainer(1018, card_number, player, game_status, 2)
@@ -3444,23 +3447,7 @@ object CardSet {
         module.setEnchantment(3)
         module.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_USE_BEHAVIOR_END){ _, player, game_status, _ ->
             if(!(game_status.getEndTurn(player))){
-                while(true){
-                    when(val command = game_status.requestBasicOperation(player, 1005)){
-                        CommandEnum.ACTION_GO_FORWARD, CommandEnum.ACTION_GO_BACKWARD, CommandEnum.ACTION_WIND_AROUND,
-                        CommandEnum.ACTION_INCUBATE, CommandEnum.ACTION_BREAK_AWAY, CommandEnum.ACTION_NAGA, CommandEnum.ACTION_YAKSHA,
-                        CommandEnum.ACTION_GARUDA, CommandEnum.ACTION_ASURA -> {
-                            if(game_status.canDoBasicOperation(player, command)){
-                                game_status.doBasicOperation(player, command, 201005)
-                                break
-                            }
-                            else{
-                                continue
-                            }
-                        }
-                        CommandEnum.SELECT_NOT -> break
-                        else -> {}
-                    }
-                }
+                game_status.requestAndDoBasicOperation(player, 1005)
             }
             null
         })
@@ -3470,7 +3457,7 @@ object CardSet {
             if(kikou.attack >= 1 && kikou.reaction >= 1) {
                 var connectDive = 0
                 for(card in game_status.getPlayer(player).usedSpecialCard.values){
-                    connectDive += card.effectAllValidEffect(3, player, game_status, TextEffectTag.WHEN_RESOLVE_COG_EFFECT)
+                    connectDive += card.effectAllValidEffect(card.card_number * 10 + 3, player, game_status, TextEffectTag.WHEN_RESOLVE_COG_EFFECT)
                 }
                 if(connectDive > 0){
                     game_status.getCardFrom(player, card_number, LocationEnum.PLAYING_ZONE_YOUR)?.let {
@@ -3504,7 +3491,7 @@ object CardSet {
         drainDevil.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_SPECIAL_RETURN_YOUR) { card_number, player, game_status, _ ->
             if(!game_status.getPlayer(player).end_turn){
                 while(true){
-                    when(game_status.receiveCardEffectSelect(player, 1007)){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_KURURU_DRAIN_DEVIL)){
                         CommandEnum.SELECT_ONE -> {
                             game_status.getCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD)?.let {
                                 game_status.useCardFrom(player, it, LocationEnum.YOUR_USED_CARD, false, null,
@@ -3531,24 +3518,8 @@ object CardSet {
             }
             null
         })
-        bigGolem.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_FULL_POWER_USED_YOUR) { card_number, player, game_status, _ ->
-            while(true){
-                when(val command = game_status.requestBasicOperation(player, 1008)){
-                    CommandEnum.ACTION_GO_FORWARD, CommandEnum.ACTION_GO_BACKWARD, CommandEnum.ACTION_WIND_AROUND,
-                    CommandEnum.ACTION_INCUBATE, CommandEnum.ACTION_BREAK_AWAY, CommandEnum.ACTION_NAGA,
-                    CommandEnum.ACTION_YAKSHA, CommandEnum.ACTION_GARUDA, CommandEnum.ACTION_ASURA  -> {
-                        if(game_status.canDoBasicOperation(player, command)){
-                            game_status.doBasicOperation(player, command, 201008)
-                            break
-                        }
-                        else{
-                            continue
-                        }
-                    }
-                    CommandEnum.SELECT_NOT -> break
-                    else -> {}
-                }
-            }
+        bigGolem.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_FULL_POWER_USED_YOUR) { _, player, game_status, _ ->
+            game_status.requestAndDoBasicOperation(player, 1008)
             null
         })
         industria.setSpecial(1)
@@ -3560,7 +3531,8 @@ object CardSet {
                 }
                 while (true){
                     val list = game_status.selectCardFrom(player, player, player,
-                        listOf(LocationEnum.HAND, LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1009
+                        listOf(LocationEnum.HAND, LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                        NUMBER_KURURU_INDUSTRIA
                     ) { card, _ -> card.card_data.card_type != CardType.ENCHANTMENT && !(card.isSoftAttack) }?: break
                     if (list.size == 1){
                         game_status.popCardFrom(player, list[0], LocationEnum.DISCARD_YOUR, true)?.let {
@@ -3647,7 +3619,8 @@ object CardSet {
             if(kikou.attack >= 2 && kikou.behavior >= 3 && kikou.enchantment >= 2){
                 while(true){
                     val list = game_status.selectCardFrom(player.opposite(), player, player,
-                        listOf(LocationEnum.SPECIAL_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1013)
+                        listOf(LocationEnum.SPECIAL_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                        NUMBER_KURURU_KANSHOUSOUCHI_KURURUSIK)
                     { _, _ ->
                         true
                     }?: break
@@ -3668,7 +3641,8 @@ object CardSet {
         kanshousouchiKururusik.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) {card_number, player, game_status, _->
             while(true){
                 val list = game_status.selectCardFrom(player.opposite(), player, player,
-                    listOf(LocationEnum.YOUR_USED_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1012){ _, _ ->
+                    listOf(LocationEnum.YOUR_USED_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_KURURU_DUPLICATED_GEAR_3){ _, _ ->
                     true
                 }?: break
                 if(list.size == 1){
@@ -3711,7 +3685,7 @@ object CardSet {
         var changeToken = false
         if(gameStatus.distanceToken - gameStatus.player1ArtificialTokenOn - gameStatus.player2ArtificialTokenOn > 0){
             while (true){
-                changeToken = when(gameStatus.receiveCardEffectSelect(player, 1100)){
+                changeToken = when(gameStatus.receiveCardEffectSelect(player, NUMBER_THALLYA_BURNING_STEAM)){
                     CommandEnum.SELECT_ONE -> {
                         gameStatus.addArtificialTokenAtDistance(player, true, 1)
                         true
@@ -3786,7 +3760,8 @@ object CardSet {
         game_status.getPlayer(player).transformNumber += 1
         if(cardList.size != 0){
             game_status.logger.insert(Log(player, LogText.TRANSFORM, -1, -1))
-            val get = game_status.selectCardFrom(player, cardList, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1110, 1)[0]
+            val get = game_status.selectCardFrom(player, cardList, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_THALLYA_JULIA_BLACKBOX
+                , 1)[0]
             game_status.getCardFrom(player, get, LocationEnum.ADDITIONAL_CARD)?.let {
                 game_status.moveAdditionalCard(player, get.toCardName(), LocationEnum.TRANSFORM)
                 it.special_card_state = SpecialCardEnum.PLAYED
@@ -3854,7 +3829,7 @@ object CardSet {
         roaring.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CHANGE_CONCENTRATION){_, player, game_status, _ ->
             if((game_status.getPlayer(player).artificialToken ?: 0) >= 2){
                 while(true){
-                    when(game_status.receiveCardEffectSelect(player, 1105)){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_THALLYA_ROARING)){
                         CommandEnum.SELECT_ONE -> {
                             game_status.combust(player, 2)
                             game_status.addConcentration(player)
@@ -3872,7 +3847,7 @@ object CardSet {
         roaring.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CHANGE_CONCENTRATION){_, player, game_status, _ ->
             if(game_status.getPlayer(player).concentration >= 2){
                 while(true){
-                    when(game_status.receiveCardEffectSelect(player, 1106)){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_THALLYA_TURBO_SWITCH)){
                         CommandEnum.SELECT_ONE -> {
                             game_status.decreaseConcentration(player)
                             game_status.decreaseConcentration(player)
@@ -3926,7 +3901,7 @@ object CardSet {
         masterPiece.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_MANEUVER) {card_number, player, game_status, _ ->
             if(game_status.turnPlayer == player){
                 while(true){
-                    when(game_status.receiveCardEffectSelect(player, 1109)){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_THALLYA_THALLYA_MASTERPIECE)){
                         CommandEnum.SELECT_ONE -> {
                             game_status.dustToDistance(1, Arrow.BOTH_DIRECTION, player,
                                 game_status.getCardOwner(card_number), card_number)
@@ -4020,10 +3995,10 @@ object CardSet {
         })
         reincarnationNail.setAttack(DistanceType.CONTINUOUS, Pair(1, 2), null, 2, 1,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
-        reincarnationNail.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) {card_number, player, game_status, _ ->
+        reincarnationNail.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) {_, player, game_status, _ ->
             while(true){
                 val list = game_status.selectCardFrom(player, player, player, listOf(LocationEnum.DISCARD_YOUR),
-                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1202
+                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_RAIRA_REINCARNATION_NAIL
                 ) { card, _ -> card.card_data.card_type == CardType.ATTACK && !(card.isSoftAttack)}?: break
                 if(list.size == 0){
                     break
@@ -4049,7 +4024,8 @@ object CardSet {
                 if(game_status.getPlayer(player).windGauge!! + it >= 4){
                     while(true){
                         val list = game_status.selectCardFrom(player, player, player,
-                            listOf(LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1204
+                            listOf(LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                            NUMBER_RAIRA_WISDOM_OF_STORM_SURGE
                         ) { card, _ -> card.card_data.megami != MegamiEnum.RAIRA && !(card.isSoftAttack)}?: break
                         if(list.size == 0){
                             break
@@ -4065,17 +4041,17 @@ object CardSet {
             }
             null
         })
-        wisdomOfStormSurge.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CHANGE_RAIRA_GAUGE) {card_number, player, game_status, _->
-            game_status.gaugeIncreaseRequest(player, card_number)
+        wisdomOfStormSurge.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CHANGE_RAIRA_GAUGE) {_, player, game_status, _->
+            game_status.gaugeIncreaseRequest(player, NUMBER_RAIRA_WISDOM_OF_STORM_SURGE)
             null
         })
-        howling.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CHANGE_RAIRA_GAUGE) {card_number, player, game_status, _->
+        howling.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CHANGE_RAIRA_GAUGE) {_, player, game_status, _->
             game_status.setShrink(player.opposite())
             while(true){
-                when(game_status.receiveCardEffectSelect(player, 1205)){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_RAIRA_HOWLING)){
                     CommandEnum.SELECT_ONE -> {
-                        game_status.gaugeIncrease(player, true)
-                        game_status.gaugeIncrease(player, false)
+                        game_status.thunderGaugeIncrease(player)
+                        game_status.windGaugeIncrease(player)
                     }
                     CommandEnum.SELECT_TWO -> {
                         for(card in game_status.getPlayer(player).hand.keys){
@@ -4097,7 +4073,7 @@ object CardSet {
         })
         windKick.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _->
             while(true){
-                when(game_status.receiveCardEffectSelect(player, 1206)){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_RAIRA_WIND_KICK)){
                    CommandEnum.SELECT_ONE -> {
                        game_status.dustToDistance(3, Arrow.BOTH_DIRECTION, player,
                            game_status.getCardOwner(card_number), card_number)
@@ -4159,14 +4135,14 @@ object CardSet {
         circularCircuit.setEnchantment(3)
         circularCircuit.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.AFTER_OTHER_ATTACK_COMPLETE) {card_number, player, game_status, _->
             while(true){
-                when(game_status.receiveCardEffectSelect(player, 1210)){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_RAIRA_CIRCULAR_CIRCUIT)){
                     CommandEnum.SELECT_ONE -> {
                         while(true){
-                            val nowCommand = game_status.receiveCardEffectSelect(player, 1211)
+                            val nowCommand = game_status.receiveCardEffectSelect(player, NUMBER_RAIRA_WIND_ATTACK)
                             if(selectDustToDistance(nowCommand, game_status, player,
                                     game_status.getCardOwner(card_number), card_number)) break
                         }
-                        game_status.gaugeIncreaseRequest(player, 1212)
+                        game_status.gaugeIncreaseRequest(player, NUMBER_RAIRA_WIND_ZEN_KAI)
                         game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
                     }
                     CommandEnum.SELECT_NOT -> {}
@@ -4185,7 +4161,7 @@ object CardSet {
         windZenKai.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) ret@{_, player, game_status, _->
             val selected = game_status.selectCardFrom(player, player, player,
                 listOf(LocationEnum.YOUR_USED_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
-                1212, 1){ _, _ ->
+                NUMBER_RAIRA_WIND_ZEN_KAI, 1){ _, _ ->
                 true
             }?: return@ret null
             game_status.returnSpecialCard(player, selected[0])
@@ -4201,7 +4177,7 @@ object CardSet {
         windCelestialSphere.setSpecial(4)
         windCelestialSphere.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _->
             while(true){
-                when(game_status.receiveCardEffectSelect(player, 1213)){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_RAIRA_WIND_CELESTIAL_SPHERE)){
                     CommandEnum.SELECT_ONE -> {
                         game_status.distanceToDust(1, Arrow.BOTH_DIRECTION, player,
                             game_status.getCardOwner(card_number), card_number)
@@ -4270,7 +4246,7 @@ object CardSet {
 
     private val masigText = Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_START_PHASE_YOUR){card_number, player, game_status, _ ->
         while(true){
-            when(game_status.receiveCardEffectSelect(player.opposite(), 1310)){
+            when(game_status.receiveCardEffectSelect(player.opposite(), NUMBER_UTSURO_MA_SIG)){
                 CommandEnum.SELECT_ONE -> {
                     game_status.auraToDust(player.opposite(), 1, Arrow.ONE_DIRECTION, player,
                         game_status.getCardOwner(card_number), card_number)
@@ -4367,10 +4343,10 @@ object CardSet {
         }))
         blackWave.setAttack(DistanceType.CONTINUOUS, Pair(4, 7), null, 1, 2,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
-        blackWave.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.WHEN_CHOOSE_AURA_DAMAGE) { card_number, player, game_status, _ ->
+        blackWave.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.WHEN_CHOOSE_AURA_DAMAGE) {_, player, game_status, _ ->
             while (true){
                 val list = game_status.selectCardFrom(player.opposite(), player, player,
-                    listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1301)
+                    listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_UTSURO_BLACK_WAVE)
                 { _, _ -> true }?: break
                 if (list.size == 1){
                     val card = game_status.popCardFrom(player.opposite(), list[0], LocationEnum.HAND, true)?: continue
@@ -4383,13 +4359,13 @@ object CardSet {
         harvest.setAttack(DistanceType.CONTINUOUS, Pair(4, 4), null, 999, 0,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         harvest.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) { card_number, player, game_status, _ ->
-            moveResourceToDust(player.opposite(), game_status,1302, 2)
+            moveResourceToDust(player.opposite(), game_status, NUMBER_UTSURO_HARVEST, 2)
             null
         })
         harvest.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) { card_number, player, game_status, _ ->
             while (true){
                 val cardList = game_status.selectCardFrom(player.opposite(), player, player,
-                    listOf(LocationEnum.ENCHANTMENT_ZONE), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1302
+                    listOf(LocationEnum.ENCHANTMENT_ZONE), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_UTSURO_HARVEST
                 ) { _, _ -> true }?: break
                 if(cardList.size == 1){
                     game_status.getCardFrom(player.opposite(), cardList[0], LocationEnum.ENCHANTMENT_ZONE)?.let {
@@ -4406,8 +4382,8 @@ object CardSet {
             }
             null
         })
-        pressure.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) ret@{ card_number, player, game_status, _ ->
-            moveResourceToDust(player.opposite(), game_status, 1303, 1)
+        pressure.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) ret@{ _, player, game_status, _ ->
+            moveResourceToDust(player.opposite(), game_status, NUMBER_UTSURO_PRESSURE, 1)
             null
         })
         pressure.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_SHRINK) ret@{ _, player, game_status, _ ->
@@ -4608,7 +4584,7 @@ object CardSet {
         })
         duetTanJuBingMyeong.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.DRAW_CARD) {_, player, game_status, _->
             while(true){
-                when(game_status.receiveCardEffectSelect(player, 213)){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_SAINE_DUET_TAN_JU_BING_MYEONG)){
                     CommandEnum.SELECT_ONE -> {
                         game_status.drawCard(player, 1)
                         break
@@ -4703,10 +4679,11 @@ object CardSet {
     private val duetChitanYangMyeong = CardData(CardClass.SPECIAL, CardName.TOKOYO_DUET_CHI_TAN_YANG_MYEONG, MegamiEnum.TOKOYO, CardType.BEHAVIOR, SubType.NONE)
     private val duetChitanYangMyeongText = Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_START_PHASE_YOUR){card_number, player, game_status, _ ->
         while(true){
-            when(game_status.receiveCardEffectSelect(player, 413)){
+            when(game_status.receiveCardEffectSelect(player, NUMBER_TOKOYO_DUET_CHI_TAN_YANG_MYEONG)){
                 CommandEnum.SELECT_ONE -> {
                     val list = game_status.selectCardFrom(player, player, player,
-                        listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 412, 1
+                        listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                        NUMBER_TOKOYO_SOUND_OF_SUN, 1
                     ) { _, _ -> true }?: break
                     game_status.popCardFrom(player, list[0], LocationEnum.COVER_CARD, false)?.let {
                         game_status.insertCardTo(player, it, LocationEnum.YOUR_DECK_BELOW, false)
@@ -4715,7 +4692,8 @@ object CardSet {
                 }
                 CommandEnum.SELECT_TWO -> {
                     val list = game_status.selectCardFrom(player, player, player,
-                        listOf(LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 413, 1
+                        listOf(LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                        NUMBER_TOKOYO_DUET_CHI_TAN_YANG_MYEONG, 1
                     ) { card, _ -> card.card_data.card_type == CardType.BEHAVIOR }?: break
                     game_status.popCardFrom(player, list[0], LocationEnum.DISCARD_YOUR, true)?.let {
                         game_status.insertCardTo(player, it, LocationEnum.YOUR_DECK_BELOW, true)
@@ -4821,7 +4799,8 @@ object CardSet {
     }
 
     private val handFlowerText = Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_END_PHASE_YOUR) {_, player, game_status, _ ->
-        game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND, 201413)
+        game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,
+            CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + 1413)
         null
     }
 
@@ -4869,7 +4848,7 @@ object CardSet {
 
     private suspend fun requestDeckBelow(player: PlayerEnum, game_status: GameStatus): Boolean{
         while (true){
-            return when(game_status.receiveCardEffectSelect(player, 1403)){
+            return when(game_status.receiveCardEffectSelect(player, NUMBER_HONOKA_DIVINE_OUKA)){
                 CommandEnum.SELECT_ONE -> {
                     true
                 }
@@ -4908,7 +4887,7 @@ object CardSet {
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = true, chogek = false)
         spiritSik.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
             if(game_status.getCardOwner(card_number) == player && checkCardName(card_number, CardName.HONOKA_SPIRIT_SIK)
-                && requestCardChange(player, 1400, game_status)){
+                && requestCardChange(player, NUMBER_HONOKA_SPIRIT_SIK, game_status)){
                 game_status.getCardFrom(player, CardName.HONOKA_GUARDIAN_SPIRIT_SIK, LocationEnum.ADDITIONAL_CARD)?.let {
                     game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
                     if(requestDeckBelow(player, game_status)){
@@ -4930,7 +4909,7 @@ object CardSet {
         })
         guardianSik.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
             if(game_status.getCardOwner(card_number) == player && checkCardName(card_number, CardName.HONOKA_GUARDIAN_SPIRIT_SIK)
-                && requestCardChange(player, 1401, game_status)){
+                && requestCardChange(player, NUMBER_HONOKA_GUARDIAN_SPIRIT_SIK, game_status)){
                 game_status.getCardFrom(player, CardName.HONOKA_ASSAULT_SPIRIT_SIK, LocationEnum.ADDITIONAL_CARD)?.let {
                     game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
                     if(requestDeckBelow(player, game_status)){
@@ -4952,7 +4931,7 @@ object CardSet {
         })
         assaultSik.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
             if(game_status.getCardOwner(card_number) == player && checkCardName(card_number, CardName.HONOKA_ASSAULT_SPIRIT_SIK)
-                && requestCardChange(player, 1402, game_status)){
+                && requestCardChange(player, NUMBER_HONOKA_ASSAULT_SPIRIT_SIK, game_status)){
                 game_status.getCardFrom(player, CardName.HONOKA_DIVINE_OUKA, LocationEnum.ADDITIONAL_CARD)?.let {
                     game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
                     if(requestDeckBelow(player, game_status)){
@@ -4976,7 +4955,7 @@ object CardSet {
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         sakuraBlizzard.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
             while(true){
-                when(game_status.receiveCardEffectSelect(player.opposite(), 1404)){
+                when(game_status.receiveCardEffectSelect(player.opposite(), NUMBER_HONOKA_SAKURA_BLIZZARD)){
                     CommandEnum.SELECT_ONE -> {
                         game_status.distanceToAura(player, 1, Arrow.ONE_DIRECTION, player,
                             game_status.getCardOwner(card_number), card_number)
@@ -4998,7 +4977,7 @@ object CardSet {
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         yuGiGongJin.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.DRAW_CARD) {_, player, game_status, _ ->
             while(true){
-                when(game_status.receiveCardEffectSelect(player, 1405)){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_HONOKA_UI_GI_GONG_JIN)){
                     CommandEnum.SELECT_ONE -> {
                         game_status.drawCard(player, 1)
                         break
@@ -5016,7 +4995,8 @@ object CardSet {
         yuGiGongJin.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) {_, player, game_status, _->
             while (true){
                 val list = game_status.selectCardFrom(player, player, player,
-                    listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1405
+                    listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_HONOKA_UI_GI_GONG_JIN
                 ) { _, _ -> true }?: break
                 if (list.size == 0){
                     break
@@ -5036,7 +5016,7 @@ object CardSet {
         yuGiGongJin.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) {card_number, player, game_status, _->
             if(card_number.toCardName() == CardName.HONOKA_UI_GI_GONG_JIN || dupligearCheck(card_number.toCardName())){
                 while(true){
-                    when(game_status.receiveCardEffectSelect(player, 1407)){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_HONOKA_REGENERATION)){
                         CommandEnum.SELECT_ONE -> {
                             game_status.movePlayingCard(player, LocationEnum.YOUR_DECK_BELOW, card_number)
                             break
@@ -5054,7 +5034,7 @@ object CardSet {
         })
         sakuraWing.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
             while (true){
-                when(game_status.receiveCardEffectSelect(player, 1406)){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_HONOKA_SAKURA_WING)){
                     CommandEnum.SELECT_ONE -> {
                         game_status.dustToDistance(2, Arrow.BOTH_DIRECTION, player,
                             game_status.getCardOwner(card_number), card_number)
@@ -5101,7 +5081,8 @@ object CardSet {
         sakuraAmulet.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.REACT_ATTACK_INVALID) {card_number, player, game_status, react_attack ->
             while (true){
                 val list = game_status.selectCardFrom(player, player, player,
-                    listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1408
+                    listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_HONOKA_SAKURA_AMULET
                 ) { card, _ -> card.card_data.canCover }?: break
                 if (list.size == 0){
                     break
@@ -5127,7 +5108,7 @@ object CardSet {
         })
         sakuraAmulet.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.GET_ADDITIONAL_CARD) {card_number, player, game_status, _ ->
             if(game_status.getCardOwner(card_number) == player && checkCardName(card_number, CardName.HONOKA_SAKURA_AMULET)
-                && requestCardChange(player, 1408, game_status)){
+                && requestCardChange(player, NUMBER_HONOKA_SAKURA_AMULET, game_status)){
                 game_status.getCardFrom(player, CardName.HONOKA_HONOKA_SPARKLE, LocationEnum.ADDITIONAL_CARD)?.let {
                     game_status.movePlayingCard(player, LocationEnum.ADDITIONAL_CARD, card_number)
                     if(requestDeckBelow(player, game_status)){
@@ -5168,7 +5149,8 @@ object CardSet {
         })
         handFlower.setSpecial(0)
         handFlower.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
-            game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,  201413)
+            game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,
+                CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + 1413)
             null
         })
         handFlower.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_END_PHASE_YOUR) {card_number, player, game_status, _ ->
@@ -5184,7 +5166,7 @@ object CardSet {
                 return@ret 0
             }
             while(true){
-                when(game_status.receiveCardEffectSelect(player, 1413)){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_HONOKA_HAND_FLOWER)){
                     CommandEnum.SELECT_ONE -> {
                         if (game_status.getPlayerAura(player) == 0){
                             continue
@@ -5252,7 +5234,8 @@ object CardSet {
         underFlag.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.ADD_TEXT_TO_ATTACK) { _, player, game_status, _ ->
             while (true){
                 val list = game_status.selectCardFrom(player, player, player,
-                    listOf(LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1415
+                    listOf(LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_HONOKA_UNDER_THE_NAME_OF_FLAG
                 ) { _, _ -> true }?: break
                 if (list.size == 1){
                     game_status.getPlayer(player).pre_attack_card?.addTextAndReturn(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.AFTER_AURA_DAMAGE_PLACE_CHANGE){ _, _, _, _ ->
@@ -5273,7 +5256,8 @@ object CardSet {
         fourSeason.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {_, player, game_status, _->
             while (true){
                 val list = game_status.selectCardFrom(player, player, player,
-                    listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1416
+                    listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_HONOKA_FOUR_SEASON_BACK
                 ) { _, _ -> true }?: break
                 if (list.size == 1){
                     game_status.popCardFrom(player, list[0], LocationEnum.COVER_CARD, false)?.let {
@@ -5289,7 +5273,7 @@ object CardSet {
         })
         fourSeason.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {_, player, game_status, _ ->
             while(true){
-                when(game_status.receiveCardEffectSelect(player, 1416)){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_HONOKA_FOUR_SEASON_BACK)){
                     CommandEnum.SELECT_ONE -> {
                         game_status.drawCard(player, 1)
                         break
@@ -5307,12 +5291,14 @@ object CardSet {
         fourSeason.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {_, player, game_status, _->
             while (true){
                 val list = game_status.selectCardFrom(player, player, player,
-                    listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1417, 1
+                    listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_HONOKA_FULL_BLOOM_PATH, 1
                 ) { card, _ -> card.card_data.canCover }?: break
                 game_status.popCardFrom(player, list[0], LocationEnum.HAND, false)?.let {
                     game_status.insertCardTo(player, it, LocationEnum.COVER_CARD, false)
                 }
-                game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND, 201416)
+                game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,
+                    CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + 1416)
                 break
             }
             null
@@ -5320,7 +5306,7 @@ object CardSet {
         fourSeason.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
             game_status.addAdditionalListener(player, Listener(player, card_number)ret@{gameStatus, cardNumber, _, _, _, _ ->
                 while(true){
-                    when(game_status.receiveCardEffectSelect(player, 1417)){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_HONOKA_FULL_BLOOM_PATH)){
                         CommandEnum.SELECT_ONE -> {
                             break
                         }
@@ -5364,7 +5350,7 @@ object CardSet {
     private val shurikenText = Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_END_PHASE_YOUR_IN_DISCARD) { card_number, player, game_status, _ ->
         if(game_status.getPlayer(PlayerEnum.PLAYER1).cover_card.size + game_status.getPlayer(PlayerEnum.PLAYER2).cover_card.size >= 5){
             while(true){
-                val nowCommand = game_status.receiveCardEffectSelect(player, 511)
+                val nowCommand = game_status.receiveCardEffectSelect(player, NUMBER_OBORO_SHURIKEN)
                 if(nowCommand == CommandEnum.SELECT_ONE){
                     game_status.popCardFrom(player, card_number, LocationEnum.DISCARD_YOUR, true)?.let {
                         game_status.insertCardTo(player, it, LocationEnum.HAND, true)
@@ -5430,7 +5416,7 @@ object CardSet {
             if(!(nowPlayer.loseCounter)){
                 nowPlayer.loseCounter = true
                 while(true){
-                    when(game_status.receiveCardEffectSelect(player, 514)){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_OBORO_LAST_CRYSTAL)){
                         CommandEnum.SELECT_ONE -> {
                             game_status.lifeToDust(player, nowPlayer.life, Arrow.NULL, player,
                                 game_status.getCardOwner(card_number), card_number, true)
@@ -5500,7 +5486,7 @@ object CardSet {
         })
         struggle.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
             while(true){
-                val nowCommand = game_status.receiveCardEffectSelect(player, 912)
+                val nowCommand = game_status.receiveCardEffectSelect(player, NUMBER_CHIKAGE_STRUGGLE)
                 if(selectDustToDistance(nowCommand, game_status, player,
                         game_status.getCardOwner(card_number), card_number)) break
             }
@@ -5623,35 +5609,13 @@ object CardSet {
         annihilationShadow.setAttack(DistanceType.CONTINUOUS, Pair(0, 3), null, 999, 0,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = true, chogek = false)
         annihilationShadow.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) { _, player, game_status, _ ->
-            moveResourceToDust(player.opposite(), game_status,1314, 6)
+            moveResourceToDust(player.opposite(), game_status,NUMBER_UTSURO_ANNIHILATION_SHADOW, 6)
             null
         })
         silentWalk.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){_, player, game_status, _ ->
             for(i in 1..5){
-                var stop = false
-
-                while(true){
-                    when(val command = game_status.requestBasicOperation(player, 1315)){
-                        CommandEnum.ACTION_GO_BACKWARD, CommandEnum.ACTION_WIND_AROUND, CommandEnum.ACTION_INCUBATE,
-                        CommandEnum.ACTION_BREAK_AWAY, CommandEnum.ACTION_NAGA, CommandEnum.ACTION_YAKSHA,
-                        CommandEnum.ACTION_GARUDA, CommandEnum.ACTION_ASURA -> {
-                            if(game_status.canDoBasicOperation(player, command)){
-                                game_status.doBasicOperation(player, command, 201315)
-                                break
-                            }
-                            else{
-                                continue
-                            }
-                        }
-                        CommandEnum.SELECT_NOT -> {
-                            stop = true
-                            break
-                        }
-                        else -> {}
-                    }
-                }
-
-                if (stop) {
+                val command = game_status.requestAndDoBasicOperation(player, 1315, hashSetOf(CommandEnum.ACTION_GO_FORWARD))
+                if(command == CommandEnum.SELECT_NOT){
                     break
                 }
             }
@@ -5729,7 +5693,7 @@ object CardSet {
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         revolvingBlade.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_THIS_CARD_REACTED_AFTER) { card_number, player, game_status, _->
             while(true){
-                val nowCommand = game_status.receiveCardEffectSelect(player, 1501)
+                val nowCommand = game_status.receiveCardEffectSelect(player, NUMBER_KORUNU_REVOLVING_BLADE)
                 if(nowCommand == CommandEnum.SELECT_ONE){
                     game_status.dustToDistance(2, Arrow.BOTH_DIRECTION, player,
                         game_status.getCardOwner(card_number), card_number)
@@ -5758,7 +5722,7 @@ object CardSet {
         })
         snowRide.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _->
             while(true){
-                val nowCommand = game_status.receiveCardEffectSelect(player, 1502)
+                val nowCommand = game_status.receiveCardEffectSelect(player, NUMBER_KORUNU_BLADE_DANCE)
                 if(selectDustToDistance(nowCommand, game_status, player,
                         game_status.getCardOwner(card_number), card_number)){
                     break
@@ -5766,7 +5730,7 @@ object CardSet {
             }
             if(game_status.getPlayer(player.opposite()).checkAuraFull()){
                 while(true){
-                    when(game_status.receiveCardEffectSelect(player, 1503)){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_KORUNU_RIDE_SNOW)){
                         CommandEnum.SELECT_ONE -> {
                             game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player,
                                 game_status.getCardOwner(card_number), card_number)
@@ -5795,9 +5759,11 @@ object CardSet {
             null
         })
         absoluteZero.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
-            game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND, 201504)
+            game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,
+                CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + 1504)
             if(game_status.getPlayer(player.opposite()).freezeToken >= 3){
-                game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND, 201504)
+                game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,
+                        CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + 1504)
             }
             null
         })
@@ -5826,7 +5792,7 @@ object CardSet {
             var result = 1
             if(game_status.turnPlayer == player && game_status.getPlayer(player.opposite()).freezeToken >= 1) {
                 while(true){
-                    when(game_status.receiveCardEffectSelect(player, 1506)){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_KORUNU_FROST_THORN_BUSH)){
                         CommandEnum.SELECT_ONE -> {
                             result = 0
                             break
@@ -5902,7 +5868,7 @@ object CardSet {
         })
         porucharto.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_SAKURA_TOKEN) { card_number, player, game_status, _ ->
             while(true){
-                val nowCommand = game_status.receiveCardEffectSelect(player, 1509)
+                val nowCommand = game_status.receiveCardEffectSelect(player, NUMBER_KORUNU_UPASTUM)
                 if(selectDustToDistance(nowCommand, game_status, player,
                         game_status.getCardOwner(card_number), card_number)) break
             }
@@ -5914,7 +5880,7 @@ object CardSet {
         })
         porucharto.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.USE_CARD) {card_number, player, game_status, _ ->
             while(true){
-                when(game_status.receiveCardEffectSelect(player, 1510)){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_KORUNU_PORUCHARTO)){
                     CommandEnum.SELECT_ONE -> {
                         val card = game_status.getCardFrom(player, card_number, LocationEnum.ENCHANTMENT_ZONE)?: break
                         game_status.useCardFrom(player, card, LocationEnum.ENCHANTMENT_ZONE, false, null,
@@ -5995,7 +5961,7 @@ object CardSet {
         })
         ghostStep.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
             while (true){
-                when(game_status.receiveCardEffectSelect(player, 1603)){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_YATSUHA_GHOST_STEP)){
                     CommandEnum.SELECT_ONE -> {
                         game_status.addThisTurnDistance(1)
                         game_status.addThisTurnSwellDistance(1)
@@ -6015,10 +5981,10 @@ object CardSet {
         })
         willing.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _->
             while (true){
-                when(game_status.receiveCardEffectSelect(player, 1604)){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_YATSUHA_WILLING)){
                     CommandEnum.SELECT_ONE -> {
                         while (true){
-                            when(game_status.receiveCardEffectSelect(player, 1605)){
+                            when(game_status.receiveCardEffectSelect(player, NUMBER_YATSUHA_CONTRACT)){
                                 CommandEnum.SELECT_ONE -> {
                                     game_status.auraToFlare(player, player, 1, Arrow.BOTH_DIRECTION, player,
                                         game_status.getCardOwner(card_number), card_number)
@@ -6038,7 +6004,7 @@ object CardSet {
                     }
                     CommandEnum.SELECT_TWO -> {
                         while (true){
-                            when(game_status.receiveCardEffectSelect(player, 1606)){
+                            when(game_status.receiveCardEffectSelect(player, NUMBER_YATSUHA_CLINGY_FLOWER)){
                                 CommandEnum.SELECT_ONE -> {
                                     game_status.auraToFlare(player.opposite(), player.opposite(), 1,
                                         Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number),
@@ -6060,7 +6026,7 @@ object CardSet {
                     }
                     CommandEnum.SELECT_THREE -> {
                         while (true){
-                            when(game_status.receiveCardEffectSelect(player, 1605)){
+                            when(game_status.receiveCardEffectSelect(player, NUMBER_YATSUHA_CONTRACT)){
                                 CommandEnum.SELECT_ONE -> {
                                     game_status.auraToFlare(player, player, 1, Arrow.BOTH_DIRECTION, player,
                                         game_status.getCardOwner(card_number), card_number)
@@ -6077,7 +6043,7 @@ object CardSet {
                             }
                         }
                         while (true){
-                            when(game_status.receiveCardEffectSelect(player, 1606)){
+                            when(game_status.receiveCardEffectSelect(player, NUMBER_YATSUHA_CLINGY_FLOWER)){
                                 CommandEnum.SELECT_ONE -> {
                                     game_status.auraToFlare(player.opposite(), player.opposite(), 1,
                                         Arrow.BOTH_DIRECTION, player, game_status.getCardOwner(card_number),
@@ -6174,7 +6140,7 @@ object CardSet {
             while (true){
                 val list = game_status.selectCardFrom(player, player, player,
                     listOf(LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.OTHER_ENCHANTMENT_ZONE_CARD),
-                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1608)
+                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_YATSUHA_FOUR_LEAP_SONG)
                 {card, _ -> card.card_data.card_class != CardClass.SPECIAL}?: break
                 if (list.size == 1){
                     game_status.getCardFrom(player, list[0], LocationEnum.ENCHANTMENT_ZONE)?.also {
@@ -6200,7 +6166,7 @@ object CardSet {
                     }?: break
 
                     while (true){
-                        when(game_status.receiveCardEffectSelect(player, 1608)){
+                        when(game_status.receiveCardEffectSelect(player, NUMBER_YATSUHA_FOUR_LEAP_SONG)){
                             CommandEnum.SELECT_ONE -> {
                                 if(game_status.useCardFrom(player, card, location, false, null,
                                         isCost = true, isConsume = true)){
@@ -6359,10 +6325,11 @@ object CardSet {
         zenChiKyoTen.setSpecial(4)
         zenChiKyoTen.setAttack(DistanceType.CONTINUOUS, Pair(0, 5), null, 2, 2,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = true, chogek = false)
-        zenChiKyoTen.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) ret@{card_number, player, game_status, _ ->
+        zenChiKyoTen.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) ret@{_, player, game_status, _ ->
             val set = mutableSetOf<Int>()
             val list = game_status.selectCardFrom(player, player, player,
-                listOf(LocationEnum.COVER_CARD, LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 712
+                listOf(LocationEnum.COVER_CARD, LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                NUMBER_SHINRA_SA_DO
             ) { _, _ -> true }?: return@ret null
             set.addAll(list)
             if(list.isNotEmpty()){
@@ -6381,7 +6348,8 @@ object CardSet {
             game_status.getPlayer(player).justRunNoCondition = true
             while(true){
                 val list = game_status.selectCardFrom(player, player, player,
-                    listOf(LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 713
+                    listOf(LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_SHINRA_ZEN_CHI_KYO_TEN
                 ) { card, _ -> card.card_number !in usedSet && card.thisCardHaveStratagem() }?: break
                 if(list.size == 1){
                     game_status.getCardFrom(player, list[0], LocationEnum.DISCARD_YOUR)?.runStratagem(player, game_status)
@@ -6403,7 +6371,8 @@ object CardSet {
 
     private suspend fun analyzeWhenNotAttack(player: PlayerEnum, game_status: GameStatus){
         val list = game_status.selectCardFrom(player.opposite(), player.opposite(), player,
-            listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1011, 1
+            listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+            NUMBER_KURURU_DUPLICATED_GEAR_2, 1
         ) { _, _ -> true }?: return
         game_status.popCardFrom(player.opposite(), list[0], LocationEnum.HAND, false)?.let{
             game_status.insertCardTo(player.opposite(), it, LocationEnum.COVER_CARD, false)
@@ -6412,7 +6381,8 @@ object CardSet {
 
     private suspend fun analyzeYour(player: PlayerEnum, game_status: GameStatus, card_number: Int){
         val list = game_status.selectCardFrom(player, player, player,
-            listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1014, 1
+            listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+            NUMBER_KURURU_ANALYZE, 1
         ) { _, _ -> true }?: return
         game_status.popCardFrom(player, list[0], LocationEnum.COVER_CARD, true)?.let{
             game_status.insertCardTo(player, it, LocationEnum.DISCARD_YOUR, true)
@@ -6446,7 +6416,7 @@ object CardSet {
     private suspend fun greatDiscovery(player: PlayerEnum, game_status: GameStatus){
         game_status.showSome(player.opposite(), CommandEnum.SHOW_SPECIAL_YOUR, -1)
         while(true) {
-            when (game_status.receiveCardEffectSelect(player, 1016)) {
+            when (game_status.receiveCardEffectSelect(player, NUMBER_KURURU_LAST_RESEARCH)) {
                 CommandEnum.SELECT_ONE -> {
                     val unused = game_status.getPlayer(player).unselectedSpecialCard
                     game_status.moveOutCard(player, unused, LocationEnum.SPECIAL_CARD)
@@ -6488,7 +6458,7 @@ object CardSet {
                     }
                     else{
                         while(true){
-                            when(game_status.receiveCardEffectSelect(player, 1014)){
+                            when(game_status.receiveCardEffectSelect(player, NUMBER_KURURU_ANALYZE)){
                                 CommandEnum.SELECT_ONE -> {
                                     analyzeYour(player, game_status, card_number)
                                     break
@@ -6513,7 +6483,8 @@ object CardSet {
                 game_status.insertCardTo(player.opposite(), it, LocationEnum.DISCARD_YOUR, true)
             }
             val list = game_status.selectCardFrom(player.opposite(), player, player,
-                listOf(LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1015, 1
+                listOf(LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                NUMBER_KURURU_DAUZING, 1
             ) { _, _ -> true }?: return@ret null
             game_status.getCardFrom(player.opposite(), list[0], LocationEnum.DISCARD_YOUR)?.let {
                 val kikou = getKikou(player, game_status)
@@ -6534,10 +6505,12 @@ object CardSet {
             val kikou = getKikou(player, game_status)
             if(kikou.attack >= 1){
                 val selectedByOther = game_status.selectCardFrom(player.opposite(), player.opposite(), player,
-                    listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1016, 1
+                    listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_KURURU_LAST_RESEARCH, 1
                 ) { _, _ -> true }?: return@ret null
                 val selectedByYour = game_status.selectCardFrom(player.opposite(), player, player,
-                    listOf(LocationEnum.ALL_NORMAL), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1017, 1
+                    listOf(LocationEnum.ALL_NORMAL), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_KURURU_GRAND_GULLIVER, 1
                 ) { _, _ -> true }?: return@ret null
                 game_status.popCardFrom(player.opposite(), selectedByOther[0], LocationEnum.COVER_CARD, true)?.let {
                     game_status.insertCardTo(player.opposite(), it, LocationEnum.DISCARD_YOUR, true)
@@ -6646,7 +6619,8 @@ object CardSet {
     private val callWaveText = Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_START_PHASE_YOUR){_, player, game_status, _ ->
         while (true){
             val list = game_status.selectCardFrom(player, player, player,
-                listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1706
+                listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                NUMBER_HATSUMI_CALL_WAVE
             ) { _, _ -> true }?: break
             if (list.size == 1){
                 game_status.popCardFrom(player, list[0], LocationEnum.COVER_CARD, false)?.let {
@@ -6663,7 +6637,7 @@ object CardSet {
 
     private val miobikiRouteText = Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_START_PHASE_YOUR){card_number, player, game_status, _ ->
         while(true){
-            when(game_status.receiveCardEffectSelect(player, 1710)){
+            when(game_status.receiveCardEffectSelect(player, NUMBER_HATSUMI_MIOBIKI_ROUTE)){
                 CommandEnum.SELECT_ONE -> {
                     game_status.getCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD)?.let {
                         game_status.useCardFrom(player, it, LocationEnum.YOUR_USED_CARD, false, null,
@@ -6696,7 +6670,7 @@ object CardSet {
         waterBall.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
             if(isHeadWind(player, game_status)){
                 while (true){
-                    when(game_status.receiveCardEffectSelect(player, 1700)){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_HATSUMI_WATER_BALL)){
                         CommandEnum.SELECT_ONE -> {
                             game_status.dustToDistance(2, Arrow.ONE_DIRECTION, player,
                                 game_status.getCardOwner(card_number), card_number)
@@ -6779,7 +6753,7 @@ object CardSet {
         })
         junBiManTen.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD){_, player, game_status, _ ->
             while (true){
-                when(game_status.receiveCardEffectSelect(player, 1704)){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_HATSUMI_JUN_BI_MAN_TAN)){
                     CommandEnum.SELECT_ONE -> {
                         game_status.drawCard(player, 1)
                         break
@@ -6792,7 +6766,9 @@ object CardSet {
                     }
                 }
             }
-            game_status.getPlayer(player).maxHand += 1
+            if(isHeadWind(player, game_status)){
+                game_status.getPlayer(player).maxHand += 1
+            }
             null
         })
         compass.setEnchantment(3)
@@ -6827,7 +6803,8 @@ object CardSet {
         callWave.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MOVE_CARD){_, player, game_status, _ ->
             while (true){
                 val list = game_status.selectCardFrom(player, player, player,
-                    listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1706
+                    listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_HATSUMI_CALL_WAVE
                 ) { _, _ -> true }?: break
                 if (list.size == 1){
                     game_status.popCardFrom(player, list[0], LocationEnum.COVER_CARD, false)?.let {
@@ -6842,25 +6819,7 @@ object CardSet {
             null
         })
         callWave.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.DO_BASIC_OPERATION){_, player, game_status, _ ->
-            while(true){
-                when(val command = game_status.requestBasicOperation(player, 1706)){
-                    CommandEnum.ACTION_GO_FORWARD, CommandEnum.ACTION_GO_BACKWARD, CommandEnum.ACTION_WIND_AROUND,
-                    CommandEnum.ACTION_INCUBATE, CommandEnum.ACTION_BREAK_AWAY, CommandEnum.ACTION_NAGA,
-                    CommandEnum.ACTION_YAKSHA, CommandEnum.ACTION_GARUDA, CommandEnum.ACTION_ASURA -> {
-                        if(game_status.canDoBasicOperation(player, command)){
-                            game_status.doBasicOperation(player, command, 201706)
-                            break
-                        }
-                        else{
-                            continue
-                        }
-                    }
-                    CommandEnum.SELECT_NOT -> {
-                        break
-                    }
-                    else -> {}
-                }
-            }
+            game_status.requestAndDoBasicOperation(player, 1706)
             null
         })
         callWave.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
@@ -6900,24 +6859,8 @@ object CardSet {
         oyogibiFire.setSpecial(2)
         oyogibiFire.setAttack(DistanceType.CONTINUOUS, Pair(5, 6), null, 2, 2,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
-        oyogibiFire.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_THIS_CARD_RETURN){ card_number, player, game_status, _ ->
-            while(true){
-                when(val command = game_status.requestBasicOperation(player, 1708)){
-                    CommandEnum.ACTION_GO_FORWARD, CommandEnum.ACTION_GO_BACKWARD, CommandEnum.ACTION_WIND_AROUND,
-                    CommandEnum.ACTION_INCUBATE, CommandEnum.ACTION_BREAK_AWAY, CommandEnum.ACTION_NAGA, CommandEnum.ACTION_YAKSHA,
-                    CommandEnum.ACTION_GARUDA, CommandEnum.ACTION_ASURA -> {
-                        if(game_status.canDoBasicOperation(player, command)){
-                            game_status.doBasicOperation(player, command, 201708)
-                            break
-                        }
-                        else{
-                            continue
-                        }
-                    }
-                    CommandEnum.SELECT_NOT -> break
-                    else -> {}
-                }
-            }
+        oyogibiFire.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_THIS_CARD_RETURN){ _, player, game_status, _ ->
+            game_status.requestAndDoBasicOperation(player, 1708)
             null
         })
         oyogibiFire.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
@@ -7092,7 +7035,7 @@ object CardSet {
 
     private suspend fun draft(player: PlayerEnum, game_status: GameStatus){
         game_status.selectCardFrom(player, player, player, listOf(LocationEnum.NOT_READY_SOLDIER_ZONE),
-            CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1800, 1
+            CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_MIZUKI_JIN_DU, 1
         ) { _, _ -> true }?.let {
             game_status.popCardFrom(player, it[0], LocationEnum.NOT_READY_SOLDIER_ZONE, false)?.let {soldier ->
                 game_status.insertCardTo(player, soldier, LocationEnum.READY_SOLDIER_ZONE, false)
@@ -7166,17 +7109,19 @@ object CardSet {
         overpoweringGoForward.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.DO_BASIC_OPERATION){_, player, game_status, _->
             for(i in 1..3){
                 while(true){
-                    when(game_status.receiveCardEffectSelect(player, 1805)){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_MIZUKI_OVERPOWERING_GO_FORWARD)){
                         CommandEnum.SELECT_ONE -> {
                             draft(player, game_status)
                             break
                         }
                         CommandEnum.SELECT_TWO -> {
-                            game_status.doBasicOperation(player, CommandEnum.ACTION_GO_FORWARD, 201805)
+                            game_status.doBasicOperation(player, CommandEnum.ACTION_GO_FORWARD,
+                                    CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + NUMBER_MIZUKI_OVERPOWERING_GO_FORWARD)
                             break
                         }
                         CommandEnum.SELECT_THREE -> {
-                            game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND, 201805)
+                            game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,
+                                CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + NUMBER_MIZUKI_OVERPOWERING_GO_FORWARD)
                             break
                         }
                         else -> {
@@ -7241,7 +7186,8 @@ object CardSet {
         tartenashiDaesumun.addtext(termination)
         tartenashiDaesumun.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD){_, player, game_status, _ ->
             game_status.selectCardFrom(player, player, player,
-                listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1809, 1
+                listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                NUMBER_MIZUKI_TARTENASHI_DAESUMUN, 1
             ) { _, _ -> true }?.let{ selected ->
                 game_status.popCardFrom(player, selected[0], LocationEnum.HAND, false)?.let { card ->
                     game_status.insertCardTo(player, card, LocationEnum.READY_SOLDIER_ZONE, false)
@@ -7416,7 +7362,7 @@ object CardSet {
     private val textForFlutteringCollar = Text(TextEffectTimingTag.USING, TextEffectTag.WHEN_AFTER_CARD_USE) {card_number, player, game_status, _->
         game_status.addConcentration(player)
         while(true){
-            when(game_status.receiveCardEffectSelect(player, 613)){
+            when(game_status.receiveCardEffectSelect(player, NUMBER_YUKIHI_FLUTTERING_COLLAR)){
                 CommandEnum.SELECT_ONE -> {
                     game_status.getCardFrom(player, card_number, LocationEnum.ENCHANTMENT_ZONE)?.let {
                         game_status.dustToCard(player, 3, it, card_number)
@@ -7482,7 +7428,8 @@ object CardSet {
         threadOrRawThread.addTextUnfold(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.USE_CARD) {card_number, player, game_status, _->
             if(!(game_status.logger.checkThisTurnUseCard(player) { card -> card != card_number })){
                 game_status.selectCardFrom(player, player, player,
-                    listOf(LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 611, 1){
+                    listOf(LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_YUKIHI_HELP_SLASH_THREAT, 1){
                     card, _ -> card.card_data.sub_type != SubType.FULL_POWER &&
                         card.card_data.megami != game_status.getCardFrom(player, card_number, LocationEnum.PLAYING_ZONE_YOUR)?.card_data?.megami
                 }?.let { selected ->
@@ -7541,7 +7488,8 @@ object CardSet {
         quickChange.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.SEAL_CARD) { card_number, player, game_status, _ ->
             val cardList = makeTransformList(player, game_status)
             if(cardList.size != 0){
-                val get = game_status.selectCardFrom(player, cardList, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1114, 1)[0]
+                val get = game_status.selectCardFrom(player, cardList, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_THALLYA_QUICK_CHANGE, 1)[0]
                 game_status.getCardFrom(player, get, LocationEnum.ADDITIONAL_CARD)?.let {
                     game_status.moveAdditionalCard(player, get.toCardName(), LocationEnum.SEAL_ZONE)
                     val nowPlayer = game_status.getPlayer(player)
@@ -7635,7 +7583,7 @@ object CardSet {
         formAsura.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_TRANSFORM) {_, player, game_status, _ ->
             for(i in 1..2){
                 game_status.selectCardFrom(player.opposite(), player.opposite(), player, listOf(LocationEnum.COVER_CARD),
-                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1118, 1){_, _ -> true}?.let {selected ->
+                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_FORM_ASURA, 1){_, _ -> true}?.let {selected ->
                     game_status.popCardFrom(player.opposite(), selected[0], LocationEnum.COVER_CARD, true)?.let { card ->
                         game_status.insertCardTo(player.opposite(), card, LocationEnum.DISCARD_YOUR, true)
                     }
@@ -7645,8 +7593,10 @@ object CardSet {
         })
         formDeva.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_TRANSFORM) {_, player, game_status, _ ->
             game_status.restoreArtificialToken(player, 2)
-            game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND, 201119)
-            game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND, 201119)
+            game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,
+                    CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + 1119)
+            game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,
+                CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + 1119)
             null
         })
         formDeva.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_DISCARD_NUMBER_CHANGE_OTHER) {_, player, game_status, _ ->
@@ -7677,11 +7627,11 @@ object CardSet {
     private suspend fun stormForce(player: PlayerEnum, game_status: GameStatus){
         val nowPlayer = game_status.getPlayer(player)
         while(true){
-            when(game_status.receiveCardEffectSelect(player, 1214, CommandEnum.SELECT_CARD_EFFECT)){
+            when(game_status.receiveCardEffectSelect(player, NUMBER_RAIRA_STORM, CommandEnum.SELECT_CARD_EFFECT)){
                 CommandEnum.SELECT_ONE -> {
                     if((game_status.getPlayer(player).windGauge ?: 0) >= 1){
                         while(true){
-                            val nowCommand = game_status.receiveCardEffectSelect(player, 1216)
+                            val nowCommand = game_status.receiveCardEffectSelect(player, NUMBER_RAIRA_JIN_PUNG_JE_CHEON_UI)
                             if(selectDustToDistance(nowCommand, game_status, player,
                                     PlayerEnum.PLAYER1, Log.STORM_FORCE)) {
                                 game_status.logger.insert(Log(player, LogText.END_EFFECT, Log.STORM_FORCE, -1))
@@ -7700,7 +7650,8 @@ object CardSet {
                     if((game_status.getPlayer(player).windGauge ?: 0) >= 2){
                         game_status.drawCard(player, 1)
                         game_status.selectCardFrom(player, player, player,
-                            listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1214, 1
+                            listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                            NUMBER_RAIRA_STORM, 1
                         ) { card, _ -> card.card_data.canCover }?.let { selected ->
                             game_status.popCardFrom(player, selected[0], LocationEnum.HAND, false)?.let {
                                 game_status.insertCardTo(player, it, LocationEnum.COVER_CARD, false)
@@ -7795,9 +7746,9 @@ object CardSet {
         furiousStorm.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_SAKURA_TOKEN) { card_number, player, game_status, _ ->
             for(i in 1..3){
                 while(true){
-                    when(game_status.receiveCardEffectSelect(player, 1215)){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_RAIRA_FURIOUS_STORM)){
                         CommandEnum.SELECT_ONE -> {
-                            game_status.gaugeIncreaseRequest(player, 1204)
+                            game_status.gaugeIncreaseRequest(player, NUMBER_RAIRA_WISDOM_OF_STORM_SURGE)
                             break
                         }
                         CommandEnum.SELECT_TWO -> {
@@ -7835,8 +7786,8 @@ object CardSet {
         })
         jinPungJeCheonUi.setSpecial(2)
         jinPungJeCheonUi.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CHANGE_RAIRA_GAUGE) {_, player, game_status, _->
-            game_status.gaugeIncrease(player, true)
-            game_status.gaugeIncrease(player, false)
+            game_status.windGaugeIncrease(player)
+            game_status.thunderGaugeIncrease(player)
             game_status.getPlayer(player).notCharge = true
             null
         })
@@ -7870,23 +7821,7 @@ object CardSet {
     private val megumiPalm = CardData(CardClass.SPECIAL, CardName.MEGUMI_MEGUMI_PALM, MegamiEnum.MEGUMI, CardType.ENCHANTMENT, SubType.NONE)
 
     private val wildRoseText = Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_END_PHASE_YOUR) { _, player, game_status, _ ->
-        while (true) {
-            when (val command = game_status.requestBasicOperation(player, 1906)) {
-                CommandEnum.ACTION_GO_FORWARD, CommandEnum.ACTION_GO_BACKWARD, CommandEnum.ACTION_WIND_AROUND,
-                CommandEnum.ACTION_INCUBATE, CommandEnum.ACTION_BREAK_AWAY, CommandEnum.ACTION_NAGA, CommandEnum.ACTION_YAKSHA,
-                CommandEnum.ACTION_GARUDA, CommandEnum.ACTION_ASURA -> {
-                    if (game_status.canDoBasicOperation(player, command)) {
-                        game_status.doBasicOperation(player, command, 201906)
-                        break
-                    } else {
-                        continue
-                    }
-                }
-
-                CommandEnum.SELECT_NOT -> break
-                else -> {}
-            }
-        }
+        game_status.requestAndDoBasicOperation(player, 1906, hashSetOf())
         null
     }
 
@@ -8017,23 +7952,7 @@ object CardSet {
         wildRose.setEnchantment(0)
         wildRose.growing = 2
         wildRose.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.DO_BASIC_OPERATION) {_, player, game_status, _ ->
-            while(true){
-                when(val command = game_status.requestBasicOperation(player, 1906)){
-                    CommandEnum.ACTION_GO_FORWARD, CommandEnum.ACTION_GO_BACKWARD, CommandEnum.ACTION_WIND_AROUND,
-                    CommandEnum.ACTION_INCUBATE, CommandEnum.ACTION_BREAK_AWAY, CommandEnum.ACTION_NAGA, CommandEnum.ACTION_YAKSHA,
-                    CommandEnum.ACTION_GARUDA, CommandEnum.ACTION_ASURA -> {
-                        if(game_status.canDoBasicOperation(player, command)){
-                            game_status.doBasicOperation(player, command, 201906)
-                            break
-                        }
-                        else{
-                            continue
-                        }
-                    }
-                    CommandEnum.SELECT_NOT -> break
-                    else -> {}
-                }
-            }
+            game_status.requestAndDoBasicOperation(player, 1906)
             null
         })
         wildRose.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_END_PHASE_YOUR) {card_number, _, game_status, _ ->
@@ -8143,27 +8062,12 @@ object CardSet {
                 game_status.logger.insert(Log(player, LogText.END_EFFECT, Log.ACT_DAMAGE, -1))
             }
             Act.COLOR_PURPLE -> {
-                while(true){
-                    when(val command = game_status.requestBasicOperation(player, 9000)){
-                        CommandEnum.ACTION_GO_FORWARD, CommandEnum.ACTION_GO_BACKWARD, CommandEnum.ACTION_WIND_AROUND,
-                        CommandEnum.ACTION_INCUBATE, CommandEnum.ACTION_BREAK_AWAY, CommandEnum.ACTION_NAGA, CommandEnum.ACTION_YAKSHA,
-                        CommandEnum.ACTION_GARUDA, CommandEnum.ACTION_ASURA -> {
-                            if(game_status.canDoBasicOperation(player, command)){
-                                game_status.doBasicOperation(player, command, 209000)
-                                break
-                            }
-                            else{
-                                continue
-                            }
-                        }
-                        CommandEnum.SELECT_NOT -> break
-                        else -> {}
-                    }
-                }
+                game_status.requestAndDoBasicOperation(player, 9000)
             }
             Act.COLOR_GREEN -> {
                 game_status.selectCardFrom(player, player, player,
-                    listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 9000, 1
+                    listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_IDEA_SAL_JIN, 1
                 ) { _, _ -> true }?.let {selected ->
                     game_status.popCardFrom(player, selected[0], LocationEnum.COVER_CARD, false)?.let {
                         game_status.insertCardTo(player, it, LocationEnum.YOUR_DECK_BELOW, false)
@@ -8369,7 +8273,7 @@ object CardSet {
 
     private val screenPlayText = Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_END_PHASE_YOUR_IN_DISCARD) { card_number, player, game_status, _ ->
         while(true){
-            when(game_status.receiveCardEffectSelect(player, 2001)){
+            when(game_status.receiveCardEffectSelect(player, NUMBER_KANAWE_SCREENPLAY)){
                 CommandEnum.SELECT_ONE -> {
                     game_status.popCardFrom(player, card_number, LocationEnum.DISCARD_YOUR, true)?.let {
                         game_status.insertCardTo(player, it, LocationEnum.YOUR_DECK_BELOW, true)
@@ -8435,7 +8339,8 @@ object CardSet {
         val cardList = makeIdeaList(player, game_status, from)
         if(cardList.size != 0){
             while(true){
-                val get = game_status.selectCardFrom(player, cardList, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2001)
+                val get = game_status.selectCardFrom(player, cardList, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_KANAWE_SCREENPLAY)
                 if(get.size == 0) return false
                 if(get.size != 1) continue
 
@@ -8490,7 +8395,7 @@ object CardSet {
                 }
                 else{
                     while(true){
-                        when(game_status.receiveCardEffectSelect(player, 2002)){
+                        when(game_status.receiveCardEffectSelect(player, NUMBER_KANAWE_PRODUCTION)){
                             CommandEnum.SELECT_ONE -> {
                                 game_status.dustToCard(player, 1, idea, idea.card_number, LocationEnum.IDEA_YOUR)
                                 break
@@ -8534,7 +8439,7 @@ object CardSet {
         image.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
             if(getActValue(player, game_status) % 2 == 0){
                 while(true){
-                    val nowCommand = game_status.receiveCardEffectSelect(player, 2000)
+                    val nowCommand = game_status.receiveCardEffectSelect(player, NUMBER_KANAWE_IMAGE)
                     if(selectDustToDistance(nowCommand, game_status, player,
                             game_status.getCardOwner(card_number), card_number)) break
                 }
@@ -8571,9 +8476,10 @@ object CardSet {
         })
         publish.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
             while(true){
-                when(game_status.receiveCardEffectSelect(player, 2003)){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_KANAWE_PUBLISH)){
                     CommandEnum.SELECT_ONE -> {
-                        game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND, 202003)
+                        game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,
+                            CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + 2003)
                         break
                     }
                     CommandEnum.SELECT_NOT -> {
@@ -8584,23 +8490,7 @@ object CardSet {
                     }
                 }
             }
-            while(true){
-                when(val command = game_status.requestBasicOperation(player, 2003)){
-                    CommandEnum.ACTION_GO_FORWARD, CommandEnum.ACTION_GO_BACKWARD, CommandEnum.ACTION_INCUBATE,
-                    CommandEnum.ACTION_BREAK_AWAY, CommandEnum.ACTION_NAGA, CommandEnum.ACTION_YAKSHA,
-                    CommandEnum.ACTION_GARUDA, CommandEnum.ACTION_ASURA -> {
-                        if(game_status.canDoBasicOperation(player, command)){
-                            game_status.doBasicOperation(player, command, 202003)
-                            break
-                        }
-                        else{
-                            continue
-                        }
-                    }
-                    CommandEnum.SELECT_NOT -> break
-                    else -> {}
-                }
-            }
+            game_status.requestAndDoBasicOperation(player, NUMBER_KANAWE_PUBLISH, hashSetOf(CommandEnum.ACTION_WIND_AROUND))
             null
         })
         publish.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {_, player, game_status, _ ->
@@ -8614,7 +8504,7 @@ object CardSet {
             val actColor = getActColor(player, game_status)
             if(actColor == Act.COLOR_PURPLE || actColor == Act.COLOR_GREEN){
                 game_status.selectCardFrom(player.opposite(), player, player, listOf(LocationEnum.HAND),
-                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2004, 1
+                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_KANAWE_AFTERGLOW, 1
                 ) { _, _ -> true }?.let {selected ->
                     game_status.popCardFrom(player.opposite(), selected[0], LocationEnum.HAND, true)?.let {
                         game_status.insertCardTo(player.opposite(), it, LocationEnum.YOUR_DECK_BELOW, true)
@@ -8657,10 +8547,10 @@ object CardSet {
             null
         })
         seal.setEnchantment(3)
-        seal.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.REACT_ATTACK_CHANGE)
+        seal.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.CAN_NOT_USE_CARD)
         ret@{ card_number, player, game_status, _ ->
             game_status.selectCardFrom(player.opposite(), player, player, listOf(LocationEnum.ALL),
-                CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2006, 1
+                CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_KANAWE_SEAL, 1
             ) { _, _ -> true }?.let { selected ->
                 val sealedPlayer = game_status.getPlayer(player.opposite())
                 if(sealedPlayer.canNotUseCardName1 == null){
@@ -8693,7 +8583,7 @@ object CardSet {
             val nowPlayer = game_status.getPlayer(player)
             if(nowPlayer.concentration >= 1){
                 while(true){
-                    when(game_status.receiveCardEffectSelect(player, 2007)){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_KANAWE_VAGUE_STORY)){
                         CommandEnum.SELECT_ONE -> {
                             game_status.setConcentration(player, nowPlayer.concentration - 1)
                             readyIdea(player, game_status, LocationEnum.ADDITIONAL_CARD)
@@ -8756,7 +8646,7 @@ object CardSet {
         distantSky.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {card_number, player, game_status, _ ->
             while(true) {
                 val selected = game_status.selectCardFrom(player, player, player, listOf(LocationEnum.HAND),
-                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2008
+                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_KANAWE_INFINITE_STARLIGHT
                 ) { card, _ -> card.card_data.card_class == CardClass.NORMAL }?: break
                 if(selected.size == 0){
                     break
@@ -8767,7 +8657,7 @@ object CardSet {
                     }
 
                     game_status.selectCardFrom(player, player, player, listOf(LocationEnum.NOT_SELECTED_NORMAL),
-                        CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2009, 1){_, _ -> true }?.let { normal ->
+                        CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_KANAWE_BEND_OVER_THIS_NIGHT, 1){_, _ -> true }?.let { normal ->
                         game_status.getPlayer(player).unselectedCard.remove(normal[0].toCardName())
                         game_status.insertCardTo(player,
                             Card.cardMakerByName(game_status.getPlayer(player).firstTurn, normal[0].toCardName(), player),
@@ -8783,7 +8673,7 @@ object CardSet {
             game_status.movePlayingCard(player, LocationEnum.OUT_OF_GAME, card_number)
 
             game_status.selectCardFrom(player, player, player, listOf(LocationEnum.NOT_SELECTED_SPECIAL),
-                CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2010, 1){ _, _ -> true }?.let { special ->
+                CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_KANAWE_DISTANT_SKY, 1){ _, _ -> true }?.let { special ->
                 game_status.getPlayer(player).unselectedSpecialCard.remove(special[0].toCardName())
                 game_status.insertCardTo(player,
                     Card.cardMakerByName(game_status.getPlayer(player).firstTurn, special[0].toCardName(), player),
@@ -8856,7 +8746,8 @@ object CardSet {
         eightSakuraInVain.setSpecial(4)
         eightSakuraInVain.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.DO_BASIC_OPERATION){_, player, game_status, _->
             for(i in 1..5){
-                game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND, 201416)
+                game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,
+                    CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + 201416)
             }
             null
         })
@@ -8904,7 +8795,7 @@ object CardSet {
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         shadowHand.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.WHEN_CHOOSE_AURA_DAMAGE) { _, player, game_status, _ ->
             game_status.selectCardFrom(player.opposite(), player, player, listOf(LocationEnum.HAND),
-                CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1419, 1)
+                CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_HONOKA_SHADOW_HAND, 1)
             { _, _ -> true }?.let { selected ->
                 game_status.popCardFrom(player.opposite(), selected[0], LocationEnum.HAND, true)?.let {
                     game_status.insertCardTo(player.opposite(), it, LocationEnum.DISCARD_YOUR, true)
@@ -8954,30 +8845,9 @@ object CardSet {
             }
             null
         })
-        followTrace.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN)ret@{_, player, game_status, _ ->
-            val set = mutableSetOf<CommandEnum>()
-            for(i in 1..2){
-                while(true){
-                    when(val command = game_status.requestBasicOperation(player, 1421)){
-                        CommandEnum.ACTION_GO_FORWARD, CommandEnum.ACTION_GO_BACKWARD, CommandEnum.ACTION_WIND_AROUND,
-                        CommandEnum.ACTION_INCUBATE, CommandEnum.ACTION_BREAK_AWAY, CommandEnum.ACTION_NAGA,
-                        CommandEnum.ACTION_YAKSHA, CommandEnum.ACTION_GARUDA, CommandEnum.ACTION_ASURA -> {
-                            if(game_status.canDoBasicOperation(player, command) && command !in set){
-                                game_status.doBasicOperation(player, command, 201421)
-                                set.add(command)
-                                break
-                            }
-                            else{
-                                continue
-                            }
-                        }
-                        CommandEnum.SELECT_NOT -> {
-                            return@ret null
-                        }
-                        else -> {}
-                    }
-                }
-            }
+        followTrace.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){_, player, game_status, _ ->
+            val firstCommand = game_status.requestAndDoBasicOperation(player, 1421)
+            game_status.requestAndDoBasicOperation(player, 1421, hashSetOf(firstCommand))
             null
         })
         followTrace.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
@@ -9001,7 +8871,7 @@ object CardSet {
         })
         facingShadow.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
             while(true){
-                when(game_status.receiveCardEffectSelect(player.opposite(), 1422)){
+                when(game_status.receiveCardEffectSelect(player.opposite(), NUMBER_HONOKA_FACING_SHADOW)){
                     CommandEnum.SELECT_ONE -> {
                         game_status.flareToDust(player.opposite(), 1, Arrow.ONE_DIRECTION, player,
                             game_status.getCardOwner(card_number), card_number)
@@ -9218,7 +9088,8 @@ object CardSet {
             if(player == game_status.getCardOwner(card_number)){
                 if(game_status.getPlayer(player).anvil == null){
                     while(true){
-                        val list = game_status.selectCardFrom(player, player, player, listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 813
+                        val list = game_status.selectCardFrom(player, player, player, listOf(LocationEnum.HAND),
+                            CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_HAGANE_GRAND_SOFT_MATERIAL
                         ) { card, _ -> card.card_data.card_type == CardType.ATTACK && card.card_data.megami != MegamiEnum.HAGANE }?: break
                         if (list.size == 1){
                             game_status.popCardFrom(player, list[0], LocationEnum.HAND, true)?.let { selectedAttack ->
@@ -9273,7 +9144,7 @@ object CardSet {
         redBlade.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT_AFTER_MAKE_ATTACK) {card_number, player, game_status, _->
             if(game_status.getPlayer(player).tabooGauge != null){
                 while(true){
-                    when(game_status.receiveCardEffectSelect(player, 2100)){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_KAMUWI_RED_BLADE)){
                         CommandEnum.SELECT_ONE -> {
                             game_status.tabooGaugeIncrease(player, 1)
                             game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {buff_player, buff_game_status, _ ->
@@ -9299,7 +9170,7 @@ object CardSet {
         flutteringBlade.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
             if(game_status.getPlayer(player).tabooGauge != null){
                 while(true){
-                    when(game_status.receiveCardEffectSelect(player, 2101)){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_KAMUWI_FLUTTERING_BLADE)){
                         CommandEnum.SELECT_ONE -> {
                             game_status.tabooGaugeIncrease(player, 1)
                             if(game_status.getPlayer(player).aura <= 4){
@@ -9307,7 +9178,8 @@ object CardSet {
                                     null, null, card_number)
                                 game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
                             }
-                            game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND, 202101)
+                            game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,
+                                CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + NUMBER_KAMUWI_FLUTTERING_BLADE)
                             break
                         }
                         CommandEnum.SELECT_NOT -> {
@@ -9324,7 +9196,7 @@ object CardSet {
         siKenLanJin.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
             if(game_status.getFullAction(player) && game_status.getPlayer(player).tabooGauge != null){
                 while(true){
-                    when(game_status.receiveCardEffectSelect(player, 2102)){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_KAMUWI_SI_KEN_LAN_JIN)){
                         CommandEnum.SELECT_ONE -> {
                             game_status.tabooGaugeIncrease(player, 1)
                             for (i in 1..3){
@@ -9354,7 +9226,7 @@ object CardSet {
         cutDown.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.REACT_ATTACK_NO_DAMAGE){card_number, player, game_status, react_attack ->
             if(game_status.getPlayer(player).tabooGauge != null){
                 while(true){
-                    when(game_status.receiveCardEffectSelect(player, 2103)){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_KAMUWI_CUT_DOWN)){
                         CommandEnum.SELECT_ONE -> {
                             game_status.tabooGaugeIncrease(player, 2)
                             react_attack?.addOtherBuff(OtherBuff(card_number, 1, OtherBuffTag.GET_IMMEDIATE,
@@ -9406,7 +9278,7 @@ object CardSet {
             var secondCommand: CommandEnum
 
             while(true){
-                firstCommand = game_status.receiveCardEffectSelect(player, 2105)
+                firstCommand = game_status.receiveCardEffectSelect(player, NUMBER_KAMUWI_KE_SYO_LAN_LYU)
                 when(firstCommand){
                     CommandEnum.SELECT_ONE, CommandEnum.SELECT_TWO, CommandEnum.SELECT_THREE, CommandEnum.SELECT_FOUR
                     -> {
@@ -9419,7 +9291,7 @@ object CardSet {
             }
 
             while(true){
-                secondCommand = game_status.receiveCardEffectSelect(player, 2105)
+                secondCommand = game_status.receiveCardEffectSelect(player, NUMBER_KAMUWI_KE_SYO_LAN_LYU)
                 when(secondCommand){
                     firstCommand -> {
                         continue
@@ -9484,7 +9356,7 @@ object CardSet {
         bloodWave.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
             if(game_status.getPlayer(player).tabooGauge != null){
                 while(true){
-                    when(game_status.receiveCardEffectSelect(player, 2106)){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_KAMUWI_BLOOD_WAVE)){
                         CommandEnum.SELECT_ONE -> {
                             game_status.tabooGaugeIncrease(player, 1)
                             if(game_status.addPreAttackZone(player, MadeAttack(CardName.KAMUWI_BLOOD_WAVE, card_number, CardClass.NULL,
@@ -9520,7 +9392,7 @@ object CardSet {
         lamp.setSpecial(5)
         lamp.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {card_number, player, game_status, _->
             while(true){
-                when(game_status.receiveCardEffectSelect(player, 2107)){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_KAMUWI_LAMP)){
                     CommandEnum.SELECT_ONE -> {
                         game_status.tabooGaugeIncrease(player, 3)
                         game_status.flareToDust(player, game_status.getPlayerFlare(player), Arrow.NULL, player,
@@ -9572,7 +9444,7 @@ object CardSet {
         graveYard.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
             if(game_status.getPlayer(player).tabooGauge != null){
                 while(true){
-                    when(game_status.receiveCardEffectSelect(player, 2109)){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_KAMUWI_GRAVEYARD)){
                         CommandEnum.SELECT_ONE -> {
                             game_status.tabooGaugeIncrease(player, 2)
                             if(game_status.addPreAttackZone(player, MadeAttack(CardName.KAMUWI_GRAVEYARD, card_number, CardClass.NULL,
@@ -9646,7 +9518,7 @@ object CardSet {
     private val shamanisticMusic = CardData(CardClass.SPECIAL, CardName.KIRIKO_SHAMANISTIC_MUSIC, MegamiEnum.KIRIKO, CardType.ATTACK, SubType.NONE)
 
     private val rururarariText = Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_END_PHASE_YOUR){card_number, player, game_status, _ ->
-        game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_DAMAGE, Pair(999, 1), false,
+        game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_AURA, Pair(1, 999), false,
             null, null, card_number)
         game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
         game_status.returnSpecialCard(player, card_number)
@@ -9658,7 +9530,7 @@ object CardSet {
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         falseStab.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_THIS_CARD_NOT_DISPROVE) ret@{card_number, player, game_status, _ ->
             while(true){
-                when(game_status.receiveCardEffectSelect(player, 2200)){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_RENRI_FALSE_STAB)){
                     CommandEnum.SELECT_ONE -> {
                         if(card_number.toCardName() != CardName.RENRI_FALSE_STAB){
                             game_status.getPlayer(player).pre_attack_card?.canNotSelectAura = true
@@ -9718,8 +9590,10 @@ object CardSet {
             game_status.setShrink(player.opposite())
             if(game_status.logger.checkThisTurnFailDisprove(player.opposite())){
                 while(true){
-                    val list = game_status.selectCardFrom(player, player, player, listOf(LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2203
-                    ) { card, _ -> isPerjure(card.card_number) }?: break
+                    val list = game_status.selectCardFrom(player, player, player,
+                        listOf(LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                        NUMBER_RENRI_IRRITATING_GESTURE
+                    ) { card, _ -> card.card_number.isPerjure() }?: break
                     if (list.size == 1){
                         game_status.popCardFrom(player, list[0], LocationEnum.DISCARD_YOUR, true)?.let { selected ->
                             game_status.insertCardTo(player, selected, LocationEnum.HAND, true)
@@ -9750,7 +9624,7 @@ object CardSet {
             }
             if(count >= 3){
                 game_status.selectCardFrom(player.opposite(), player.opposite(), player, listOf(LocationEnum.HAND),
-                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2204, 1
+                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_RENRI_FLOATING_CLOUDS, 1
                 ) { card, _ -> card.card_data.canCover }?.let { selected ->
                     game_status.popCardFrom(player, selected[0], LocationEnum.HAND, true)?.let {
                         game_status.insertCardTo(player, it, LocationEnum.COVER_CARD, true)
@@ -9803,13 +9677,14 @@ object CardSet {
         ranararomirerira.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) ret@{_, player, game_status, react_attack ->
             while(true){
                 val selected = game_status.selectCardFrom(player.opposite(), player, player,
-                    listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2208)
+                    listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_RENRI_RA_NA_RA_RO_MI_RE_RI_RA)
                 {card, _ -> card.card_data.sub_type != SubType.FULL_POWER && card.card_data.megami != MegamiEnum.RENRI}?: run {
                     return@ret null
                 }
                 if(selected.size == 1){
                     while(true){
-                        when(game_status.receiveCardEffectSelect(player, 2208)){
+                        when(game_status.receiveCardEffectSelect(player, NUMBER_RENRI_RA_NA_RA_RO_MI_RE_RI_RA)){
                             CommandEnum.SELECT_ONE -> {
                                 val selectNumber = selected[0]
                                 game_status.getCardFrom(player.opposite(), selectNumber, LocationEnum.HAND)?.let {
@@ -9841,7 +9716,9 @@ object CardSet {
         orireterareru.setSpecial(2)
         orireterareru.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) ret@{_, player, game_status, react_attack ->
             game_status.selectCardFrom(player, player, player, listOf(LocationEnum.NOT_SELECTED_NORMAL),
-                CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2209, 1){card, _ -> isPerjure(card.card_number) }?.let { selected ->
+                CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_RENRI_O_RI_RE_TE_RA_RE_RU, 1) {
+                    card, _ -> card.card_number.isPerjure()
+            }?.let { selected ->
                 game_status.getPlayer(player).unselectedCard.remove(selected[0].toCardName())
                 val useCard = Card.cardMakerByName(game_status.getPlayer(player).firstTurn,
                     selected[0].toCardName(), player)
@@ -9970,7 +9847,8 @@ object CardSet {
     private suspend fun changeCompleteCard(game_status: GameStatus, player: PlayerEnum): Boolean{
         while (true){
             val list = game_status.selectCardFrom(player, player, player,
-                listOf(LocationEnum.HAND, LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 1617
+                listOf(LocationEnum.HAND, LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                NUMBER_YATSUHA_VAIN_FLOWER
             ) {card, _ -> card.card_data.megami == MegamiEnum.YATSUHA && card.card_data.card_name in notCompleteSet}?: break
             if (list.size == 1){
                 game_status.popCardFrom(player, list[0], LocationEnum.HAND, true)?.let {
@@ -10021,7 +9899,7 @@ object CardSet {
         })
         ghostLink.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
             while (true){
-                when(game_status.receiveCardEffectSelect(player, 1614)){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_YATSUHA_GHOST_LINK)){
                     CommandEnum.SELECT_ONE -> {
                         game_status.addThisTurnDistance(1)
                         game_status.addThisTurnSwellDistance(1)
@@ -10049,10 +9927,10 @@ object CardSet {
         })
         resolution.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, react_attack->
             while (true){
-                when(game_status.receiveCardEffectSelect(player, 1615)){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_YATSUHA_RESOLUTION)){
                     CommandEnum.SELECT_ONE -> {
                         while (true){
-                            when(game_status.receiveCardEffectSelect(player, 1611)){
+                            when(game_status.receiveCardEffectSelect(player, NUMBER_YATSUHA_HOLY_RAKE_HANDS)){
                                 CommandEnum.SELECT_ONE -> {
                                     game_status.auraToFlare(player, player, 1, Arrow.BOTH_DIRECTION, player,
                                         game_status.getCardOwner(card_number), card_number)
@@ -10086,7 +9964,7 @@ object CardSet {
                     }
                     CommandEnum.SELECT_THREE -> {
                         while (true){
-                            when(game_status.receiveCardEffectSelect(player, 1611)){
+                            when(game_status.receiveCardEffectSelect(player, NUMBER_YATSUHA_HOLY_RAKE_HANDS)){
                                 CommandEnum.SELECT_ONE -> {
                                     game_status.auraToFlare(player, player, 1, Arrow.BOTH_DIRECTION, player,
                                         game_status.getCardOwner(card_number), card_number)
@@ -10124,10 +10002,10 @@ object CardSet {
         })
         pledge.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, react_attack->
             while (true) {
-                when (game_status.receiveCardEffectSelect(player, 1616)) {
+                when (game_status.receiveCardEffectSelect(player, NUMBER_YATSUHA_PLEDGE)) {
                     CommandEnum.SELECT_ONE -> {
                         while (true) {
-                            when (game_status.receiveCardEffectSelect(player, 1612)) {
+                            when (game_status.receiveCardEffectSelect(player, NUMBER_YATSUHA_ENTRANCE_OF_ABYSS)) {
                                 CommandEnum.SELECT_ONE -> {
                                     game_status.auraToFlare(
                                         player.opposite(), player, 1, Arrow.BOTH_DIRECTION, player,
@@ -10151,7 +10029,7 @@ object CardSet {
                     }
                     CommandEnum.SELECT_TWO -> {
                         while (true) {
-                            when (game_status.receiveCardEffectSelect(player, 1613)) {
+                            when (game_status.receiveCardEffectSelect(player, NUMBER_YATSUHA_TRUE_MONSTER)) {
                                 CommandEnum.SELECT_ONE -> {
                                     game_status.flareToAura(
                                         player.opposite(), player, 1, Arrow.BOTH_DIRECTION, player,
@@ -10194,8 +10072,9 @@ object CardSet {
             }
             null
         })
+        eightMirrorVainSakura.setSpecial(1)
         eightMirrorVainSakura.addtext(termination)
-        eightMirrorVainSakura.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.USING_CONDITION){_, player, game_status, _ ->
+        eightMirrorVainSakura.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.USING_CONDITION){_, _, game_status, _ ->
             if(game_status.getAdjustDistance() <= 7) 1
             else 0
         })
@@ -10225,11 +10104,11 @@ object CardSet {
             game_status.getCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD)?.let {
                 var connectDive = 0
                 for(card in game_status.getPlayer(player).usedSpecialCard.values){
-                    connectDive += card.effectAllValidEffect(5, player, game_status, TextEffectTag.WHEN_RESOLVE_COG_EFFECT)
+                    connectDive += card.effectAllValidEffect(card.card_number * 10 + 5, player, game_status, TextEffectTag.WHEN_RESOLVE_COG_EFFECT)
                 }
                 if(connectDive > 0){
                     while (true) {
-                        when (game_status.receiveCardEffectSelect(player, 1019)) {
+                        when (game_status.receiveCardEffectSelect(player, NUMBER_KURURU_RAILGUN)) {
                             CommandEnum.SELECT_ONE -> {
                                 if(game_status.dust >= 2){
                                     game_status.dustToCard(player, 2, it, card_number, LocationEnum.YOUR_USED_CARD)
@@ -10255,7 +10134,7 @@ object CardSet {
                 }
                 else{
                     while (true) {
-                        when (game_status.receiveCardEffectSelect(player, 1020)) {
+                        when (game_status.receiveCardEffectSelect(player, NUMBER_KURURU_CONNECT_DIVE)) {
                             CommandEnum.SELECT_ONE -> {
                                 if(game_status.dust >= 1){
                                     game_status.dustToCard(player, 1, it, card_number, LocationEnum.PLAYING_ZONE_YOUR)
@@ -10295,7 +10174,7 @@ object CardSet {
             if(kikou.enchantment >= 1){
                 var connectDive = 0
                 for(card in game_status.getPlayer(player).usedSpecialCard.values){
-                    connectDive += card.effectAllValidEffect(5, player, game_status, TextEffectTag.WHEN_RESOLVE_COG_EFFECT)
+                    connectDive += card.effectAllValidEffect(card.card_number * 10 + 6, player, game_status, TextEffectTag.WHEN_RESOLVE_COG_EFFECT)
                 }
                 if(connectDive > 0){
                     if(game_status.addPreAttackZone(player, MadeAttack(CardName.KURURU_BLASTER, card_number, CardClass.NULL,
@@ -10323,7 +10202,7 @@ object CardSet {
             if (kikou.reaction >= 1 && kikou.behavior >= 1) {
                 var connectDive = 0
                 for(card in game_status.getPlayer(player).usedSpecialCard.values){
-                    connectDive += card.effectAllValidEffect(6, player, game_status, TextEffectTag.WHEN_RESOLVE_COG_EFFECT)
+                    connectDive += card.effectAllValidEffect(card.card_number * 10 + 7, player, game_status, TextEffectTag.WHEN_RESOLVE_COG_EFFECT)
                 }
                 if(connectDive > 0){
                     if(game_status.addPreAttackZone(player, MadeAttack(CardName.KURURU_BLASTER, card_number, CardClass.NULL,
@@ -10350,7 +10229,7 @@ object CardSet {
             if(kikou.attack >= 2){
                 var connectDive = 0
                 for(card in game_status.getPlayer(player).usedSpecialCard.values){
-                    connectDive += card.effectAllValidEffect(7, player, game_status, TextEffectTag.WHEN_RESOLVE_COG_EFFECT)
+                    connectDive += card.effectAllValidEffect(card.card_number * 10 + 8, player, game_status, TextEffectTag.WHEN_RESOLVE_COG_EFFECT)
                 }
                 if(connectDive > 0){
                     game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ ->
@@ -10372,7 +10251,7 @@ object CardSet {
 
                 var connectDive = 0
                 for(card in game_status.getPlayer(player).usedSpecialCard.values){
-                    connectDive += card.effectAllValidEffect(8, player, game_status, TextEffectTag.WHEN_RESOLVE_COG_EFFECT)
+                    connectDive += card.effectAllValidEffect(card.card_number * 10 + 9, player, game_status, TextEffectTag.WHEN_RESOLVE_COG_EFFECT)
                 }
                 if(connectDive > 0){
                     game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ ->
@@ -10408,20 +10287,16 @@ object CardSet {
             if(kikou.behavior >= 1 && kikou.reaction >= 1 && kikou.enchantment >= 1){
                 game_status.getCardFrom(player, card_number, LocationEnum.PLAYING_ZONE_YOUR)?.let {
                     while (true) {
-                        when (game_status.receiveCardEffectSelect(player, 1020)) {
+                        when (game_status.receiveCardEffectSelect(player, NUMBER_KURURU_CONNECT_DIVE)) {
                             CommandEnum.SELECT_ONE -> {
                                 if(game_status.dust >= 1){
-                                    game_status.getCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD)?.let {
-                                        game_status.dustToCard(player, 1, it, Log.IGNORE, LocationEnum.PLAYING_ZONE_YOUR)
-                                    }
+                                    game_status.dustToCard(player, 1, it, Log.IGNORE, LocationEnum.PLAYING_ZONE_YOUR)
                                     break
                                 }
                             }
                             CommandEnum.SELECT_TWO -> {
                                 if(game_status.getPlayerAura(player) >= 1){
-                                    game_status.getCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD)?.let {
-                                        game_status.auraToCard(player, 1, it, Log.IGNORE, LocationEnum.PLAYING_ZONE_YOUR)
-                                    }
+                                    game_status.auraToCard(player, 1, it, Log.IGNORE, LocationEnum.PLAYING_ZONE_YOUR)
                                     break
                                 }
                             }
@@ -10442,13 +10317,14 @@ object CardSet {
             null
         })
         connectDive.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_RESOLVE_COG_EFFECT) ret@{card_number, player, game_status, _ ->
-            val connectDive = game_status.getCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD)?: return@ret null
+            val connectDiveNumber = card_number / 10
+            val connectDive = game_status.getCardFrom(player, connectDiveNumber, LocationEnum.YOUR_USED_CARD)?: return@ret null
             if((connectDive.getNap()?: 0) >= 1){
                 while(true){
-                    val nowCommand = game_status.receiveCardEffectSelect(player, 102000000 + card_number)
+                    val nowCommand = game_status.receiveCardEffectSelect(player, 102000000 + card_number - connectDiveNumber * 10)
                     if(nowCommand == CommandEnum.SELECT_ONE){
-                        game_status.cardToDust(player, 1, connectDive, false, card_number)
-                        game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
+                        game_status.cardToDust(player, 1, connectDive, false, connectDiveNumber)
+                        game_status.logger.insert(Log(player, LogText.END_EFFECT, connectDiveNumber, -1))
                         return@ret 1
                     }
                     else if(nowCommand == CommandEnum.SELECT_NOT){
@@ -10524,6 +10400,23 @@ object CardSet {
         })
     }
 
+    private val questionAnswer = CardData(CardClass.NORMAL, CardName.YURINA_QUESTION_ANSWER, MegamiEnum.YURINA, CardType.ATTACK, SubType.NONE)
+
+
+    private fun yurinaA2CardInit(){
+        questionAnswer.setAttack(DistanceType.CONTINUOUS, Pair(2, 5), null, 3, 0,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        questionAnswer.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.WHEN_CHOOSE_LIFE_DAMAGE) { _, player, game_status, _ ->
+            game_status.getPlayer(player.opposite()).deckToCoverCard(game_status, 3)
+            val basicOperationSelected = game_status.requestAndDoBasicOperation(player, 114)
+            if(game_status.canDoBasicOperation(player.opposite(), basicOperationSelected)){
+                game_status.doBasicOperation(player.opposite(), basicOperationSelected, CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + 114)
+            }
+            null
+        })
+
+    }
+
     fun init(){
         yurinaCardInit()
         saineCardInit()
@@ -10567,20 +10460,44 @@ object CardSet {
         yatsuhaA1CardInit()
         kururuA2CardInit()
         hatsumiA1CardInit()
+        yurinaA2CardInit()
 
         hashMapInit()
         hashMapTest()
     }
+}
 
-    private val poisonSet = setOf(1, 995, 996, 997, 998, 999, 10995, 10996, 10997, 10998, 10999)
+private val poisonSet = hashSetOf(NUMBER_POISON_ANYTHING, NUMBER_POISON_PARALYTIC, NUMBER_POISON_HALLUCINOGENIC,
+    NUMBER_POISON_RELAXATION, NUMBER_POISON_DEADLY_1, NUMBER_POISON_DEADLY_2,
+    SECOND_PLAYER_START_NUMBER + NUMBER_POISON_PARALYTIC, SECOND_PLAYER_START_NUMBER + NUMBER_POISON_HALLUCINOGENIC,
+    SECOND_PLAYER_START_NUMBER + NUMBER_POISON_RELAXATION, SECOND_PLAYER_START_NUMBER + NUMBER_POISON_DEADLY_1,
+    SECOND_PLAYER_START_NUMBER + NUMBER_POISON_DEADLY_2)
 
-    fun isPoison(card_number: Int) = card_number in poisonSet
+fun Int.isPoison() = this in poisonSet
 
-    private val soldierSet = setOf(1812, 1813, 1814, 1815, 11812, 11813, 11814, 11815)
+private val soldierSet = hashSetOf(NUMBER_SOLDIER_HORSE, NUMBER_SOLDIER_SHIELD, NUMBER_SOLDIER_SPEAR_1,
+    NUMBER_SOLDIER_SPEAR_2, SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_HORSE,
+    SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_SHIELD, SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_SPEAR_1,
+    SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_SPEAR_2)
 
-    fun isSoldier(card_number: Int) = card_number in soldierSet
+fun Int.isSoldier() = this in soldierSet
 
-    private val perjureSet = setOf(2200, 2201, 2202, 2204, 2205, 12200, 12201, 12202, 12204, 12205)
+private val perjureSet = hashSetOf(
+    NUMBER_RENRI_FALSE_STAB, NUMBER_RENRI_TEMPORARY_EXPEDIENT, NUMBER_RENRI_BLACK_AND_WHITE,
+    NUMBER_RENRI_FLOATING_CLOUDS, NUMBER_RENRI_FISHING, SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_FALSE_STAB,
+    SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_TEMPORARY_EXPEDIENT,
+    SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_BLACK_AND_WHITE,
+    SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_FLOATING_CLOUDS,
+    SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_FISHING)
 
-    fun isPerjure(card_number: Int) = card_number in perjureSet
+fun Int.isPerjure() = this in perjureSet
+
+fun Int.toPrivate(): Int{
+    return if(this.isPoison()){
+        1
+    } else if(this.isSoldier()){
+        2
+    } else{
+        0
+    }
 }

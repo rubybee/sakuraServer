@@ -1,7 +1,7 @@
 package com.sakurageto.protocol
 
 import com.sakurageto.Connection
-import com.sakurageto.card.CardSet
+import com.sakurageto.card.toPrivate
 import com.sakurageto.gamelogic.Stratagem
 import com.sakurageto.protocol.CommandEnum.*
 import io.ktor.websocket.*
@@ -81,16 +81,17 @@ suspend fun sendDestructionEnchant(mine: Connection, other: Connection, card_num
 
 suspend fun sendPopCardZone(mine: Connection, other: Connection, card_number: Int, public: Boolean, command: CommandEnum){
     val dataYour = SakuraCardCommand(command, card_number)
-    val dataOther = if(public) SakuraCardCommand(command.Opposite(), card_number) else SakuraCardCommand(command.Opposite(), if(CardSet.isPoison(card_number)) 1 else 0)
+    val dataOther = if(public) SakuraCardCommand(command.Opposite(), card_number)
+    else SakuraCardCommand(command.Opposite(), card_number.toPrivate())
     send(mine, Json.encodeToString(dataYour))
     send(other, Json.encodeToString(dataOther))
 }
 
 suspend fun sendAddCardZone(mine: Connection, other: Connection, card_number: Int, publicForOther: Boolean, command: CommandEnum, publicForYour: Boolean = true){
     val dataYour = if(publicForYour)SakuraCardCommand(command, card_number)
-    else SakuraCardCommand(command, if(CardSet.isPoison(card_number)) 1 else if(CardSet.isSoldier(card_number)) 2 else 0)
+    else SakuraCardCommand(command, card_number.toPrivate())
     val dataOther = if(publicForOther) SakuraCardCommand(command.Opposite(), card_number)
-    else SakuraCardCommand(command.Opposite(), if(CardSet.isPoison(card_number)) 1 else if(CardSet.isSoldier(card_number)) 2 else 0)
+    else SakuraCardCommand(command.Opposite(), card_number.toPrivate())
     send(mine, Json.encodeToString(dataYour))
     send(other, Json.encodeToString(dataOther))
 }
@@ -181,14 +182,14 @@ suspend fun sendRemoveShrink(mine: Connection, other: Connection){
 suspend fun sendHandToDeck(mine: Connection, other: Connection, card_number: Int, public: Boolean, below: Boolean){
     val dataYour = SakuraCardCommand(if (below) CARD_HAND_TO_DECK_BELOW_YOUR else CARD_HAND_TO_DECK_UPPER_YOUR, card_number)
     val dataOther = if(public) SakuraCardCommand(if (below) CARD_HAND_TO_DECK_BELOW_OTHER else CARD_HAND_TO_DECK_UPPER_OTHER, card_number)
-    else SakuraCardCommand(if (below) CARD_HAND_TO_DECK_BELOW_OTHER else CARD_HAND_TO_DECK_UPPER_OTHER, if(CardSet.isPoison(card_number)) 1 else 0)
+    else SakuraCardCommand(if (below) CARD_HAND_TO_DECK_BELOW_OTHER else CARD_HAND_TO_DECK_UPPER_OTHER, card_number.toPrivate())
     send(mine, Json.encodeToString(dataYour))
     send(other, Json.encodeToString(dataOther))
 }
 
 suspend fun sendDrawCard(mine: Connection, other: Connection, card_number: Int){
     val dataYour = SakuraCardCommand(DRAW_CARD_YOUR, card_number)
-    val dataOther = SakuraCardCommand(DRAW_CARD_OTHER, if(CardSet.isPoison(card_number)) 1 else 0)
+    val dataOther = SakuraCardCommand(DRAW_CARD_OTHER, card_number.toPrivate())
     send(mine, Json.encodeToString(dataYour))
     send(other, Json.encodeToString(dataOther))
 }

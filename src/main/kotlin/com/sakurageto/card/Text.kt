@@ -74,6 +74,7 @@ enum class TextEffectTag {
     PHASE_SKIP,
     ADD_COST,
     DIVING,
+    CAN_NOT_USE_CARD,
 
     //description when this effect use
     WHEN_USE_BEHAVIOR_END,

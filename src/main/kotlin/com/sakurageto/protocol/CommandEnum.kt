@@ -1,5 +1,7 @@
 package com.sakurageto.protocol
 
+import java.util.*
+
 enum class CommandEnum {
     ACK,
     NULL,
@@ -284,6 +286,17 @@ enum class CommandEnum {
     DIVING_FORWARD,
     DIVING_BACKWARD,
     DIVING_SHOW;
+
+    fun isBasicOperation() = this in basicOperationSet
+
+    companion object{
+        const val BASIC_OPERATION_CAUSE_BY_CARD = 200000
+
+        private val basicOperationSet: EnumSet<CommandEnum> = EnumSet.of(
+            ACTION_GO_FORWARD, ACTION_GO_BACKWARD, ACTION_WIND_AROUND, ACTION_INCUBATE, ACTION_BREAK_AWAY,
+            ACTION_NAGA, ACTION_YAKSHA, ACTION_GARUDA, ACTION_ASURA
+        )
+    }
 
     fun Opposite(): CommandEnum{
         when(this){

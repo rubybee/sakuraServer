@@ -9,6 +9,7 @@ import com.sakurageto.gamelogic.log.LogText
 import com.sakurageto.gamelogic.log.Logger
 import com.sakurageto.gamelogic.storyboard.StoryBoard
 import com.sakurageto.protocol.*
+import com.sakurageto.protocol.CommandEnum.Companion.BASIC_OPERATION_CAUSE_BY_CARD
 import io.ktor.websocket.*
 
 class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private val player1_socket: Connection, private val player2_socket: Connection) {
@@ -2321,19 +2322,19 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    suspend fun gaugeIncrease(player: PlayerEnum, thunder: Boolean){
+    suspend fun thunderGaugeIncrease(player: PlayerEnum){
         val nowPlayer = getPlayer(player)
-        if(thunder){
-            nowPlayer.thunderGauge?.let {
-                nowPlayer.thunderGauge = it + 1
-                sendSimpleCommand(getSocket(player), getSocket(player.opposite()), CommandEnum.INCREASE_THUNDER_GAUGE_YOUR, -1)
-            }
+        nowPlayer.thunderGauge?.let {
+            nowPlayer.thunderGauge = it + 1
+            sendSimpleCommand(getSocket(player), getSocket(player.opposite()), CommandEnum.INCREASE_THUNDER_GAUGE_YOUR, -1)
         }
-        else{
-            nowPlayer.windGauge?.let {
-                nowPlayer.windGauge = it + 1
-                sendSimpleCommand(getSocket(player), getSocket(player.opposite()), CommandEnum.INCREASE_WIND_GAUGE_YOUR, -1)
-            }
+    }
+
+    suspend fun windGaugeIncrease(player: PlayerEnum){
+        val nowPlayer = getPlayer(player)
+        nowPlayer.windGauge?.let {
+            nowPlayer.windGauge = it + 1
+            sendSimpleCommand(getSocket(player), getSocket(player.opposite()), CommandEnum.INCREASE_WIND_GAUGE_YOUR, -1)
         }
     }
 
@@ -2360,10 +2361,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             while(true){
                 when(receiveCardEffectSelect(player, card)){
                     CommandEnum.SELECT_ONE -> {
-                        gaugeIncrease(player, true)
+                        thunderGaugeIncrease(player)
                     }
                     CommandEnum.SELECT_TWO -> {
-                        gaugeIncrease(player, false)
+                        windGaugeIncrease(player)
                     }
                     else -> {
                         continue
@@ -2381,10 +2382,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             while(true){
                 when(receiveCardEffectSelect(player, 1200)){
                     CommandEnum.SELECT_ONE -> {
-                        gaugeIncrease(player, true)
+                        thunderGaugeIncrease(player)
                     }
                     CommandEnum.SELECT_TWO -> {
-                        gaugeIncrease(player, false)
+                        windGaugeIncrease(player)
                     }
                     CommandEnum.SELECT_NOT -> {
                     }
@@ -3946,7 +3947,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val otherSocket = getSocket(player.opposite())
 
         for(card in getPlayer(player).usedSpecialCard.values){
-            card.effectAllValidEffect(player.opposite(), this, TextEffectTag.WHEN_DECK_RECONSTRUCT_YOUR)
+            card.effectAllValidEffect(player, this, TextEffectTag.WHEN_DECK_RECONSTRUCT_YOUR)
         }
 
         installationProcess(player)
@@ -4037,11 +4038,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     val realCardNumber = card_number / 100000
                     val perjuryCardNumber = card_number % 100000
                     getCardFrom(player, realCardNumber, LocationEnum.HAND)?.let {
-                        if(!(CardSet.isPoison(realCardNumber) && CardSet.isSoldier(realCardNumber))){
+                        if(!(realCardNumber.isPoison() && realCardNumber.isSoldier())){
                             return useCardPerjury(player, it, perjuryCardNumber, LocationEnum.HAND)
                         }
                     }?: getCardFrom(player, realCardNumber, LocationEnum.READY_SOLDIER_ZONE)?.let {
-                        if(!(CardSet.isPoison(realCardNumber) && CardSet.isSoldier(realCardNumber))){
+                        if(!(realCardNumber.isPoison() && realCardNumber.isSoldier())){
                             return useCardPerjury(player, it, perjuryCardNumber, LocationEnum.READY_SOLDIER_ZONE)
                         }
                     }
@@ -4077,8 +4078,35 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return true
     }
 
-    suspend fun requestBasicOperation(player: PlayerEnum, card_number: Int): CommandEnum{
-        return receiveBasicOperation(getSocket(player), card_number)
+    suspend fun requestAndDoBasicOperation(player: PlayerEnum, card_number: Int): CommandEnum {
+        while(true){
+            val command = receiveBasicOperation(getSocket(player), card_number)
+            if(command.isBasicOperation()){
+                if(command == CommandEnum.SELECT_NOT){
+                    return command
+                }
+                if(canDoBasicOperation(player, command)){
+                    doBasicOperation(player, command, BASIC_OPERATION_CAUSE_BY_CARD + card_number)
+                    return command
+                }
+            }
+        }
+    }
+
+    suspend fun requestAndDoBasicOperation(player: PlayerEnum, card_number: Int, canNotSelect: HashSet<CommandEnum>):
+        CommandEnum {
+        while(true){
+            val command = receiveBasicOperation(getSocket(player), card_number)
+            if(command !in canNotSelect && command.isBasicOperation()){
+                if(command == CommandEnum.SELECT_NOT){
+                    return command
+                }
+                if(canDoBasicOperation(player, command)){
+                    doBasicOperation(player, command, BASIC_OPERATION_CAUSE_BY_CARD + card_number)
+                    return command
+                }
+            }
+        }
     }
 
     suspend fun checkAdditionalBasicOperation(player: PlayerEnum, textTag: TextEffectTag): Boolean{
@@ -4922,7 +4950,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
 
         val nowSocket = getSocket(player)
-        val otherSocket = getSocket(player)
+        val otherSocket = getSocket(player.opposite())
 
         sendSimpleCommand(nowSocket, otherSocket, CommandEnum.DIVING_YOUR)
         while(true){

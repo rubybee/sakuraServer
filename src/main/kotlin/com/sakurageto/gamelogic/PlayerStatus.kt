@@ -570,4 +570,20 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
             else -> TODO()
         }
     }
+
+    suspend fun deckToCoverCard(game_status: GameStatus, numberToMove: Int){
+        var index = 0
+        for(i in 1..numberToMove){
+            normalCardDeck.getOrNull(index)?.let let@{
+                if(it.card_data.canCover) {
+                    val card = game_status.popCardFrom(player_enum, it.card_number, LocationEnum.DECK, false)?: return@let
+                    game_status.insertCardTo(player_enum, card, LocationEnum.COVER_CARD, false)
+                }
+                else {
+                    index += 1
+                    return@let
+                }
+            }?: break
+        }
+    }
 }

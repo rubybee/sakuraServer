@@ -111,6 +111,12 @@ class RangeBuff(
 class RangeBuffQueue() {
     companion object {
         const val buffQueueNumber = 6
+        const val INDEX_CARD_CHANGE = 0
+        const val INDEX_CHANGE = 1
+        const val INDEX_ADD = 2
+        const val INDEX_DELETE = 3
+        const val INDEX_PLUS = 4
+        const val INDEX_MINUS = 5
     }
 
     private var rangeBuff: Array<ArrayDeque<RangeBuff>> = arrayOf(
@@ -124,18 +130,18 @@ class RangeBuffQueue() {
 
     fun addRangeBuff(buff: RangeBuff) {
         when (buff.tag) {
-            RangeBufTag.CARD_CHANGE -> rangeBuff[0].add(buff)
-            RangeBufTag.CHANGE -> rangeBuff[1].add(buff)
-            RangeBufTag.ADD -> rangeBuff[2].add(buff)
-            RangeBufTag.DELETE -> rangeBuff[3].add(buff)
-            RangeBufTag.PLUS -> rangeBuff[4].add(buff)
-            RangeBufTag.MINUS -> rangeBuff[5].add(buff)
-            RangeBufTag.CARD_CHANGE_IMMEDIATE -> rangeBuff[0].add(buff)
-            RangeBufTag.CHANGE_IMMEDIATE -> rangeBuff[1].add(buff)
-            RangeBufTag.ADD_IMMEDIATE -> rangeBuff[2].add(buff)
-            RangeBufTag.DELETE_IMMEDIATE -> rangeBuff[3].add(buff)
-            RangeBufTag.PLUS_IMMEDIATE -> rangeBuff[4].add(buff)
-            RangeBufTag.MINUS_IMMEDIATE -> rangeBuff[5].add(buff)
+            RangeBufTag.CARD_CHANGE -> rangeBuff[INDEX_CARD_CHANGE].add(buff)
+            RangeBufTag.CHANGE -> rangeBuff[INDEX_CHANGE].add(buff)
+            RangeBufTag.ADD -> rangeBuff[INDEX_ADD].add(buff)
+            RangeBufTag.DELETE -> rangeBuff[INDEX_DELETE].add(buff)
+            RangeBufTag.PLUS -> rangeBuff[INDEX_PLUS].add(buff)
+            RangeBufTag.MINUS -> rangeBuff[INDEX_MINUS].add(buff)
+            RangeBufTag.CARD_CHANGE_IMMEDIATE -> rangeBuff[INDEX_CARD_CHANGE].add(buff)
+            RangeBufTag.CHANGE_IMMEDIATE -> rangeBuff[INDEX_CHANGE].add(buff)
+            RangeBufTag.ADD_IMMEDIATE -> rangeBuff[INDEX_ADD].add(buff)
+            RangeBufTag.DELETE_IMMEDIATE -> rangeBuff[INDEX_DELETE].add(buff)
+            RangeBufTag.PLUS_IMMEDIATE -> rangeBuff[INDEX_PLUS].add(buff)
+            RangeBufTag.MINUS_IMMEDIATE -> rangeBuff[INDEX_MINUS].add(buff)
         }
     }
 

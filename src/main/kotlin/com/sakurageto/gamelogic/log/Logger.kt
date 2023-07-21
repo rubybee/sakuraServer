@@ -330,4 +330,127 @@ class Logger {
         return false
     }
 
+    private fun isNotAhumUsePlayerAuraMoved(playerUseAhum: PlayerEnum, log: Log): Boolean{
+        when(log.player){
+            playerUseAhum -> {
+                if(log.resource == LocationEnum.OTHER_AURA || log.destination == LocationEnum.OTHER_AURA){
+                    return true
+                }
+            }
+            else -> {
+                if(log.resource == LocationEnum.YOUR_AURA || log.destination == LocationEnum.YOUR_AURA){
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    private fun isNotAhumUsePlayerCardAuraMoved(playerUseAhum: PlayerEnum, log: Log): Boolean{
+        when(log.player){
+            playerUseAhum -> {
+                if(log.resource == LocationEnum.OTHER_ENCHANTMENT_ZONE_CARD || log.destination == LocationEnum.OTHER_USED_CARD){
+                    return true
+                }
+            }
+            else -> {
+                if(log.resource == LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD || log.destination == LocationEnum.YOUR_USED_CARD){
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    private fun isAttackMoveAura(playerUseAhum: PlayerEnum, startIndex: Int): Pair<Int, Boolean>{
+        var index = startIndex
+        while (index < logQueue.size){
+            val log = logQueue[index]
+            if(log.text == LogText.END_EFFECT){
+                return Pair(index, false)
+            }
+            else if(log.text == LogText.MOVE_TOKEN){
+                if(isNotAhumUsePlayerAuraMoved(playerUseAhum, log) || isNotAhumUsePlayerCardAuraMoved(playerUseAhum, log)){
+                    return Pair(index, true)
+                }
+            }
+            index += 1
+        }
+        return Pair(index, false)
+    }
+
+    private fun isAhumAttackTwice(playerUseAhum: PlayerEnum, card_number: Int, startIndex: Int): Boolean{
+        var index = startIndex
+        while (index < logQueue.size){
+            val log = logQueue[index]
+            if(log.player == playerUseAhum && log.text == LogText.ATTACK && log.number1 == card_number){
+                return true
+            }
+            index += 1
+        }
+        return false
+    }
+
+    fun checkAhumAttack(playerUseAhum: PlayerEnum, card_number: Int): Boolean{
+        var index = 0
+        while (index < logQueue.size){
+            val log = logQueue[index]
+            if(log.text == LogText.MOVE_TOKEN && log.number1 == Log.BASIC_OPERATION){
+                if(isNotAhumUsePlayerAuraMoved(playerUseAhum, log)){
+                    return false
+                }
+            }
+            else if(log.text == LogText.START_PROCESS_ATTACK_DAMAGE && playerUseAhum == log.player){
+                val (endIndex, isMove) = isAttackMoveAura(playerUseAhum, index + 1)
+                index = endIndex
+                while(logQueue[index].text != LogText.END_EFFECT){
+                    index += 1
+                }
+                if(isMove){
+                    return if(log.number1 == card_number){
+                        !isAhumAttackTwice(playerUseAhum, card_number, index + 1)
+                    } else{
+                        false
+                    }
+                }
+            }
+            index += 1
+        }
+        return false
+    }
+
+    private fun isAhumBasicOperationTwice(playerUseAhum: PlayerEnum, startIndex: Int): Boolean{
+        var index = startIndex
+        while (index < logQueue.size){
+            val log = logQueue[index]
+            if(log.player == playerUseAhum.opposite() && log.text == LogText.MOVE_TOKEN && log.number1 == Log.BASIC_OPERATION){
+                return true
+            }
+            index += 1
+        }
+        return false
+    }
+
+
+    fun checkAhumBasicOperation(playerUseAhum: PlayerEnum): Boolean{
+        var index = 0
+        while (index < logQueue.size){
+            val log = logQueue[index]
+            if(log.text == LogText.MOVE_TOKEN && log.number1 == Log.BASIC_OPERATION){
+                return !isAhumBasicOperationTwice(playerUseAhum, index + 1)
+            }
+            else if(log.text == LogText.START_PROCESS_ATTACK_DAMAGE && playerUseAhum == log.player){
+                val (endIndex, isMove) = isAttackMoveAura(playerUseAhum, index + 1)
+                index = endIndex
+                while(logQueue[index].text != LogText.END_EFFECT){
+                    index += 1
+                }
+                if(isMove){
+                    return false
+                }
+            }
+            index += 1
+        }
+        return false
+    }
 }

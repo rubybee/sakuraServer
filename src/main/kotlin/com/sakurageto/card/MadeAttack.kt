@@ -340,7 +340,7 @@ class MadeAttack(
         if(cannotReact) returnData.add(1) else returnData.add(0)
         if(cannotReactNormal) returnData.add(1) else returnData.add(0)
         if(cannotReactSpecial) returnData.add(1) else returnData.add(0)
-        returnData.add(card_number)
+        returnData.add(card_name.toCardNumber(true))
 
         return returnData
     }
@@ -351,6 +351,7 @@ class MadeAttack(
                 return
             }
         }
+
         this.effect?.let{
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.AFTER_ATTACK){
@@ -370,6 +371,8 @@ class MadeAttack(
                 }
             }
         }
+
+
     }
 
     suspend fun beforeProcessDamageCheck(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?): Boolean{

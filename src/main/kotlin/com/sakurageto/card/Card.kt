@@ -20,6 +20,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
 
     var isSoftAttack = false
 
+    var numberForX = 0
+
     fun getNap() = nap
     fun getSeedToken() = seedToken
 
@@ -209,15 +211,18 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     }
 
     suspend fun getBaseCost(player: PlayerEnum, gameStatus: GameStatus): Int{
+        var x = 10000
         return this.card_data.cost ?: card_data.effect?.let {
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
                     if(text.tag == TextEffectTag.COST_X){
-                        text.effect!!(this.card_number, player, gameStatus, null)!!
+                        x = text.effect!!(this.card_number, player, gameStatus, null)!!
+                        this.numberForX = x
+                        break
                     }
                 }
             }
-            10000
+            x
         }?: 10000
     }
 

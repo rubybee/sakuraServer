@@ -3,16 +3,23 @@ package com.sakurageto.card
 import com.sakurageto.card.BufTag.*
 import com.sakurageto.gamelogic.GameStatus
 
-class CostBuff(val cardNumber: Int, var counter: Int, val tag: BufTag, val condition: suspend (PlayerEnum, GameStatus, Card) -> Boolean, val effect: suspend (Int) -> Int
+class CostBuff(
+    val cardNumber: Int, var counter: Int, val tag: BufTag,
+    val condition: suspend (PlayerEnum, GameStatus, Card) -> Boolean,
+    val effect: suspend (Int) -> Int
 )
 
 
 class Buff(
- val cardNumber: Int, var counter: Int, val tag: BufTag, val condition: suspend (PlayerEnum, GameStatus, MadeAttack) -> Boolean, val effect: suspend (PlayerEnum, GameStatus, MadeAttack) -> Unit
+    val cardNumber: Int, var counter: Int, val tag: BufTag,
+    val condition: suspend (PlayerEnum, GameStatus, MadeAttack) -> Boolean,
+    val effect: suspend (PlayerEnum, GameStatus, MadeAttack) -> Unit
 )
 
 class OtherBuff(
-    val cardNumber: Int, var counter: Int, val tag: OtherBuffTag, val condition: suspend (PlayerEnum, GameStatus, MadeAttack) -> Boolean, val effect: suspend (PlayerEnum, GameStatus, MadeAttack) -> Unit
+    val cardNumber: Int, var counter: Int, val tag: OtherBuffTag,
+    val condition: suspend (PlayerEnum, GameStatus, MadeAttack) -> Boolean,
+    val effect: suspend (PlayerEnum, GameStatus, MadeAttack) -> Unit
 )
 
 class AttackBuffQueue() {

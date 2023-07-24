@@ -1,4 +1,4 @@
-package com.sakurageto.gamelogic.storyboard
+package com.sakurageto.gamelogic.megamispecial.storyboard
 
 object StoryBoard {
     private val act15 = Act(0, Act.COLOR_END, mutableListOf(), mutableListOf())
@@ -39,7 +39,7 @@ object StoryBoard {
         actHashMap[15] = act15
     }
 
-    fun getActByNumber(number: Int): Act{
+    fun getActByNumber(number: Int): Act {
         return actHashMap[number]?: throw Exception("Act $number not exist")
     }
 }

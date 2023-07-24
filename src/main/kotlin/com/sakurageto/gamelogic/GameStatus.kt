@@ -7,7 +7,7 @@ import com.sakurageto.card.CardSet.toCardName
 import com.sakurageto.gamelogic.log.Log
 import com.sakurageto.gamelogic.log.LogText
 import com.sakurageto.gamelogic.log.Logger
-import com.sakurageto.gamelogic.storyboard.StoryBoard
+import com.sakurageto.gamelogic.megamispecial.storyboard.StoryBoard
 import com.sakurageto.protocol.*
 import com.sakurageto.protocol.CommandEnum.Companion.BASIC_OPERATION_CAUSE_BY_CARD
 import io.ktor.websocket.*
@@ -28,11 +28,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         fun getPerjuryCard(card_number: Int): Card?{
             return when(card_number){
-                2200 -> RENRI_FALSE_STAB
-                2201 -> RENRI_TEMPORARY_EXPEDIENT
-                2202 -> RENRI_BLACK_AND_WHITE
-                2204 -> RENRI_FLOATING_CLOUDS
-                2205 -> RENRI_FISHING
+                NUMBER_RENRI_FALSE_STAB -> RENRI_FALSE_STAB
+                NUMBER_RENRI_TEMPORARY_EXPEDIENT -> RENRI_TEMPORARY_EXPEDIENT
+                NUMBER_RENRI_BLACK_AND_WHITE -> RENRI_BLACK_AND_WHITE
+                NUMBER_RENRI_FLOATING_CLOUDS -> RENRI_FLOATING_CLOUDS
+                NUMBER_RENRI_FISHING -> RENRI_FISHING
                 else -> null
             }
         }
@@ -1425,7 +1425,19 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    //this three function is must check number before use
+    suspend fun outToCard(player: PlayerEnum, number: Int, card: Card,
+                          card_number: Int, location: LocationEnum = LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD){
+        if(number <= 0) return
+
+        logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, number,
+            LocationEnum.OUT_OF_GAME, location, false))
+
+        card.addNap(number)
+        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
+            LocationEnum.OUT_OF_GAME, location, number, card.card_number)
+
+    }
+
     suspend fun dustToCard(player: PlayerEnum, number: Int, card: Card,
                            card_number: Int, location: LocationEnum = LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD){
         if(number <= 0) return
@@ -2131,7 +2143,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val now_player = getPlayer(player)
         var now_cost = cost
 
-        for(queue in now_player.cost_buf){
+        for(queue in now_player.costBuff){
             val tempq: ArrayDeque<CostBuff> = ArrayDeque()
             for(buff in queue){
                 if(buff.condition(player, this, card)){
@@ -2170,13 +2182,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     fun cleanAfterUseCost(){
-        cleanCostBuff(player1.cost_buf)
-        cleanCostBuff(player2.cost_buf)
+        cleanCostBuff(player1.costBuff)
+        cleanCostBuff(player2.costBuff)
     }
 
     fun cleanCostBuff(){
-        cleanCostTempBuff(player1.cost_buf)
-        cleanCostTempBuff(player2.cost_buf)
+        cleanCostTempBuff(player1.costBuff)
+        cleanCostTempBuff(player2.costBuff)
     }
 
     private fun cleanAllBuffWhenUnused(player: PlayerEnum){
@@ -2552,9 +2564,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 )
             }
 
-            val isTermination = terminationListenerProcess(player, card)
-
             val nowPlayer = getPlayer(player)
+
+            nowPlayer.isUseCard = true
+
+            val isTermination = terminationListenerProcess(player, card)
             if(isCost) card.effectText(player, this, react_attack, TextEffectTag.COST)
 
             //kamuwi card cost
@@ -2750,6 +2764,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     )
                 )
             }
+
+            nowPlayer.isUseCard = true
 
             var lightHouseCheck = 0
             if(turnPlayer == player && perjuryCard.card_data.card_type != CardType.ATTACK && location == LocationEnum.HAND){
@@ -4031,7 +4047,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
             //
             CommandEnum.ACTION_USE_CARD_PERJURY -> {
-                if(getPlayer(player).megami_1 == MegamiEnum.RENRI || getPlayer(player).megami_2 == MegamiEnum.RENRI){
+                if(getPlayer(player).megamiOne == MegamiEnum.RENRI || getPlayer(player).megamiTwo == MegamiEnum.RENRI){
                     val realCardNumber = card_number / 100000
                     val perjuryCardNumber = card_number % 100000
                     getCardFrom(player, realCardNumber, LocationEnum.HAND)?.let {

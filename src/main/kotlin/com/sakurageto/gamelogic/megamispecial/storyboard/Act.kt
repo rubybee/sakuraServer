@@ -1,4 +1,4 @@
-package com.sakurageto.gamelogic.storyboard
+package com.sakurageto.gamelogic.megamispecial.storyboard
 
 /**
  nextact and nextacttrial's elements must not be changed

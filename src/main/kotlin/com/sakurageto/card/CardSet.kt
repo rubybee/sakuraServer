@@ -6,7 +6,8 @@ import com.sakurageto.gamelogic.GameStatus.Companion.START_PHASE
 import com.sakurageto.gamelogic.GameStatus.Companion.START_PHASE_REDUCE_NAP
 import com.sakurageto.gamelogic.log.Log
 import com.sakurageto.gamelogic.log.LogText
-import com.sakurageto.gamelogic.storyboard.Act
+import com.sakurageto.gamelogic.megamispecial.YatsuhaJourney
+import com.sakurageto.gamelogic.megamispecial.storyboard.Act
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import com.sakurageto.protocol.sendSimpleCommand
@@ -87,6 +88,9 @@ object CardSet {
         cardNumberHashmap[NUMBER_YURINA_NAN_TA] = CardName.YURINA_NAN_TA
         cardNumberHashmap[NUMBER_YURINA_BEAN_BULLET] = CardName.YURINA_BEAN_BULLET
         cardNumberHashmap[NUMBER_YURINA_NOT_COMPLETE_POBARAM] = CardName.YURINA_NOT_COMPLETE_POBARAM
+        cardNumberHashmap[NUMBER_YURINA_QUESTION_ANSWER] = CardName.YURINA_QUESTION_ANSWER
+        cardNumberHashmap[NUMBER_YURINA_AHUM] = CardName.YURINA_AHUM
+        cardNumberHashmap[NUMBER_YURINA_KANZA_DO] = CardName.YURINA_KANZA_DO
 
         cardNumberHashmap[NUMBER_SAINE_DOUBLEBEGI] = CardName.SAINE_DOUBLEBEGI
         cardNumberHashmap[NUMBER_SAINE_HURUBEGI] = CardName.SAINE_HURUBEGI
@@ -471,6 +475,9 @@ object CardSet {
         cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_NAN_TA] = CardName.YURINA_NAN_TA
         cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_BEAN_BULLET] = CardName.YURINA_BEAN_BULLET
         cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_NOT_COMPLETE_POBARAM] = CardName.YURINA_NOT_COMPLETE_POBARAM
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_QUESTION_ANSWER] = CardName.YURINA_QUESTION_ANSWER
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_AHUM] = CardName.YURINA_AHUM
+        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_KANZA_DO] = CardName.YURINA_KANZA_DO
 
         cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_DOUBLEBEGI] = CardName.SAINE_DOUBLEBEGI
         cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_HURUBEGI] = CardName.SAINE_HURUBEGI
@@ -1230,6 +1237,10 @@ object CardSet {
         cardDataHashmap[CardName.HATSUMI_TORPEDO] = torpedo
         cardDataHashmap[CardName.HATSUMI_SAGIRI_HAIL] = sagiriHail
         cardDataHashmap[CardName.HATSUMI_WADANAKA_ROUTE] = wadanakaRoute
+
+        cardDataHashmap[CardName.YURINA_QUESTION_ANSWER] = questionAnswer
+        cardDataHashmap[CardName.YURINA_AHUM] = ahum
+        cardDataHashmap[CardName.YURINA_KANZA_DO] = kanzaDo
     }
 
     private suspend fun selectDustToDistance(nowCommand: CommandEnum, game_status: GameStatus,
@@ -5160,7 +5171,7 @@ object CardSet {
         handFlower.setSpecial(0)
         handFlower.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
             game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,
-                CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + 1413)
+                CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + NUMBER_HONOKA_HAND_FLOWER)
             null
         })
         handFlower.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_END_PHASE_YOUR) {card_number, player, game_status, _ ->
@@ -5308,7 +5319,7 @@ object CardSet {
                     game_status.insertCardTo(player, it, LocationEnum.COVER_CARD, false)
                 }
                 game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,
-                    CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + 1416)
+                    CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + NUMBER_HONOKA_FOUR_SEASON_BACK)
                 break
             }
             null
@@ -5774,10 +5785,10 @@ object CardSet {
         })
         absoluteZero.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {_, player, game_status, _ ->
             game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,
-                CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + 1504)
+                CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + NUMBER_KORUNU_ABSOLUTE_ZERO)
             if(game_status.getPlayer(player.opposite()).freezeToken >= 3){
                 game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,
-                        CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + 1504)
+                        CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + NUMBER_KORUNU_ABSOLUTE_ZERO)
             }
             null
         })
@@ -7618,9 +7629,9 @@ object CardSet {
         formDeva.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_TRANSFORM) {_, player, game_status, _ ->
             game_status.restoreArtificialToken(player, 2)
             game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,
-                    CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + 1119)
+                    CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + NUMBER_FORM_DEVA)
             game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,
-                CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + 1119)
+                CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + NUMBER_FORM_DEVA)
             null
         })
         formDeva.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_DISCARD_NUMBER_CHANGE_OTHER) {_, player, game_status, _ ->
@@ -8509,7 +8520,7 @@ object CardSet {
                 when(game_status.receiveCardEffectSelect(player, NUMBER_KANAWE_PUBLISH)){
                     CommandEnum.SELECT_ONE -> {
                         game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,
-                            CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + 2003)
+                            CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + NUMBER_KANAWE_PUBLISH)
                         break
                     }
                     CommandEnum.SELECT_NOT -> {
@@ -8778,7 +8789,7 @@ object CardSet {
         eightSakuraInVain.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.DO_BASIC_OPERATION){_, player, game_status, _->
             for(i in 1..5){
                 game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,
-                    CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + 201416)
+                    CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + NUMBER_TOKOYO_EIGHT_SAKURA_IN_VAIN)
             }
             null
         })
@@ -10553,6 +10564,92 @@ object CardSet {
         })
     }
 
+    private val unfamiliarWorld = CardData(CardClass.NORMAL, CardName.YATSUHA_UNFAMILIAR_WORLD, MegamiEnum.YATSUHA, CardType.ENCHANTMENT, SubType.NONE)
+    private val coloredWorld = CardData(CardClass.SPECIAL, CardName.YATSUHA_COLORED_WORLD, MegamiEnum.YATSUHA, CardType.BEHAVIOR, SubType.NONE)
+
+    private fun backHome(player: PlayerEnum, game_status: GameStatus){
+
+    }
+
+    private fun yatsuhaA2CardInit(){
+        unfamiliarWorld.setEnchantment(1)
+        unfamiliarWorld.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.ADJUST_NAP) ret@{card_number, player, game_status, _ ->
+            if (game_status.getPlayer(player).isUseCard){
+                return@ret null
+            }
+            while(true){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_YATSUHA_UNFAMILIAR_WORLD)){
+                    CommandEnum.SELECT_ONE -> {
+                        game_status.getCardFrom(player, card_number, LocationEnum.PLAYING_ZONE_YOUR)?.let {
+                            game_status.outToCard(player, 1, it, card_number)
+                        }
+                        return@ret 0
+                    }
+                    CommandEnum.SELECT_NOT -> {
+                        break
+                    }
+                    else -> {}
+                }
+            }
+            return@ret null
+        })
+        unfamiliarWorld.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.DO_BASIC_OPERATION) {card_number, player, game_status, _ ->
+            game_status.doBasicOperation(player, CommandEnum.ACTION_GO_FORWARD,
+                CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + NUMBER_YATSUHA_UNFAMILIAR_WORLD)
+            game_status.doBasicOperation(player, CommandEnum.ACTION_GO_FORWARD,
+                CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + NUMBER_YATSUHA_UNFAMILIAR_WORLD)
+
+            game_status.popCardFrom(player, card_number, LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, true)?.let {
+                game_status.insertCardTo(player, it, LocationEnum.OUT_OF_GAME, true)
+            }
+
+            game_status.moveAdditionalCard(player, CardName.YATSUHA_COLORED_WORLD, LocationEnum.SPECIAL_CARD)
+            null
+        })
+        coloredWorld.setSpecial(2)
+        coloredWorld.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.JOURNEY) {_, player, game_status, _ ->
+            val nowPlayer = game_status.getPlayer(player)
+
+            if(nowPlayer.journey == null && (nowPlayer.haveSpecificMegami(MegamiEnum.YATSUHA_AA1))){
+                while(true){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_YATSUHA_COLORED_WORLD)){
+                        CommandEnum.SELECT_ONE -> {
+                            nowPlayer.journey = YatsuhaJourney(1)
+                            break
+                        }
+                        CommandEnum.SELECT_TWO -> {
+                            nowPlayer.journey = YatsuhaJourney(2)
+                            break
+                        }
+                        CommandEnum.SELECT_THREE -> {
+                            nowPlayer.journey = YatsuhaJourney(3)
+                            break
+                        }
+                        CommandEnum.SELECT_FOUR -> {
+                            nowPlayer.journey = YatsuhaJourney(4)
+                            break
+                        }
+                        else -> {}
+                    }
+                }
+
+                nowPlayer.journey?.startJourney(player, game_status)
+            }
+            null
+        })
+        coloredWorld.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_START_PHASE_YOUR){_, player, game_status, _ ->
+            game_status.getPlayer(player).journey?.let {
+                if(it.effectJourney(player, game_status)){
+                    it.moveJourney(player, game_status)
+                }
+                else{
+                    backHome(player, game_status)
+                }
+            }
+            null
+        })
+    }
+
     fun init(){
         yurinaCardInit()
         saineCardInit()
@@ -10597,6 +10694,7 @@ object CardSet {
         kururuA2CardInit()
         hatsumiA1CardInit()
         yurinaA2CardInit()
+        yatsuhaA2CardInit()
 
         hashMapInit()
         hashMapTest()

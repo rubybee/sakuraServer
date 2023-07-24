@@ -285,7 +285,10 @@ enum class CommandEnum {
     DIVING_REQUEST,
     DIVING_FORWARD,
     DIVING_BACKWARD,
-    DIVING_SHOW;
+    DIVING_SHOW,
+
+    SET_JOURNEY_YOUR,
+    SET_JOURNEY_OTHER;
 
     fun isBasicOperation() = this in basicOperationSet
 

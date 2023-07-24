@@ -484,7 +484,12 @@ enum class CardName {
 
     YURINA_QUESTION_ANSWER,
     YURINA_AHUM,
-    YURINA_KANZA_DO;
+    YURINA_KANZA_DO,
+
+    YATSUHA_UNFAMILIAR_WORLD,
+    YATSUHA_COLORED_WORLD,
+    YATSUHA_SHES_CHERRY_BLOSSOM_WORLD,
+    YATSUHA_SHES_EGO_AND_DETERMINATION;
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -512,6 +517,9 @@ enum class CardName {
             put(YURINA_NAN_TA, NUMBER_YURINA_NAN_TA)
             put(YURINA_BEAN_BULLET, NUMBER_YURINA_BEAN_BULLET)
             put(YURINA_NOT_COMPLETE_POBARAM, NUMBER_YURINA_NOT_COMPLETE_POBARAM)
+            put(YURINA_QUESTION_ANSWER, NUMBER_YURINA_QUESTION_ANSWER)
+            put(YURINA_AHUM, NUMBER_YURINA_AHUM)
+            put(YURINA_KANZA_DO, NUMBER_YURINA_KANZA_DO)
 
             put(SAINE_DOUBLEBEGI, NUMBER_SAINE_DOUBLEBEGI)
             put(SAINE_HURUBEGI, NUMBER_SAINE_HURUBEGI)
@@ -894,6 +902,9 @@ enum class CardName {
             put(YURINA_NAN_TA, SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_NAN_TA)
             put(YURINA_BEAN_BULLET, SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_BEAN_BULLET)
             put(YURINA_NOT_COMPLETE_POBARAM, SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_NOT_COMPLETE_POBARAM)
+            put(YURINA_QUESTION_ANSWER, SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_QUESTION_ANSWER)
+            put(YURINA_AHUM, SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_AHUM)
+            put(YURINA_KANZA_DO, SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_KANZA_DO)
 
             put(SAINE_DOUBLEBEGI, SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_DOUBLEBEGI)
             put(SAINE_HURUBEGI, SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_HURUBEGI)
@@ -1463,6 +1474,12 @@ enum class CardName {
             YATSUHA_CLINGY_FLOWER
         )
 
+        private val yatsuhaAA1NormalCardList = listOf(
+            YATSUHA_STAR_NAIL, YATSUHA_DARKNESS_GILL, YATSUHA_MIRROR_DEVIL,
+            YATSUHA_GHOST_STEP, YATSUHA_WILLING, YATSUHA_CONTRACT,
+            YATSUHA_UNFAMILIAR_WORLD
+        )
+
         private val hatsumiNormalCardList = listOf(
             HATSUMI_WATER_BALL, HATSUMI_WATER_CURRENT, HATSUMI_STRONG_ACID,
             HATSUMI_TSUNAMI, HATSUMI_JUN_BI_MAN_TAN, HATSUMI_COMPASS,
@@ -1545,6 +1562,7 @@ enum class CardName {
                 KORUNU -> korunuNormalCardList
                 YATSUHA -> yatsuhaNormalCardList
                 YATSUHA_A1 -> yatsuhaA1NormalCardList
+                YATSUHA_AA1 -> yatsuhaAA1NormalCardList
                 HATSUMI -> hatsumiNormalCardList
                 HATSUMI_A1 -> hatsumiA1NormalCardList
                 MIZUKI -> mizukiNormalCardList
@@ -1711,6 +1729,10 @@ enum class CardName {
             YATSUHA_EIGHT_MIRROR_VAIN_SAKURA
         )
 
+        private val yatsuhaAA1SpecialCardList = listOf(
+            YATSUHA_SHES_EGO_AND_DETERMINATION
+        )
+
         private val hatsumiSpecialCardList = listOf(
             HATSUMI_ISANA_HAIL, HATSUMI_OYOGIBI_FIRE, HATSUMI_KIRAHARI_LIGHTHOUSE,
             HATSUMI_MIOBIKI_ROUTE
@@ -1785,6 +1807,7 @@ enum class CardName {
                 KORUNU -> korunuSpecialCardList
                 YATSUHA -> yatsuhaSpecialCardList
                 YATSUHA_A1 -> yatsuhaA1SpecialCardList
+                YATSUHA_AA1 -> yatsuhaAA1SpecialCardList
                 HATSUMI -> hatsumiSpecialCardList
                 HATSUMI_A1 -> hatsumiA1SpecialCardList
                 MIZUKI -> mizukiSpecialCardList
@@ -1849,6 +1872,10 @@ enum class CardName {
             YATSUHA_VAIN_FLOWER,
         )
 
+        private val yatsuhaAA1AdditionalCardList = listOf(
+            YATSUHA_SHES_CHERRY_BLOSSOM_WORLD, YATSUHA_COLORED_WORLD
+        )
+
         private val mizukiAdditionalCardList = listOf(
             KODAMA_TU_SIN
         )
@@ -1904,6 +1931,7 @@ enum class CardName {
                 KORUNU -> emptyList
                 YATSUHA -> emptyList
                 YATSUHA_A1 -> yatsuhaA1AdditionalCardList
+                YATSUHA_AA1 -> yatsuhaAA1AdditionalCardList
                 SHINRA_A1 -> emptyList
                 HATSUMI -> emptyList
                 HATSUMI_A1 -> emptyList
@@ -2253,6 +2281,12 @@ const val NUMBER_YATSUHA_RESOLUTION = 1615
 const val NUMBER_YATSUHA_PLEDGE = 1616
 const val NUMBER_YATSUHA_VAIN_FLOWER = 1617
 const val NUMBER_YATSUHA_EIGHT_MIRROR_VAIN_SAKURA = 1618
+const val NUMBER_YATSUHA_UNFAMILIAR_WORLD = 1619
+const val NUMBER_YATSUHA_COLORED_WORLD = 1620
+const val NUMBER_YATSUHA_SHES_CHERRY_BLOSSOM_WORLD = 1621
+const val NUMBER_YATSUHA_SHES_EGO_AND_DETERMINATION = 1622
+const val NUMBER_JOURNEY_SECOND_EFFECT = 1623
+const val NUMBER_JOURNEY_THIRD_EFFECT = 1624
 
 const val NUMBER_HATSUMI_WATER_BALL = 1700
 const val NUMBER_HATSUMI_WATER_CURRENT = 1701

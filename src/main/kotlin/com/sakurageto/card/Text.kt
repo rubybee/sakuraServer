@@ -75,6 +75,7 @@ enum class TextEffectTag {
     ADD_COST,
     DIVING,
     CAN_NOT_USE_CARD,
+    JOURNEY,
 
     //description when this effect use
     WHEN_USE_BEHAVIOR_END,

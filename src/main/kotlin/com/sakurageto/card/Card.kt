@@ -1,12 +1,13 @@
 package com.sakurageto.card
 
 import com.sakurageto.card.CardSet.toCardData
+import com.sakurageto.card.CardSet.toCardName
 import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.MegamiEnum
 import com.sakurageto.gamelogic.Umbrella
 import com.sakurageto.gamelogic.log.Log
 import com.sakurageto.gamelogic.log.LogText
-import com.sakurageto.gamelogic.storyboard.Act
+import com.sakurageto.gamelogic.megamispecial.storyboard.Act
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.receiveNapInformation
 import java.util.SortedSet
@@ -200,13 +201,14 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 for(text in it){
                     if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
                         if(text.tag == TextEffectTag.ADJUST_NAP){
-                            return text.effect!!(this.card_number, player, game_status, react_attack)!!
+                            return text.effect!!(this.card_number, player, game_status, react_attack)?: this.card_data.charge?:
+                            throw Exception("enchantment card must have charge: ${this.card_number.toCardName()}")
                         }
                     }
                 }
             }
-
-            return this.card_data.charge!!
+            return this.card_data.charge?:
+            throw Exception("enchantment card must have charge: ${this.card_number.toCardName()}")
         }
     }
 

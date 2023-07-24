@@ -6,7 +6,7 @@ import com.sakurageto.card.*
 import com.sakurageto.gamelogic.GameStatus.Companion.END_PHASE
 import com.sakurageto.gamelogic.GameStatus.Companion.MAIN_PHASE
 import com.sakurageto.gamelogic.GameStatus.Companion.START_PHASE
-import com.sakurageto.gamelogic.storyboard.StoryBoard
+import com.sakurageto.gamelogic.megamispecial.storyboard.StoryBoard
 import com.sakurageto.protocol.*
 import io.ktor.websocket.*
 import kotlinx.serialization.encodeToString
@@ -110,164 +110,141 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         player1.session.send(Json.encodeToString(player1_player2_data))
         player2.session.send(Json.encodeToString(player2_player1_data))
 
-        //additional board setting here
-        if(gameStatus.player1.megami_1 == MegamiEnum.YUKIHI || gameStatus.player1.megami_2 == MegamiEnum.YUKIHI ||
-            gameStatus.player1.megami_1 == MegamiEnum.YUKIHI_A1 || gameStatus.player1.megami_2 == MegamiEnum.YUKIHI_A1) {
-            gameStatus.player1.umbrella = Umbrella.FOLD
-            if(gameStatus.player1.megami_1 == MegamiEnum.YUKIHI || gameStatus.player1.megami_1 == MegamiEnum.YUKIHI_A1){
-                gameStatus.player1.megamiCard = Card.cardMakerByName(firstTurn == PlayerEnum.PLAYER1, CardName.YUKIHI_YUKIHI, PlayerEnum.PLAYER1)
-                gameStatus.player1.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
-            }
-            else{
-                gameStatus.player1.megamiCard2 = Card.cardMakerByName(firstTurn == PlayerEnum.PLAYER1, CardName.YUKIHI_YUKIHI, PlayerEnum.PLAYER1)
-                gameStatus.player1.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
-            }
-        }
+        settingForAnotherMegami(PlayerEnum.PLAYER1, gameStatus.player1.megamiOne)
+        settingForAnotherMegami(PlayerEnum.PLAYER1, gameStatus.player1.megamiTwo)
+        settingForAnotherMegami(PlayerEnum.PLAYER2, gameStatus.player2.megamiOne)
+        settingForAnotherMegami(PlayerEnum.PLAYER2, gameStatus.player2.megamiTwo)
 
-        if(gameStatus.player2.megami_1 == MegamiEnum.YUKIHI || gameStatus.player2.megami_2 == MegamiEnum.YUKIHI ||
-            gameStatus.player2.megami_1 == MegamiEnum.YUKIHI_A1 || gameStatus.player2.megami_2 == MegamiEnum.YUKIHI_A1) {
-            gameStatus.player2.umbrella = Umbrella.FOLD
-            if(gameStatus.player2.megami_1 == MegamiEnum.YUKIHI || gameStatus.player2.megami_1 == MegamiEnum.YUKIHI){
-                gameStatus.player2.megamiCard = Card.cardMakerByName(firstTurn == PlayerEnum.PLAYER2, CardName.YUKIHI_YUKIHI, PlayerEnum.PLAYER2)
-                gameStatus.player2.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
-            }
-            else{
-                gameStatus.player2.megamiCard2 = Card.cardMakerByName(firstTurn == PlayerEnum.PLAYER2, CardName.YUKIHI_YUKIHI, PlayerEnum.PLAYER2)
-                gameStatus.player2.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
-            }
-        }
-
-        if(gameStatus.player1.megami_1 == MegamiEnum.SHINRA || gameStatus.player1.megami_1 == MegamiEnum.SHINRA_A1 ||
-            gameStatus.player1.megami_2 == MegamiEnum.SHINRA || gameStatus.player1.megami_2 == MegamiEnum.SHINRA_A1){
-            gameStatus.player1.stratagem = Stratagem.SHIN_SAN
-            if(gameStatus.player1.megami_1 == MegamiEnum.SHINRA || gameStatus.player1.megami_1 == MegamiEnum.SHINRA_A1){
-                gameStatus.player1.megamiCard = Card.cardMakerByName(firstTurn == PlayerEnum.PLAYER1, CardName.SHINRA_SHINRA, PlayerEnum.PLAYER1)
-                gameStatus.player1.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
-            }
-            else{
-                gameStatus.player1.megamiCard2 = Card.cardMakerByName(firstTurn == PlayerEnum.PLAYER1, CardName.SHINRA_SHINRA, PlayerEnum.PLAYER1)
-                gameStatus.player1.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
-            }
-        }
-
-        if(gameStatus.player2.megami_1 == MegamiEnum.SHINRA || gameStatus.player2.megami_1 == MegamiEnum.SHINRA_A1 ||
-            gameStatus.player2.megami_2 == MegamiEnum.SHINRA || gameStatus.player2.megami_2 == MegamiEnum.SHINRA_A1){
-            gameStatus.player2.stratagem = Stratagem.SHIN_SAN
-            if(gameStatus.player2.megami_1 == MegamiEnum.SHINRA || gameStatus.player2.megami_1 == MegamiEnum.SHINRA_A1){
-                gameStatus.player2.megamiCard = Card.cardMakerByName(firstTurn == PlayerEnum.PLAYER2, CardName.SHINRA_SHINRA, PlayerEnum.PLAYER2)
-                gameStatus.player2.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
-            }
-            else{
-                gameStatus.player2.megamiCard2 = Card.cardMakerByName(firstTurn == PlayerEnum.PLAYER2, CardName.SHINRA_SHINRA, PlayerEnum.PLAYER2)
-                gameStatus.player2.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
-            }
-        }
-
-        if(gameStatus.player1.megami_1 == MegamiEnum.CHIKAGE || gameStatus.player1.megami_2 == MegamiEnum.CHIKAGE
-            || gameStatus.player1.megami_1 == MegamiEnum.CHIKAGE_A1 || gameStatus.player1.megami_2 == MegamiEnum.CHIKAGE_A1){
-            for(card_name in CardName.returnPoisonCardName()){
-                val turnCheck = firstTurn == PlayerEnum.PLAYER2
-                val card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER2)
-                gameStatus.player1.poisonBag[card.card_data.card_name] = card
-            }
-        }
-
-        if(gameStatus.player2.megami_1 == MegamiEnum.CHIKAGE || gameStatus.player2.megami_2 == MegamiEnum.CHIKAGE
-            || gameStatus.player2.megami_1 == MegamiEnum.CHIKAGE_A1 || gameStatus.player2.megami_2 == MegamiEnum.CHIKAGE_A1){
-            for(card_name in CardName.returnPoisonCardName()){
-                val turnCheck = firstTurn == PlayerEnum.PLAYER1
-                val card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER1)
-                gameStatus.player2.poisonBag[card.card_data.card_name] = card
-            }
-        }
-
-        if(gameStatus.player1.megami_1 == MegamiEnum.THALLYA || gameStatus.player1.megami_2 == MegamiEnum.THALLYA ||
-            gameStatus.player1.megami_1 == MegamiEnum.THALLYA_A1 || gameStatus.player1.megami_2 == MegamiEnum.THALLYA_A1){
-            gameStatus.player1.artificialToken = 5
-            gameStatus.player1ManeuverListener = ArrayDeque()
-        }
-
-        if(gameStatus.player2.megami_1 == MegamiEnum.THALLYA || gameStatus.player2.megami_2 == MegamiEnum.THALLYA ||
-            gameStatus.player2.megami_1 == MegamiEnum.THALLYA_A1 || gameStatus.player2.megami_2 == MegamiEnum.THALLYA_A1){
-            gameStatus.player2.artificialToken = 5
-            gameStatus.player2ManeuverListener = ArrayDeque()
-        }
-
-        if(gameStatus.player1.megami_1 == MegamiEnum.RAIRA || gameStatus.player1.megami_2 == MegamiEnum.RAIRA ||
-            gameStatus.player1.megami_1 == MegamiEnum.RAIRA_A1 || gameStatus.player1.megami_2 == MegamiEnum.RAIRA_A1){
-            gameStatus.getPlayer(PlayerEnum.PLAYER1).windGauge = 0
-            gameStatus.getPlayer(PlayerEnum.PLAYER1).thunderGauge = 0
-        }
-
-        if(gameStatus.player2.megami_1 == MegamiEnum.RAIRA || gameStatus.player2.megami_2 == MegamiEnum.RAIRA ||
-            gameStatus.player2.megami_1 == MegamiEnum.RAIRA_A1 || gameStatus.player2.megami_2 == MegamiEnum.RAIRA_A1){
-            gameStatus.getPlayer(PlayerEnum.PLAYER2).windGauge = 0
-            gameStatus.getPlayer(PlayerEnum.PLAYER2).thunderGauge = 0
-        }
-
-        if(gameStatus.player1.megami_1 == MegamiEnum.MIZUKI || gameStatus.player1.megami_2 == MegamiEnum.MIZUKI){
-            for(card_name in CardName.returnSoldierCardName()){
-                val turnCheck = firstTurn == PlayerEnum.PLAYER1
-                val card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER1)
-                gameStatus.player1.notReadySoldierZone[card.card_number] = card
-            }
-        }
-
-        if(gameStatus.player2.megami_1 == MegamiEnum.MIZUKI || gameStatus.player2.megami_2 == MegamiEnum.MIZUKI){
-            for(card_name in CardName.returnSoldierCardName()){
-                val turnCheck = firstTurn == PlayerEnum.PLAYER2
-                val card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER2)
-                gameStatus.player2.notReadySoldierZone[card.card_number] = card
-            }
-        }
-
-        if(gameStatus.player1.megami_1 == MegamiEnum.MEGUMI || gameStatus.player1.megami_2 == MegamiEnum.MEGUMI){
-            gameStatus.player1.notReadySeed = 5
-        }
-
-        if(gameStatus.player2.megami_1 == MegamiEnum.MEGUMI || gameStatus.player2.megami_2 == MegamiEnum.MEGUMI){
-            gameStatus.player2.notReadySeed = 5
-        }
-
-        if(gameStatus.player1.megami_1 == MegamiEnum.KANAWE || gameStatus.player1.megami_2 == MegamiEnum.KANAWE){
-            gameStatus.player1.nowAct = StoryBoard.getActByNumber(0)
-            if(gameStatus.player1.megami_1 == MegamiEnum.KANAWE){
-                gameStatus.player1.megamiCard = Card.cardMakerByName(firstTurn == PlayerEnum.PLAYER1,
-                    CardName.KANAWE_KANAWE, PlayerEnum.PLAYER1)
-                gameStatus.player1.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
-            }
-            else{
-                gameStatus.player1.megamiCard2 = Card.cardMakerByName(firstTurn == PlayerEnum.PLAYER1,
-                    CardName.KANAWE_KANAWE, PlayerEnum.PLAYER1)
-                gameStatus.player1.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
-            }
-        }
-
-        if(gameStatus.player2.megami_1 == MegamiEnum.KANAWE || gameStatus.player2.megami_2 == MegamiEnum.KANAWE){
-            gameStatus.player2.nowAct = StoryBoard.getActByNumber(0)
-            if(gameStatus.player2.megami_1 == MegamiEnum.KANAWE){
-                gameStatus.player2.megamiCard = Card.cardMakerByName(firstTurn == PlayerEnum.PLAYER2,
-                    CardName.KANAWE_KANAWE, PlayerEnum.PLAYER2)
-                gameStatus.player2.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
-            }
-            else{
-                gameStatus.player2.megamiCard2 = Card.cardMakerByName(firstTurn == PlayerEnum.PLAYER2,
-                    CardName.KANAWE_KANAWE, PlayerEnum.PLAYER2)
-                gameStatus.player2.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
-            }
-        }
-
-        if(gameStatus.player1.megami_1 == MegamiEnum.KAMUWI || gameStatus.player1.megami_2 == MegamiEnum.KAMUWI){
-            gameStatus.player1.tabooGauge = 0
-        }
-
-        if(gameStatus.player2.megami_1 == MegamiEnum.KAMUWI || gameStatus.player2.megami_2 == MegamiEnum.KAMUWI){
-            gameStatus.player2.tabooGauge = 0
-        }
-        //additional board setting here
+        settingForMegami(PlayerEnum.PLAYER1, gameStatus.player1.megamiOne.changeNormalMegami())
+        settingForMegami(PlayerEnum.PLAYER1, gameStatus.player1.megamiTwo.changeNormalMegami())
+        settingForMegami(PlayerEnum.PLAYER2, gameStatus.player2.megamiOne.changeNormalMegami())
+        settingForMegami(PlayerEnum.PLAYER2, gameStatus.player2.megamiTwo.changeNormalMegami())
     }
 
-    fun checkCardSet(bigger: MutableList<CardName>, smaller: MutableList<CardName>?, size: Int): Boolean{
+    private fun settingForMegami(player: PlayerEnum, megami: MegamiEnum){
+        when(megami){
+            MegamiEnum.YUKIHI -> settingForYukihi(player)
+            MegamiEnum.SHINRA -> settingForShinra(player)
+            MegamiEnum.CHIKAGE -> settingForChikage(player)
+            MegamiEnum.THALLYA -> settingForThallya(player)
+            MegamiEnum.RAIRA -> settingForRaira(player)
+            MegamiEnum.MIZUKI -> settingForMizuki(player)
+            MegamiEnum.MEGUMI -> settingForMegumi(player)
+            MegamiEnum.KANAWE -> settingForKanawe(player)
+            MegamiEnum.KAMUWI -> settingForKamuwi(player)
+            else -> {}
+        }
+    }
+
+    private fun settingForYukihi(player: PlayerEnum){
+        val nowPlayer = gameStatus.getPlayer(player)
+
+        nowPlayer.umbrella = Umbrella.FOLD
+        if(nowPlayer.megamiOneNormalForm() == MegamiEnum.YUKIHI){
+            nowPlayer.megamiCard = Card.cardMakerByName(firstTurn == player, CardName.YUKIHI_YUKIHI, player)
+            nowPlayer.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
+        }
+        else{
+            nowPlayer.megamiCard2 = Card.cardMakerByName(firstTurn == player, CardName.YUKIHI_YUKIHI, player)
+            nowPlayer.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
+        }
+    }
+
+    private fun settingForShinra(player: PlayerEnum){
+        val nowPlayer = gameStatus.getPlayer(player)
+
+        nowPlayer.stratagem = Stratagem.SHIN_SAN
+        if(nowPlayer.megamiOneNormalForm() == MegamiEnum.SHINRA){
+            nowPlayer.megamiCard = Card.cardMakerByName(firstTurn == player, CardName.SHINRA_SHINRA, player)
+            nowPlayer.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
+        }
+        else{
+            nowPlayer.megamiCard2 = Card.cardMakerByName(firstTurn == player, CardName.SHINRA_SHINRA, player)
+            nowPlayer.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
+        }
+    }
+
+    private fun settingForChikage(player: PlayerEnum){
+        val nowPlayer = gameStatus.getPlayer(player)
+        val turnCheck = firstTurn == player.opposite()
+
+        for(card_name in CardName.returnPoisonCardName()){
+            val card = Card.cardMakerByName(turnCheck, card_name, player.opposite())
+            nowPlayer.poisonBag[card.card_data.card_name] = card
+        }
+    }
+
+    private fun settingForThallya(player: PlayerEnum){
+        when(player){
+            PlayerEnum.PLAYER1 -> {
+                gameStatus.player1.artificialToken = 5
+                gameStatus.player1ManeuverListener = ArrayDeque()
+            }
+            PlayerEnum.PLAYER2 -> {
+                gameStatus.player2.artificialToken = 5
+                gameStatus.player2ManeuverListener = ArrayDeque()
+            }
+        }
+    }
+
+    private fun settingForRaira(player: PlayerEnum){
+        val nowPlayer = gameStatus.getPlayer(player)
+
+        nowPlayer.windGauge = 0
+        nowPlayer.thunderGauge = 0
+    }
+
+    private fun settingForMizuki(player: PlayerEnum){
+        val nowPlayer = gameStatus.getPlayer(player)
+        val turnCheck = firstTurn == player
+
+        for(card_name in CardName.returnSoldierCardName()){
+            val card = Card.cardMakerByName(turnCheck, card_name, player)
+            nowPlayer.notReadySoldierZone[card.card_number] = card
+        }
+    }
+
+    private fun settingForMegumi(player: PlayerEnum){
+        val nowPlayer = gameStatus.getPlayer(player)
+        nowPlayer.notReadySeed = 5
+    }
+
+    private fun settingForKanawe(player: PlayerEnum){
+        val nowPlayer = gameStatus.getPlayer(player)
+
+        nowPlayer.nowAct = StoryBoard.getActByNumber(0)
+        if(nowPlayer.megamiOneNormalForm() == MegamiEnum.KANAWE){
+            nowPlayer.megamiCard = Card.cardMakerByName(firstTurn == player,
+                CardName.KANAWE_KANAWE, player)
+            nowPlayer.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
+        }
+        else{
+            nowPlayer.megamiCard2 = Card.cardMakerByName(firstTurn == player,
+                CardName.KANAWE_KANAWE, player)
+            nowPlayer.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
+        }
+    }
+
+    private fun settingForKamuwi(player: PlayerEnum){
+        val nowPlayer = gameStatus.getPlayer(player)
+
+        nowPlayer.tabooGauge = 0
+    }
+
+
+    private fun settingForAnotherMegami(player: PlayerEnum, megami: MegamiEnum){
+        when(megami){
+            MegamiEnum.YATSUHA_AA1 -> settingForYatsuhaAA1(player)
+            else -> {}
+        }
+    }
+    private fun settingForYatsuhaAA1(player: PlayerEnum){
+        val nowPlayer = gameStatus.getPlayer(player)
+
+        nowPlayer.memory = hashMapOf()
+    }
+
+    private fun checkCardSet(bigger: MutableList<CardName>, smaller: MutableList<CardName>?, size: Int): Boolean{
         if(smaller == null){
             return false
         }
@@ -288,15 +265,15 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         }
     }
 
-    suspend fun selectCard(){
-        gameStatus.player1.unselectedCard.addAll(CardName.returnNormalCardNameByMegami(gameStatus.player1.megami_1))
-        gameStatus.player1.unselectedCard.addAll(CardName.returnNormalCardNameByMegami(gameStatus.player1.megami_2))
-        gameStatus.player2.unselectedCard.addAll(CardName.returnNormalCardNameByMegami(gameStatus.player2.megami_1))
-        gameStatus.player2.unselectedCard.addAll(CardName.returnNormalCardNameByMegami(gameStatus.player2.megami_2))
-        gameStatus.player1.unselectedSpecialCard.addAll(CardName.returnSpecialCardNameByMegami(gameStatus.player1.megami_1))
-        gameStatus.player1.unselectedSpecialCard.addAll(CardName.returnSpecialCardNameByMegami(gameStatus.player1.megami_2))
-        gameStatus.player2.unselectedSpecialCard.addAll(CardName.returnSpecialCardNameByMegami(gameStatus.player2.megami_1))
-        gameStatus.player2.unselectedSpecialCard.addAll(CardName.returnSpecialCardNameByMegami(gameStatus.player2.megami_2))
+    private suspend fun selectCard(){
+        gameStatus.player1.unselectedCard.addAll(CardName.returnNormalCardNameByMegami(gameStatus.player1.megamiOne))
+        gameStatus.player1.unselectedCard.addAll(CardName.returnNormalCardNameByMegami(gameStatus.player1.megamiTwo))
+        gameStatus.player2.unselectedCard.addAll(CardName.returnNormalCardNameByMegami(gameStatus.player2.megamiOne))
+        gameStatus.player2.unselectedCard.addAll(CardName.returnNormalCardNameByMegami(gameStatus.player2.megamiTwo))
+        gameStatus.player1.unselectedSpecialCard.addAll(CardName.returnSpecialCardNameByMegami(gameStatus.player1.megamiOne))
+        gameStatus.player1.unselectedSpecialCard.addAll(CardName.returnSpecialCardNameByMegami(gameStatus.player1.megamiTwo))
+        gameStatus.player2.unselectedSpecialCard.addAll(CardName.returnSpecialCardNameByMegami(gameStatus.player2.megamiOne))
+        gameStatus.player2.unselectedSpecialCard.addAll(CardName.returnSpecialCardNameByMegami(gameStatus.player2.megamiTwo))
 
         val send_request_player1 = SakuraCardSetSend(CommandEnum.SELECT_CARD, gameStatus.player1.unselectedCard, gameStatus.player1.unselectedSpecialCard)
         val send_request_player2 = SakuraCardSetSend(CommandEnum.SELECT_CARD, gameStatus.player2.unselectedCard, gameStatus.player2.unselectedSpecialCard)
@@ -355,10 +332,10 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
 
         val additional_card_player1 = mutableListOf<CardName>()
         val additional_card_player2 = mutableListOf<CardName>()
-        additional_card_player1.addAll(CardName.returnAdditionalCardNameByMegami(gameStatus.player1.megami_1))
-        additional_card_player2.addAll(CardName.returnAdditionalCardNameByMegami(gameStatus.player2.megami_1))
-        additional_card_player1.addAll(CardName.returnAdditionalCardNameByMegami(gameStatus.player1.megami_2))
-        additional_card_player2.addAll(CardName.returnAdditionalCardNameByMegami(gameStatus.player2.megami_2))
+        additional_card_player1.addAll(CardName.returnAdditionalCardNameByMegami(gameStatus.player1.megamiOne))
+        additional_card_player2.addAll(CardName.returnAdditionalCardNameByMegami(gameStatus.player2.megamiOne))
+        additional_card_player1.addAll(CardName.returnAdditionalCardNameByMegami(gameStatus.player1.megamiTwo))
+        additional_card_player2.addAll(CardName.returnAdditionalCardNameByMegami(gameStatus.player2.megamiTwo))
 
         if(!additional_card_player1.isEmpty()){
             val turnCheck = firstTurn == PlayerEnum.PLAYER1

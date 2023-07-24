@@ -41,6 +41,7 @@ enum class MegamiEnum(var real_number: Int) {
     KORUNU(150),
     YATSUHA(160),
     YATSUHA_A1(161),
+    YATSUHA_AA1(162),
     HATSUMI(170),
     HATSUMI_A1(171),
     MIZUKI(180),
@@ -49,6 +50,14 @@ enum class MegamiEnum(var real_number: Int) {
     KAMUWI(210),
     RENRI(220);
 
+    fun changeNormalMegami(): MegamiEnum{
+        val anotherNumber = this.real_number % 10
+        return if(anotherNumber == 0){
+            this
+        } else{
+            fromInt(this.real_number - anotherNumber)
+        }
+    }
 
     fun getAllNormalCardName(): List<CardName>{
         return CardName.returnNormalCardNameByMegami(this)

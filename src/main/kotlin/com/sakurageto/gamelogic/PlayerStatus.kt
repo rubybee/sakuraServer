@@ -3,7 +3,8 @@ package com.sakurageto.gamelogic
 import com.sakurageto.card.*
 import com.sakurageto.card.CardSet.toCardData
 import com.sakurageto.card.CardSet.toCardName
-import com.sakurageto.gamelogic.storyboard.Act
+import com.sakurageto.gamelogic.megamispecial.YatsuhaJourney
+import com.sakurageto.gamelogic.megamispecial.storyboard.Act
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import com.sakurageto.protocol.SakuraSendData
@@ -22,26 +23,6 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
 
     var maxAura = 5
 
-    fun isLose() = (tabooGauge?: 0) >= 16 || life == 0
-
-    fun setMaxAura(arrow: Arrow, user: PlayerEnum) {
-        if(user == player_enum && arrow != Arrow.NULL){
-            for(card in usedSpecialCard.values){
-                card.card_data.effect?.let {
-                    for(text in it){
-                        if(text.tag == TextEffectTag.TOKOYO_EIGHT_SAKURA){
-                            maxAura = 8
-                            return
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    fun checkAuraFull(): Boolean = aura + freezeToken >= maxAura
-
-
     //for megami(must be present)
     var umbrella: Umbrella? = null
 
@@ -59,7 +40,6 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var divingSuccess = false
 
     var readySoldierZone= hashMapOf<Int, Card>()
-    fun getCardFromSoldier(card_number: Int) = readySoldierZone[card_number]
     var notReadySoldierZone = hashMapOf<Int, Card>()
     var notReadySeed: Int? = null
 
@@ -72,11 +52,18 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var ideaCardStage = 0
     var endIdeaCards = HashMap<Int, Card>()
     var canIdeaProcess: Boolean = true
+
     var canNotUseCardName1: Pair<Int, CardName>? = null
     var canNotUseCardName2: Pair<Int, CardName>? = null
+
     var tabooGauge: Int? = null
+
     var anvil: Card? = null
+
     var forwardDiving: Boolean? = null
+
+    var journey: YatsuhaJourney? = null
+    var memory: HashMap<Int, Card>? = null
     //for megami(must be present)
 
 
@@ -98,8 +85,27 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var nextMainPhaseSkip = false
     var nextCostAddMegami: MegamiEnum? = null
     var afterCardUseTermination: Boolean = false
+    var isUseCard: Boolean = false
     //for some card(some day refactor may be needed)
 
+    fun isLose() = (tabooGauge?: 0) >= 16 || life == 0
+
+    fun setMaxAura(arrow: Arrow, user: PlayerEnum) {
+        if(user == player_enum && arrow != Arrow.NULL){
+            for(card in usedSpecialCard.values){
+                card.card_data.effect?.let {
+                    for(text in it){
+                        if(text.tag == TextEffectTag.TOKOYO_EIGHT_SAKURA){
+                            maxAura = 8
+                            return
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun checkAuraFull(): Boolean = aura + freezeToken >= maxAura
 
     fun auraDamagePossible(data: MutableList<Int>?, damage: Int, possibleList: MutableList<Int>): Boolean{
         var totalAura = 0
@@ -131,6 +137,29 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
 
     var usingCard = ArrayDeque<Card>()
 
+
+
+    var hand = HashMap<Int, Card>()
+
+    var enchantmentCard: HashMap<Int, Card> = HashMap()
+
+    var special_card_deck = HashMap<Int, Card>()
+
+    var sealZone = HashMap<Int, Card>()
+    var sealInformation = HashMap<Int, MutableList<Int>>()
+    var outOfGame = HashMap<Int, Card>()
+
+    var end_turn = false
+
+    var life = 10
+    var flare = 0
+
+    var concentration = 0
+    var max_concentration = 2
+    var shrink = false
+
+    fun getCardFromSoldier(card_number: Int) = readySoldierZone[card_number]
+
     fun getCardFromPlaying(card_number: Int): Card?{
         for(card in usingCard){
             if(card.card_number == card_number) return card
@@ -138,23 +167,13 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
         return null
     }
 
-    var hand = HashMap<Int, Card>()
-
     fun getCardFromHand(card_number: Int): Card?{
         return hand[card_number]
     }
 
-    var enchantmentCard: HashMap<Int, Card> = HashMap()
-
     fun getCardFromEnchantment(card_number: Int): Card?{
         return enchantmentCard[card_number]
     }
-
-    var special_card_deck = HashMap<Int, Card>()
-
-    var sealZone = HashMap<Int, Card>()
-    var sealInformation = HashMap<Int, MutableList<Int>>()
-    var outOfGame = HashMap<Int, Card>()
 
     fun getFullAuraDamage(): MutableList<Int>{
         val selectable = mutableListOf<Int>()
@@ -246,15 +265,6 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
         return cardList
     }
 
-    var end_turn = false
-
-    var life = 10
-    var flare = 0
-
-    var concentration = 0
-    var max_concentration = 2
-    var shrink = false
-
     //0 success add conentration, 1 fail because shrink, 2 can not plus because full
     fun addConcentration(): Int{
         if(shrink){
@@ -275,9 +285,16 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     }
 
 
-    lateinit var megami_1: MegamiEnum
-    lateinit var megami_2: MegamiEnum
-    lateinit var megami_ban: MegamiEnum
+    lateinit var megamiOne: MegamiEnum
+    lateinit var megamiTwo: MegamiEnum
+    lateinit var megamiBanned: MegamiEnum
+
+
+    fun megamiOneNormalForm() = megamiOne.changeNormalMegami()
+
+    fun megamiTwoNormalForm() = megamiTwo.changeNormalMegami()
+
+    fun haveSpecificMegami(megami: MegamiEnum) = megamiOne == megami || megamiTwo == megami
 
     var megamiCard: Card? = null
     var megamiCard2: Card? = null
@@ -303,8 +320,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var otherBuff: OtherBuffQueue = OtherBuffQueue()
     var attackBuff: AttackBuffQueue = AttackBuffQueue()
     var rangeBuff: RangeBuffQueue = RangeBuffQueue()
-
-    var cost_buf: Array<ArrayDeque<CostBuff>> = arrayOf(
+    var costBuff: Array<ArrayDeque<CostBuff>> = arrayOf(
         ArrayDeque(),
         ArrayDeque(),
         ArrayDeque(),
@@ -320,93 +336,93 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
 
     fun addCostBuff(buf: CostBuff){
         when(buf.tag){
-            BufTag.INSERT -> cost_buf[1].add(buf)
-            BufTag.CHANGE_EACH -> cost_buf[3].add(buf)
-            BufTag.MULTIPLE -> cost_buf[5].add(buf)
-            BufTag.DIVIDE -> cost_buf[7].add(buf)
-            BufTag.PLUS_MINUS -> cost_buf[9].add(buf)
-            BufTag.INSERT_IMMEDIATE -> cost_buf[0].add(buf)
-            BufTag.CHANGE_EACH_IMMEDIATE -> cost_buf[2].add(buf)
-            BufTag.MULTIPLE_IMMEDIATE -> cost_buf[4].add(buf)
-            BufTag.DIVIDE_IMMEDIATE -> cost_buf[6].add(buf)
-            BufTag.PLUS_MINUS_IMMEDIATE -> cost_buf[8].add(buf)
-            else -> cost_buf[11].add(buf)
+            BufTag.INSERT -> costBuff[1].add(buf)
+            BufTag.CHANGE_EACH -> costBuff[3].add(buf)
+            BufTag.MULTIPLE -> costBuff[5].add(buf)
+            BufTag.DIVIDE -> costBuff[7].add(buf)
+            BufTag.PLUS_MINUS -> costBuff[9].add(buf)
+            BufTag.INSERT_IMMEDIATE -> costBuff[0].add(buf)
+            BufTag.CHANGE_EACH_IMMEDIATE -> costBuff[2].add(buf)
+            BufTag.MULTIPLE_IMMEDIATE -> costBuff[4].add(buf)
+            BufTag.DIVIDE_IMMEDIATE -> costBuff[6].add(buf)
+            BufTag.PLUS_MINUS_IMMEDIATE -> costBuff[8].add(buf)
+            else -> costBuff[11].add(buf)
         }
     }
 
     fun setMegamiSSangjang(data: SakuraSendData){
-        megami_1 = try{
+        megamiOne = try{
             MegamiEnum.fromInt(data.data?.get(0)?: 10)
         }catch (e: NoSuchElementException){
             MegamiEnum.fromInt(10)
         }
 
-        megami_2 = try{
+        megamiTwo = try{
             MegamiEnum.fromInt(data.data?.get(1)?: 20)
         }catch (e: NoSuchElementException){
             MegamiEnum.fromInt(20)
         }
 
-        if(megami_1 == megami_2){
-            megami_1 = MegamiEnum.YURINA
-            megami_2 = MegamiEnum.HIMIKA
+        if(megamiOne == megamiTwo){
+            megamiOne = MegamiEnum.YURINA
+            megamiTwo = MegamiEnum.HIMIKA
         }
     }
 
     fun setMegamiSamSep(data: SakuraSendData){
-        megami_1 = try{
+        megamiOne = try{
             MegamiEnum.fromInt(data.data?.get(0)?: 10)
         }catch (e: NoSuchElementException){
             MegamiEnum.fromInt(10)
         }
 
-        megami_2 = try{
+        megamiTwo = try{
             MegamiEnum.fromInt(data.data?.get(1)?: 20)
         }catch (e: NoSuchElementException){
             MegamiEnum.fromInt(20)
         }
 
-        megami_ban = try{
+        megamiBanned = try{
             MegamiEnum.fromInt(data.data?.get(2)?: 30)
         }catch (e: NoSuchElementException){
             MegamiEnum.fromInt(30)
         }
 
-        if(megami_2 == megami_1){
-            megami_1 = MegamiEnum.YURINA
-            megami_2 = MegamiEnum.HIMIKA
-            megami_ban = MegamiEnum.SAINE
+        if(megamiTwo == megamiOne){
+            megamiOne = MegamiEnum.YURINA
+            megamiTwo = MegamiEnum.HIMIKA
+            megamiBanned = MegamiEnum.SAINE
         }
-        else if(megami_1 == megami_ban){
-            megami_1 = MegamiEnum.YURINA
-            megami_2 = MegamiEnum.HIMIKA
-            megami_ban = MegamiEnum.SAINE
+        else if(megamiOne == megamiBanned){
+            megamiOne = MegamiEnum.YURINA
+            megamiTwo = MegamiEnum.HIMIKA
+            megamiBanned = MegamiEnum.SAINE
         }
-        else if(megami_2 == megami_ban){
-            megami_1 = MegamiEnum.YURINA
-            megami_2 = MegamiEnum.HIMIKA
-            megami_ban = MegamiEnum.SAINE
+        else if(megamiTwo == megamiBanned){
+            megamiOne = MegamiEnum.YURINA
+            megamiTwo = MegamiEnum.HIMIKA
+            megamiBanned = MegamiEnum.SAINE
         }
     }
 
     fun returnListMegami3(): MutableList<Int>{
-        return mutableListOf(megami_1.real_number, megami_2.real_number, megami_ban.real_number)
+        return mutableListOf(megamiOne.real_number, megamiTwo.real_number, megamiBanned.real_number)
     }
 
     fun banMegami(data: SakuraSendData){
-        val ben_megami = data.data?.get(0)?: megami_1
-        if (ben_megami != megami_ban.real_number){
-            if(ben_megami == megami_1.real_number){
-                megami_1 = megami_ban
+        val ben_megami = data.data?.get(0)?: megamiOne
+        if (ben_megami != megamiBanned.real_number){
+            if(ben_megami == megamiOne.real_number){
+                megamiOne = megamiBanned
             }
             else{
-                megami_2 = megami_ban
+                megamiTwo = megamiBanned
             }
         }
     }
 
     fun makeMegamiData(command: CommandEnum): SakuraSendData {
-        return SakuraSendData(command, mutableListOf(megami_1.real_number, megami_2.real_number))
+        return SakuraSendData(command, mutableListOf(megamiOne.real_number, megamiTwo.real_number))
     }
 
     fun deleteNormalUsedCard(card: MutableList<CardName>){
@@ -520,28 +536,28 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
                     }
                 }
             LocationEnum.ALL_NORMAL -> {
-                list.addAll(megami_1.getAllNormalCardName().map { it.toCardNumber(true) })
-                list.addAll(megami_2.getAllNormalCardName().map { it.toCardNumber(true) })
-                list.addAll(megami_1.getAllAdditionalCardName().filter
+                list.addAll(megamiOne.getAllNormalCardName().map { it.toCardNumber(true) })
+                list.addAll(megamiTwo.getAllNormalCardName().map { it.toCardNumber(true) })
+                list.addAll(megamiOne.getAllAdditionalCardName().filter
                 {it.toCardData().card_class == CardClass.NORMAL}.map
                 {it.toCardNumber(true)})
-                list.addAll(megami_2.getAllAdditionalCardName().filter
+                list.addAll(megamiTwo.getAllAdditionalCardName().filter
                 {it.toCardData().card_class == CardClass.NORMAL}.map
                 {it.toCardNumber(true)})
             }
             LocationEnum.ALL -> {
-                if(megami_2 == MegamiEnum.RENRI){
+                if(megamiTwo == MegamiEnum.RENRI){
                     list.add(707); list.add(407); list.add(1313)
                 }
-                else if(megami_1 == MegamiEnum.RENRI){
+                else if(megamiOne == MegamiEnum.RENRI){
                     list.add(707); list.add(407); list.add(1313)
                 }
-                list.addAll(megami_1.getAllNormalCardName().map { it.toCardNumber(true) })
-                list.addAll(megami_2.getAllNormalCardName().map { it.toCardNumber(true) })
-                list.addAll(megami_1.getAllSpecialCardName().map { it.toCardNumber(true) })
-                list.addAll(megami_2.getAllSpecialCardName().map { it.toCardNumber(true) })
-                list.addAll(megami_1.getAllAdditionalCardName().map {it.toCardNumber(true)})
-                list.addAll(megami_2.getAllAdditionalCardName().map {it.toCardNumber(true)})
+                list.addAll(megamiOne.getAllNormalCardName().map { it.toCardNumber(true) })
+                list.addAll(megamiTwo.getAllNormalCardName().map { it.toCardNumber(true) })
+                list.addAll(megamiOne.getAllSpecialCardName().map { it.toCardNumber(true) })
+                list.addAll(megamiTwo.getAllSpecialCardName().map { it.toCardNumber(true) })
+                list.addAll(megamiOne.getAllAdditionalCardName().map {it.toCardNumber(true)})
+                list.addAll(megamiTwo.getAllAdditionalCardName().map {it.toCardNumber(true)})
             }
             LocationEnum.NOT_SELECTED_NORMAL_CARD -> {
                 unselectedCard.forEach{

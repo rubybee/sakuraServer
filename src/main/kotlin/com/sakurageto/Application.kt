@@ -1,7 +1,7 @@
 package com.sakurageto
 
 import com.sakurageto.card.CardSet
-import com.sakurageto.gamelogic.storyboard.StoryBoard
+import com.sakurageto.gamelogic.megamispecial.storyboard.StoryBoard
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*

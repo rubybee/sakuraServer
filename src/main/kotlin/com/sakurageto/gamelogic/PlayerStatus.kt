@@ -490,8 +490,14 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
                         list.add(card.card_number)
                     }
                 }
-
-            else -> TODO()
+            LocationEnum.MEMORY_YOUR -> {
+                memory?.values?.forEach{
+                    if(condition(it, location) && condition2(it)){
+                        list.add(it.card_number)
+                    }
+                }
+            }
+            else -> throw Exception("location: $location not supported")
         }
     }
 
@@ -583,7 +589,14 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
                     }
                 }
             }
-            else -> TODO()
+            LocationEnum.MEMORY_YOUR -> {
+                memory?.values?.forEach{
+                    if(condition(it, location)){
+                        list.add(it.card_number)
+                    }
+                }
+            }
+            else -> throw Exception("location: $location not supported")
         }
     }
 

@@ -11,6 +11,7 @@ import com.sakurageto.gamelogic.megamispecial.storyboard.StoryBoard
 import com.sakurageto.protocol.*
 import com.sakurageto.protocol.CommandEnum.Companion.BASIC_OPERATION_CAUSE_BY_CARD
 import io.ktor.websocket.*
+import java.lang.Exception
 
 class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private val player1_socket: Connection, private val player2_socket: Connection) {
 
@@ -690,6 +691,35 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.DUST, LocationEnum.ANVIL_YOUR, value, anvilCard.card_number)
         }
+    }
+
+    suspend fun dustToJourney(player: PlayerEnum, number: Int, reason: Int){
+        if(number <= 0) return
+
+        var value = number
+
+        if(dust < value){
+            value = dust
+        }
+
+        if(value != 0){
+            dust -= value
+
+            logger.insert(Log(player, LogText.MOVE_TOKEN, reason, value,
+                LocationEnum.DUST, LocationEnum.MEMORY_YOUR, false))
+            sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
+                LocationEnum.DUST, LocationEnum.MEMORY_YOUR, value, -1)
+        }
+    }
+
+    suspend fun journeyToDust(player: PlayerEnum, number: Int, reason: Int){
+        if(number <= 0) return
+        dust += number
+
+        logger.insert(Log(player, LogText.MOVE_TOKEN, reason, number,
+            LocationEnum.MEMORY_YOUR, LocationEnum.DUST, false))
+        sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
+            LocationEnum.MEMORY_YOUR, LocationEnum.DUST, number, -1)
     }
 
     suspend fun notReadyToReadySeed(player: PlayerEnum, number: Int){
@@ -2841,6 +2871,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         logger.insert(
             Log(player, LogText.ATTACK, nowAttack.card_number, when(nowAttack.card_class){
+                CardClass.POISON -> 5
                 CardClass.IDEA -> 4
                 CardClass.SOLDIER -> 3
                 CardClass.SPECIAL -> 2
@@ -2851,43 +2882,51 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         makeAttackComplete(nowSocket, otherSocket, card_number)
         sendAttackInformation(nowSocket, otherSocket, nowAttack.toInformation())
-        if(!otherPlayer.end_turn && react_attack == null){
-            while(true){
-                sendRequestReact(otherSocket)
-                val react = receiveReact(otherSocket)
-                if(react.first == CommandEnum.REACT_USE_CARD_HAND){
-                    val card = otherPlayer.getCardFromHand(react.second)?: continue
-                    if(reactCheck(player.opposite(), card, nowAttack)){
-                        if(useCardFrom(player.opposite(), card, LocationEnum.HAND, true, nowAttack,
-                                isCost = true, isConsume = true)) {
-                            otherPlayer.thisTurnReact = true
-                            break
+        if(react_attack == null){
+            var reactCheckCancel = false
+            for(card in otherPlayer.usedSpecialCard.values){
+                if (card.effectAllValidEffect(player.opposite(), this, TextEffectTag.WHEN_GET_ATTACK) == 1){
+                    reactCheckCancel = true
+                }
+            }
+            if(!otherPlayer.end_turn && !reactCheckCancel){
+                while(true){
+                    sendRequestReact(otherSocket)
+                    val react = receiveReact(otherSocket)
+                    if(react.first == CommandEnum.REACT_USE_CARD_HAND){
+                        val card = otherPlayer.getCardFromHand(react.second)?: continue
+                        if(reactCheck(player.opposite(), card, nowAttack)){
+                            if(useCardFrom(player.opposite(), card, LocationEnum.HAND, true, nowAttack,
+                                    isCost = true, isConsume = true)) {
+                                otherPlayer.thisTurnReact = true
+                                break
+                            }
                         }
-                    }
 
-                }
-                else if(react.first == CommandEnum.REACT_USE_CARD_SPECIAL){
-                    val card = otherPlayer.getCardFromSpecial(react.second)?: continue
-                    if(reactCheck(player.opposite(), card, nowAttack)){
-                        if(useCardFrom(player.opposite(), card, LocationEnum.SPECIAL_CARD, true, nowAttack,
-                                isCost = true, isConsume = true)) {
-                            otherPlayer.thisTurnReact = true
-                            break
+                    }
+                    else if(react.first == CommandEnum.REACT_USE_CARD_SPECIAL){
+                        val card = otherPlayer.getCardFromSpecial(react.second)?: continue
+                        if(reactCheck(player.opposite(), card, nowAttack)){
+                            if(useCardFrom(player.opposite(), card, LocationEnum.SPECIAL_CARD, true, nowAttack,
+                                    isCost = true, isConsume = true)) {
+                                otherPlayer.thisTurnReact = true
+                                break
+                            }
                         }
                     }
-                }
-                else if(react.first == CommandEnum.REACT_USE_CARD_SOLDIER){
-                    val card = otherPlayer.getCardFromSoldier(react.second)?: continue
-                    if(reactCheck(player.opposite(), card, nowAttack)){
-                        if(useCardFrom(player.opposite(), card, LocationEnum.READY_SOLDIER_ZONE, true, nowAttack,
-                                isCost = true, isConsume = true)) {
-                            otherPlayer.thisTurnReact = true
-                            break
+                    else if(react.first == CommandEnum.REACT_USE_CARD_SOLDIER){
+                        val card = otherPlayer.getCardFromSoldier(react.second)?: continue
+                        if(reactCheck(player.opposite(), card, nowAttack)){
+                            if(useCardFrom(player.opposite(), card, LocationEnum.READY_SOLDIER_ZONE, true, nowAttack,
+                                    isCost = true, isConsume = true)) {
+                                otherPlayer.thisTurnReact = true
+                                break
+                            }
                         }
                     }
-                }
-                else{
-                    break
+                    else{
+                        break
+                    }
                 }
             }
         }
@@ -2996,7 +3035,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     card.special_card_state = SpecialCardEnum.PLAYED
                     insertCardTo(card.player, card, LocationEnum.YOUR_USED_CARD, true)
                 }
-                CardClass.NORMAL -> {
+                CardClass.NORMAL, CardClass.POISON  -> {
                     insertCardTo(card.player, card, LocationEnum.DISCARD_YOUR, true)
                 }
                 CardClass.NULL -> {
@@ -3069,7 +3108,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 card.special_card_state = SpecialCardEnum.PLAYED
                 insertCardTo(card.player, card, LocationEnum.YOUR_USED_CARD, true)
             }
-            CardClass.NORMAL -> {
+            CardClass.NORMAL, CardClass.POISON -> {
                 insertCardTo(card.player, card, location, true)
             }
             CardClass.SOLDIER -> {
@@ -3512,23 +3551,35 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun drawCard(player: PlayerEnum, number: Int){
-        val now_player = getPlayer(player)
+        val nowPlayer = getPlayer(player)
 
-        val now_socket = getSocket(player)
-        val other_socket = getSocket(player.opposite())
+        val nowSocket = getSocket(player)
+        val otherSocket = getSocket(player.opposite())
 
         for(i in 1..number){
-            if(now_player.normalCardDeck.size == 0){
-                sendChooseDamage(now_socket, CommandEnum.CHOOSE_CHOJO, 1, 1)
-                val chosen = receiveChooseDamage(now_socket)
+            var drawCancel = false
+
+            for(card in nowPlayer.usedSpecialCard.values){
+                if(card.effectAllValidEffect(player, this, TextEffectTag.WHEN_DRAW_CARD) == 1){
+                    drawCancel = true
+                }
+            }
+
+            if(drawCancel){
+                continue
+            }
+
+            if(nowPlayer.normalCardDeck.size == 0){
+                sendChooseDamage(nowSocket, CommandEnum.CHOOSE_CHOJO, 1, 1)
+                val chosen = receiveChooseDamage(nowSocket)
                 processDamage(player, chosen, Pair(1, 1), false, null, null, Log.CHOJO)
                 logger.insert(Log(player, LogText.END_EFFECT, Log.CHOJO, -1))
                 continue
             }
-            val draw_card = now_player.normalCardDeck.first()
-            sendDrawCard(now_socket, other_socket, draw_card.card_number)
-            now_player.hand[draw_card.card_number] = draw_card
-            now_player.normalCardDeck.removeFirst()
+            val drawCard = nowPlayer.normalCardDeck.first()
+            sendDrawCard(nowSocket, otherSocket, drawCard.card_number)
+            nowPlayer.hand[drawCard.card_number] = drawCard
+            nowPlayer.normalCardDeck.removeFirst()
         }
     }
 
@@ -3970,10 +4021,20 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
 
         sendDeckReconstruct(nowSocket, otherSocket)
+
         if(damage){
-            processDamage(player, CommandEnum.CHOOSE_LIFE, Pair(999, 1), true, null, null,
-                Log.DECK_RECONSTRUCT_DAMAGE)
-            logger.insert(Log(player, LogText.END_EFFECT, Log.DECK_RECONSTRUCT_DAMAGE, -1))
+            var damageCancel = false
+            for(card in getPlayer(player).usedSpecialCard.values){
+                if (card.effectAllValidEffect(player, this, TextEffectTag.WHEN_GET_DAMAGE_BY_DECK_RECONSTRUCT) == 1){
+                    damageCancel = true
+                    break
+                }
+            }
+            if(!damageCancel){
+                processDamage(player, CommandEnum.CHOOSE_LIFE, Pair(999, 1), true, null, null,
+                    Log.DECK_RECONSTRUCT_DAMAGE)
+                logger.insert(Log(player, LogText.END_EFFECT, Log.DECK_RECONSTRUCT_DAMAGE, -1))
+            }
         }
         Card.cardReconstructInsert(nowPlayer.discard, nowPlayer.cover_card, nowPlayer.normalCardDeck)
 
@@ -4601,6 +4662,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 nowPlayer.endIdeaCards.remove(card_number)
                 return result
             }
+            LocationEnum.MEMORY_YOUR -> {
+                val result = nowPlayer.memory?.get(card_number)?: return null
+                sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_MEMORY_YOUR)
+                nowPlayer.memory?.remove(card_number)
+                return result
+            }
             else -> TODO()
         }
         return null
@@ -4733,6 +4800,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 nowPlayer.anvil = card
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, publicForOther, CommandEnum.ANVIL_YOUR, publicForYour)
             }
+            LocationEnum.MEMORY_YOUR -> {
+                nowPlayer.memory!![card.card_number] = card
+                sendAddCardZone(nowSocket, otherSocket, card.card_number, publicForOther, CommandEnum.MEMORY_YOUR, publicForYour)
+            }
             else -> TODO()
         }
     }
@@ -4775,7 +4846,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             LocationEnum.END_IDEA_YOUR -> {
                 getPlayer(player).endIdeaCards[card_number]
             }
-            else -> TODO()
+            LocationEnum.MEMORY_YOUR -> {
+                getPlayer(player).memory?.get(card_number)
+            }
+            else -> throw Exception("location: $location not supported")
         }
     }
 

@@ -13,7 +13,6 @@ import com.sakurageto.protocol.LocationEnum
 import com.sakurageto.protocol.sendSimpleCommand
 import io.ktor.network.sockets.*
 import java.util.EnumMap
-import kotlin.collections.HashMap
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.random.Random
@@ -36,7 +35,7 @@ data class Kikou(var attack: Int = 0, var behavior: Int = 0, var enchantment: In
 }
 
 object CardSet {
-    private val cardNumberHashmap = HashMap<Int, CardName>()
+    private val cardNumberHashmap = numberHashmapInit()
     private val cardDataHashmap = EnumMap<CardName, CardData>(CardName::class.java)
 
     fun Int.toCardName(): CardName = cardNumberHashmap[this]?: CardName.CARD_UNNAME
@@ -68,781 +67,805 @@ object CardSet {
         }
     }
 
-    private fun hashMapInit(){
+    private fun numberHashmapInit(): Map<Int, CardName>{
+        val cardTempNumberHashmap = hashMapOf<Int, CardName>()
+
         //for number -> card name
-        cardNumberHashmap[NUMBER_CARD_UNAME] = CardName.CARD_UNNAME
-        cardNumberHashmap[NUMBER_POISON_ANYTHING] = CardName.POISON_ANYTHING
-        cardNumberHashmap[NUMBER_SOLDIER_ANYTHING] = CardName.SOLDIER_ANYTHING
+        cardTempNumberHashmap[NUMBER_CARD_UNAME] = CardName.CARD_UNNAME
+        cardTempNumberHashmap[NUMBER_POISON_ANYTHING] = CardName.POISON_ANYTHING
+        cardTempNumberHashmap[NUMBER_SOLDIER_ANYTHING] = CardName.SOLDIER_ANYTHING
 
-        cardNumberHashmap[NUMBER_YURINA_CHAM] = CardName.YURINA_CHAM
-        cardNumberHashmap[NUMBER_YURINA_ILSUM] = CardName.YURINA_ILSUM
-        cardNumberHashmap[NUMBER_YURINA_JARUCHIGI] = CardName.YURINA_JARUCHIGI
-        cardNumberHashmap[NUMBER_YURINA_GUHAB] = CardName.YURINA_GUHAB
-        cardNumberHashmap[NUMBER_YURINA_GIBACK] = CardName.YURINA_GIBACK
-        cardNumberHashmap[NUMBER_YURINA_APDO] = CardName.YURINA_APDO
-        cardNumberHashmap[NUMBER_YURINA_GIYENBANJO] = CardName.YURINA_GIYENBANJO
-        cardNumberHashmap[NUMBER_YURINA_WOLYUNGNACK] = CardName.YURINA_WOLYUNGNACK
-        cardNumberHashmap[NUMBER_YURINA_POBARAM] = CardName.YURINA_POBARAM
-        cardNumberHashmap[NUMBER_YURINA_JJOCKBAE] = CardName.YURINA_JJOCKBAE
-        cardNumberHashmap[NUMBER_YURINA_JURUCK] = CardName.YURINA_JURUCK
-        cardNumberHashmap[NUMBER_YURINA_NAN_TA] = CardName.YURINA_NAN_TA
-        cardNumberHashmap[NUMBER_YURINA_BEAN_BULLET] = CardName.YURINA_BEAN_BULLET
-        cardNumberHashmap[NUMBER_YURINA_NOT_COMPLETE_POBARAM] = CardName.YURINA_NOT_COMPLETE_POBARAM
-        cardNumberHashmap[NUMBER_YURINA_QUESTION_ANSWER] = CardName.YURINA_QUESTION_ANSWER
-        cardNumberHashmap[NUMBER_YURINA_AHUM] = CardName.YURINA_AHUM
-        cardNumberHashmap[NUMBER_YURINA_KANZA_DO] = CardName.YURINA_KANZA_DO
+        cardTempNumberHashmap[NUMBER_YURINA_CHAM] = CardName.YURINA_CHAM
+        cardTempNumberHashmap[NUMBER_YURINA_ILSUM] = CardName.YURINA_ILSUM
+        cardTempNumberHashmap[NUMBER_YURINA_JARUCHIGI] = CardName.YURINA_JARUCHIGI
+        cardTempNumberHashmap[NUMBER_YURINA_GUHAB] = CardName.YURINA_GUHAB
+        cardTempNumberHashmap[NUMBER_YURINA_GIBACK] = CardName.YURINA_GIBACK
+        cardTempNumberHashmap[NUMBER_YURINA_APDO] = CardName.YURINA_APDO
+        cardTempNumberHashmap[NUMBER_YURINA_GIYENBANJO] = CardName.YURINA_GIYENBANJO
+        cardTempNumberHashmap[NUMBER_YURINA_WOLYUNGNACK] = CardName.YURINA_WOLYUNGNACK
+        cardTempNumberHashmap[NUMBER_YURINA_POBARAM] = CardName.YURINA_POBARAM
+        cardTempNumberHashmap[NUMBER_YURINA_JJOCKBAE] = CardName.YURINA_JJOCKBAE
+        cardTempNumberHashmap[NUMBER_YURINA_JURUCK] = CardName.YURINA_JURUCK
+        cardTempNumberHashmap[NUMBER_YURINA_NAN_TA] = CardName.YURINA_NAN_TA
+        cardTempNumberHashmap[NUMBER_YURINA_BEAN_BULLET] = CardName.YURINA_BEAN_BULLET
+        cardTempNumberHashmap[NUMBER_YURINA_NOT_COMPLETE_POBARAM] = CardName.YURINA_NOT_COMPLETE_POBARAM
+        cardTempNumberHashmap[NUMBER_YURINA_QUESTION_ANSWER] = CardName.YURINA_QUESTION_ANSWER
+        cardTempNumberHashmap[NUMBER_YURINA_AHUM] = CardName.YURINA_AHUM
+        cardTempNumberHashmap[NUMBER_YURINA_KANZA_DO] = CardName.YURINA_KANZA_DO
 
-        cardNumberHashmap[NUMBER_SAINE_DOUBLEBEGI] = CardName.SAINE_DOUBLEBEGI
-        cardNumberHashmap[NUMBER_SAINE_HURUBEGI] = CardName.SAINE_HURUBEGI
-        cardNumberHashmap[NUMBER_SAINE_MOOGECHOO] = CardName.SAINE_MOOGECHOO
-        cardNumberHashmap[NUMBER_SAINE_GANPA] = CardName.SAINE_GANPA
-        cardNumberHashmap[NUMBER_SAINE_GWONYUCK] = CardName.SAINE_GWONYUCK
-        cardNumberHashmap[NUMBER_SAINE_CHOONGEMJUNG] = CardName.SAINE_CHOONGEMJUNG
-        cardNumberHashmap[NUMBER_SAINE_MOOEMBUCK] = CardName.SAINE_MOOEMBUCK
-        cardNumberHashmap[NUMBER_SAINE_YULDONGHOGEK] = CardName.SAINE_YULDONGHOGEK
-        cardNumberHashmap[NUMBER_SAINE_HANGMUNGGONGJIN] = CardName.SAINE_HANGMUNGGONGJIN
-        cardNumberHashmap[NUMBER_SAINE_EMMOOSHOEBING] = CardName.SAINE_EMMOOSHOEBING
-        cardNumberHashmap[NUMBER_SAINE_JONGGEK] = CardName.SAINE_JONGGEK
-        cardNumberHashmap[NUMBER_SAINE_SOUND_OF_ICE] = CardName.SAINE_SOUND_OF_ICE
-        cardNumberHashmap[NUMBER_SAINE_ACCOMPANIMENT] = CardName.SAINE_ACCOMPANIMENT
-        cardNumberHashmap[NUMBER_SAINE_DUET_TAN_JU_BING_MYEONG] = CardName.SAINE_DUET_TAN_JU_BING_MYEONG
-        cardNumberHashmap[NUMBER_SAINE_BETRAYAL] = CardName.SAINE_BETRAYAL
-        cardNumberHashmap[NUMBER_SAINE_FLOWING_WALL] = CardName.SAINE_FLOWING_WALL
-        cardNumberHashmap[NUMBER_SAINE_JEOL_CHANG_JEOL_HWA] = CardName.SAINE_JEOL_CHANG_JEOL_HWA
+        cardTempNumberHashmap[NUMBER_SAINE_DOUBLEBEGI] = CardName.SAINE_DOUBLEBEGI
+        cardTempNumberHashmap[NUMBER_SAINE_HURUBEGI] = CardName.SAINE_HURUBEGI
+        cardTempNumberHashmap[NUMBER_SAINE_MOOGECHOO] = CardName.SAINE_MOOGECHOO
+        cardTempNumberHashmap[NUMBER_SAINE_GANPA] = CardName.SAINE_GANPA
+        cardTempNumberHashmap[NUMBER_SAINE_GWONYUCK] = CardName.SAINE_GWONYUCK
+        cardTempNumberHashmap[NUMBER_SAINE_CHOONGEMJUNG] = CardName.SAINE_CHOONGEMJUNG
+        cardTempNumberHashmap[NUMBER_SAINE_MOOEMBUCK] = CardName.SAINE_MOOEMBUCK
+        cardTempNumberHashmap[NUMBER_SAINE_YULDONGHOGEK] = CardName.SAINE_YULDONGHOGEK
+        cardTempNumberHashmap[NUMBER_SAINE_HANGMUNGGONGJIN] = CardName.SAINE_HANGMUNGGONGJIN
+        cardTempNumberHashmap[NUMBER_SAINE_EMMOOSHOEBING] = CardName.SAINE_EMMOOSHOEBING
+        cardTempNumberHashmap[NUMBER_SAINE_JONGGEK] = CardName.SAINE_JONGGEK
+        cardTempNumberHashmap[NUMBER_SAINE_SOUND_OF_ICE] = CardName.SAINE_SOUND_OF_ICE
+        cardTempNumberHashmap[NUMBER_SAINE_ACCOMPANIMENT] = CardName.SAINE_ACCOMPANIMENT
+        cardTempNumberHashmap[NUMBER_SAINE_DUET_TAN_JU_BING_MYEONG] = CardName.SAINE_DUET_TAN_JU_BING_MYEONG
+        cardTempNumberHashmap[NUMBER_SAINE_BETRAYAL] = CardName.SAINE_BETRAYAL
+        cardTempNumberHashmap[NUMBER_SAINE_FLOWING_WALL] = CardName.SAINE_FLOWING_WALL
+        cardTempNumberHashmap[NUMBER_SAINE_JEOL_CHANG_JEOL_HWA] = CardName.SAINE_JEOL_CHANG_JEOL_HWA
 
-        cardNumberHashmap[NUMBER_HIMIKA_SHOOT] = CardName.HIMIKA_SHOOT
-        cardNumberHashmap[NUMBER_HIMIKA_RAPIDFIRE] = CardName.HIMIKA_RAPIDFIRE
-        cardNumberHashmap[NUMBER_HIMIKA_MAGNUMCANON] = CardName.HIMIKA_MAGNUMCANON
-        cardNumberHashmap[NUMBER_HIMIKA_FULLBURST] = CardName.HIMIKA_FULLBURST
-        cardNumberHashmap[NUMBER_HIMIKA_BACKSTEP] = CardName.HIMIKA_BACKSTEP
-        cardNumberHashmap[NUMBER_HIMIKA_BACKDRAFT] = CardName.HIMIKA_BACKDRAFT
-        cardNumberHashmap[NUMBER_HIMIKA_SMOKE] = CardName.HIMIKA_SMOKE
-        cardNumberHashmap[NUMBER_HIMIKA_REDBULLET] = CardName.HIMIKA_REDBULLET
-        cardNumberHashmap[NUMBER_HIMIKA_CRIMSONZERO] = CardName.HIMIKA_CRIMSONZERO
-        cardNumberHashmap[NUMBER_HIMIKA_SCARLETIMAGINE] = CardName.HIMIKA_SCARLETIMAGINE
-        cardNumberHashmap[NUMBER_HIMIKA_BURMILIONFIELD] = CardName.HIMIKA_BURMILIONFIELD
-        cardNumberHashmap[NUMBER_HIMIKA_FIRE_WAVE] = CardName.HIMIKA_FIRE_WAVE
-        cardNumberHashmap[NUMBER_HIMIKA_SAT_SUI] = CardName.HIMIKA_SAT_SUI
-        cardNumberHashmap[NUMBER_HIMIKA_EN_TEN_HIMIKA] = CardName.HIMIKA_EN_TEN_HIMIKA
+        cardTempNumberHashmap[NUMBER_HIMIKA_SHOOT] = CardName.HIMIKA_SHOOT
+        cardTempNumberHashmap[NUMBER_HIMIKA_RAPIDFIRE] = CardName.HIMIKA_RAPIDFIRE
+        cardTempNumberHashmap[NUMBER_HIMIKA_MAGNUMCANON] = CardName.HIMIKA_MAGNUMCANON
+        cardTempNumberHashmap[NUMBER_HIMIKA_FULLBURST] = CardName.HIMIKA_FULLBURST
+        cardTempNumberHashmap[NUMBER_HIMIKA_BACKSTEP] = CardName.HIMIKA_BACKSTEP
+        cardTempNumberHashmap[NUMBER_HIMIKA_BACKDRAFT] = CardName.HIMIKA_BACKDRAFT
+        cardTempNumberHashmap[NUMBER_HIMIKA_SMOKE] = CardName.HIMIKA_SMOKE
+        cardTempNumberHashmap[NUMBER_HIMIKA_REDBULLET] = CardName.HIMIKA_REDBULLET
+        cardTempNumberHashmap[NUMBER_HIMIKA_CRIMSONZERO] = CardName.HIMIKA_CRIMSONZERO
+        cardTempNumberHashmap[NUMBER_HIMIKA_SCARLETIMAGINE] = CardName.HIMIKA_SCARLETIMAGINE
+        cardTempNumberHashmap[NUMBER_HIMIKA_BURMILIONFIELD] = CardName.HIMIKA_BURMILIONFIELD
+        cardTempNumberHashmap[NUMBER_HIMIKA_FIRE_WAVE] = CardName.HIMIKA_FIRE_WAVE
+        cardTempNumberHashmap[NUMBER_HIMIKA_SAT_SUI] = CardName.HIMIKA_SAT_SUI
+        cardTempNumberHashmap[NUMBER_HIMIKA_EN_TEN_HIMIKA] = CardName.HIMIKA_EN_TEN_HIMIKA
 
-        cardNumberHashmap[NUMBER_TOKOYO_BITSUNERIGI] = CardName.TOKOYO_BITSUNERIGI
-        cardNumberHashmap[NUMBER_TOKOYO_WOOAHHANTAGUCK] = CardName.TOKOYO_WOOAHHANTAGUCK
-        cardNumberHashmap[NUMBER_TOKOYO_RUNNINGRABIT] = CardName.TOKOYO_RUNNINGRABIT
-        cardNumberHashmap[NUMBER_TOKOYO_POETDANCE] = CardName.TOKOYO_POETDANCE
-        cardNumberHashmap[NUMBER_TOKOYO_FLIPFAN] = CardName.TOKOYO_FLIPFAN
-        cardNumberHashmap[NUMBER_TOKOYO_WINDSTAGE] = CardName.TOKOYO_WINDSTAGE
-        cardNumberHashmap[NUMBER_TOKOYO_SUNSTAGE] = CardName.TOKOYO_SUNSTAGE
-        cardNumberHashmap[NUMBER_TOKOYO_KUON] = CardName.TOKOYO_KUON
-        cardNumberHashmap[NUMBER_TOKOYO_THOUSANDBIRD] = CardName.TOKOYO_THOUSANDBIRD
-        cardNumberHashmap[NUMBER_TOKOYO_ENDLESSWIND] = CardName.TOKOYO_ENDLESSWIND
-        cardNumberHashmap[NUMBER_TOKOYO_TOKOYOMOON] = CardName.TOKOYO_TOKOYOMOON
-        cardNumberHashmap[NUMBER_TOKOYO_FLOWING_PLAY] = CardName.TOKOYO_FLOWING_PLAY
-        cardNumberHashmap[NUMBER_TOKOYO_SOUND_OF_SUN] = CardName.TOKOYO_SOUND_OF_SUN
-        cardNumberHashmap[NUMBER_TOKOYO_DUET_CHI_TAN_YANG_MYEONG] = CardName.TOKOYO_DUET_CHI_TAN_YANG_MYEONG
-        cardNumberHashmap[NUMBER_TOKOYO_PASSING_FEAR] = CardName.TOKOYO_PASSING_FEAR
-        cardNumberHashmap[NUMBER_TOKOYO_RELIC_EYE] = CardName.TOKOYO_RELIC_EYE
-        cardNumberHashmap[NUMBER_TOKOYO_EIGHT_SAKURA_IN_VAIN] = CardName.TOKOYO_EIGHT_SAKURA_IN_VAIN
+        cardTempNumberHashmap[NUMBER_TOKOYO_BITSUNERIGI] = CardName.TOKOYO_BITSUNERIGI
+        cardTempNumberHashmap[NUMBER_TOKOYO_WOOAHHANTAGUCK] = CardName.TOKOYO_WOOAHHANTAGUCK
+        cardTempNumberHashmap[NUMBER_TOKOYO_RUNNINGRABIT] = CardName.TOKOYO_RUNNINGRABIT
+        cardTempNumberHashmap[NUMBER_TOKOYO_POETDANCE] = CardName.TOKOYO_POETDANCE
+        cardTempNumberHashmap[NUMBER_TOKOYO_FLIPFAN] = CardName.TOKOYO_FLIPFAN
+        cardTempNumberHashmap[NUMBER_TOKOYO_WINDSTAGE] = CardName.TOKOYO_WINDSTAGE
+        cardTempNumberHashmap[NUMBER_TOKOYO_SUNSTAGE] = CardName.TOKOYO_SUNSTAGE
+        cardTempNumberHashmap[NUMBER_TOKOYO_KUON] = CardName.TOKOYO_KUON
+        cardTempNumberHashmap[NUMBER_TOKOYO_THOUSANDBIRD] = CardName.TOKOYO_THOUSANDBIRD
+        cardTempNumberHashmap[NUMBER_TOKOYO_ENDLESSWIND] = CardName.TOKOYO_ENDLESSWIND
+        cardTempNumberHashmap[NUMBER_TOKOYO_TOKOYOMOON] = CardName.TOKOYO_TOKOYOMOON
+        cardTempNumberHashmap[NUMBER_TOKOYO_FLOWING_PLAY] = CardName.TOKOYO_FLOWING_PLAY
+        cardTempNumberHashmap[NUMBER_TOKOYO_SOUND_OF_SUN] = CardName.TOKOYO_SOUND_OF_SUN
+        cardTempNumberHashmap[NUMBER_TOKOYO_DUET_CHI_TAN_YANG_MYEONG] = CardName.TOKOYO_DUET_CHI_TAN_YANG_MYEONG
+        cardTempNumberHashmap[NUMBER_TOKOYO_PASSING_FEAR] = CardName.TOKOYO_PASSING_FEAR
+        cardTempNumberHashmap[NUMBER_TOKOYO_RELIC_EYE] = CardName.TOKOYO_RELIC_EYE
+        cardTempNumberHashmap[NUMBER_TOKOYO_EIGHT_SAKURA_IN_VAIN] = CardName.TOKOYO_EIGHT_SAKURA_IN_VAIN
 
-        cardNumberHashmap[NUMBER_OBORO_WIRE] = CardName.OBORO_WIRE
-        cardNumberHashmap[NUMBER_OBORO_SHADOWCALTROP] = CardName.OBORO_SHADOWCALTROP
-        cardNumberHashmap[NUMBER_OBORO_ZANGEKIRANBU] = CardName.OBORO_ZANGEKIRANBU
-        cardNumberHashmap[NUMBER_OBORO_NINJAWALK] = CardName.OBORO_NINJAWALK
-        cardNumberHashmap[NUMBER_OBORO_INDUCE] = CardName.OBORO_INDUCE
-        cardNumberHashmap[NUMBER_OBORO_CLONE] = CardName.OBORO_CLONE
-        cardNumberHashmap[NUMBER_OBORO_BIOACTIVITY] = CardName.OBORO_BIOACTIVITY
-        cardNumberHashmap[NUMBER_OBORO_KUMASUKE] = CardName.OBORO_KUMASUKE
-        cardNumberHashmap[NUMBER_OBORO_TOBIKAGE] = CardName.OBORO_TOBIKAGE
-        cardNumberHashmap[NUMBER_OBORO_ULOO] = CardName.OBORO_ULOO
-        cardNumberHashmap[NUMBER_OBORO_MIKAZRA] = CardName.OBORO_MIKAZRA
-        cardNumberHashmap[NUMBER_OBORO_SHURIKEN] = CardName.OBORO_SHURIKEN
-        cardNumberHashmap[NUMBER_OBORO_AMBUSH] = CardName.OBORO_AMBUSH
-        cardNumberHashmap[NUMBER_OBORO_BRANCH_OF_DIVINE] = CardName.OBORO_BRANCH_OF_DIVINE
-        cardNumberHashmap[NUMBER_OBORO_LAST_CRYSTAL] = CardName.OBORO_LAST_CRYSTAL
+        cardTempNumberHashmap[NUMBER_OBORO_WIRE] = CardName.OBORO_WIRE
+        cardTempNumberHashmap[NUMBER_OBORO_SHADOWCALTROP] = CardName.OBORO_SHADOWCALTROP
+        cardTempNumberHashmap[NUMBER_OBORO_ZANGEKIRANBU] = CardName.OBORO_ZANGEKIRANBU
+        cardTempNumberHashmap[NUMBER_OBORO_NINJAWALK] = CardName.OBORO_NINJAWALK
+        cardTempNumberHashmap[NUMBER_OBORO_INDUCE] = CardName.OBORO_INDUCE
+        cardTempNumberHashmap[NUMBER_OBORO_CLONE] = CardName.OBORO_CLONE
+        cardTempNumberHashmap[NUMBER_OBORO_BIOACTIVITY] = CardName.OBORO_BIOACTIVITY
+        cardTempNumberHashmap[NUMBER_OBORO_KUMASUKE] = CardName.OBORO_KUMASUKE
+        cardTempNumberHashmap[NUMBER_OBORO_TOBIKAGE] = CardName.OBORO_TOBIKAGE
+        cardTempNumberHashmap[NUMBER_OBORO_ULOO] = CardName.OBORO_ULOO
+        cardTempNumberHashmap[NUMBER_OBORO_MIKAZRA] = CardName.OBORO_MIKAZRA
+        cardTempNumberHashmap[NUMBER_OBORO_SHURIKEN] = CardName.OBORO_SHURIKEN
+        cardTempNumberHashmap[NUMBER_OBORO_AMBUSH] = CardName.OBORO_AMBUSH
+        cardTempNumberHashmap[NUMBER_OBORO_BRANCH_OF_DIVINE] = CardName.OBORO_BRANCH_OF_DIVINE
+        cardTempNumberHashmap[NUMBER_OBORO_LAST_CRYSTAL] = CardName.OBORO_LAST_CRYSTAL
 
-        cardNumberHashmap[NUMBER_YUKIHI_YUKIHI] = CardName.YUKIHI_YUKIHI
-        cardNumberHashmap[NUMBER_YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE] = CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE
-        cardNumberHashmap[NUMBER_YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS] = CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS
-        cardNumberHashmap[NUMBER_YUKIHI_PUSH_OUT_SLASH_PULL] = CardName.YUKIHI_PUSH_OUT_SLASH_PULL
-        cardNumberHashmap[NUMBER_YUKIHI_SWING_SLASH_STAB] = CardName.YUKIHI_SWING_SLASH_STAB
-        cardNumberHashmap[NUMBER_YUKIHI_TURN_UMBRELLA] = CardName.YUKIHI_TURN_UMBRELLA
-        cardNumberHashmap[NUMBER_YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN] = CardName.YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN
-        cardNumberHashmap[NUMBER_YUKIHI_MAKE_CONNECTION] = CardName.YUKIHI_MAKE_CONNECTION
-        cardNumberHashmap[NUMBER_YUKIHI_FLUTTERING_SNOWFLAKE] = CardName.YUKIHI_FLUTTERING_SNOWFLAKE
-        cardNumberHashmap[NUMBER_YUKIHI_SWAYING_LAMPLIGHT] = CardName.YUKIHI_SWAYING_LAMPLIGHT
-        cardNumberHashmap[NUMBER_YUKIHI_CLINGY_MIND] = CardName.YUKIHI_CLINGY_MIND
-        cardNumberHashmap[NUMBER_YUKIHI_SWIRLING_GESTURE] = CardName.YUKIHI_SWIRLING_GESTURE
-        cardNumberHashmap[NUMBER_YUKIHI_HELP_SLASH_THREAT] = CardName.YUKIHI_HELP_SLASH_THREAT
-        cardNumberHashmap[NUMBER_YUKIHI_THREAD_SLASH_RAW_THREAD] = CardName.YUKIHI_THREAD_SLASH_RAW_THREAD
-        cardNumberHashmap[NUMBER_YUKIHI_FLUTTERING_COLLAR] = CardName.YUKIHI_FLUTTERING_COLLAR
+        cardTempNumberHashmap[NUMBER_YUKIHI_YUKIHI] = CardName.YUKIHI_YUKIHI
+        cardTempNumberHashmap[NUMBER_YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE] = CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE
+        cardTempNumberHashmap[NUMBER_YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS] = CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS
+        cardTempNumberHashmap[NUMBER_YUKIHI_PUSH_OUT_SLASH_PULL] = CardName.YUKIHI_PUSH_OUT_SLASH_PULL
+        cardTempNumberHashmap[NUMBER_YUKIHI_SWING_SLASH_STAB] = CardName.YUKIHI_SWING_SLASH_STAB
+        cardTempNumberHashmap[NUMBER_YUKIHI_TURN_UMBRELLA] = CardName.YUKIHI_TURN_UMBRELLA
+        cardTempNumberHashmap[NUMBER_YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN] = CardName.YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN
+        cardTempNumberHashmap[NUMBER_YUKIHI_MAKE_CONNECTION] = CardName.YUKIHI_MAKE_CONNECTION
+        cardTempNumberHashmap[NUMBER_YUKIHI_FLUTTERING_SNOWFLAKE] = CardName.YUKIHI_FLUTTERING_SNOWFLAKE
+        cardTempNumberHashmap[NUMBER_YUKIHI_SWAYING_LAMPLIGHT] = CardName.YUKIHI_SWAYING_LAMPLIGHT
+        cardTempNumberHashmap[NUMBER_YUKIHI_CLINGY_MIND] = CardName.YUKIHI_CLINGY_MIND
+        cardTempNumberHashmap[NUMBER_YUKIHI_SWIRLING_GESTURE] = CardName.YUKIHI_SWIRLING_GESTURE
+        cardTempNumberHashmap[NUMBER_YUKIHI_HELP_SLASH_THREAT] = CardName.YUKIHI_HELP_SLASH_THREAT
+        cardTempNumberHashmap[NUMBER_YUKIHI_THREAD_SLASH_RAW_THREAD] = CardName.YUKIHI_THREAD_SLASH_RAW_THREAD
+        cardTempNumberHashmap[NUMBER_YUKIHI_FLUTTERING_COLLAR] = CardName.YUKIHI_FLUTTERING_COLLAR
 
-        cardNumberHashmap[NUMBER_SHINRA_SHINRA] = CardName.SHINRA_SHINRA
-        cardNumberHashmap[NUMBER_SHINRA_IBLON] = CardName.SHINRA_IBLON
-        cardNumberHashmap[NUMBER_SHINRA_BANLON] = CardName.SHINRA_BANLON
-        cardNumberHashmap[NUMBER_SHINRA_KIBEN] = CardName.SHINRA_KIBEN
-        cardNumberHashmap[NUMBER_SHINRA_INYONG] = CardName.SHINRA_INYONG
-        cardNumberHashmap[NUMBER_SHINRA_SEONDONG] = CardName.SHINRA_SEONDONG
-        cardNumberHashmap[NUMBER_SHINRA_JANGDAM] = CardName.SHINRA_JANGDAM
-        cardNumberHashmap[NUMBER_SHINRA_NONPA] = CardName.SHINRA_NONPA
-        cardNumberHashmap[NUMBER_SHINRA_WANJEON_NONPA] = CardName.SHINRA_WANJEON_NONPA
-        cardNumberHashmap[NUMBER_SHINRA_DASIG_IHAE] = CardName.SHINRA_DASIG_IHAE
-        cardNumberHashmap[NUMBER_SHINRA_CHEONJI_BANBAG] = CardName.SHINRA_CHEONJI_BANBAG
-        cardNumberHashmap[NUMBER_SHINRA_SAMRA_BAN_SHO] = CardName.SHINRA_SAMRA_BAN_SHO
-        cardNumberHashmap[NUMBER_SHINRA_ZHEN_YEN] = CardName.SHINRA_ZHEN_YEN
-        cardNumberHashmap[NUMBER_SHINRA_SA_DO] = CardName.SHINRA_SA_DO
-        cardNumberHashmap[NUMBER_SHINRA_ZEN_CHI_KYO_TEN] = CardName.SHINRA_ZEN_CHI_KYO_TEN
+        cardTempNumberHashmap[NUMBER_SHINRA_SHINRA] = CardName.SHINRA_SHINRA
+        cardTempNumberHashmap[NUMBER_SHINRA_IBLON] = CardName.SHINRA_IBLON
+        cardTempNumberHashmap[NUMBER_SHINRA_BANLON] = CardName.SHINRA_BANLON
+        cardTempNumberHashmap[NUMBER_SHINRA_KIBEN] = CardName.SHINRA_KIBEN
+        cardTempNumberHashmap[NUMBER_SHINRA_INYONG] = CardName.SHINRA_INYONG
+        cardTempNumberHashmap[NUMBER_SHINRA_SEONDONG] = CardName.SHINRA_SEONDONG
+        cardTempNumberHashmap[NUMBER_SHINRA_JANGDAM] = CardName.SHINRA_JANGDAM
+        cardTempNumberHashmap[NUMBER_SHINRA_NONPA] = CardName.SHINRA_NONPA
+        cardTempNumberHashmap[NUMBER_SHINRA_WANJEON_NONPA] = CardName.SHINRA_WANJEON_NONPA
+        cardTempNumberHashmap[NUMBER_SHINRA_DASIG_IHAE] = CardName.SHINRA_DASIG_IHAE
+        cardTempNumberHashmap[NUMBER_SHINRA_CHEONJI_BANBAG] = CardName.SHINRA_CHEONJI_BANBAG
+        cardTempNumberHashmap[NUMBER_SHINRA_SAMRA_BAN_SHO] = CardName.SHINRA_SAMRA_BAN_SHO
+        cardTempNumberHashmap[NUMBER_SHINRA_ZHEN_YEN] = CardName.SHINRA_ZHEN_YEN
+        cardTempNumberHashmap[NUMBER_SHINRA_SA_DO] = CardName.SHINRA_SA_DO
+        cardTempNumberHashmap[NUMBER_SHINRA_ZEN_CHI_KYO_TEN] = CardName.SHINRA_ZEN_CHI_KYO_TEN
 
-        cardNumberHashmap[NUMBER_HAGANE_CENTRIFUGAL_ATTACK] = CardName.HAGANE_CENTRIFUGAL_ATTACK
-        cardNumberHashmap[NUMBER_HAGANE_FOUR_WINDED_EARTHQUAKE] = CardName.HAGANE_FOUR_WINDED_EARTHQUAKE
-        cardNumberHashmap[NUMBER_HAGANE_GROUND_BREAKING] = CardName.HAGANE_GROUND_BREAKING
-        cardNumberHashmap[NUMBER_HAGANE_HYPER_RECOIL] = CardName.HAGANE_HYPER_RECOIL
-        cardNumberHashmap[NUMBER_HAGANE_WON_MU_RUYN] = CardName.HAGANE_WON_MU_RUYN
-        cardNumberHashmap[NUMBER_HAGANE_RING_A_BELL] = CardName.HAGANE_RING_A_BELL
-        cardNumberHashmap[NUMBER_HAGANE_GRAVITATION_FIELD] = CardName.HAGANE_GRAVITATION_FIELD
-        cardNumberHashmap[NUMBER_HAGANE_GRAND_SKY_HOLE_CRASH] = CardName.HAGANE_GRAND_SKY_HOLE_CRASH
-        cardNumberHashmap[NUMBER_HAGANE_GRAND_BELL_MEGALOBEL] = CardName.HAGANE_GRAND_BELL_MEGALOBEL
-        cardNumberHashmap[NUMBER_HAGANE_GRAND_GRAVITATION_ATTRACT] = CardName.HAGANE_GRAND_GRAVITATION_ATTRACT
-        cardNumberHashmap[NUMBER_HAGANE_GRAND_MOUNTAIN_RESPECT] = CardName.HAGANE_GRAND_MOUNTAIN_RESPECT
-        cardNumberHashmap[NUMBER_HAGANE_BONFIRE] = CardName.HAGANE_BONFIRE
-        cardNumberHashmap[NUMBER_HAGANE_WHEEL_SKILL] = CardName.HAGANE_WHEEL_SKILL
-        cardNumberHashmap[NUMBER_HAGANE_GRAND_SOFT_MATERIAL] = CardName.HAGANE_GRAND_SOFT_MATERIAL
-        cardNumberHashmap[NUMBER_HAGANE_SOFT_ATTACK] = CardName.HAGANE_SOFT_ATTACK
+        cardTempNumberHashmap[NUMBER_HAGANE_CENTRIFUGAL_ATTACK] = CardName.HAGANE_CENTRIFUGAL_ATTACK
+        cardTempNumberHashmap[NUMBER_HAGANE_FOUR_WINDED_EARTHQUAKE] = CardName.HAGANE_FOUR_WINDED_EARTHQUAKE
+        cardTempNumberHashmap[NUMBER_HAGANE_GROUND_BREAKING] = CardName.HAGANE_GROUND_BREAKING
+        cardTempNumberHashmap[NUMBER_HAGANE_HYPER_RECOIL] = CardName.HAGANE_HYPER_RECOIL
+        cardTempNumberHashmap[NUMBER_HAGANE_WON_MU_RUYN] = CardName.HAGANE_WON_MU_RUYN
+        cardTempNumberHashmap[NUMBER_HAGANE_RING_A_BELL] = CardName.HAGANE_RING_A_BELL
+        cardTempNumberHashmap[NUMBER_HAGANE_GRAVITATION_FIELD] = CardName.HAGANE_GRAVITATION_FIELD
+        cardTempNumberHashmap[NUMBER_HAGANE_GRAND_SKY_HOLE_CRASH] = CardName.HAGANE_GRAND_SKY_HOLE_CRASH
+        cardTempNumberHashmap[NUMBER_HAGANE_GRAND_BELL_MEGALOBEL] = CardName.HAGANE_GRAND_BELL_MEGALOBEL
+        cardTempNumberHashmap[NUMBER_HAGANE_GRAND_GRAVITATION_ATTRACT] = CardName.HAGANE_GRAND_GRAVITATION_ATTRACT
+        cardTempNumberHashmap[NUMBER_HAGANE_GRAND_MOUNTAIN_RESPECT] = CardName.HAGANE_GRAND_MOUNTAIN_RESPECT
+        cardTempNumberHashmap[NUMBER_HAGANE_BONFIRE] = CardName.HAGANE_BONFIRE
+        cardTempNumberHashmap[NUMBER_HAGANE_WHEEL_SKILL] = CardName.HAGANE_WHEEL_SKILL
+        cardTempNumberHashmap[NUMBER_HAGANE_GRAND_SOFT_MATERIAL] = CardName.HAGANE_GRAND_SOFT_MATERIAL
+        cardTempNumberHashmap[NUMBER_HAGANE_SOFT_ATTACK] = CardName.HAGANE_SOFT_ATTACK
 
-        cardNumberHashmap[NUMBER_CHIKAGE_THROW_KUNAI] = CardName.CHIKAGE_THROW_KUNAI
-        cardNumberHashmap[NUMBER_CHIKAGE_POISON_NEEDLE] = CardName.CHIKAGE_POISON_NEEDLE
-        cardNumberHashmap[NUMBER_CHIKAGE_TO_ZU_CHU] = CardName.CHIKAGE_TO_ZU_CHU
-        cardNumberHashmap[NUMBER_CHIKAGE_CUTTING_NECK] = CardName.CHIKAGE_CUTTING_NECK
-        cardNumberHashmap[NUMBER_CHIKAGE_POISON_SMOKE] = CardName.CHIKAGE_POISON_SMOKE
-        cardNumberHashmap[NUMBER_CHIKAGE_TIP_TOEING] = CardName.CHIKAGE_TIP_TOEING
-        cardNumberHashmap[NUMBER_CHIKAGE_MUDDLE] = CardName.CHIKAGE_MUDDLE
-        cardNumberHashmap[NUMBER_CHIKAGE_DEADLY_POISON] = CardName.CHIKAGE_DEADLY_POISON
-        cardNumberHashmap[NUMBER_CHIKAGE_HAN_KI_POISON] = CardName.CHIKAGE_HAN_KI_POISON
-        cardNumberHashmap[NUMBER_CHIKAGE_REINCARNATION_POISON] = CardName.CHIKAGE_REINCARNATION_POISON
-        cardNumberHashmap[NUMBER_CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE] = CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE
-        cardNumberHashmap[NUMBER_CHIKAGE_TRICK_UMBRELLA] = CardName.CHIKAGE_TRICK_UMBRELLA
-        cardNumberHashmap[NUMBER_CHIKAGE_STRUGGLE] = CardName.CHIKAGE_STRUGGLE
-        cardNumberHashmap[NUMBER_CHIKAGE_ZAN_ZE_NO_CONNECTION_POISON] = CardName.CHIKAGE_ZAN_ZE_NO_CONNECTION_POISON
-        cardNumberHashmap[NUMBER_POISON_PARALYTIC] = CardName.POISON_PARALYTIC
-        cardNumberHashmap[NUMBER_POISON_HALLUCINOGENIC] = CardName.POISON_HALLUCINOGENIC
-        cardNumberHashmap[NUMBER_POISON_RELAXATION] = CardName.POISON_RELAXATION
-        cardNumberHashmap[NUMBER_POISON_DEADLY_1] = CardName.POISON_DEADLY_1
-        cardNumberHashmap[NUMBER_POISON_DEADLY_2] = CardName.POISON_DEADLY_2
+        cardTempNumberHashmap[NUMBER_CHIKAGE_THROW_KUNAI] = CardName.CHIKAGE_THROW_KUNAI
+        cardTempNumberHashmap[NUMBER_CHIKAGE_POISON_NEEDLE] = CardName.CHIKAGE_POISON_NEEDLE
+        cardTempNumberHashmap[NUMBER_CHIKAGE_TO_ZU_CHU] = CardName.CHIKAGE_TO_ZU_CHU
+        cardTempNumberHashmap[NUMBER_CHIKAGE_CUTTING_NECK] = CardName.CHIKAGE_CUTTING_NECK
+        cardTempNumberHashmap[NUMBER_CHIKAGE_POISON_SMOKE] = CardName.CHIKAGE_POISON_SMOKE
+        cardTempNumberHashmap[NUMBER_CHIKAGE_TIP_TOEING] = CardName.CHIKAGE_TIP_TOEING
+        cardTempNumberHashmap[NUMBER_CHIKAGE_MUDDLE] = CardName.CHIKAGE_MUDDLE
+        cardTempNumberHashmap[NUMBER_CHIKAGE_DEADLY_POISON] = CardName.CHIKAGE_DEADLY_POISON
+        cardTempNumberHashmap[NUMBER_CHIKAGE_HAN_KI_POISON] = CardName.CHIKAGE_HAN_KI_POISON
+        cardTempNumberHashmap[NUMBER_CHIKAGE_REINCARNATION_POISON] = CardName.CHIKAGE_REINCARNATION_POISON
+        cardTempNumberHashmap[NUMBER_CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE] = CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE
+        cardTempNumberHashmap[NUMBER_CHIKAGE_TRICK_UMBRELLA] = CardName.CHIKAGE_TRICK_UMBRELLA
+        cardTempNumberHashmap[NUMBER_CHIKAGE_STRUGGLE] = CardName.CHIKAGE_STRUGGLE
+        cardTempNumberHashmap[NUMBER_CHIKAGE_ZAN_ZE_NO_CONNECTION_POISON] = CardName.CHIKAGE_ZAN_ZE_NO_CONNECTION_POISON
+        cardTempNumberHashmap[NUMBER_POISON_PARALYTIC] = CardName.POISON_PARALYTIC
+        cardTempNumberHashmap[NUMBER_POISON_HALLUCINOGENIC] = CardName.POISON_HALLUCINOGENIC
+        cardTempNumberHashmap[NUMBER_POISON_RELAXATION] = CardName.POISON_RELAXATION
+        cardTempNumberHashmap[NUMBER_POISON_DEADLY_1] = CardName.POISON_DEADLY_1
+        cardTempNumberHashmap[NUMBER_POISON_DEADLY_2] = CardName.POISON_DEADLY_2
 
-        cardNumberHashmap[NUMBER_KURURU_ELEKITTEL] = CardName.KURURU_ELEKITTEL
-        cardNumberHashmap[NUMBER_KURURU_ACCELERATOR] = CardName.KURURU_ACCELERATOR
-        cardNumberHashmap[NUMBER_KURURU_KURURUOONG] = CardName.KURURU_KURURUOONG
-        cardNumberHashmap[NUMBER_KURURU_TORNADO] = CardName.KURURU_TORNADO
-        cardNumberHashmap[NUMBER_KURURU_REGAINER] = CardName.KURURU_REGAINER
-        cardNumberHashmap[NUMBER_KURURU_MODULE] = CardName.KURURU_MODULE
-        cardNumberHashmap[NUMBER_KURURU_REFLECTOR] = CardName.KURURU_REFLECTOR
-        cardNumberHashmap[NUMBER_KURURU_DRAIN_DEVIL] = CardName.KURURU_DRAIN_DEVIL
-        cardNumberHashmap[NUMBER_KURURU_BIG_GOLEM] = CardName.KURURU_BIG_GOLEM
-        cardNumberHashmap[NUMBER_KURURU_INDUSTRIA] = CardName.KURURU_INDUSTRIA
-        cardNumberHashmap[NUMBER_KURURU_DUPLICATED_GEAR_1] = CardName.KURURU_DUPLICATED_GEAR_1
-        cardNumberHashmap[NUMBER_KURURU_DUPLICATED_GEAR_2] = CardName.KURURU_DUPLICATED_GEAR_2
-        cardNumberHashmap[NUMBER_KURURU_DUPLICATED_GEAR_3] = CardName.KURURU_DUPLICATED_GEAR_3
-        cardNumberHashmap[NUMBER_KURURU_KANSHOUSOUCHI_KURURUSIK] = CardName.KURURU_KANSHOUSOUCHI_KURURUSIK
-        cardNumberHashmap[NUMBER_KURURU_ANALYZE] = CardName.KURURU_ANALYZE
-        cardNumberHashmap[NUMBER_KURURU_DAUZING] = CardName.KURURU_DAUZING
-        cardNumberHashmap[NUMBER_KURURU_LAST_RESEARCH] = CardName.KURURU_LAST_RESEARCH
-        cardNumberHashmap[NUMBER_KURURU_GRAND_GULLIVER] = CardName.KURURU_GRAND_GULLIVER
-        cardNumberHashmap[NUMBER_KURURU_BLASTER] = CardName.KURURU_BLASTER
-        cardNumberHashmap[NUMBER_KURURU_RAILGUN] = CardName.KURURU_RAILGUN
-        cardNumberHashmap[NUMBER_KURURU_CONNECT_DIVE] = CardName.KURURU_CONNECT_DIVE
+        cardTempNumberHashmap[NUMBER_KURURU_ELEKITTEL] = CardName.KURURU_ELEKITTEL
+        cardTempNumberHashmap[NUMBER_KURURU_ACCELERATOR] = CardName.KURURU_ACCELERATOR
+        cardTempNumberHashmap[NUMBER_KURURU_KURURUOONG] = CardName.KURURU_KURURUOONG
+        cardTempNumberHashmap[NUMBER_KURURU_TORNADO] = CardName.KURURU_TORNADO
+        cardTempNumberHashmap[NUMBER_KURURU_REGAINER] = CardName.KURURU_REGAINER
+        cardTempNumberHashmap[NUMBER_KURURU_MODULE] = CardName.KURURU_MODULE
+        cardTempNumberHashmap[NUMBER_KURURU_REFLECTOR] = CardName.KURURU_REFLECTOR
+        cardTempNumberHashmap[NUMBER_KURURU_DRAIN_DEVIL] = CardName.KURURU_DRAIN_DEVIL
+        cardTempNumberHashmap[NUMBER_KURURU_BIG_GOLEM] = CardName.KURURU_BIG_GOLEM
+        cardTempNumberHashmap[NUMBER_KURURU_INDUSTRIA] = CardName.KURURU_INDUSTRIA
+        cardTempNumberHashmap[NUMBER_KURURU_DUPLICATED_GEAR_1] = CardName.KURURU_DUPLICATED_GEAR_1
+        cardTempNumberHashmap[NUMBER_KURURU_DUPLICATED_GEAR_2] = CardName.KURURU_DUPLICATED_GEAR_2
+        cardTempNumberHashmap[NUMBER_KURURU_DUPLICATED_GEAR_3] = CardName.KURURU_DUPLICATED_GEAR_3
+        cardTempNumberHashmap[NUMBER_KURURU_KANSHOUSOUCHI_KURURUSIK] = CardName.KURURU_KANSHOUSOUCHI_KURURUSIK
+        cardTempNumberHashmap[NUMBER_KURURU_ANALYZE] = CardName.KURURU_ANALYZE
+        cardTempNumberHashmap[NUMBER_KURURU_DAUZING] = CardName.KURURU_DAUZING
+        cardTempNumberHashmap[NUMBER_KURURU_LAST_RESEARCH] = CardName.KURURU_LAST_RESEARCH
+        cardTempNumberHashmap[NUMBER_KURURU_GRAND_GULLIVER] = CardName.KURURU_GRAND_GULLIVER
+        cardTempNumberHashmap[NUMBER_KURURU_BLASTER] = CardName.KURURU_BLASTER
+        cardTempNumberHashmap[NUMBER_KURURU_RAILGUN] = CardName.KURURU_RAILGUN
+        cardTempNumberHashmap[NUMBER_KURURU_CONNECT_DIVE] = CardName.KURURU_CONNECT_DIVE
 
-        cardNumberHashmap[NUMBER_THALLYA_BURNING_STEAM] = CardName.THALLYA_BURNING_STEAM
-        cardNumberHashmap[NUMBER_THALLYA_WAVING_EDGE] = CardName.THALLYA_WAVING_EDGE
-        cardNumberHashmap[NUMBER_THALLYA_SHIELD_CHARGE] = CardName.THALLYA_SHIELD_CHARGE
-        cardNumberHashmap[NUMBER_THALLYA_STEAM_CANNON] = CardName.THALLYA_STEAM_CANNON
-        cardNumberHashmap[NUMBER_THALLYA_STUNT] = CardName.THALLYA_STUNT
-        cardNumberHashmap[NUMBER_THALLYA_ROARING] = CardName.THALLYA_ROARING
-        cardNumberHashmap[NUMBER_THALLYA_TURBO_SWITCH] = CardName.THALLYA_TURBO_SWITCH
-        cardNumberHashmap[NUMBER_THALLYA_ALPHA_EDGE] = CardName.THALLYA_ALPHA_EDGE
-        cardNumberHashmap[NUMBER_THALLYA_OMEGA_BURST] = CardName.THALLYA_OMEGA_BURST
-        cardNumberHashmap[NUMBER_THALLYA_THALLYA_MASTERPIECE] = CardName.THALLYA_THALLYA_MASTERPIECE
-        cardNumberHashmap[NUMBER_THALLYA_JULIA_BLACKBOX] = CardName.THALLYA_JULIA_BLACKBOX
-        cardNumberHashmap[NUMBER_FORM_YAKSHA] = CardName.FORM_YAKSHA
-        cardNumberHashmap[NUMBER_FORM_NAGA] = CardName.FORM_NAGA
-        cardNumberHashmap[NUMBER_FORM_GARUDA] = CardName.FORM_GARUDA
-        cardNumberHashmap[NUMBER_THALLYA_QUICK_CHANGE] = CardName.THALLYA_QUICK_CHANGE
-        cardNumberHashmap[NUMBER_THALLYA_BLACKBOX_NEO] = CardName.THALLYA_BLACKBOX_NEO
-        cardNumberHashmap[NUMBER_THALLYA_OMNIS_BLASTER] = CardName.THALLYA_OMNIS_BLASTER
-        cardNumberHashmap[NUMBER_FORM_KINNARI] = CardName.FORM_KINNARI
-        cardNumberHashmap[NUMBER_FORM_ASURA] = CardName.FORM_ASURA
-        cardNumberHashmap[NUMBER_FORM_DEVA] = CardName.FORM_DEVA
+        cardTempNumberHashmap[NUMBER_THALLYA_BURNING_STEAM] = CardName.THALLYA_BURNING_STEAM
+        cardTempNumberHashmap[NUMBER_THALLYA_WAVING_EDGE] = CardName.THALLYA_WAVING_EDGE
+        cardTempNumberHashmap[NUMBER_THALLYA_SHIELD_CHARGE] = CardName.THALLYA_SHIELD_CHARGE
+        cardTempNumberHashmap[NUMBER_THALLYA_STEAM_CANNON] = CardName.THALLYA_STEAM_CANNON
+        cardTempNumberHashmap[NUMBER_THALLYA_STUNT] = CardName.THALLYA_STUNT
+        cardTempNumberHashmap[NUMBER_THALLYA_ROARING] = CardName.THALLYA_ROARING
+        cardTempNumberHashmap[NUMBER_THALLYA_TURBO_SWITCH] = CardName.THALLYA_TURBO_SWITCH
+        cardTempNumberHashmap[NUMBER_THALLYA_ALPHA_EDGE] = CardName.THALLYA_ALPHA_EDGE
+        cardTempNumberHashmap[NUMBER_THALLYA_OMEGA_BURST] = CardName.THALLYA_OMEGA_BURST
+        cardTempNumberHashmap[NUMBER_THALLYA_THALLYA_MASTERPIECE] = CardName.THALLYA_THALLYA_MASTERPIECE
+        cardTempNumberHashmap[NUMBER_THALLYA_JULIA_BLACKBOX] = CardName.THALLYA_JULIA_BLACKBOX
+        cardTempNumberHashmap[NUMBER_FORM_YAKSHA] = CardName.FORM_YAKSHA
+        cardTempNumberHashmap[NUMBER_FORM_NAGA] = CardName.FORM_NAGA
+        cardTempNumberHashmap[NUMBER_FORM_GARUDA] = CardName.FORM_GARUDA
+        cardTempNumberHashmap[NUMBER_THALLYA_QUICK_CHANGE] = CardName.THALLYA_QUICK_CHANGE
+        cardTempNumberHashmap[NUMBER_THALLYA_BLACKBOX_NEO] = CardName.THALLYA_BLACKBOX_NEO
+        cardTempNumberHashmap[NUMBER_THALLYA_OMNIS_BLASTER] = CardName.THALLYA_OMNIS_BLASTER
+        cardTempNumberHashmap[NUMBER_FORM_KINNARI] = CardName.FORM_KINNARI
+        cardTempNumberHashmap[NUMBER_FORM_ASURA] = CardName.FORM_ASURA
+        cardTempNumberHashmap[NUMBER_FORM_DEVA] = CardName.FORM_DEVA
 
-        cardNumberHashmap[NUMBER_RAIRA_BEAST_NAIL] = CardName.RAIRA_BEAST_NAIL
-        cardNumberHashmap[NUMBER_RAIRA_STORM_SURGE_ATTACK] = CardName.RAIRA_STORM_SURGE_ATTACK
-        cardNumberHashmap[NUMBER_RAIRA_REINCARNATION_NAIL] = CardName.RAIRA_REINCARNATION_NAIL
-        cardNumberHashmap[NUMBER_RAIRA_WIND_RUN] = CardName.RAIRA_WIND_RUN
-        cardNumberHashmap[NUMBER_RAIRA_WISDOM_OF_STORM_SURGE] = CardName.RAIRA_WISDOM_OF_STORM_SURGE
-        cardNumberHashmap[NUMBER_RAIRA_HOWLING] = CardName.RAIRA_HOWLING
-        cardNumberHashmap[NUMBER_RAIRA_WIND_KICK] = CardName.RAIRA_WIND_KICK
-        cardNumberHashmap[NUMBER_RAIRA_THUNDER_WIND_PUNCH] = CardName.RAIRA_THUNDER_WIND_PUNCH
-        cardNumberHashmap[NUMBER_RAIRA_SUMMON_THUNDER] = CardName.RAIRA_SUMMON_THUNDER
-        cardNumberHashmap[NUMBER_RAIRA_WIND_CONSEQUENCE_BALL] = CardName.RAIRA_WIND_CONSEQUENCE_BALL
-        cardNumberHashmap[NUMBER_RAIRA_CIRCULAR_CIRCUIT] = CardName.RAIRA_CIRCULAR_CIRCUIT
-        cardNumberHashmap[NUMBER_RAIRA_WIND_ATTACK] = CardName.RAIRA_WIND_ATTACK
-        cardNumberHashmap[NUMBER_RAIRA_WIND_ZEN_KAI] = CardName.RAIRA_WIND_ZEN_KAI
-        cardNumberHashmap[NUMBER_RAIRA_WIND_CELESTIAL_SPHERE] = CardName.RAIRA_WIND_CELESTIAL_SPHERE
-        cardNumberHashmap[NUMBER_RAIRA_STORM] = CardName.RAIRA_STORM
-        cardNumberHashmap[NUMBER_RAIRA_FURIOUS_STORM] = CardName.RAIRA_FURIOUS_STORM
-        cardNumberHashmap[NUMBER_RAIRA_JIN_PUNG_JE_CHEON_UI] = CardName.RAIRA_JIN_PUNG_JE_CHEON_UI
+        cardTempNumberHashmap[NUMBER_RAIRA_BEAST_NAIL] = CardName.RAIRA_BEAST_NAIL
+        cardTempNumberHashmap[NUMBER_RAIRA_STORM_SURGE_ATTACK] = CardName.RAIRA_STORM_SURGE_ATTACK
+        cardTempNumberHashmap[NUMBER_RAIRA_REINCARNATION_NAIL] = CardName.RAIRA_REINCARNATION_NAIL
+        cardTempNumberHashmap[NUMBER_RAIRA_WIND_RUN] = CardName.RAIRA_WIND_RUN
+        cardTempNumberHashmap[NUMBER_RAIRA_WISDOM_OF_STORM_SURGE] = CardName.RAIRA_WISDOM_OF_STORM_SURGE
+        cardTempNumberHashmap[NUMBER_RAIRA_HOWLING] = CardName.RAIRA_HOWLING
+        cardTempNumberHashmap[NUMBER_RAIRA_WIND_KICK] = CardName.RAIRA_WIND_KICK
+        cardTempNumberHashmap[NUMBER_RAIRA_THUNDER_WIND_PUNCH] = CardName.RAIRA_THUNDER_WIND_PUNCH
+        cardTempNumberHashmap[NUMBER_RAIRA_SUMMON_THUNDER] = CardName.RAIRA_SUMMON_THUNDER
+        cardTempNumberHashmap[NUMBER_RAIRA_WIND_CONSEQUENCE_BALL] = CardName.RAIRA_WIND_CONSEQUENCE_BALL
+        cardTempNumberHashmap[NUMBER_RAIRA_CIRCULAR_CIRCUIT] = CardName.RAIRA_CIRCULAR_CIRCUIT
+        cardTempNumberHashmap[NUMBER_RAIRA_WIND_ATTACK] = CardName.RAIRA_WIND_ATTACK
+        cardTempNumberHashmap[NUMBER_RAIRA_WIND_ZEN_KAI] = CardName.RAIRA_WIND_ZEN_KAI
+        cardTempNumberHashmap[NUMBER_RAIRA_WIND_CELESTIAL_SPHERE] = CardName.RAIRA_WIND_CELESTIAL_SPHERE
+        cardTempNumberHashmap[NUMBER_RAIRA_STORM] = CardName.RAIRA_STORM
+        cardTempNumberHashmap[NUMBER_RAIRA_FURIOUS_STORM] = CardName.RAIRA_FURIOUS_STORM
+        cardTempNumberHashmap[NUMBER_RAIRA_JIN_PUNG_JE_CHEON_UI] = CardName.RAIRA_JIN_PUNG_JE_CHEON_UI
 
-        cardNumberHashmap[NUMBER_UTSURO_WON_WOL] = CardName.UTSURO_WON_WOL
-        cardNumberHashmap[NUMBER_UTSURO_BLACK_WAVE] = CardName.UTSURO_BLACK_WAVE
-        cardNumberHashmap[NUMBER_UTSURO_HARVEST] = CardName.UTSURO_HARVEST
-        cardNumberHashmap[NUMBER_UTSURO_PRESSURE] = CardName.UTSURO_PRESSURE
-        cardNumberHashmap[NUMBER_UTSURO_SHADOW_WING] = CardName.UTSURO_SHADOW_WING
-        cardNumberHashmap[NUMBER_UTSURO_SHADOW_WALL] = CardName.UTSURO_SHADOW_WALL
-        cardNumberHashmap[NUMBER_UTSURO_YUE_HOE_JU] = CardName.UTSURO_YUE_HOE_JU
-        cardNumberHashmap[NUMBER_UTSURO_HOE_MYEOL] = CardName.UTSURO_HOE_MYEOL
-        cardNumberHashmap[NUMBER_UTSURO_HEO_WI] = CardName.UTSURO_HEO_WI
-        cardNumberHashmap[NUMBER_UTSURO_JONG_MAL] = CardName.UTSURO_JONG_MAL
-        cardNumberHashmap[NUMBER_UTSURO_MA_SIG] = CardName.UTSURO_MA_SIG
-        cardNumberHashmap[NUMBER_UTSURO_BITE_DUST] = CardName.UTSURO_BITE_DUST
-        cardNumberHashmap[NUMBER_UTSURO_REVERBERATE_DEVICE_KURURUSIK] = CardName.UTSURO_REVERBERATE_DEVICE_KURURUSIK
-        cardNumberHashmap[NUMBER_UTSURO_MANG_A] = CardName.UTSURO_MANG_A
-        cardNumberHashmap[NUMBER_UTSURO_ANNIHILATION_SHADOW] = CardName.UTSURO_ANNIHILATION_SHADOW
-        cardNumberHashmap[NUMBER_UTSURO_SILENT_WALK] = CardName.UTSURO_SILENT_WALK
-        cardNumberHashmap[NUMBER_UTSURO_DE_MISE] = CardName.UTSURO_DE_MISE
+        cardTempNumberHashmap[NUMBER_UTSURO_WON_WOL] = CardName.UTSURO_WON_WOL
+        cardTempNumberHashmap[NUMBER_UTSURO_BLACK_WAVE] = CardName.UTSURO_BLACK_WAVE
+        cardTempNumberHashmap[NUMBER_UTSURO_HARVEST] = CardName.UTSURO_HARVEST
+        cardTempNumberHashmap[NUMBER_UTSURO_PRESSURE] = CardName.UTSURO_PRESSURE
+        cardTempNumberHashmap[NUMBER_UTSURO_SHADOW_WING] = CardName.UTSURO_SHADOW_WING
+        cardTempNumberHashmap[NUMBER_UTSURO_SHADOW_WALL] = CardName.UTSURO_SHADOW_WALL
+        cardTempNumberHashmap[NUMBER_UTSURO_YUE_HOE_JU] = CardName.UTSURO_YUE_HOE_JU
+        cardTempNumberHashmap[NUMBER_UTSURO_HOE_MYEOL] = CardName.UTSURO_HOE_MYEOL
+        cardTempNumberHashmap[NUMBER_UTSURO_HEO_WI] = CardName.UTSURO_HEO_WI
+        cardTempNumberHashmap[NUMBER_UTSURO_JONG_MAL] = CardName.UTSURO_JONG_MAL
+        cardTempNumberHashmap[NUMBER_UTSURO_MA_SIG] = CardName.UTSURO_MA_SIG
+        cardTempNumberHashmap[NUMBER_UTSURO_BITE_DUST] = CardName.UTSURO_BITE_DUST
+        cardTempNumberHashmap[NUMBER_UTSURO_REVERBERATE_DEVICE_KURURUSIK] = CardName.UTSURO_REVERBERATE_DEVICE_KURURUSIK
+        cardTempNumberHashmap[NUMBER_UTSURO_MANG_A] = CardName.UTSURO_MANG_A
+        cardTempNumberHashmap[NUMBER_UTSURO_ANNIHILATION_SHADOW] = CardName.UTSURO_ANNIHILATION_SHADOW
+        cardTempNumberHashmap[NUMBER_UTSURO_SILENT_WALK] = CardName.UTSURO_SILENT_WALK
+        cardTempNumberHashmap[NUMBER_UTSURO_DE_MISE] = CardName.UTSURO_DE_MISE
 
-        cardNumberHashmap[NUMBER_HONOKA_SPIRIT_SIK] = CardName.HONOKA_SPIRIT_SIK
-        cardNumberHashmap[NUMBER_HONOKA_GUARDIAN_SPIRIT_SIK] = CardName.HONOKA_GUARDIAN_SPIRIT_SIK
-        cardNumberHashmap[NUMBER_HONOKA_ASSAULT_SPIRIT_SIK] = CardName.HONOKA_ASSAULT_SPIRIT_SIK
-        cardNumberHashmap[NUMBER_HONOKA_DIVINE_OUKA] = CardName.HONOKA_DIVINE_OUKA
-        cardNumberHashmap[NUMBER_HONOKA_SAKURA_BLIZZARD] = CardName.HONOKA_SAKURA_BLIZZARD
-        cardNumberHashmap[NUMBER_HONOKA_UI_GI_GONG_JIN] = CardName.HONOKA_UI_GI_GONG_JIN
-        cardNumberHashmap[NUMBER_HONOKA_SAKURA_WING] = CardName.HONOKA_SAKURA_WING
-        cardNumberHashmap[NUMBER_HONOKA_REGENERATION] = CardName.HONOKA_REGENERATION
-        cardNumberHashmap[NUMBER_HONOKA_SAKURA_AMULET] = CardName.HONOKA_SAKURA_AMULET
-        cardNumberHashmap[NUMBER_HONOKA_HONOKA_SPARKLE] = CardName.HONOKA_HONOKA_SPARKLE
-        cardNumberHashmap[NUMBER_HONOKA_COMMAND] = CardName.HONOKA_COMMAND
-        cardNumberHashmap[NUMBER_HONOKA_TAIL_WIND] = CardName.HONOKA_TAIL_WIND
-        cardNumberHashmap[NUMBER_HONOKA_CHEST_WILLINGNESS] = CardName.HONOKA_CHEST_WILLINGNESS
-        cardNumberHashmap[NUMBER_HONOKA_HAND_FLOWER] = CardName.HONOKA_HAND_FLOWER
-        cardNumberHashmap[NUMBER_HONOKA_A_NEW_OPENING] = CardName.HONOKA_A_NEW_OPENING
-        cardNumberHashmap[NUMBER_HONOKA_UNDER_THE_NAME_OF_FLAG] = CardName.HONOKA_UNDER_THE_NAME_OF_FLAG
-        cardNumberHashmap[NUMBER_HONOKA_FOUR_SEASON_BACK] = CardName.HONOKA_FOUR_SEASON_BACK
-        cardNumberHashmap[NUMBER_HONOKA_FULL_BLOOM_PATH] = CardName.HONOKA_FULL_BLOOM_PATH
-        cardNumberHashmap[NUMBER_HONOKA_SAKURA_SWORD] = CardName.HONOKA_SAKURA_SWORD
-        cardNumberHashmap[NUMBER_HONOKA_SHADOW_HAND] = CardName.HONOKA_SHADOW_HAND
-        cardNumberHashmap[NUMBER_HONOKA_EYE_OPEN_ALONE] = CardName.HONOKA_EYE_OPEN_ALONE
-        cardNumberHashmap[NUMBER_HONOKA_FOLLOW_TRACE] = CardName.HONOKA_FOLLOW_TRACE
-        cardNumberHashmap[NUMBER_HONOKA_FACING_SHADOW] = CardName.HONOKA_FACING_SHADOW
-        cardNumberHashmap[NUMBER_HONOKA_SAKURA_SHINING_BRIGHTLY] = CardName.HONOKA_SAKURA_SHINING_BRIGHTLY
-        cardNumberHashmap[NUMBER_HONOKA_HOLD_HANDS] = CardName.HONOKA_HOLD_HANDS
-        cardNumberHashmap[NUMBER_HONOKA_WALK_OLD_LOAD] = CardName.HONOKA_WALK_OLD_LOAD
+        cardTempNumberHashmap[NUMBER_HONOKA_SPIRIT_SIK] = CardName.HONOKA_SPIRIT_SIK
+        cardTempNumberHashmap[NUMBER_HONOKA_GUARDIAN_SPIRIT_SIK] = CardName.HONOKA_GUARDIAN_SPIRIT_SIK
+        cardTempNumberHashmap[NUMBER_HONOKA_ASSAULT_SPIRIT_SIK] = CardName.HONOKA_ASSAULT_SPIRIT_SIK
+        cardTempNumberHashmap[NUMBER_HONOKA_DIVINE_OUKA] = CardName.HONOKA_DIVINE_OUKA
+        cardTempNumberHashmap[NUMBER_HONOKA_SAKURA_BLIZZARD] = CardName.HONOKA_SAKURA_BLIZZARD
+        cardTempNumberHashmap[NUMBER_HONOKA_UI_GI_GONG_JIN] = CardName.HONOKA_UI_GI_GONG_JIN
+        cardTempNumberHashmap[NUMBER_HONOKA_SAKURA_WING] = CardName.HONOKA_SAKURA_WING
+        cardTempNumberHashmap[NUMBER_HONOKA_REGENERATION] = CardName.HONOKA_REGENERATION
+        cardTempNumberHashmap[NUMBER_HONOKA_SAKURA_AMULET] = CardName.HONOKA_SAKURA_AMULET
+        cardTempNumberHashmap[NUMBER_HONOKA_HONOKA_SPARKLE] = CardName.HONOKA_HONOKA_SPARKLE
+        cardTempNumberHashmap[NUMBER_HONOKA_COMMAND] = CardName.HONOKA_COMMAND
+        cardTempNumberHashmap[NUMBER_HONOKA_TAIL_WIND] = CardName.HONOKA_TAIL_WIND
+        cardTempNumberHashmap[NUMBER_HONOKA_CHEST_WILLINGNESS] = CardName.HONOKA_CHEST_WILLINGNESS
+        cardTempNumberHashmap[NUMBER_HONOKA_HAND_FLOWER] = CardName.HONOKA_HAND_FLOWER
+        cardTempNumberHashmap[NUMBER_HONOKA_A_NEW_OPENING] = CardName.HONOKA_A_NEW_OPENING
+        cardTempNumberHashmap[NUMBER_HONOKA_UNDER_THE_NAME_OF_FLAG] = CardName.HONOKA_UNDER_THE_NAME_OF_FLAG
+        cardTempNumberHashmap[NUMBER_HONOKA_FOUR_SEASON_BACK] = CardName.HONOKA_FOUR_SEASON_BACK
+        cardTempNumberHashmap[NUMBER_HONOKA_FULL_BLOOM_PATH] = CardName.HONOKA_FULL_BLOOM_PATH
+        cardTempNumberHashmap[NUMBER_HONOKA_SAKURA_SWORD] = CardName.HONOKA_SAKURA_SWORD
+        cardTempNumberHashmap[NUMBER_HONOKA_SHADOW_HAND] = CardName.HONOKA_SHADOW_HAND
+        cardTempNumberHashmap[NUMBER_HONOKA_EYE_OPEN_ALONE] = CardName.HONOKA_EYE_OPEN_ALONE
+        cardTempNumberHashmap[NUMBER_HONOKA_FOLLOW_TRACE] = CardName.HONOKA_FOLLOW_TRACE
+        cardTempNumberHashmap[NUMBER_HONOKA_FACING_SHADOW] = CardName.HONOKA_FACING_SHADOW
+        cardTempNumberHashmap[NUMBER_HONOKA_SAKURA_SHINING_BRIGHTLY] = CardName.HONOKA_SAKURA_SHINING_BRIGHTLY
+        cardTempNumberHashmap[NUMBER_HONOKA_HOLD_HANDS] = CardName.HONOKA_HOLD_HANDS
+        cardTempNumberHashmap[NUMBER_HONOKA_WALK_OLD_LOAD] = CardName.HONOKA_WALK_OLD_LOAD
 
-        cardNumberHashmap[NUMBER_KORUNU_SNOW_BLADE] = CardName.KORUNU_SNOW_BLADE
-        cardNumberHashmap[NUMBER_KORUNU_REVOLVING_BLADE] = CardName.KORUNU_REVOLVING_BLADE
-        cardNumberHashmap[NUMBER_KORUNU_BLADE_DANCE] = CardName.KORUNU_BLADE_DANCE
-        cardNumberHashmap[NUMBER_KORUNU_RIDE_SNOW] = CardName.KORUNU_RIDE_SNOW
-        cardNumberHashmap[NUMBER_KORUNU_ABSOLUTE_ZERO] = CardName.KORUNU_ABSOLUTE_ZERO
-        cardNumberHashmap[NUMBER_KORUNU_FROSTBITE] = CardName.KORUNU_FROSTBITE
-        cardNumberHashmap[NUMBER_KORUNU_FROST_THORN_BUSH] = CardName.KORUNU_FROST_THORN_BUSH
-        cardNumberHashmap[NUMBER_KORUNU_CONLU_RUYANPEH] = CardName.KORUNU_CONLU_RUYANPEH
-        cardNumberHashmap[NUMBER_KORUNU_LETAR_LERA] = CardName.KORUNU_LETAR_LERA
-        cardNumberHashmap[NUMBER_KORUNU_UPASTUM] = CardName.KORUNU_UPASTUM
-        cardNumberHashmap[NUMBER_KORUNU_PORUCHARTO] = CardName.KORUNU_PORUCHARTO
+        cardTempNumberHashmap[NUMBER_KORUNU_SNOW_BLADE] = CardName.KORUNU_SNOW_BLADE
+        cardTempNumberHashmap[NUMBER_KORUNU_REVOLVING_BLADE] = CardName.KORUNU_REVOLVING_BLADE
+        cardTempNumberHashmap[NUMBER_KORUNU_BLADE_DANCE] = CardName.KORUNU_BLADE_DANCE
+        cardTempNumberHashmap[NUMBER_KORUNU_RIDE_SNOW] = CardName.KORUNU_RIDE_SNOW
+        cardTempNumberHashmap[NUMBER_KORUNU_ABSOLUTE_ZERO] = CardName.KORUNU_ABSOLUTE_ZERO
+        cardTempNumberHashmap[NUMBER_KORUNU_FROSTBITE] = CardName.KORUNU_FROSTBITE
+        cardTempNumberHashmap[NUMBER_KORUNU_FROST_THORN_BUSH] = CardName.KORUNU_FROST_THORN_BUSH
+        cardTempNumberHashmap[NUMBER_KORUNU_CONLU_RUYANPEH] = CardName.KORUNU_CONLU_RUYANPEH
+        cardTempNumberHashmap[NUMBER_KORUNU_LETAR_LERA] = CardName.KORUNU_LETAR_LERA
+        cardTempNumberHashmap[NUMBER_KORUNU_UPASTUM] = CardName.KORUNU_UPASTUM
+        cardTempNumberHashmap[NUMBER_KORUNU_PORUCHARTO] = CardName.KORUNU_PORUCHARTO
 
-        cardNumberHashmap[NUMBER_YATSUHA_STAR_NAIL] = CardName.YATSUHA_STAR_NAIL
-        cardNumberHashmap[NUMBER_YATSUHA_DARKNESS_GILL] = CardName.YATSUHA_DARKNESS_GILL
-        cardNumberHashmap[NUMBER_YATSUHA_MIRROR_DEVIL] = CardName.YATSUHA_MIRROR_DEVIL
-        cardNumberHashmap[NUMBER_YATSUHA_GHOST_STEP] = CardName.YATSUHA_GHOST_STEP
-        cardNumberHashmap[NUMBER_YATSUHA_WILLING] = CardName.YATSUHA_WILLING
-        cardNumberHashmap[NUMBER_YATSUHA_CONTRACT] = CardName.YATSUHA_CONTRACT
-        cardNumberHashmap[NUMBER_YATSUHA_CLINGY_FLOWER] = CardName.YATSUHA_CLINGY_FLOWER
-        cardNumberHashmap[NUMBER_YATSUHA_TWO_LEAP_MIRROR_DIVINE] = CardName.YATSUHA_TWO_LEAP_MIRROR_DIVINE
-        cardNumberHashmap[NUMBER_YATSUHA_FOUR_LEAP_SONG] = CardName.YATSUHA_FOUR_LEAP_SONG
-        cardNumberHashmap[NUMBER_YATSUHA_SIX_STAR_SEA] = CardName.YATSUHA_SIX_STAR_SEA
-        cardNumberHashmap[NUMBER_YATSUHA_EIGHT_MIRROR_OTHER_SIDE] = CardName.YATSUHA_EIGHT_MIRROR_OTHER_SIDE
-        cardNumberHashmap[NUMBER_YATSUHA_HOLY_RAKE_HANDS] = CardName.YATSUHA_HOLY_RAKE_HANDS
-        cardNumberHashmap[NUMBER_YATSUHA_ENTRANCE_OF_ABYSS] = CardName.YATSUHA_ENTRANCE_OF_ABYSS
-        cardNumberHashmap[NUMBER_YATSUHA_TRUE_MONSTER] = CardName.YATSUHA_TRUE_MONSTER
-        cardNumberHashmap[NUMBER_YATSUHA_GHOST_LINK] = CardName.YATSUHA_GHOST_LINK
-        cardNumberHashmap[NUMBER_YATSUHA_RESOLUTION] = CardName.YATSUHA_RESOLUTION
-        cardNumberHashmap[NUMBER_YATSUHA_PLEDGE] = CardName.YATSUHA_PLEDGE
-        cardNumberHashmap[NUMBER_YATSUHA_VAIN_FLOWER] = CardName.YATSUHA_VAIN_FLOWER
-        cardNumberHashmap[NUMBER_YATSUHA_EIGHT_MIRROR_VAIN_SAKURA] = CardName.YATSUHA_EIGHT_MIRROR_VAIN_SAKURA
+        cardTempNumberHashmap[NUMBER_YATSUHA_STAR_NAIL] = CardName.YATSUHA_STAR_NAIL
+        cardTempNumberHashmap[NUMBER_YATSUHA_DARKNESS_GILL] = CardName.YATSUHA_DARKNESS_GILL
+        cardTempNumberHashmap[NUMBER_YATSUHA_MIRROR_DEVIL] = CardName.YATSUHA_MIRROR_DEVIL
+        cardTempNumberHashmap[NUMBER_YATSUHA_GHOST_STEP] = CardName.YATSUHA_GHOST_STEP
+        cardTempNumberHashmap[NUMBER_YATSUHA_WILLING] = CardName.YATSUHA_WILLING
+        cardTempNumberHashmap[NUMBER_YATSUHA_CONTRACT] = CardName.YATSUHA_CONTRACT
+        cardTempNumberHashmap[NUMBER_YATSUHA_CLINGY_FLOWER] = CardName.YATSUHA_CLINGY_FLOWER
+        cardTempNumberHashmap[NUMBER_YATSUHA_TWO_LEAP_MIRROR_DIVINE] = CardName.YATSUHA_TWO_LEAP_MIRROR_DIVINE
+        cardTempNumberHashmap[NUMBER_YATSUHA_FOUR_LEAP_SONG] = CardName.YATSUHA_FOUR_LEAP_SONG
+        cardTempNumberHashmap[NUMBER_YATSUHA_SIX_STAR_SEA] = CardName.YATSUHA_SIX_STAR_SEA
+        cardTempNumberHashmap[NUMBER_YATSUHA_EIGHT_MIRROR_OTHER_SIDE] = CardName.YATSUHA_EIGHT_MIRROR_OTHER_SIDE
+        cardTempNumberHashmap[NUMBER_YATSUHA_HOLY_RAKE_HANDS] = CardName.YATSUHA_HOLY_RAKE_HANDS
+        cardTempNumberHashmap[NUMBER_YATSUHA_ENTRANCE_OF_ABYSS] = CardName.YATSUHA_ENTRANCE_OF_ABYSS
+        cardTempNumberHashmap[NUMBER_YATSUHA_TRUE_MONSTER] = CardName.YATSUHA_TRUE_MONSTER
+        cardTempNumberHashmap[NUMBER_YATSUHA_GHOST_LINK] = CardName.YATSUHA_GHOST_LINK
+        cardTempNumberHashmap[NUMBER_YATSUHA_RESOLUTION] = CardName.YATSUHA_RESOLUTION
+        cardTempNumberHashmap[NUMBER_YATSUHA_PLEDGE] = CardName.YATSUHA_PLEDGE
+        cardTempNumberHashmap[NUMBER_YATSUHA_VAIN_FLOWER] = CardName.YATSUHA_VAIN_FLOWER
+        cardTempNumberHashmap[NUMBER_YATSUHA_EIGHT_MIRROR_VAIN_SAKURA] = CardName.YATSUHA_EIGHT_MIRROR_VAIN_SAKURA
+        cardTempNumberHashmap[NUMBER_YATSUHA_UNFAMILIAR_WORLD] = CardName.YATSUHA_UNFAMILIAR_WORLD
+        cardTempNumberHashmap[NUMBER_YATSUHA_COLORED_WORLD] = CardName.YATSUHA_COLORED_WORLD
+        cardTempNumberHashmap[NUMBER_YATSUHA_SHES_CHERRY_BLOSSOM_WORLD] = CardName.YATSUHA_SHES_CHERRY_BLOSSOM_WORLD
+        cardTempNumberHashmap[NUMBER_YATSUHA_SHES_EGO_AND_DETERMINATION] = CardName.YATSUHA_SHES_EGO_AND_DETERMINATION
 
-        cardNumberHashmap[NUMBER_HATSUMI_WATER_BALL] = CardName.HATSUMI_WATER_BALL
-        cardNumberHashmap[NUMBER_HATSUMI_WATER_CURRENT] = CardName.HATSUMI_WATER_CURRENT
-        cardNumberHashmap[NUMBER_HATSUMI_STRONG_ACID] = CardName.HATSUMI_STRONG_ACID
-        cardNumberHashmap[NUMBER_HATSUMI_TSUNAMI] = CardName.HATSUMI_TSUNAMI
-        cardNumberHashmap[NUMBER_HATSUMI_JUN_BI_MAN_TAN] = CardName.HATSUMI_JUN_BI_MAN_TAN
-        cardNumberHashmap[NUMBER_HATSUMI_COMPASS] = CardName.HATSUMI_COMPASS
-        cardNumberHashmap[NUMBER_HATSUMI_CALL_WAVE] = CardName.HATSUMI_CALL_WAVE
-        cardNumberHashmap[NUMBER_HATSUMI_ISANA_HAIL] = CardName.HATSUMI_ISANA_HAIL
-        cardNumberHashmap[NUMBER_HATSUMI_OYOGIBI_FIRE] = CardName.HATSUMI_OYOGIBI_FIRE
-        cardNumberHashmap[NUMBER_HATSUMI_KIRAHARI_LIGHTHOUSE] = CardName.HATSUMI_KIRAHARI_LIGHTHOUSE
-        cardNumberHashmap[NUMBER_HATSUMI_MIOBIKI_ROUTE] = CardName.HATSUMI_MIOBIKI_ROUTE
-        cardNumberHashmap[NUMBER_HATSUMI_TORPEDO] = CardName.HATSUMI_TORPEDO
-        cardNumberHashmap[NUMBER_HATSUMI_SAGIRI_HAIL] = CardName.HATSUMI_SAGIRI_HAIL
-        cardNumberHashmap[NUMBER_HATSUMI_WADANAKA_ROUTE] = CardName.HATSUMI_WADANAKA_ROUTE
+        cardTempNumberHashmap[NUMBER_HATSUMI_WATER_BALL] = CardName.HATSUMI_WATER_BALL
+        cardTempNumberHashmap[NUMBER_HATSUMI_WATER_CURRENT] = CardName.HATSUMI_WATER_CURRENT
+        cardTempNumberHashmap[NUMBER_HATSUMI_STRONG_ACID] = CardName.HATSUMI_STRONG_ACID
+        cardTempNumberHashmap[NUMBER_HATSUMI_TSUNAMI] = CardName.HATSUMI_TSUNAMI
+        cardTempNumberHashmap[NUMBER_HATSUMI_JUN_BI_MAN_TAN] = CardName.HATSUMI_JUN_BI_MAN_TAN
+        cardTempNumberHashmap[NUMBER_HATSUMI_COMPASS] = CardName.HATSUMI_COMPASS
+        cardTempNumberHashmap[NUMBER_HATSUMI_CALL_WAVE] = CardName.HATSUMI_CALL_WAVE
+        cardTempNumberHashmap[NUMBER_HATSUMI_ISANA_HAIL] = CardName.HATSUMI_ISANA_HAIL
+        cardTempNumberHashmap[NUMBER_HATSUMI_OYOGIBI_FIRE] = CardName.HATSUMI_OYOGIBI_FIRE
+        cardTempNumberHashmap[NUMBER_HATSUMI_KIRAHARI_LIGHTHOUSE] = CardName.HATSUMI_KIRAHARI_LIGHTHOUSE
+        cardTempNumberHashmap[NUMBER_HATSUMI_MIOBIKI_ROUTE] = CardName.HATSUMI_MIOBIKI_ROUTE
+        cardTempNumberHashmap[NUMBER_HATSUMI_TORPEDO] = CardName.HATSUMI_TORPEDO
+        cardTempNumberHashmap[NUMBER_HATSUMI_SAGIRI_HAIL] = CardName.HATSUMI_SAGIRI_HAIL
+        cardTempNumberHashmap[NUMBER_HATSUMI_WADANAKA_ROUTE] = CardName.HATSUMI_WADANAKA_ROUTE
 
-        cardNumberHashmap[NUMBER_MIZUKI_JIN_DU] = CardName.MIZUKI_JIN_DU
-        cardNumberHashmap[NUMBER_MIZUKI_BAN_GONG] = CardName.MIZUKI_BAN_GONG
-        cardNumberHashmap[NUMBER_MIZUKI_SHOOTING_DOWN] = CardName.MIZUKI_SHOOTING_DOWN
-        cardNumberHashmap[NUMBER_MIZUKI_HO_LYEONG] = CardName.MIZUKI_HO_LYEONG
-        cardNumberHashmap[NUMBER_MIZUKI_BANG_BYEOG] = CardName.MIZUKI_BANG_BYEOG
-        cardNumberHashmap[NUMBER_MIZUKI_OVERPOWERING_GO_FORWARD] = CardName.MIZUKI_OVERPOWERING_GO_FORWARD
-        cardNumberHashmap[NUMBER_MIZUKI_JEON_JANG] = CardName.MIZUKI_JEON_JANG
-        cardNumberHashmap[NUMBER_MIZUKI_HACHIRYU_CHEONJUGAK] = CardName.MIZUKI_HACHIRYU_CHEONJUGAK
-        cardNumberHashmap[NUMBER_MIZUKI_HIJAMARU_TRIPLET] = CardName.MIZUKI_HIJAMARU_TRIPLET
-        cardNumberHashmap[NUMBER_MIZUKI_TARTENASHI_DAESUMUN] = CardName.MIZUKI_TARTENASHI_DAESUMUN
-        cardNumberHashmap[NUMBER_MIZUKI_MIZUKI_BATTLE_CRY] = CardName.MIZUKI_MIZUKI_BATTLE_CRY
-        cardNumberHashmap[NUMBER_KODAMA_TU_SIN] = CardName.KODAMA_TU_SIN
-        cardNumberHashmap[NUMBER_SOLDIER_SPEAR_1] = CardName.SOLDIER_SPEAR_1
-        cardNumberHashmap[NUMBER_SOLDIER_SPEAR_2] = CardName.SOLDIER_SPEAR_2
-        cardNumberHashmap[NUMBER_SOLDIER_SHIELD] = CardName.SOLDIER_SHIELD
-        cardNumberHashmap[NUMBER_SOLDIER_HORSE] = CardName.SOLDIER_HORSE
+        cardTempNumberHashmap[NUMBER_MIZUKI_JIN_DU] = CardName.MIZUKI_JIN_DU
+        cardTempNumberHashmap[NUMBER_MIZUKI_BAN_GONG] = CardName.MIZUKI_BAN_GONG
+        cardTempNumberHashmap[NUMBER_MIZUKI_SHOOTING_DOWN] = CardName.MIZUKI_SHOOTING_DOWN
+        cardTempNumberHashmap[NUMBER_MIZUKI_HO_LYEONG] = CardName.MIZUKI_HO_LYEONG
+        cardTempNumberHashmap[NUMBER_MIZUKI_BANG_BYEOG] = CardName.MIZUKI_BANG_BYEOG
+        cardTempNumberHashmap[NUMBER_MIZUKI_OVERPOWERING_GO_FORWARD] = CardName.MIZUKI_OVERPOWERING_GO_FORWARD
+        cardTempNumberHashmap[NUMBER_MIZUKI_JEON_JANG] = CardName.MIZUKI_JEON_JANG
+        cardTempNumberHashmap[NUMBER_MIZUKI_HACHIRYU_CHEONJUGAK] = CardName.MIZUKI_HACHIRYU_CHEONJUGAK
+        cardTempNumberHashmap[NUMBER_MIZUKI_HIJAMARU_TRIPLET] = CardName.MIZUKI_HIJAMARU_TRIPLET
+        cardTempNumberHashmap[NUMBER_MIZUKI_TARTENASHI_DAESUMUN] = CardName.MIZUKI_TARTENASHI_DAESUMUN
+        cardTempNumberHashmap[NUMBER_MIZUKI_MIZUKI_BATTLE_CRY] = CardName.MIZUKI_MIZUKI_BATTLE_CRY
+        cardTempNumberHashmap[NUMBER_KODAMA_TU_SIN] = CardName.KODAMA_TU_SIN
+        cardTempNumberHashmap[NUMBER_SOLDIER_SPEAR_1] = CardName.SOLDIER_SPEAR_1
+        cardTempNumberHashmap[NUMBER_SOLDIER_SPEAR_2] = CardName.SOLDIER_SPEAR_2
+        cardTempNumberHashmap[NUMBER_SOLDIER_SHIELD] = CardName.SOLDIER_SHIELD
+        cardTempNumberHashmap[NUMBER_SOLDIER_HORSE] = CardName.SOLDIER_HORSE
 
-        cardNumberHashmap[NUMBER_MEGUMI_GONG_SUM] = CardName.MEGUMI_GONG_SUM
-        cardNumberHashmap[NUMBER_MEGUMI_TA_CHEOG] = CardName.MEGUMI_TA_CHEOG
-        cardNumberHashmap[NUMBER_MEGUMI_SHELL_ATTACK] = CardName.MEGUMI_SHELL_ATTACK
-        cardNumberHashmap[NUMBER_MEGUMI_POLE_THRUST] = CardName.MEGUMI_POLE_THRUST
-        cardNumberHashmap[NUMBER_MEGUMI_REED] = CardName.MEGUMI_REED
-        cardNumberHashmap[NUMBER_MEGUMI_BALSAM] = CardName.MEGUMI_BALSAM
-        cardNumberHashmap[NUMBER_MEGUMI_WILD_ROSE] = CardName.MEGUMI_WILD_ROSE
-        cardNumberHashmap[NUMBER_MEGUMI_ROOT_OF_CAUSALITY] = CardName.MEGUMI_ROOT_OF_CAUSALITY
-        cardNumberHashmap[NUMBER_MEGUMI_BRANCH_OF_POSSIBILITY] = CardName.MEGUMI_BRANCH_OF_POSSIBILITY
-        cardNumberHashmap[NUMBER_MEGUMI_FRUIT_OF_END] = CardName.MEGUMI_FRUIT_OF_END
-        cardNumberHashmap[NUMBER_MEGUMI_MEGUMI_PALM] = CardName.MEGUMI_MEGUMI_PALM
+        cardTempNumberHashmap[NUMBER_MEGUMI_GONG_SUM] = CardName.MEGUMI_GONG_SUM
+        cardTempNumberHashmap[NUMBER_MEGUMI_TA_CHEOG] = CardName.MEGUMI_TA_CHEOG
+        cardTempNumberHashmap[NUMBER_MEGUMI_SHELL_ATTACK] = CardName.MEGUMI_SHELL_ATTACK
+        cardTempNumberHashmap[NUMBER_MEGUMI_POLE_THRUST] = CardName.MEGUMI_POLE_THRUST
+        cardTempNumberHashmap[NUMBER_MEGUMI_REED] = CardName.MEGUMI_REED
+        cardTempNumberHashmap[NUMBER_MEGUMI_BALSAM] = CardName.MEGUMI_BALSAM
+        cardTempNumberHashmap[NUMBER_MEGUMI_WILD_ROSE] = CardName.MEGUMI_WILD_ROSE
+        cardTempNumberHashmap[NUMBER_MEGUMI_ROOT_OF_CAUSALITY] = CardName.MEGUMI_ROOT_OF_CAUSALITY
+        cardTempNumberHashmap[NUMBER_MEGUMI_BRANCH_OF_POSSIBILITY] = CardName.MEGUMI_BRANCH_OF_POSSIBILITY
+        cardTempNumberHashmap[NUMBER_MEGUMI_FRUIT_OF_END] = CardName.MEGUMI_FRUIT_OF_END
+        cardTempNumberHashmap[NUMBER_MEGUMI_MEGUMI_PALM] = CardName.MEGUMI_MEGUMI_PALM
 
-        cardNumberHashmap[NUMBER_KANAWE_IMAGE] = CardName.KANAWE_IMAGE
-        cardNumberHashmap[NUMBER_KANAWE_SCREENPLAY] = CardName.KANAWE_SCREENPLAY
-        cardNumberHashmap[NUMBER_KANAWE_PRODUCTION] = CardName.KANAWE_PRODUCTION
-        cardNumberHashmap[NUMBER_KANAWE_PUBLISH] = CardName.KANAWE_PUBLISH
-        cardNumberHashmap[NUMBER_KANAWE_AFTERGLOW] = CardName.KANAWE_AFTERGLOW
-        cardNumberHashmap[NUMBER_KANAWE_IMPROMPTU] = CardName.KANAWE_IMPROMPTU
-        cardNumberHashmap[NUMBER_KANAWE_SEAL] = CardName.KANAWE_SEAL
-        cardNumberHashmap[NUMBER_KANAWE_VAGUE_STORY] = CardName.KANAWE_VAGUE_STORY
-        cardNumberHashmap[NUMBER_KANAWE_INFINITE_STARLIGHT] = CardName.KANAWE_INFINITE_STARLIGHT
-        cardNumberHashmap[NUMBER_KANAWE_BEND_OVER_THIS_NIGHT] = CardName.KANAWE_BEND_OVER_THIS_NIGHT
-        cardNumberHashmap[NUMBER_KANAWE_DISTANT_SKY] = CardName.KANAWE_DISTANT_SKY
-        cardNumberHashmap[NUMBER_KANAWE_KANAWE] = CardName.KANAWE_KANAWE
+        cardTempNumberHashmap[NUMBER_KANAWE_IMAGE] = CardName.KANAWE_IMAGE
+        cardTempNumberHashmap[NUMBER_KANAWE_SCREENPLAY] = CardName.KANAWE_SCREENPLAY
+        cardTempNumberHashmap[NUMBER_KANAWE_PRODUCTION] = CardName.KANAWE_PRODUCTION
+        cardTempNumberHashmap[NUMBER_KANAWE_PUBLISH] = CardName.KANAWE_PUBLISH
+        cardTempNumberHashmap[NUMBER_KANAWE_AFTERGLOW] = CardName.KANAWE_AFTERGLOW
+        cardTempNumberHashmap[NUMBER_KANAWE_IMPROMPTU] = CardName.KANAWE_IMPROMPTU
+        cardTempNumberHashmap[NUMBER_KANAWE_SEAL] = CardName.KANAWE_SEAL
+        cardTempNumberHashmap[NUMBER_KANAWE_VAGUE_STORY] = CardName.KANAWE_VAGUE_STORY
+        cardTempNumberHashmap[NUMBER_KANAWE_INFINITE_STARLIGHT] = CardName.KANAWE_INFINITE_STARLIGHT
+        cardTempNumberHashmap[NUMBER_KANAWE_BEND_OVER_THIS_NIGHT] = CardName.KANAWE_BEND_OVER_THIS_NIGHT
+        cardTempNumberHashmap[NUMBER_KANAWE_DISTANT_SKY] = CardName.KANAWE_DISTANT_SKY
+        cardTempNumberHashmap[NUMBER_KANAWE_KANAWE] = CardName.KANAWE_KANAWE
 
-        cardNumberHashmap[NUMBER_IDEA_SAL_JIN] = CardName.IDEA_SAL_JIN
-        cardNumberHashmap[NUMBER_IDEA_SAKURA_WAVE] = CardName.IDEA_SAKURA_WAVE
-        cardNumberHashmap[NUMBER_IDEA_WHISTLE] = CardName.IDEA_WHISTLE
-        cardNumberHashmap[NUMBER_IDEA_MYEONG_JEON] = CardName.IDEA_MYEONG_JEON
-        cardNumberHashmap[NUMBER_IDEA_EMPHASIZING] = CardName.IDEA_EMPHASIZING
-        cardNumberHashmap[NUMBER_IDEA_POSITIONING] = CardName.IDEA_POSITIONING
+        cardTempNumberHashmap[NUMBER_IDEA_SAL_JIN] = CardName.IDEA_SAL_JIN
+        cardTempNumberHashmap[NUMBER_IDEA_SAKURA_WAVE] = CardName.IDEA_SAKURA_WAVE
+        cardTempNumberHashmap[NUMBER_IDEA_WHISTLE] = CardName.IDEA_WHISTLE
+        cardTempNumberHashmap[NUMBER_IDEA_MYEONG_JEON] = CardName.IDEA_MYEONG_JEON
+        cardTempNumberHashmap[NUMBER_IDEA_EMPHASIZING] = CardName.IDEA_EMPHASIZING
+        cardTempNumberHashmap[NUMBER_IDEA_POSITIONING] = CardName.IDEA_POSITIONING
 
-        cardNumberHashmap[NUMBER_KAMUWI_RED_BLADE] = CardName.KAMUWI_RED_BLADE
-        cardNumberHashmap[NUMBER_KAMUWI_FLUTTERING_BLADE] = CardName.KAMUWI_FLUTTERING_BLADE
-        cardNumberHashmap[NUMBER_KAMUWI_SI_KEN_LAN_JIN] = CardName.KAMUWI_SI_KEN_LAN_JIN
-        cardNumberHashmap[NUMBER_KAMUWI_CUT_DOWN] = CardName.KAMUWI_CUT_DOWN
-        cardNumberHashmap[NUMBER_KAMUWI_THREADING_THORN] = CardName.KAMUWI_THREADING_THORN
-        cardNumberHashmap[NUMBER_KAMUWI_KE_SYO_LAN_LYU] = CardName.KAMUWI_KE_SYO_LAN_LYU
-        cardNumberHashmap[NUMBER_KAMUWI_BLOOD_WAVE] = CardName.KAMUWI_BLOOD_WAVE
-        cardNumberHashmap[NUMBER_KAMUWI_LAMP] = CardName.KAMUWI_LAMP
-        cardNumberHashmap[NUMBER_KAMUWI_DAWN] = CardName.KAMUWI_DAWN
-        cardNumberHashmap[NUMBER_KAMUWI_GRAVEYARD] = CardName.KAMUWI_GRAVEYARD
-        cardNumberHashmap[NUMBER_KAMUWI_KATA_SHIRO] = CardName.KAMUWI_KATA_SHIRO
-        cardNumberHashmap[NUMBER_KAMUWI_LOGIC] = CardName.KAMUWI_LOGIC
+        cardTempNumberHashmap[NUMBER_KAMUWI_RED_BLADE] = CardName.KAMUWI_RED_BLADE
+        cardTempNumberHashmap[NUMBER_KAMUWI_FLUTTERING_BLADE] = CardName.KAMUWI_FLUTTERING_BLADE
+        cardTempNumberHashmap[NUMBER_KAMUWI_SI_KEN_LAN_JIN] = CardName.KAMUWI_SI_KEN_LAN_JIN
+        cardTempNumberHashmap[NUMBER_KAMUWI_CUT_DOWN] = CardName.KAMUWI_CUT_DOWN
+        cardTempNumberHashmap[NUMBER_KAMUWI_THREADING_THORN] = CardName.KAMUWI_THREADING_THORN
+        cardTempNumberHashmap[NUMBER_KAMUWI_KE_SYO_LAN_LYU] = CardName.KAMUWI_KE_SYO_LAN_LYU
+        cardTempNumberHashmap[NUMBER_KAMUWI_BLOOD_WAVE] = CardName.KAMUWI_BLOOD_WAVE
+        cardTempNumberHashmap[NUMBER_KAMUWI_LAMP] = CardName.KAMUWI_LAMP
+        cardTempNumberHashmap[NUMBER_KAMUWI_DAWN] = CardName.KAMUWI_DAWN
+        cardTempNumberHashmap[NUMBER_KAMUWI_GRAVEYARD] = CardName.KAMUWI_GRAVEYARD
+        cardTempNumberHashmap[NUMBER_KAMUWI_KATA_SHIRO] = CardName.KAMUWI_KATA_SHIRO
+        cardTempNumberHashmap[NUMBER_KAMUWI_LOGIC] = CardName.KAMUWI_LOGIC
 
-        cardNumberHashmap[NUMBER_RENRI_FALSE_STAB] = CardName.RENRI_FALSE_STAB
-        cardNumberHashmap[NUMBER_RENRI_TEMPORARY_EXPEDIENT] = CardName.RENRI_TEMPORARY_EXPEDIENT
-        cardNumberHashmap[NUMBER_RENRI_BLACK_AND_WHITE] = CardName.RENRI_BLACK_AND_WHITE
-        cardNumberHashmap[NUMBER_RENRI_IRRITATING_GESTURE] = CardName.RENRI_IRRITATING_GESTURE
-        cardNumberHashmap[NUMBER_RENRI_FLOATING_CLOUDS] = CardName.RENRI_FLOATING_CLOUDS
-        cardNumberHashmap[NUMBER_RENRI_FISHING] = CardName.RENRI_FISHING
-        cardNumberHashmap[NUMBER_RENRI_PULLING_FISHING] = CardName.RENRI_PULLING_FISHING
-        cardNumberHashmap[NUMBER_RENRI_RU_RU_RA_RA_RI] = CardName.RENRI_RU_RU_RA_RA_RI
-        cardNumberHashmap[NUMBER_RENRI_RA_NA_RA_RO_MI_RE_RI_RA] = CardName.RENRI_RA_NA_RA_RO_MI_RE_RI_RA
-        cardNumberHashmap[NUMBER_RENRI_O_RI_RE_TE_RA_RE_RU] = CardName.RENRI_O_RI_RE_TE_RA_RE_RU
-        cardNumberHashmap[NUMBER_RENRI_RENRI_THE_END] = CardName.RENRI_RENRI_THE_END
-        cardNumberHashmap[NUMBER_RENRI_ENGRAVED_GARMENT] = CardName.RENRI_ENGRAVED_GARMENT
-        cardNumberHashmap[NUMBER_KIRIKO_SHAMANISTIC_MUSIC] = CardName.KIRIKO_SHAMANISTIC_MUSIC
+        cardTempNumberHashmap[NUMBER_RENRI_FALSE_STAB] = CardName.RENRI_FALSE_STAB
+        cardTempNumberHashmap[NUMBER_RENRI_TEMPORARY_EXPEDIENT] = CardName.RENRI_TEMPORARY_EXPEDIENT
+        cardTempNumberHashmap[NUMBER_RENRI_BLACK_AND_WHITE] = CardName.RENRI_BLACK_AND_WHITE
+        cardTempNumberHashmap[NUMBER_RENRI_IRRITATING_GESTURE] = CardName.RENRI_IRRITATING_GESTURE
+        cardTempNumberHashmap[NUMBER_RENRI_FLOATING_CLOUDS] = CardName.RENRI_FLOATING_CLOUDS
+        cardTempNumberHashmap[NUMBER_RENRI_FISHING] = CardName.RENRI_FISHING
+        cardTempNumberHashmap[NUMBER_RENRI_PULLING_FISHING] = CardName.RENRI_PULLING_FISHING
+        cardTempNumberHashmap[NUMBER_RENRI_RU_RU_RA_RA_RI] = CardName.RENRI_RU_RU_RA_RA_RI
+        cardTempNumberHashmap[NUMBER_RENRI_RA_NA_RA_RO_MI_RE_RI_RA] = CardName.RENRI_RA_NA_RA_RO_MI_RE_RI_RA
+        cardTempNumberHashmap[NUMBER_RENRI_O_RI_RE_TE_RA_RE_RU] = CardName.RENRI_O_RI_RE_TE_RA_RE_RU
+        cardTempNumberHashmap[NUMBER_RENRI_RENRI_THE_END] = CardName.RENRI_RENRI_THE_END
+        cardTempNumberHashmap[NUMBER_RENRI_ENGRAVED_GARMENT] = CardName.RENRI_ENGRAVED_GARMENT
+        cardTempNumberHashmap[NUMBER_KIRIKO_SHAMANISTIC_MUSIC] = CardName.KIRIKO_SHAMANISTIC_MUSIC
+
+        cardTempNumberHashmap[NUMBER_YATSUHA_UNFAMILIAR_WORLD] = CardName.YATSUHA_UNFAMILIAR_WORLD
+        cardTempNumberHashmap[NUMBER_YATSUHA_COLORED_WORLD] = CardName.YATSUHA_COLORED_WORLD
+        cardTempNumberHashmap[NUMBER_YATSUHA_SHES_CHERRY_BLOSSOM_WORLD] = CardName.YATSUHA_SHES_CHERRY_BLOSSOM_WORLD
+        cardTempNumberHashmap[NUMBER_YATSUHA_SHES_EGO_AND_DETERMINATION] = CardName.YATSUHA_SHES_EGO_AND_DETERMINATION
 
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CARD_UNAME] = CardName.CARD_UNNAME
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_POISON_ANYTHING] = CardName.POISON_ANYTHING
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_ANYTHING] = CardName.SOLDIER_ANYTHING
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CARD_UNAME] = CardName.CARD_UNNAME
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_POISON_ANYTHING] = CardName.POISON_ANYTHING
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_ANYTHING] = CardName.SOLDIER_ANYTHING
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_CHAM] = CardName.YURINA_CHAM
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_ILSUM] = CardName.YURINA_ILSUM
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_JARUCHIGI] = CardName.YURINA_JARUCHIGI
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_GUHAB] = CardName.YURINA_GUHAB
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_GIBACK] = CardName.YURINA_GIBACK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_APDO] = CardName.YURINA_APDO
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_GIYENBANJO] = CardName.YURINA_GIYENBANJO
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_WOLYUNGNACK] = CardName.YURINA_WOLYUNGNACK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_POBARAM] = CardName.YURINA_POBARAM
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_JJOCKBAE] = CardName.YURINA_JJOCKBAE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_JURUCK] = CardName.YURINA_JURUCK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_NAN_TA] = CardName.YURINA_NAN_TA
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_BEAN_BULLET] = CardName.YURINA_BEAN_BULLET
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_NOT_COMPLETE_POBARAM] = CardName.YURINA_NOT_COMPLETE_POBARAM
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_QUESTION_ANSWER] = CardName.YURINA_QUESTION_ANSWER
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_AHUM] = CardName.YURINA_AHUM
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_KANZA_DO] = CardName.YURINA_KANZA_DO
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_CHAM] = CardName.YURINA_CHAM
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_ILSUM] = CardName.YURINA_ILSUM
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_JARUCHIGI] = CardName.YURINA_JARUCHIGI
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_GUHAB] = CardName.YURINA_GUHAB
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_GIBACK] = CardName.YURINA_GIBACK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_APDO] = CardName.YURINA_APDO
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_GIYENBANJO] = CardName.YURINA_GIYENBANJO
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_WOLYUNGNACK] = CardName.YURINA_WOLYUNGNACK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_POBARAM] = CardName.YURINA_POBARAM
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_JJOCKBAE] = CardName.YURINA_JJOCKBAE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_JURUCK] = CardName.YURINA_JURUCK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_NAN_TA] = CardName.YURINA_NAN_TA
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_BEAN_BULLET] = CardName.YURINA_BEAN_BULLET
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_NOT_COMPLETE_POBARAM] = CardName.YURINA_NOT_COMPLETE_POBARAM
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_QUESTION_ANSWER] = CardName.YURINA_QUESTION_ANSWER
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_AHUM] = CardName.YURINA_AHUM
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_KANZA_DO] = CardName.YURINA_KANZA_DO
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_DOUBLEBEGI] = CardName.SAINE_DOUBLEBEGI
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_HURUBEGI] = CardName.SAINE_HURUBEGI
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_MOOGECHOO] = CardName.SAINE_MOOGECHOO
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_GANPA] = CardName.SAINE_GANPA
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_GWONYUCK] = CardName.SAINE_GWONYUCK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_CHOONGEMJUNG] = CardName.SAINE_CHOONGEMJUNG
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_MOOEMBUCK] = CardName.SAINE_MOOEMBUCK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_YULDONGHOGEK] = CardName.SAINE_YULDONGHOGEK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_HANGMUNGGONGJIN] = CardName.SAINE_HANGMUNGGONGJIN
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_EMMOOSHOEBING] = CardName.SAINE_EMMOOSHOEBING
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_JONGGEK] = CardName.SAINE_JONGGEK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_SOUND_OF_ICE] = CardName.SAINE_SOUND_OF_ICE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_ACCOMPANIMENT] = CardName.SAINE_ACCOMPANIMENT
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_DUET_TAN_JU_BING_MYEONG] = CardName.SAINE_DUET_TAN_JU_BING_MYEONG
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_BETRAYAL] = CardName.SAINE_BETRAYAL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_FLOWING_WALL] = CardName.SAINE_FLOWING_WALL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_JEOL_CHANG_JEOL_HWA] = CardName.SAINE_JEOL_CHANG_JEOL_HWA
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_DOUBLEBEGI] = CardName.SAINE_DOUBLEBEGI
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_HURUBEGI] = CardName.SAINE_HURUBEGI
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_MOOGECHOO] = CardName.SAINE_MOOGECHOO
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_GANPA] = CardName.SAINE_GANPA
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_GWONYUCK] = CardName.SAINE_GWONYUCK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_CHOONGEMJUNG] = CardName.SAINE_CHOONGEMJUNG
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_MOOEMBUCK] = CardName.SAINE_MOOEMBUCK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_YULDONGHOGEK] = CardName.SAINE_YULDONGHOGEK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_HANGMUNGGONGJIN] = CardName.SAINE_HANGMUNGGONGJIN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_EMMOOSHOEBING] = CardName.SAINE_EMMOOSHOEBING
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_JONGGEK] = CardName.SAINE_JONGGEK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_SOUND_OF_ICE] = CardName.SAINE_SOUND_OF_ICE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_ACCOMPANIMENT] = CardName.SAINE_ACCOMPANIMENT
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_DUET_TAN_JU_BING_MYEONG] = CardName.SAINE_DUET_TAN_JU_BING_MYEONG
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_BETRAYAL] = CardName.SAINE_BETRAYAL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_FLOWING_WALL] = CardName.SAINE_FLOWING_WALL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_JEOL_CHANG_JEOL_HWA] = CardName.SAINE_JEOL_CHANG_JEOL_HWA
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_SHOOT] = CardName.HIMIKA_SHOOT
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_RAPIDFIRE] = CardName.HIMIKA_RAPIDFIRE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_MAGNUMCANON] = CardName.HIMIKA_MAGNUMCANON
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_FULLBURST] = CardName.HIMIKA_FULLBURST
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_BACKSTEP] = CardName.HIMIKA_BACKSTEP
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_BACKDRAFT] = CardName.HIMIKA_BACKDRAFT
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_SMOKE] = CardName.HIMIKA_SMOKE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_REDBULLET] = CardName.HIMIKA_REDBULLET
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_CRIMSONZERO] = CardName.HIMIKA_CRIMSONZERO
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_SCARLETIMAGINE] = CardName.HIMIKA_SCARLETIMAGINE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_BURMILIONFIELD] = CardName.HIMIKA_BURMILIONFIELD
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_FIRE_WAVE] = CardName.HIMIKA_FIRE_WAVE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_SAT_SUI] = CardName.HIMIKA_SAT_SUI
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_EN_TEN_HIMIKA] = CardName.HIMIKA_EN_TEN_HIMIKA
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_SHOOT] = CardName.HIMIKA_SHOOT
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_RAPIDFIRE] = CardName.HIMIKA_RAPIDFIRE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_MAGNUMCANON] = CardName.HIMIKA_MAGNUMCANON
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_FULLBURST] = CardName.HIMIKA_FULLBURST
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_BACKSTEP] = CardName.HIMIKA_BACKSTEP
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_BACKDRAFT] = CardName.HIMIKA_BACKDRAFT
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_SMOKE] = CardName.HIMIKA_SMOKE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_REDBULLET] = CardName.HIMIKA_REDBULLET
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_CRIMSONZERO] = CardName.HIMIKA_CRIMSONZERO
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_SCARLETIMAGINE] = CardName.HIMIKA_SCARLETIMAGINE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_BURMILIONFIELD] = CardName.HIMIKA_BURMILIONFIELD
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_FIRE_WAVE] = CardName.HIMIKA_FIRE_WAVE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_SAT_SUI] = CardName.HIMIKA_SAT_SUI
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_EN_TEN_HIMIKA] = CardName.HIMIKA_EN_TEN_HIMIKA
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_BITSUNERIGI] = CardName.TOKOYO_BITSUNERIGI
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_WOOAHHANTAGUCK] = CardName.TOKOYO_WOOAHHANTAGUCK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_RUNNINGRABIT] = CardName.TOKOYO_RUNNINGRABIT
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_POETDANCE] = CardName.TOKOYO_POETDANCE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_FLIPFAN] = CardName.TOKOYO_FLIPFAN
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_WINDSTAGE] = CardName.TOKOYO_WINDSTAGE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_SUNSTAGE] = CardName.TOKOYO_SUNSTAGE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_KUON] = CardName.TOKOYO_KUON
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_THOUSANDBIRD] = CardName.TOKOYO_THOUSANDBIRD
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_ENDLESSWIND] = CardName.TOKOYO_ENDLESSWIND
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_TOKOYOMOON] = CardName.TOKOYO_TOKOYOMOON
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_FLOWING_PLAY] = CardName.TOKOYO_FLOWING_PLAY
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_SOUND_OF_SUN] = CardName.TOKOYO_SOUND_OF_SUN
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_DUET_CHI_TAN_YANG_MYEONG] = CardName.TOKOYO_DUET_CHI_TAN_YANG_MYEONG
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_PASSING_FEAR] = CardName.TOKOYO_PASSING_FEAR
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_RELIC_EYE] = CardName.TOKOYO_RELIC_EYE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_EIGHT_SAKURA_IN_VAIN] = CardName.TOKOYO_EIGHT_SAKURA_IN_VAIN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_BITSUNERIGI] = CardName.TOKOYO_BITSUNERIGI
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_WOOAHHANTAGUCK] = CardName.TOKOYO_WOOAHHANTAGUCK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_RUNNINGRABIT] = CardName.TOKOYO_RUNNINGRABIT
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_POETDANCE] = CardName.TOKOYO_POETDANCE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_FLIPFAN] = CardName.TOKOYO_FLIPFAN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_WINDSTAGE] = CardName.TOKOYO_WINDSTAGE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_SUNSTAGE] = CardName.TOKOYO_SUNSTAGE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_KUON] = CardName.TOKOYO_KUON
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_THOUSANDBIRD] = CardName.TOKOYO_THOUSANDBIRD
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_ENDLESSWIND] = CardName.TOKOYO_ENDLESSWIND
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_TOKOYOMOON] = CardName.TOKOYO_TOKOYOMOON
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_FLOWING_PLAY] = CardName.TOKOYO_FLOWING_PLAY
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_SOUND_OF_SUN] = CardName.TOKOYO_SOUND_OF_SUN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_DUET_CHI_TAN_YANG_MYEONG] = CardName.TOKOYO_DUET_CHI_TAN_YANG_MYEONG
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_PASSING_FEAR] = CardName.TOKOYO_PASSING_FEAR
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_RELIC_EYE] = CardName.TOKOYO_RELIC_EYE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_EIGHT_SAKURA_IN_VAIN] = CardName.TOKOYO_EIGHT_SAKURA_IN_VAIN
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_WIRE] = CardName.OBORO_WIRE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_SHADOWCALTROP] = CardName.OBORO_SHADOWCALTROP
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_ZANGEKIRANBU] = CardName.OBORO_ZANGEKIRANBU
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_NINJAWALK] = CardName.OBORO_NINJAWALK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_INDUCE] = CardName.OBORO_INDUCE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_CLONE] = CardName.OBORO_CLONE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_BIOACTIVITY] = CardName.OBORO_BIOACTIVITY
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_KUMASUKE] = CardName.OBORO_KUMASUKE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_TOBIKAGE] = CardName.OBORO_TOBIKAGE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_ULOO] = CardName.OBORO_ULOO
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_MIKAZRA] = CardName.OBORO_MIKAZRA
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_SHURIKEN] = CardName.OBORO_SHURIKEN
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_AMBUSH] = CardName.OBORO_AMBUSH
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_BRANCH_OF_DIVINE] = CardName.OBORO_BRANCH_OF_DIVINE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_LAST_CRYSTAL] = CardName.OBORO_LAST_CRYSTAL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_WIRE] = CardName.OBORO_WIRE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_SHADOWCALTROP] = CardName.OBORO_SHADOWCALTROP
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_ZANGEKIRANBU] = CardName.OBORO_ZANGEKIRANBU
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_NINJAWALK] = CardName.OBORO_NINJAWALK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_INDUCE] = CardName.OBORO_INDUCE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_CLONE] = CardName.OBORO_CLONE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_BIOACTIVITY] = CardName.OBORO_BIOACTIVITY
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_KUMASUKE] = CardName.OBORO_KUMASUKE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_TOBIKAGE] = CardName.OBORO_TOBIKAGE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_ULOO] = CardName.OBORO_ULOO
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_MIKAZRA] = CardName.OBORO_MIKAZRA
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_SHURIKEN] = CardName.OBORO_SHURIKEN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_AMBUSH] = CardName.OBORO_AMBUSH
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_BRANCH_OF_DIVINE] = CardName.OBORO_BRANCH_OF_DIVINE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_LAST_CRYSTAL] = CardName.OBORO_LAST_CRYSTAL
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_YUKIHI] = CardName.YUKIHI_YUKIHI
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE] = CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS] = CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_PUSH_OUT_SLASH_PULL] = CardName.YUKIHI_PUSH_OUT_SLASH_PULL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_SWING_SLASH_STAB] = CardName.YUKIHI_SWING_SLASH_STAB
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_TURN_UMBRELLA] = CardName.YUKIHI_TURN_UMBRELLA
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN] = CardName.YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_MAKE_CONNECTION] = CardName.YUKIHI_MAKE_CONNECTION
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_FLUTTERING_SNOWFLAKE] = CardName.YUKIHI_FLUTTERING_SNOWFLAKE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_SWAYING_LAMPLIGHT] = CardName.YUKIHI_SWAYING_LAMPLIGHT
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_CLINGY_MIND] = CardName.YUKIHI_CLINGY_MIND
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_SWIRLING_GESTURE] = CardName.YUKIHI_SWIRLING_GESTURE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_HELP_SLASH_THREAT] = CardName.YUKIHI_HELP_SLASH_THREAT
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_THREAD_SLASH_RAW_THREAD] = CardName.YUKIHI_THREAD_SLASH_RAW_THREAD
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_FLUTTERING_COLLAR] = CardName.YUKIHI_FLUTTERING_COLLAR
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_YUKIHI] = CardName.YUKIHI_YUKIHI
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE] = CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS] = CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_PUSH_OUT_SLASH_PULL] = CardName.YUKIHI_PUSH_OUT_SLASH_PULL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_SWING_SLASH_STAB] = CardName.YUKIHI_SWING_SLASH_STAB
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_TURN_UMBRELLA] = CardName.YUKIHI_TURN_UMBRELLA
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN] = CardName.YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_MAKE_CONNECTION] = CardName.YUKIHI_MAKE_CONNECTION
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_FLUTTERING_SNOWFLAKE] = CardName.YUKIHI_FLUTTERING_SNOWFLAKE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_SWAYING_LAMPLIGHT] = CardName.YUKIHI_SWAYING_LAMPLIGHT
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_CLINGY_MIND] = CardName.YUKIHI_CLINGY_MIND
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_SWIRLING_GESTURE] = CardName.YUKIHI_SWIRLING_GESTURE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_HELP_SLASH_THREAT] = CardName.YUKIHI_HELP_SLASH_THREAT
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_THREAD_SLASH_RAW_THREAD] = CardName.YUKIHI_THREAD_SLASH_RAW_THREAD
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_FLUTTERING_COLLAR] = CardName.YUKIHI_FLUTTERING_COLLAR
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_SHINRA] = CardName.SHINRA_SHINRA
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_IBLON] = CardName.SHINRA_IBLON
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_BANLON] = CardName.SHINRA_BANLON
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_KIBEN] = CardName.SHINRA_KIBEN
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_INYONG] = CardName.SHINRA_INYONG
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_SEONDONG] = CardName.SHINRA_SEONDONG
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_JANGDAM] = CardName.SHINRA_JANGDAM
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_NONPA] = CardName.SHINRA_NONPA
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_WANJEON_NONPA] = CardName.SHINRA_WANJEON_NONPA
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_DASIG_IHAE] = CardName.SHINRA_DASIG_IHAE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_CHEONJI_BANBAG] = CardName.SHINRA_CHEONJI_BANBAG
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_SAMRA_BAN_SHO] = CardName.SHINRA_SAMRA_BAN_SHO
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_ZHEN_YEN] = CardName.SHINRA_ZHEN_YEN
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_SA_DO] = CardName.SHINRA_SA_DO
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_ZEN_CHI_KYO_TEN] = CardName.SHINRA_ZEN_CHI_KYO_TEN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_SHINRA] = CardName.SHINRA_SHINRA
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_IBLON] = CardName.SHINRA_IBLON
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_BANLON] = CardName.SHINRA_BANLON
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_KIBEN] = CardName.SHINRA_KIBEN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_INYONG] = CardName.SHINRA_INYONG
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_SEONDONG] = CardName.SHINRA_SEONDONG
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_JANGDAM] = CardName.SHINRA_JANGDAM
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_NONPA] = CardName.SHINRA_NONPA
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_WANJEON_NONPA] = CardName.SHINRA_WANJEON_NONPA
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_DASIG_IHAE] = CardName.SHINRA_DASIG_IHAE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_CHEONJI_BANBAG] = CardName.SHINRA_CHEONJI_BANBAG
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_SAMRA_BAN_SHO] = CardName.SHINRA_SAMRA_BAN_SHO
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_ZHEN_YEN] = CardName.SHINRA_ZHEN_YEN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_SA_DO] = CardName.SHINRA_SA_DO
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHINRA_ZEN_CHI_KYO_TEN] = CardName.SHINRA_ZEN_CHI_KYO_TEN
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_CENTRIFUGAL_ATTACK] = CardName.HAGANE_CENTRIFUGAL_ATTACK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_FOUR_WINDED_EARTHQUAKE] = CardName.HAGANE_FOUR_WINDED_EARTHQUAKE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_GROUND_BREAKING] = CardName.HAGANE_GROUND_BREAKING
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_HYPER_RECOIL] = CardName.HAGANE_HYPER_RECOIL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_WON_MU_RUYN] = CardName.HAGANE_WON_MU_RUYN
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_RING_A_BELL] = CardName.HAGANE_RING_A_BELL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_GRAVITATION_FIELD] = CardName.HAGANE_GRAVITATION_FIELD
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_GRAND_SKY_HOLE_CRASH] = CardName.HAGANE_GRAND_SKY_HOLE_CRASH
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_GRAND_BELL_MEGALOBEL] = CardName.HAGANE_GRAND_BELL_MEGALOBEL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_GRAND_GRAVITATION_ATTRACT] = CardName.HAGANE_GRAND_GRAVITATION_ATTRACT
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_GRAND_MOUNTAIN_RESPECT] = CardName.HAGANE_GRAND_MOUNTAIN_RESPECT
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_BONFIRE] = CardName.HAGANE_BONFIRE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_WHEEL_SKILL] = CardName.HAGANE_WHEEL_SKILL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_GRAND_SOFT_MATERIAL] = CardName.HAGANE_GRAND_SOFT_MATERIAL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_SOFT_ATTACK] = CardName.HAGANE_SOFT_ATTACK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_CENTRIFUGAL_ATTACK] = CardName.HAGANE_CENTRIFUGAL_ATTACK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_FOUR_WINDED_EARTHQUAKE] = CardName.HAGANE_FOUR_WINDED_EARTHQUAKE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_GROUND_BREAKING] = CardName.HAGANE_GROUND_BREAKING
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_HYPER_RECOIL] = CardName.HAGANE_HYPER_RECOIL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_WON_MU_RUYN] = CardName.HAGANE_WON_MU_RUYN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_RING_A_BELL] = CardName.HAGANE_RING_A_BELL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_GRAVITATION_FIELD] = CardName.HAGANE_GRAVITATION_FIELD
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_GRAND_SKY_HOLE_CRASH] = CardName.HAGANE_GRAND_SKY_HOLE_CRASH
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_GRAND_BELL_MEGALOBEL] = CardName.HAGANE_GRAND_BELL_MEGALOBEL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_GRAND_GRAVITATION_ATTRACT] = CardName.HAGANE_GRAND_GRAVITATION_ATTRACT
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_GRAND_MOUNTAIN_RESPECT] = CardName.HAGANE_GRAND_MOUNTAIN_RESPECT
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_BONFIRE] = CardName.HAGANE_BONFIRE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_WHEEL_SKILL] = CardName.HAGANE_WHEEL_SKILL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_GRAND_SOFT_MATERIAL] = CardName.HAGANE_GRAND_SOFT_MATERIAL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HAGANE_SOFT_ATTACK] = CardName.HAGANE_SOFT_ATTACK
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_THROW_KUNAI] = CardName.CHIKAGE_THROW_KUNAI
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_POISON_NEEDLE] = CardName.CHIKAGE_POISON_NEEDLE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_TO_ZU_CHU] = CardName.CHIKAGE_TO_ZU_CHU
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_CUTTING_NECK] = CardName.CHIKAGE_CUTTING_NECK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_POISON_SMOKE] = CardName.CHIKAGE_POISON_SMOKE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_TIP_TOEING] = CardName.CHIKAGE_TIP_TOEING
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_MUDDLE] = CardName.CHIKAGE_MUDDLE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_DEADLY_POISON] = CardName.CHIKAGE_DEADLY_POISON
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_HAN_KI_POISON] = CardName.CHIKAGE_HAN_KI_POISON
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_REINCARNATION_POISON] = CardName.CHIKAGE_REINCARNATION_POISON
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE] = CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_TRICK_UMBRELLA] = CardName.CHIKAGE_TRICK_UMBRELLA
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_STRUGGLE] = CardName.CHIKAGE_STRUGGLE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_ZAN_ZE_NO_CONNECTION_POISON] = CardName.CHIKAGE_ZAN_ZE_NO_CONNECTION_POISON
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_POISON_PARALYTIC] = CardName.POISON_PARALYTIC
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_POISON_HALLUCINOGENIC] = CardName.POISON_HALLUCINOGENIC
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_POISON_RELAXATION] = CardName.POISON_RELAXATION
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_POISON_DEADLY_1] = CardName.POISON_DEADLY_1
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_POISON_DEADLY_2] = CardName.POISON_DEADLY_2
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_THROW_KUNAI] = CardName.CHIKAGE_THROW_KUNAI
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_POISON_NEEDLE] = CardName.CHIKAGE_POISON_NEEDLE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_TO_ZU_CHU] = CardName.CHIKAGE_TO_ZU_CHU
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_CUTTING_NECK] = CardName.CHIKAGE_CUTTING_NECK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_POISON_SMOKE] = CardName.CHIKAGE_POISON_SMOKE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_TIP_TOEING] = CardName.CHIKAGE_TIP_TOEING
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_MUDDLE] = CardName.CHIKAGE_MUDDLE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_DEADLY_POISON] = CardName.CHIKAGE_DEADLY_POISON
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_HAN_KI_POISON] = CardName.CHIKAGE_HAN_KI_POISON
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_REINCARNATION_POISON] = CardName.CHIKAGE_REINCARNATION_POISON
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE] = CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_TRICK_UMBRELLA] = CardName.CHIKAGE_TRICK_UMBRELLA
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_STRUGGLE] = CardName.CHIKAGE_STRUGGLE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_ZAN_ZE_NO_CONNECTION_POISON] = CardName.CHIKAGE_ZAN_ZE_NO_CONNECTION_POISON
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_POISON_PARALYTIC] = CardName.POISON_PARALYTIC
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_POISON_HALLUCINOGENIC] = CardName.POISON_HALLUCINOGENIC
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_POISON_RELAXATION] = CardName.POISON_RELAXATION
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_POISON_DEADLY_1] = CardName.POISON_DEADLY_1
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_POISON_DEADLY_2] = CardName.POISON_DEADLY_2
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_ELEKITTEL] = CardName.KURURU_ELEKITTEL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_ACCELERATOR] = CardName.KURURU_ACCELERATOR
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_KURURUOONG] = CardName.KURURU_KURURUOONG
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_TORNADO] = CardName.KURURU_TORNADO
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_REGAINER] = CardName.KURURU_REGAINER
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_MODULE] = CardName.KURURU_MODULE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_REFLECTOR] = CardName.KURURU_REFLECTOR
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_DRAIN_DEVIL] = CardName.KURURU_DRAIN_DEVIL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_BIG_GOLEM] = CardName.KURURU_BIG_GOLEM
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_INDUSTRIA] = CardName.KURURU_INDUSTRIA
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_DUPLICATED_GEAR_1] = CardName.KURURU_DUPLICATED_GEAR_1
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_DUPLICATED_GEAR_2] = CardName.KURURU_DUPLICATED_GEAR_2
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_DUPLICATED_GEAR_3] = CardName.KURURU_DUPLICATED_GEAR_3
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_KANSHOUSOUCHI_KURURUSIK] = CardName.KURURU_KANSHOUSOUCHI_KURURUSIK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_ANALYZE] = CardName.KURURU_ANALYZE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_DAUZING] = CardName.KURURU_DAUZING
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_LAST_RESEARCH] = CardName.KURURU_LAST_RESEARCH
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_GRAND_GULLIVER] = CardName.KURURU_GRAND_GULLIVER
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_BLASTER] = CardName.KURURU_BLASTER
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_RAILGUN] = CardName.KURURU_RAILGUN
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_CONNECT_DIVE] = CardName.KURURU_CONNECT_DIVE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_ELEKITTEL] = CardName.KURURU_ELEKITTEL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_ACCELERATOR] = CardName.KURURU_ACCELERATOR
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_KURURUOONG] = CardName.KURURU_KURURUOONG
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_TORNADO] = CardName.KURURU_TORNADO
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_REGAINER] = CardName.KURURU_REGAINER
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_MODULE] = CardName.KURURU_MODULE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_REFLECTOR] = CardName.KURURU_REFLECTOR
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_DRAIN_DEVIL] = CardName.KURURU_DRAIN_DEVIL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_BIG_GOLEM] = CardName.KURURU_BIG_GOLEM
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_INDUSTRIA] = CardName.KURURU_INDUSTRIA
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_DUPLICATED_GEAR_1] = CardName.KURURU_DUPLICATED_GEAR_1
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_DUPLICATED_GEAR_2] = CardName.KURURU_DUPLICATED_GEAR_2
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_DUPLICATED_GEAR_3] = CardName.KURURU_DUPLICATED_GEAR_3
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_KANSHOUSOUCHI_KURURUSIK] = CardName.KURURU_KANSHOUSOUCHI_KURURUSIK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_ANALYZE] = CardName.KURURU_ANALYZE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_DAUZING] = CardName.KURURU_DAUZING
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_LAST_RESEARCH] = CardName.KURURU_LAST_RESEARCH
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_GRAND_GULLIVER] = CardName.KURURU_GRAND_GULLIVER
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_BLASTER] = CardName.KURURU_BLASTER
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_RAILGUN] = CardName.KURURU_RAILGUN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KURURU_CONNECT_DIVE] = CardName.KURURU_CONNECT_DIVE
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_BURNING_STEAM] = CardName.THALLYA_BURNING_STEAM
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_WAVING_EDGE] = CardName.THALLYA_WAVING_EDGE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_SHIELD_CHARGE] = CardName.THALLYA_SHIELD_CHARGE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_STEAM_CANNON] = CardName.THALLYA_STEAM_CANNON
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_STUNT] = CardName.THALLYA_STUNT
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_ROARING] = CardName.THALLYA_ROARING
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_TURBO_SWITCH] = CardName.THALLYA_TURBO_SWITCH
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_ALPHA_EDGE] = CardName.THALLYA_ALPHA_EDGE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_OMEGA_BURST] = CardName.THALLYA_OMEGA_BURST
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_THALLYA_MASTERPIECE] = CardName.THALLYA_THALLYA_MASTERPIECE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_JULIA_BLACKBOX] = CardName.THALLYA_JULIA_BLACKBOX
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_FORM_YAKSHA] = CardName.FORM_YAKSHA
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_FORM_NAGA] = CardName.FORM_NAGA
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_FORM_GARUDA] = CardName.FORM_GARUDA
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_QUICK_CHANGE] = CardName.THALLYA_QUICK_CHANGE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_BLACKBOX_NEO] = CardName.THALLYA_BLACKBOX_NEO
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_OMNIS_BLASTER] = CardName.THALLYA_OMNIS_BLASTER
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_FORM_KINNARI] = CardName.FORM_KINNARI
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_FORM_ASURA] = CardName.FORM_ASURA
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_FORM_DEVA] = CardName.FORM_DEVA
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_BURNING_STEAM] = CardName.THALLYA_BURNING_STEAM
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_WAVING_EDGE] = CardName.THALLYA_WAVING_EDGE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_SHIELD_CHARGE] = CardName.THALLYA_SHIELD_CHARGE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_STEAM_CANNON] = CardName.THALLYA_STEAM_CANNON
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_STUNT] = CardName.THALLYA_STUNT
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_ROARING] = CardName.THALLYA_ROARING
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_TURBO_SWITCH] = CardName.THALLYA_TURBO_SWITCH
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_ALPHA_EDGE] = CardName.THALLYA_ALPHA_EDGE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_OMEGA_BURST] = CardName.THALLYA_OMEGA_BURST
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_THALLYA_MASTERPIECE] = CardName.THALLYA_THALLYA_MASTERPIECE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_JULIA_BLACKBOX] = CardName.THALLYA_JULIA_BLACKBOX
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_FORM_YAKSHA] = CardName.FORM_YAKSHA
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_FORM_NAGA] = CardName.FORM_NAGA
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_FORM_GARUDA] = CardName.FORM_GARUDA
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_QUICK_CHANGE] = CardName.THALLYA_QUICK_CHANGE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_BLACKBOX_NEO] = CardName.THALLYA_BLACKBOX_NEO
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_THALLYA_OMNIS_BLASTER] = CardName.THALLYA_OMNIS_BLASTER
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_FORM_KINNARI] = CardName.FORM_KINNARI
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_FORM_ASURA] = CardName.FORM_ASURA
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_FORM_DEVA] = CardName.FORM_DEVA
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_BEAST_NAIL] = CardName.RAIRA_BEAST_NAIL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_STORM_SURGE_ATTACK] = CardName.RAIRA_STORM_SURGE_ATTACK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_REINCARNATION_NAIL] = CardName.RAIRA_REINCARNATION_NAIL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_WIND_RUN] = CardName.RAIRA_WIND_RUN
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_WISDOM_OF_STORM_SURGE] = CardName.RAIRA_WISDOM_OF_STORM_SURGE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_HOWLING] = CardName.RAIRA_HOWLING
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_WIND_KICK] = CardName.RAIRA_WIND_KICK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_THUNDER_WIND_PUNCH] = CardName.RAIRA_THUNDER_WIND_PUNCH
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_SUMMON_THUNDER] = CardName.RAIRA_SUMMON_THUNDER
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_WIND_CONSEQUENCE_BALL] = CardName.RAIRA_WIND_CONSEQUENCE_BALL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_CIRCULAR_CIRCUIT] = CardName.RAIRA_CIRCULAR_CIRCUIT
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_WIND_ATTACK] = CardName.RAIRA_WIND_ATTACK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_WIND_ZEN_KAI] = CardName.RAIRA_WIND_ZEN_KAI
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_WIND_CELESTIAL_SPHERE] = CardName.RAIRA_WIND_CELESTIAL_SPHERE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_STORM] = CardName.RAIRA_STORM
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_FURIOUS_STORM] = CardName.RAIRA_FURIOUS_STORM
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_JIN_PUNG_JE_CHEON_UI] = CardName.RAIRA_JIN_PUNG_JE_CHEON_UI
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_BEAST_NAIL] = CardName.RAIRA_BEAST_NAIL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_STORM_SURGE_ATTACK] = CardName.RAIRA_STORM_SURGE_ATTACK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_REINCARNATION_NAIL] = CardName.RAIRA_REINCARNATION_NAIL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_WIND_RUN] = CardName.RAIRA_WIND_RUN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_WISDOM_OF_STORM_SURGE] = CardName.RAIRA_WISDOM_OF_STORM_SURGE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_HOWLING] = CardName.RAIRA_HOWLING
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_WIND_KICK] = CardName.RAIRA_WIND_KICK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_THUNDER_WIND_PUNCH] = CardName.RAIRA_THUNDER_WIND_PUNCH
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_SUMMON_THUNDER] = CardName.RAIRA_SUMMON_THUNDER
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_WIND_CONSEQUENCE_BALL] = CardName.RAIRA_WIND_CONSEQUENCE_BALL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_CIRCULAR_CIRCUIT] = CardName.RAIRA_CIRCULAR_CIRCUIT
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_WIND_ATTACK] = CardName.RAIRA_WIND_ATTACK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_WIND_ZEN_KAI] = CardName.RAIRA_WIND_ZEN_KAI
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_WIND_CELESTIAL_SPHERE] = CardName.RAIRA_WIND_CELESTIAL_SPHERE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_STORM] = CardName.RAIRA_STORM
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_FURIOUS_STORM] = CardName.RAIRA_FURIOUS_STORM
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RAIRA_JIN_PUNG_JE_CHEON_UI] = CardName.RAIRA_JIN_PUNG_JE_CHEON_UI
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_WON_WOL] = CardName.UTSURO_WON_WOL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_BLACK_WAVE] = CardName.UTSURO_BLACK_WAVE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_HARVEST] = CardName.UTSURO_HARVEST
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_PRESSURE] = CardName.UTSURO_PRESSURE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_SHADOW_WING] = CardName.UTSURO_SHADOW_WING
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_SHADOW_WALL] = CardName.UTSURO_SHADOW_WALL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_YUE_HOE_JU] = CardName.UTSURO_YUE_HOE_JU
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_HOE_MYEOL] = CardName.UTSURO_HOE_MYEOL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_HEO_WI] = CardName.UTSURO_HEO_WI
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_JONG_MAL] = CardName.UTSURO_JONG_MAL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_MA_SIG] = CardName.UTSURO_MA_SIG
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_BITE_DUST] = CardName.UTSURO_BITE_DUST
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_REVERBERATE_DEVICE_KURURUSIK] = CardName.UTSURO_REVERBERATE_DEVICE_KURURUSIK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_MANG_A] = CardName.UTSURO_MANG_A
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_ANNIHILATION_SHADOW] = CardName.UTSURO_ANNIHILATION_SHADOW
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_SILENT_WALK] = CardName.UTSURO_SILENT_WALK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_DE_MISE] = CardName.UTSURO_DE_MISE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_WON_WOL] = CardName.UTSURO_WON_WOL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_BLACK_WAVE] = CardName.UTSURO_BLACK_WAVE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_HARVEST] = CardName.UTSURO_HARVEST
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_PRESSURE] = CardName.UTSURO_PRESSURE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_SHADOW_WING] = CardName.UTSURO_SHADOW_WING
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_SHADOW_WALL] = CardName.UTSURO_SHADOW_WALL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_YUE_HOE_JU] = CardName.UTSURO_YUE_HOE_JU
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_HOE_MYEOL] = CardName.UTSURO_HOE_MYEOL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_HEO_WI] = CardName.UTSURO_HEO_WI
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_JONG_MAL] = CardName.UTSURO_JONG_MAL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_MA_SIG] = CardName.UTSURO_MA_SIG
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_BITE_DUST] = CardName.UTSURO_BITE_DUST
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_REVERBERATE_DEVICE_KURURUSIK] = CardName.UTSURO_REVERBERATE_DEVICE_KURURUSIK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_MANG_A] = CardName.UTSURO_MANG_A
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_ANNIHILATION_SHADOW] = CardName.UTSURO_ANNIHILATION_SHADOW
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_SILENT_WALK] = CardName.UTSURO_SILENT_WALK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_UTSURO_DE_MISE] = CardName.UTSURO_DE_MISE
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_SPIRIT_SIK] = CardName.HONOKA_SPIRIT_SIK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_GUARDIAN_SPIRIT_SIK] = CardName.HONOKA_GUARDIAN_SPIRIT_SIK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_ASSAULT_SPIRIT_SIK] = CardName.HONOKA_ASSAULT_SPIRIT_SIK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_DIVINE_OUKA] = CardName.HONOKA_DIVINE_OUKA
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_SAKURA_BLIZZARD] = CardName.HONOKA_SAKURA_BLIZZARD
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_UI_GI_GONG_JIN] = CardName.HONOKA_UI_GI_GONG_JIN
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_SAKURA_WING] = CardName.HONOKA_SAKURA_WING
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_REGENERATION] = CardName.HONOKA_REGENERATION
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_SAKURA_AMULET] = CardName.HONOKA_SAKURA_AMULET
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_HONOKA_SPARKLE] = CardName.HONOKA_HONOKA_SPARKLE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_COMMAND] = CardName.HONOKA_COMMAND
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_TAIL_WIND] = CardName.HONOKA_TAIL_WIND
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_CHEST_WILLINGNESS] = CardName.HONOKA_CHEST_WILLINGNESS
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_HAND_FLOWER] = CardName.HONOKA_HAND_FLOWER
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_A_NEW_OPENING] = CardName.HONOKA_A_NEW_OPENING
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_UNDER_THE_NAME_OF_FLAG] = CardName.HONOKA_UNDER_THE_NAME_OF_FLAG
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_FOUR_SEASON_BACK] = CardName.HONOKA_FOUR_SEASON_BACK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_FULL_BLOOM_PATH] = CardName.HONOKA_FULL_BLOOM_PATH
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_SAKURA_SWORD] = CardName.HONOKA_SAKURA_SWORD
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_SHADOW_HAND] = CardName.HONOKA_SHADOW_HAND
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_EYE_OPEN_ALONE] = CardName.HONOKA_EYE_OPEN_ALONE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_FOLLOW_TRACE] = CardName.HONOKA_FOLLOW_TRACE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_FACING_SHADOW] = CardName.HONOKA_FACING_SHADOW
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_SAKURA_SHINING_BRIGHTLY] = CardName.HONOKA_SAKURA_SHINING_BRIGHTLY
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_HOLD_HANDS] = CardName.HONOKA_HOLD_HANDS
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_WALK_OLD_LOAD] = CardName.HONOKA_WALK_OLD_LOAD
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_SPIRIT_SIK] = CardName.HONOKA_SPIRIT_SIK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_GUARDIAN_SPIRIT_SIK] = CardName.HONOKA_GUARDIAN_SPIRIT_SIK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_ASSAULT_SPIRIT_SIK] = CardName.HONOKA_ASSAULT_SPIRIT_SIK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_DIVINE_OUKA] = CardName.HONOKA_DIVINE_OUKA
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_SAKURA_BLIZZARD] = CardName.HONOKA_SAKURA_BLIZZARD
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_UI_GI_GONG_JIN] = CardName.HONOKA_UI_GI_GONG_JIN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_SAKURA_WING] = CardName.HONOKA_SAKURA_WING
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_REGENERATION] = CardName.HONOKA_REGENERATION
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_SAKURA_AMULET] = CardName.HONOKA_SAKURA_AMULET
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_HONOKA_SPARKLE] = CardName.HONOKA_HONOKA_SPARKLE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_COMMAND] = CardName.HONOKA_COMMAND
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_TAIL_WIND] = CardName.HONOKA_TAIL_WIND
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_CHEST_WILLINGNESS] = CardName.HONOKA_CHEST_WILLINGNESS
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_HAND_FLOWER] = CardName.HONOKA_HAND_FLOWER
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_A_NEW_OPENING] = CardName.HONOKA_A_NEW_OPENING
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_UNDER_THE_NAME_OF_FLAG] = CardName.HONOKA_UNDER_THE_NAME_OF_FLAG
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_FOUR_SEASON_BACK] = CardName.HONOKA_FOUR_SEASON_BACK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_FULL_BLOOM_PATH] = CardName.HONOKA_FULL_BLOOM_PATH
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_SAKURA_SWORD] = CardName.HONOKA_SAKURA_SWORD
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_SHADOW_HAND] = CardName.HONOKA_SHADOW_HAND
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_EYE_OPEN_ALONE] = CardName.HONOKA_EYE_OPEN_ALONE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_FOLLOW_TRACE] = CardName.HONOKA_FOLLOW_TRACE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_FACING_SHADOW] = CardName.HONOKA_FACING_SHADOW
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_SAKURA_SHINING_BRIGHTLY] = CardName.HONOKA_SAKURA_SHINING_BRIGHTLY
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_HOLD_HANDS] = CardName.HONOKA_HOLD_HANDS
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HONOKA_WALK_OLD_LOAD] = CardName.HONOKA_WALK_OLD_LOAD
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_SNOW_BLADE] = CardName.KORUNU_SNOW_BLADE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_REVOLVING_BLADE] = CardName.KORUNU_REVOLVING_BLADE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_BLADE_DANCE] = CardName.KORUNU_BLADE_DANCE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_RIDE_SNOW] = CardName.KORUNU_RIDE_SNOW
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_ABSOLUTE_ZERO] = CardName.KORUNU_ABSOLUTE_ZERO
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_FROSTBITE] = CardName.KORUNU_FROSTBITE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_FROST_THORN_BUSH] = CardName.KORUNU_FROST_THORN_BUSH
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_CONLU_RUYANPEH] = CardName.KORUNU_CONLU_RUYANPEH
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_LETAR_LERA] = CardName.KORUNU_LETAR_LERA
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_UPASTUM] = CardName.KORUNU_UPASTUM
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_PORUCHARTO] = CardName.KORUNU_PORUCHARTO
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_SNOW_BLADE] = CardName.KORUNU_SNOW_BLADE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_REVOLVING_BLADE] = CardName.KORUNU_REVOLVING_BLADE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_BLADE_DANCE] = CardName.KORUNU_BLADE_DANCE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_RIDE_SNOW] = CardName.KORUNU_RIDE_SNOW
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_ABSOLUTE_ZERO] = CardName.KORUNU_ABSOLUTE_ZERO
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_FROSTBITE] = CardName.KORUNU_FROSTBITE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_FROST_THORN_BUSH] = CardName.KORUNU_FROST_THORN_BUSH
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_CONLU_RUYANPEH] = CardName.KORUNU_CONLU_RUYANPEH
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_LETAR_LERA] = CardName.KORUNU_LETAR_LERA
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_UPASTUM] = CardName.KORUNU_UPASTUM
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KORUNU_PORUCHARTO] = CardName.KORUNU_PORUCHARTO
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_STAR_NAIL] = CardName.YATSUHA_STAR_NAIL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_DARKNESS_GILL] = CardName.YATSUHA_DARKNESS_GILL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_MIRROR_DEVIL] = CardName.YATSUHA_MIRROR_DEVIL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_GHOST_STEP] = CardName.YATSUHA_GHOST_STEP
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_WILLING] = CardName.YATSUHA_WILLING
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_CONTRACT] = CardName.YATSUHA_CONTRACT
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_CLINGY_FLOWER] = CardName.YATSUHA_CLINGY_FLOWER
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_TWO_LEAP_MIRROR_DIVINE] = CardName.YATSUHA_TWO_LEAP_MIRROR_DIVINE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_FOUR_LEAP_SONG] = CardName.YATSUHA_FOUR_LEAP_SONG
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_SIX_STAR_SEA] = CardName.YATSUHA_SIX_STAR_SEA
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_EIGHT_MIRROR_OTHER_SIDE] = CardName.YATSUHA_EIGHT_MIRROR_OTHER_SIDE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_HOLY_RAKE_HANDS] = CardName.YATSUHA_HOLY_RAKE_HANDS
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_ENTRANCE_OF_ABYSS] = CardName.YATSUHA_ENTRANCE_OF_ABYSS
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_TRUE_MONSTER] = CardName.YATSUHA_TRUE_MONSTER
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_GHOST_LINK] = CardName.YATSUHA_GHOST_LINK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_RESOLUTION] = CardName.YATSUHA_RESOLUTION
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_PLEDGE] = CardName.YATSUHA_PLEDGE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_VAIN_FLOWER] = CardName.YATSUHA_VAIN_FLOWER
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_EIGHT_MIRROR_VAIN_SAKURA] = CardName.YATSUHA_EIGHT_MIRROR_VAIN_SAKURA
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_STAR_NAIL] = CardName.YATSUHA_STAR_NAIL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_DARKNESS_GILL] = CardName.YATSUHA_DARKNESS_GILL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_MIRROR_DEVIL] = CardName.YATSUHA_MIRROR_DEVIL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_GHOST_STEP] = CardName.YATSUHA_GHOST_STEP
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_WILLING] = CardName.YATSUHA_WILLING
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_CONTRACT] = CardName.YATSUHA_CONTRACT
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_CLINGY_FLOWER] = CardName.YATSUHA_CLINGY_FLOWER
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_TWO_LEAP_MIRROR_DIVINE] = CardName.YATSUHA_TWO_LEAP_MIRROR_DIVINE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_FOUR_LEAP_SONG] = CardName.YATSUHA_FOUR_LEAP_SONG
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_SIX_STAR_SEA] = CardName.YATSUHA_SIX_STAR_SEA
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_EIGHT_MIRROR_OTHER_SIDE] = CardName.YATSUHA_EIGHT_MIRROR_OTHER_SIDE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_HOLY_RAKE_HANDS] = CardName.YATSUHA_HOLY_RAKE_HANDS
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_ENTRANCE_OF_ABYSS] = CardName.YATSUHA_ENTRANCE_OF_ABYSS
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_TRUE_MONSTER] = CardName.YATSUHA_TRUE_MONSTER
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_GHOST_LINK] = CardName.YATSUHA_GHOST_LINK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_RESOLUTION] = CardName.YATSUHA_RESOLUTION
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_PLEDGE] = CardName.YATSUHA_PLEDGE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_VAIN_FLOWER] = CardName.YATSUHA_VAIN_FLOWER
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_EIGHT_MIRROR_VAIN_SAKURA] = CardName.YATSUHA_EIGHT_MIRROR_VAIN_SAKURA
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_UNFAMILIAR_WORLD] = CardName.YATSUHA_UNFAMILIAR_WORLD
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_COLORED_WORLD] = CardName.YATSUHA_COLORED_WORLD
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_SHES_CHERRY_BLOSSOM_WORLD] = CardName.YATSUHA_SHES_CHERRY_BLOSSOM_WORLD
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_SHES_EGO_AND_DETERMINATION] = CardName.YATSUHA_SHES_EGO_AND_DETERMINATION
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_WATER_BALL] = CardName.HATSUMI_WATER_BALL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_WATER_CURRENT] = CardName.HATSUMI_WATER_CURRENT
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_STRONG_ACID] = CardName.HATSUMI_STRONG_ACID
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_TSUNAMI] = CardName.HATSUMI_TSUNAMI
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_JUN_BI_MAN_TAN] = CardName.HATSUMI_JUN_BI_MAN_TAN
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_COMPASS] = CardName.HATSUMI_COMPASS
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_CALL_WAVE] = CardName.HATSUMI_CALL_WAVE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_ISANA_HAIL] = CardName.HATSUMI_ISANA_HAIL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_OYOGIBI_FIRE] = CardName.HATSUMI_OYOGIBI_FIRE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_KIRAHARI_LIGHTHOUSE] = CardName.HATSUMI_KIRAHARI_LIGHTHOUSE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_MIOBIKI_ROUTE] = CardName.HATSUMI_MIOBIKI_ROUTE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_TORPEDO] = CardName.HATSUMI_TORPEDO
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_SAGIRI_HAIL] = CardName.HATSUMI_SAGIRI_HAIL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_WADANAKA_ROUTE] = CardName.HATSUMI_WADANAKA_ROUTE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_WATER_BALL] = CardName.HATSUMI_WATER_BALL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_WATER_CURRENT] = CardName.HATSUMI_WATER_CURRENT
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_STRONG_ACID] = CardName.HATSUMI_STRONG_ACID
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_TSUNAMI] = CardName.HATSUMI_TSUNAMI
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_JUN_BI_MAN_TAN] = CardName.HATSUMI_JUN_BI_MAN_TAN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_COMPASS] = CardName.HATSUMI_COMPASS
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_CALL_WAVE] = CardName.HATSUMI_CALL_WAVE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_ISANA_HAIL] = CardName.HATSUMI_ISANA_HAIL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_OYOGIBI_FIRE] = CardName.HATSUMI_OYOGIBI_FIRE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_KIRAHARI_LIGHTHOUSE] = CardName.HATSUMI_KIRAHARI_LIGHTHOUSE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_MIOBIKI_ROUTE] = CardName.HATSUMI_MIOBIKI_ROUTE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_TORPEDO] = CardName.HATSUMI_TORPEDO
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_SAGIRI_HAIL] = CardName.HATSUMI_SAGIRI_HAIL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_HATSUMI_WADANAKA_ROUTE] = CardName.HATSUMI_WADANAKA_ROUTE
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_JIN_DU] = CardName.MIZUKI_JIN_DU
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_BAN_GONG] = CardName.MIZUKI_BAN_GONG
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_SHOOTING_DOWN] = CardName.MIZUKI_SHOOTING_DOWN
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_HO_LYEONG] = CardName.MIZUKI_HO_LYEONG
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_BANG_BYEOG] = CardName.MIZUKI_BANG_BYEOG
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_OVERPOWERING_GO_FORWARD] = CardName.MIZUKI_OVERPOWERING_GO_FORWARD
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_JEON_JANG] = CardName.MIZUKI_JEON_JANG
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_HACHIRYU_CHEONJUGAK] = CardName.MIZUKI_HACHIRYU_CHEONJUGAK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_HIJAMARU_TRIPLET] = CardName.MIZUKI_HIJAMARU_TRIPLET
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_TARTENASHI_DAESUMUN] = CardName.MIZUKI_TARTENASHI_DAESUMUN
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_MIZUKI_BATTLE_CRY] = CardName.MIZUKI_MIZUKI_BATTLE_CRY
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KODAMA_TU_SIN] = CardName.KODAMA_TU_SIN
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_SPEAR_1] = CardName.SOLDIER_SPEAR_1
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_SPEAR_2] = CardName.SOLDIER_SPEAR_2
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_SHIELD] = CardName.SOLDIER_SHIELD
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_HORSE] = CardName.SOLDIER_HORSE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_JIN_DU] = CardName.MIZUKI_JIN_DU
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_BAN_GONG] = CardName.MIZUKI_BAN_GONG
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_SHOOTING_DOWN] = CardName.MIZUKI_SHOOTING_DOWN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_HO_LYEONG] = CardName.MIZUKI_HO_LYEONG
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_BANG_BYEOG] = CardName.MIZUKI_BANG_BYEOG
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_OVERPOWERING_GO_FORWARD] = CardName.MIZUKI_OVERPOWERING_GO_FORWARD
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_JEON_JANG] = CardName.MIZUKI_JEON_JANG
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_HACHIRYU_CHEONJUGAK] = CardName.MIZUKI_HACHIRYU_CHEONJUGAK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_HIJAMARU_TRIPLET] = CardName.MIZUKI_HIJAMARU_TRIPLET
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_TARTENASHI_DAESUMUN] = CardName.MIZUKI_TARTENASHI_DAESUMUN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MIZUKI_MIZUKI_BATTLE_CRY] = CardName.MIZUKI_MIZUKI_BATTLE_CRY
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KODAMA_TU_SIN] = CardName.KODAMA_TU_SIN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_SPEAR_1] = CardName.SOLDIER_SPEAR_1
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_SPEAR_2] = CardName.SOLDIER_SPEAR_2
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_SHIELD] = CardName.SOLDIER_SHIELD
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_HORSE] = CardName.SOLDIER_HORSE
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_GONG_SUM] = CardName.MEGUMI_GONG_SUM
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_TA_CHEOG] = CardName.MEGUMI_TA_CHEOG
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_SHELL_ATTACK] = CardName.MEGUMI_SHELL_ATTACK
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_POLE_THRUST] = CardName.MEGUMI_POLE_THRUST
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_REED] = CardName.MEGUMI_REED
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_BALSAM] = CardName.MEGUMI_BALSAM
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_WILD_ROSE] = CardName.MEGUMI_WILD_ROSE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_ROOT_OF_CAUSALITY] = CardName.MEGUMI_ROOT_OF_CAUSALITY
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_BRANCH_OF_POSSIBILITY] = CardName.MEGUMI_BRANCH_OF_POSSIBILITY
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_FRUIT_OF_END] = CardName.MEGUMI_FRUIT_OF_END
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_MEGUMI_PALM] = CardName.MEGUMI_MEGUMI_PALM
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_GONG_SUM] = CardName.MEGUMI_GONG_SUM
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_TA_CHEOG] = CardName.MEGUMI_TA_CHEOG
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_SHELL_ATTACK] = CardName.MEGUMI_SHELL_ATTACK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_POLE_THRUST] = CardName.MEGUMI_POLE_THRUST
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_REED] = CardName.MEGUMI_REED
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_BALSAM] = CardName.MEGUMI_BALSAM
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_WILD_ROSE] = CardName.MEGUMI_WILD_ROSE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_ROOT_OF_CAUSALITY] = CardName.MEGUMI_ROOT_OF_CAUSALITY
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_BRANCH_OF_POSSIBILITY] = CardName.MEGUMI_BRANCH_OF_POSSIBILITY
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_FRUIT_OF_END] = CardName.MEGUMI_FRUIT_OF_END
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_MEGUMI_MEGUMI_PALM] = CardName.MEGUMI_MEGUMI_PALM
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_IMAGE] = CardName.KANAWE_IMAGE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_SCREENPLAY] = CardName.KANAWE_SCREENPLAY
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_PRODUCTION] = CardName.KANAWE_PRODUCTION
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_PUBLISH] = CardName.KANAWE_PUBLISH
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_AFTERGLOW] = CardName.KANAWE_AFTERGLOW
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_IMPROMPTU] = CardName.KANAWE_IMPROMPTU
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_SEAL] = CardName.KANAWE_SEAL
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_VAGUE_STORY] = CardName.KANAWE_VAGUE_STORY
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_INFINITE_STARLIGHT] = CardName.KANAWE_INFINITE_STARLIGHT
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_BEND_OVER_THIS_NIGHT] = CardName.KANAWE_BEND_OVER_THIS_NIGHT
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_DISTANT_SKY] = CardName.KANAWE_DISTANT_SKY
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_KANAWE] = CardName.KANAWE_KANAWE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_IMAGE] = CardName.KANAWE_IMAGE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_SCREENPLAY] = CardName.KANAWE_SCREENPLAY
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_PRODUCTION] = CardName.KANAWE_PRODUCTION
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_PUBLISH] = CardName.KANAWE_PUBLISH
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_AFTERGLOW] = CardName.KANAWE_AFTERGLOW
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_IMPROMPTU] = CardName.KANAWE_IMPROMPTU
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_SEAL] = CardName.KANAWE_SEAL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_VAGUE_STORY] = CardName.KANAWE_VAGUE_STORY
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_INFINITE_STARLIGHT] = CardName.KANAWE_INFINITE_STARLIGHT
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_BEND_OVER_THIS_NIGHT] = CardName.KANAWE_BEND_OVER_THIS_NIGHT
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_DISTANT_SKY] = CardName.KANAWE_DISTANT_SKY
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KANAWE_KANAWE] = CardName.KANAWE_KANAWE
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_IDEA_SAL_JIN] = CardName.IDEA_SAL_JIN
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_IDEA_SAKURA_WAVE] = CardName.IDEA_SAKURA_WAVE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_IDEA_WHISTLE] = CardName.IDEA_WHISTLE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_IDEA_MYEONG_JEON] = CardName.IDEA_MYEONG_JEON
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_IDEA_EMPHASIZING] = CardName.IDEA_EMPHASIZING
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_IDEA_POSITIONING] = CardName.IDEA_POSITIONING
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_IDEA_SAL_JIN] = CardName.IDEA_SAL_JIN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_IDEA_SAKURA_WAVE] = CardName.IDEA_SAKURA_WAVE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_IDEA_WHISTLE] = CardName.IDEA_WHISTLE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_IDEA_MYEONG_JEON] = CardName.IDEA_MYEONG_JEON
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_IDEA_EMPHASIZING] = CardName.IDEA_EMPHASIZING
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_IDEA_POSITIONING] = CardName.IDEA_POSITIONING
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_RED_BLADE] = CardName.KAMUWI_RED_BLADE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_FLUTTERING_BLADE] = CardName.KAMUWI_FLUTTERING_BLADE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_SI_KEN_LAN_JIN] = CardName.KAMUWI_SI_KEN_LAN_JIN
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_CUT_DOWN] = CardName.KAMUWI_CUT_DOWN
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_THREADING_THORN] = CardName.KAMUWI_THREADING_THORN
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_KE_SYO_LAN_LYU] = CardName.KAMUWI_KE_SYO_LAN_LYU
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_BLOOD_WAVE] = CardName.KAMUWI_BLOOD_WAVE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_LAMP] = CardName.KAMUWI_LAMP
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_DAWN] = CardName.KAMUWI_DAWN
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_GRAVEYARD] = CardName.KAMUWI_GRAVEYARD
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_KATA_SHIRO] = CardName.KAMUWI_KATA_SHIRO
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_LOGIC] = CardName.KAMUWI_LOGIC
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_RED_BLADE] = CardName.KAMUWI_RED_BLADE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_FLUTTERING_BLADE] = CardName.KAMUWI_FLUTTERING_BLADE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_SI_KEN_LAN_JIN] = CardName.KAMUWI_SI_KEN_LAN_JIN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_CUT_DOWN] = CardName.KAMUWI_CUT_DOWN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_THREADING_THORN] = CardName.KAMUWI_THREADING_THORN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_KE_SYO_LAN_LYU] = CardName.KAMUWI_KE_SYO_LAN_LYU
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_BLOOD_WAVE] = CardName.KAMUWI_BLOOD_WAVE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_LAMP] = CardName.KAMUWI_LAMP
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_DAWN] = CardName.KAMUWI_DAWN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_GRAVEYARD] = CardName.KAMUWI_GRAVEYARD
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_KATA_SHIRO] = CardName.KAMUWI_KATA_SHIRO
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KAMUWI_LOGIC] = CardName.KAMUWI_LOGIC
 
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_FALSE_STAB] = CardName.RENRI_FALSE_STAB
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_TEMPORARY_EXPEDIENT] = CardName.RENRI_TEMPORARY_EXPEDIENT
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_BLACK_AND_WHITE] = CardName.RENRI_BLACK_AND_WHITE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_IRRITATING_GESTURE] = CardName.RENRI_IRRITATING_GESTURE
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_FLOATING_CLOUDS] = CardName.RENRI_FLOATING_CLOUDS
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_FISHING] = CardName.RENRI_FISHING
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_PULLING_FISHING] = CardName.RENRI_PULLING_FISHING
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_RU_RU_RA_RA_RI] = CardName.RENRI_RU_RU_RA_RA_RI
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_RA_NA_RA_RO_MI_RE_RI_RA] = CardName.RENRI_RA_NA_RA_RO_MI_RE_RI_RA
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_O_RI_RE_TE_RA_RE_RU] = CardName.RENRI_O_RI_RE_TE_RA_RE_RU
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_RENRI_THE_END] = CardName.RENRI_RENRI_THE_END
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_ENGRAVED_GARMENT] = CardName.RENRI_ENGRAVED_GARMENT
-        cardNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KIRIKO_SHAMANISTIC_MUSIC] = CardName.KIRIKO_SHAMANISTIC_MUSIC
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_FALSE_STAB] = CardName.RENRI_FALSE_STAB
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_TEMPORARY_EXPEDIENT] = CardName.RENRI_TEMPORARY_EXPEDIENT
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_BLACK_AND_WHITE] = CardName.RENRI_BLACK_AND_WHITE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_IRRITATING_GESTURE] = CardName.RENRI_IRRITATING_GESTURE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_FLOATING_CLOUDS] = CardName.RENRI_FLOATING_CLOUDS
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_FISHING] = CardName.RENRI_FISHING
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_PULLING_FISHING] = CardName.RENRI_PULLING_FISHING
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_RU_RU_RA_RA_RI] = CardName.RENRI_RU_RU_RA_RA_RI
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_RA_NA_RA_RO_MI_RE_RI_RA] = CardName.RENRI_RA_NA_RA_RO_MI_RE_RI_RA
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_O_RI_RE_TE_RA_RE_RU] = CardName.RENRI_O_RI_RE_TE_RA_RE_RU
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_RENRI_THE_END] = CardName.RENRI_RENRI_THE_END
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_ENGRAVED_GARMENT] = CardName.RENRI_ENGRAVED_GARMENT
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KIRIKO_SHAMANISTIC_MUSIC] = CardName.KIRIKO_SHAMANISTIC_MUSIC
 
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_UNFAMILIAR_WORLD] = CardName.YATSUHA_UNFAMILIAR_WORLD
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_COLORED_WORLD] = CardName.YATSUHA_COLORED_WORLD
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_SHES_CHERRY_BLOSSOM_WORLD] = CardName.YATSUHA_SHES_CHERRY_BLOSSOM_WORLD
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_SHES_EGO_AND_DETERMINATION] = CardName.YATSUHA_SHES_EGO_AND_DETERMINATION
+
+        return cardTempNumberHashmap.toMap()
+    }
+
+    fun dataHashmapInit(){
         cardDataHashmap[CardName.CARD_UNNAME] = unused
         cardDataHashmap[CardName.POISON_ANYTHING] = unused
 
@@ -1241,6 +1264,11 @@ object CardSet {
         cardDataHashmap[CardName.YURINA_QUESTION_ANSWER] = questionAnswer
         cardDataHashmap[CardName.YURINA_AHUM] = ahum
         cardDataHashmap[CardName.YURINA_KANZA_DO] = kanzaDo
+
+        cardDataHashmap[CardName.YATSUHA_UNFAMILIAR_WORLD] = unfamiliarWorld
+        cardDataHashmap[CardName.YATSUHA_COLORED_WORLD] = coloredWorld
+        cardDataHashmap[CardName.YATSUHA_SHES_CHERRY_BLOSSOM_WORLD] = shesCherryBlossomWorld
+        cardDataHashmap[CardName.YATSUHA_SHES_EGO_AND_DETERMINATION] = shesEgoAndDetermination
     }
 
     private suspend fun selectDustToDistance(nowCommand: CommandEnum, game_status: GameStatus,
@@ -2868,11 +2896,11 @@ object CardSet {
     private val reincarnationPoison = CardData(CardClass.SPECIAL, CardName.CHIKAGE_REINCARNATION_POISON, MegamiEnum.CHIKAGE, CardType.ATTACK, SubType.NONE)
     private val chikageWayOfLive = CardData(CardClass.SPECIAL, CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE, MegamiEnum.CHIKAGE, CardType.ENCHANTMENT, SubType.FULL_POWER)
 
-    private val poisonParalytic = CardData(CardClass.NORMAL, CardName.POISON_PARALYTIC, MegamiEnum.NONE, CardType.BEHAVIOR, SubType.NONE)
-    private val poisonHallucinogenic = CardData(CardClass.NORMAL, CardName.POISON_HALLUCINOGENIC, MegamiEnum.NONE, CardType.BEHAVIOR, SubType.NONE)
-    private val poisonRelaxation = CardData(CardClass.NORMAL, CardName.POISON_RELAXATION, MegamiEnum.NONE, CardType.ENCHANTMENT, SubType.NONE)
-    private val poisonDeadly1 = CardData(CardClass.NORMAL, CardName.POISON_DEADLY_1, MegamiEnum.NONE, CardType.BEHAVIOR, SubType.NONE)
-    private val poisonDeadly2 = CardData(CardClass.NORMAL, CardName.POISON_DEADLY_2, MegamiEnum.NONE, CardType.BEHAVIOR, SubType.NONE)
+    private val poisonParalytic = CardData(CardClass.POISON, CardName.POISON_PARALYTIC, MegamiEnum.NONE, CardType.BEHAVIOR, SubType.NONE)
+    private val poisonHallucinogenic = CardData(CardClass.POISON, CardName.POISON_HALLUCINOGENIC, MegamiEnum.NONE, CardType.BEHAVIOR, SubType.NONE)
+    private val poisonRelaxation = CardData(CardClass.POISON, CardName.POISON_RELAXATION, MegamiEnum.NONE, CardType.ENCHANTMENT, SubType.NONE)
+    private val poisonDeadly1 = CardData(CardClass.POISON, CardName.POISON_DEADLY_1, MegamiEnum.NONE, CardType.BEHAVIOR, SubType.NONE)
+    private val poisonDeadly2 = CardData(CardClass.POISON, CardName.POISON_DEADLY_2, MegamiEnum.NONE, CardType.BEHAVIOR, SubType.NONE)
 
     private fun makePoisonList(player: PlayerEnum, game_status: GameStatus): MutableList<Int>{
         val cardList = mutableListOf<Int>()
@@ -3321,7 +3349,7 @@ object CardSet {
     }
 
     private fun duplicateCardDataForIndustria(card_data: CardData, card_name: CardName): CardData{
-        val result = CardData(card_data.card_class, card_name, card_data.megami, card_data.card_type, card_data.sub_type)
+        val result = CardData(CardClass.NORMAL, card_name, card_data.megami, card_data.card_type, card_data.sub_type)
         result.run {
             umbrellaMark = card_data.umbrellaMark
 
@@ -9048,7 +9076,7 @@ object CardSet {
     }
 
     private fun duplicateCardDataForMaterial(card_data: CardData, card_name: CardName, megamiEnum: MegamiEnum): CardData{
-        val result = CardData(card_data.card_class, card_name, megamiEnum, card_data.card_type, card_data.sub_type)
+        val result = CardData(CardClass.NORMAL, card_name, megamiEnum, card_data.card_type, card_data.sub_type)
         result.run {
             umbrellaMark = card_data.umbrellaMark
 
@@ -10566,9 +10594,111 @@ object CardSet {
 
     private val unfamiliarWorld = CardData(CardClass.NORMAL, CardName.YATSUHA_UNFAMILIAR_WORLD, MegamiEnum.YATSUHA, CardType.ENCHANTMENT, SubType.NONE)
     private val coloredWorld = CardData(CardClass.SPECIAL, CardName.YATSUHA_COLORED_WORLD, MegamiEnum.YATSUHA, CardType.BEHAVIOR, SubType.NONE)
+    private val shesCherryBlossomWorld = CardData(CardClass.SPECIAL, CardName.YATSUHA_SHES_CHERRY_BLOSSOM_WORLD, MegamiEnum.YATSUHA, CardType.BEHAVIOR, SubType.NONE)
+    private val shesEgoAndDetermination = CardData(CardClass.SPECIAL, CardName.YATSUHA_SHES_EGO_AND_DETERMINATION, MegamiEnum.YATSUHA, CardType.BEHAVIOR, SubType.NONE)
 
-    private fun backHome(player: PlayerEnum, game_status: GameStatus){
+    private val coloredWorldText = Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_START_PHASE_YOUR){ card_number, player, game_status, _ ->
+        game_status.getPlayer(player).journey?.let {
+            if(it.effectJourney(player, game_status)){
+                it.moveJourney(player, game_status)
+            }
+            else{
+                backHome(player, game_status, card_number)
+            }
+        }
+        null
+    }
 
+    private suspend fun backHome(player: PlayerEnum, game_status: GameStatus, card_number: Int){
+        fun backHomeCardCheck(card: Card, player: PlayerEnum) = card.card_data.card_class == CardClass.NORMAL && card.player == player
+
+        while(true){
+            val selected = game_status.selectCardFrom(player, player, player,
+                listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_YATSUHA_COLORED_WORLD){card, _ ->
+                card.card_data.card_class == CardClass.NORMAL
+            }?: break
+            if (selected.size == 0){
+                break
+            }
+            else if(selected.size == 1){
+                val nowPlayer = game_status.getPlayer(player)
+                val card = game_status.getCardFrom(player, selected[0], LocationEnum.HAND)
+
+                for (memoryCard in nowPlayer.enchantmentCard.values){
+                    if(backHomeCardCheck(memoryCard, player)){
+                        game_status.cardToDust(player, memoryCard.getNap(), memoryCard, false, card_number)
+                        game_status.afterDestruction(player, memoryCard.card_number, LocationEnum.MEMORY_YOUR)
+                    }
+                }
+                for (memoryCard in nowPlayer.discard){
+                    if(backHomeCardCheck(memoryCard, player)){
+                        game_status.popCardFrom(player, memoryCard.card_number, LocationEnum.DISCARD_YOUR, true)?.let {
+                            game_status.insertCardTo(player, it, LocationEnum.MEMORY_YOUR, true)
+                        }
+                    }
+                }
+                for (memoryCard in nowPlayer.cover_card){
+                    if(backHomeCardCheck(memoryCard, player)){
+                        game_status.popCardFrom(player, memoryCard.card_number, LocationEnum.COVER_CARD, false)?.let {
+                            game_status.insertCardTo(player, it, LocationEnum.MEMORY_YOUR, false)
+                        }
+                    }
+                }
+                for (memoryCard in nowPlayer.normalCardDeck){
+                    if(backHomeCardCheck(memoryCard, player)){
+                        game_status.popCardFrom(player, memoryCard.card_number, LocationEnum.DECK, false)?.let {
+                            game_status.insertCardTo(player, it, LocationEnum.MEMORY_YOUR, false)
+                        }
+                    }
+                }
+                for (memoryCard in nowPlayer.hand.values){
+                    if(backHomeCardCheck(memoryCard, player) && memoryCard != card){
+                        game_status.popCardFrom(player, memoryCard.card_number, LocationEnum.HAND, false)?.let {
+                            game_status.insertCardTo(player, it, LocationEnum.MEMORY_YOUR, false)
+                        }
+                    }
+                }
+                game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
+
+                game_status.journeyToDust(player, 1, NUMBER_YATSUHA_COLORED_WORLD)
+                game_status.logger.insert(Log(player, LogText.END_EFFECT, NUMBER_YATSUHA_COLORED_WORLD, -1))
+
+                game_status.moveAdditionalCard(player, CardName.YATSUHA_SHES_CHERRY_BLOSSOM_WORLD, LocationEnum.SPECIAL_CARD)
+            }
+            else{
+                continue
+            }
+        }
+    }
+
+    private suspend fun backFromMemory(player: PlayerEnum, game_status: GameStatus){
+        game_status.selectCardFrom(player, player, player,
+            listOf(LocationEnum.MEMORY_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_YATSUHA_AA1_ALT_DRAW, 1){_, _ ->
+            true
+        }?.let {selected ->
+            game_status.getCardFrom(player, selected[0], LocationEnum.MEMORY_YOUR)?.let ret@{
+                if(it.card_data.card_name in notCompleteSet){
+                    while (true){
+                        when(game_status.receiveCardEffectSelect(player, NUMBER_YATSUHA_AA1_CARD_CHANGE)){
+                            CommandEnum.SELECT_ONE -> {
+                                game_status.popCardFrom(player, it.card_number, LocationEnum.MEMORY_YOUR, true)
+                                game_status.insertCardTo(player, it, LocationEnum.ADDITIONAL_CARD, true)
+                                game_status.moveAdditionalCard(player, completeMap[it.card_data.card_name]!!, LocationEnum.HAND)
+                                return@ret
+                            }
+                            CommandEnum.SELECT_NOT ->{
+                                break
+                            }
+                            else -> {
+                                continue
+                            }
+                        }
+                    }
+                }
+                game_status.popCardFrom(player, it.card_number, LocationEnum.MEMORY_YOUR, false)
+                game_status.insertCardTo(player, it, LocationEnum.HAND, false)
+            }
+        }
     }
 
     private fun yatsuhaA2CardInit(){
@@ -10607,10 +10737,12 @@ object CardSet {
             null
         })
         coloredWorld.setSpecial(2)
-        coloredWorld.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.JOURNEY) {_, player, game_status, _ ->
+        coloredWorld.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.JOURNEY) {card_number, player, game_status, _ ->
             val nowPlayer = game_status.getPlayer(player)
 
             if(nowPlayer.journey == null && (nowPlayer.haveSpecificMegami(MegamiEnum.YATSUHA_AA1))){
+                game_status.dustToJourney(player, 1, card_number)
+
                 while(true){
                     when(game_status.receiveCardEffectSelect(player, NUMBER_YATSUHA_COLORED_WORLD)){
                         CommandEnum.SELECT_ONE -> {
@@ -10637,16 +10769,132 @@ object CardSet {
             }
             null
         })
-        coloredWorld.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_START_PHASE_YOUR){_, player, game_status, _ ->
-            game_status.getPlayer(player).journey?.let {
-                if(it.effectJourney(player, game_status)){
-                    it.moveJourney(player, game_status)
+        coloredWorld.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_START_PHASE_YOUR){card_number, player, game_status, _ ->
+            game_status.startPhaseEffect[card_number] = Pair(CardEffectLocation.USED_YOUR, coloredWorldText)
+            null
+        })
+        shesCherryBlossomWorld.setSpecial(0)
+        shesCherryBlossomWorld.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {_, player, game_status, _->
+            backFromMemory(player, game_status)
+            null
+        })
+        shesCherryBlossomWorld.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_DRAW_CARD) ret@{_, player, game_status, _->
+            if((game_status.getPlayer(player).memory?.size ?: 0) > 0){
+                while(true){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_YATSUHA_AA1_ALT_DRAW)){
+                        CommandEnum.SELECT_ONE -> {
+                            backFromMemory(player, game_status)
+                            return@ret 1
+                        }
+                        CommandEnum.SELECT_NOT -> {
+                            return@ret 0
+                        }
+                        else -> {}
+                    }
                 }
-                else{
-                    backHome(player, game_status)
+            }
+            0
+        })
+        shesCherryBlossomWorld.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_GET_DAMAGE_BY_DECK_RECONSTRUCT) ret@{_, player, game_status, _->
+            if((game_status.getPlayer(player).memory?.size ?: 0) > 0){
+                while(true){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_YATSUHA_AA1_ALT_RECONSTRUCT_DAMAGE)){
+                        CommandEnum.SELECT_ONE -> {
+                            game_status.selectCardFrom(player, player, player,
+                                listOf(LocationEnum.MEMORY_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                                NUMBER_YATSUHA_AA1_ALT_RECONSTRUCT_DAMAGE, 1){_, _ ->
+                                true
+                            }?.let { selected ->
+                                game_status.popCardFrom(player, selected[0], LocationEnum.MEMORY_YOUR, true)?.let {
+                                    game_status.insertCardTo(player, it, LocationEnum.OUT_OF_GAME, true)
+                                }
+                            }
+                            return@ret 1
+                        }
+                        CommandEnum.SELECT_NOT -> {
+                            return@ret 0
+                        }
+                        else -> {}
+                    }
+                }
+            }
+            0
+        })
+        shesEgoAndDetermination.setSpecial(4)
+        shesEgoAndDetermination.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {_, player, game_status, _->
+            while (true){
+                val list = game_status.selectCardFrom(player, player, player,
+                    listOf(LocationEnum.HAND, LocationEnum.DISCARD_YOUR, LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_YATSUHA_SHES_EGO_AND_DETERMINATION
+                ){card, _ -> card.card_data.megami == MegamiEnum.YATSUHA && card.card_data.card_name in notCompleteSet}?: break
+                if (list.size == 1){
+                    var isGoDeckTop = false
+
+                    while (true){
+                        when(game_status.receiveCardEffectSelect(player, NUMBER_YATSUHA_SHES_EGO_AND_DETERMINATION)){
+                            CommandEnum.SELECT_ONE -> {
+                                isGoDeckTop = true
+                                break
+                            }
+                            CommandEnum.SELECT_NOT -> {
+                                break
+                            }
+                            else -> {}
+                        }
+                    }
+
+                    var zone = LocationEnum.DECK
+
+                    val card = game_status.popCardFrom(player, list[0], LocationEnum.HAND, true)?.also {
+                        game_status.insertCardTo(player, it, LocationEnum.ADDITIONAL_CARD, true)
+                    }?: game_status.popCardFrom(player, list[0], LocationEnum.DISCARD_YOUR, true)?.also {
+                        game_status.insertCardTo(player, it, LocationEnum.ADDITIONAL_CARD, true)
+                        zone = LocationEnum.DISCARD_YOUR
+                    }?: game_status.popCardFrom(player, list[0], LocationEnum.COVER_CARD, true)?.also {
+                        game_status.insertCardTo(player, it, LocationEnum.ADDITIONAL_CARD, true)
+                        zone = LocationEnum.COVER_CARD
+                    }?: break
+
+                    if(isGoDeckTop) game_status.moveAdditionalCard(player, completeMap[card.card_data.card_name]!!, LocationEnum.YOUR_DECK_TOP)
+                    else game_status.moveAdditionalCard(player, completeMap[card.card_data.card_name]!!, zone)
+                    break
+                }
+                else if(list.size == 0){
+                    break
                 }
             }
             null
+        })
+        shesEgoAndDetermination.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_GET_ATTACK) ret@{card_number, player, game_status, react_attack->
+            while(true){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_YATSUHA_ABSOLUTE_DAMAGE_INVALID)){
+                    CommandEnum.SELECT_ONE -> {
+                        game_status.selectCardFrom(player, player, player,
+                            listOf(LocationEnum.MEMORY_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                            NUMBER_YATSUHA_ABSOLUTE_DAMAGE_INVALID, 1){card, _ ->
+                            card.card_data.megami != MegamiEnum.YATSUHA
+                        }?.let { selected ->
+                            game_status.popCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD, true)?.let {
+                                game_status.insertCardTo(player, it, LocationEnum.OUT_OF_GAME, true)
+                            }
+                            game_status.popCardFrom(player, selected[0], LocationEnum.HAND, true)?.let {
+                                game_status.insertCardTo(player, it, LocationEnum.DISCARD_YOUR, true)
+                            }
+                            react_attack?.addOtherBuff(OtherBuff(card_number, 1, OtherBuffTag.GET_IMMEDIATE, { _, _, _ ->
+                                true
+                            }, { _, _, attack ->
+                                attack.makeNotValid()
+                            }))
+                        }?: return@ret 0
+                        return@ret 1
+                    }
+                    CommandEnum.SELECT_NOT -> {
+                        return@ret 0
+                    }
+                    else -> {}
+                }
+            }
+            0
         })
     }
 
@@ -10696,12 +10944,12 @@ object CardSet {
         yurinaA2CardInit()
         yatsuhaA2CardInit()
 
-        hashMapInit()
+        dataHashmapInit()
         hashMapTest()
     }
 }
 
-private val poisonSet = hashSetOf(NUMBER_POISON_ANYTHING, NUMBER_POISON_PARALYTIC, NUMBER_POISON_HALLUCINOGENIC,
+private val poisonSet = setOf(NUMBER_POISON_ANYTHING, NUMBER_POISON_PARALYTIC, NUMBER_POISON_HALLUCINOGENIC,
     NUMBER_POISON_RELAXATION, NUMBER_POISON_DEADLY_1, NUMBER_POISON_DEADLY_2,
     SECOND_PLAYER_START_NUMBER + NUMBER_POISON_PARALYTIC, SECOND_PLAYER_START_NUMBER + NUMBER_POISON_HALLUCINOGENIC,
     SECOND_PLAYER_START_NUMBER + NUMBER_POISON_RELAXATION, SECOND_PLAYER_START_NUMBER + NUMBER_POISON_DEADLY_1,
@@ -10709,14 +10957,14 @@ private val poisonSet = hashSetOf(NUMBER_POISON_ANYTHING, NUMBER_POISON_PARALYTI
 
 fun Int.isPoison() = this in poisonSet
 
-private val soldierSet = hashSetOf(NUMBER_SOLDIER_HORSE, NUMBER_SOLDIER_SHIELD, NUMBER_SOLDIER_SPEAR_1,
+private val soldierSet = setOf(NUMBER_SOLDIER_HORSE, NUMBER_SOLDIER_SHIELD, NUMBER_SOLDIER_SPEAR_1,
     NUMBER_SOLDIER_SPEAR_2, SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_HORSE,
     SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_SHIELD, SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_SPEAR_1,
     SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_SPEAR_2)
 
 fun Int.isSoldier() = this in soldierSet
 
-private val perjureSet = hashSetOf(
+private val perjureSet = setOf(
     NUMBER_RENRI_FALSE_STAB, NUMBER_RENRI_TEMPORARY_EXPEDIENT, NUMBER_RENRI_BLACK_AND_WHITE,
     NUMBER_RENRI_FLOATING_CLOUDS, NUMBER_RENRI_FISHING, SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_FALSE_STAB,
     SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_TEMPORARY_EXPEDIENT,

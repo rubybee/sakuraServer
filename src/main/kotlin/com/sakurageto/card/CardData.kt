@@ -9,6 +9,30 @@ class CardData(
     val card_type: CardType,
     val sub_type: SubType,
 ) {
+    //attack
+    var distance_type: DistanceType? = null
+    var distance_cont: Pair<Int, Int>? = null
+    var distance_uncont: Array<Boolean>? = null
+    var life_damage: Int? = null
+    var aura_damage: Int? = null
+
+    //Enchantment
+    var charge: Int? = null
+
+    //Special
+    var cost: Int? = null
+
+    //general
+    var effect: MutableList<Text>? = null
+    var canCover = true
+    var canDiscard = true
+
+    var cannotReactNormal: Boolean = false
+    var cannotReactSpecial: Boolean = false
+    var cannotReact: Boolean = false
+    var chogek: Boolean = false
+    var inevitable: Boolean = false
+
     //for yukihi
     var umbrellaMark: Boolean = false
 
@@ -75,30 +99,6 @@ class CardData(
         }
         this.effectUnfold!!.add(text)
     }
-
-    //attack
-    var distance_type: DistanceType? = null
-    var distance_cont: Pair<Int, Int>? = null
-    var distance_uncont: Array<Boolean>? = null
-    var life_damage: Int? = null
-    var aura_damage: Int? = null
-
-    //Enchantment
-    var charge: Int? = null
-
-    //Special
-    var cost: Int? = null
-
-    //general
-    var effect: MutableList<Text>? = null
-    var canCover = true
-    var canDiscard = true
-
-    var cannotReactNormal: Boolean = false
-    var cannotReactSpecial: Boolean = false
-    var cannotReact: Boolean = false
-    var chogek: Boolean = false
-    var inevitable: Boolean = false
 
     fun setAttack(distance_type: DistanceType, distance_cont: Pair<Int, Int>?, distance_uncont: MutableList<Int>?,
                   aura_damage: Int, life_damage: Int, cannotReactNormal: Boolean, cannotReactSpecial: Boolean,

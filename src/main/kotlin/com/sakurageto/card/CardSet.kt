@@ -461,11 +461,6 @@ object CardSet {
         cardTempNumberHashmap[NUMBER_RENRI_ENGRAVED_GARMENT] = CardName.RENRI_ENGRAVED_GARMENT
         cardTempNumberHashmap[NUMBER_KIRIKO_SHAMANISTIC_MUSIC] = CardName.KIRIKO_SHAMANISTIC_MUSIC
 
-        cardTempNumberHashmap[NUMBER_YATSUHA_UNFAMILIAR_WORLD] = CardName.YATSUHA_UNFAMILIAR_WORLD
-        cardTempNumberHashmap[NUMBER_YATSUHA_COLORED_WORLD] = CardName.YATSUHA_COLORED_WORLD
-        cardTempNumberHashmap[NUMBER_YATSUHA_SHES_CHERRY_BLOSSOM_WORLD] = CardName.YATSUHA_SHES_CHERRY_BLOSSOM_WORLD
-        cardTempNumberHashmap[NUMBER_YATSUHA_SHES_EGO_AND_DETERMINATION] = CardName.YATSUHA_SHES_EGO_AND_DETERMINATION
-
 
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CARD_UNAME] = CardName.CARD_UNNAME
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_POISON_ANYTHING] = CardName.POISON_ANYTHING
@@ -857,10 +852,6 @@ object CardSet {
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_ENGRAVED_GARMENT] = CardName.RENRI_ENGRAVED_GARMENT
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KIRIKO_SHAMANISTIC_MUSIC] = CardName.KIRIKO_SHAMANISTIC_MUSIC
 
-        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_UNFAMILIAR_WORLD] = CardName.YATSUHA_UNFAMILIAR_WORLD
-        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_COLORED_WORLD] = CardName.YATSUHA_COLORED_WORLD
-        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_SHES_CHERRY_BLOSSOM_WORLD] = CardName.YATSUHA_SHES_CHERRY_BLOSSOM_WORLD
-        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YATSUHA_SHES_EGO_AND_DETERMINATION] = CardName.YATSUHA_SHES_EGO_AND_DETERMINATION
 
         return cardTempNumberHashmap.toMap()
     }
@@ -4360,12 +4351,18 @@ object CardSet {
                 }
             }
         }
-        game_status.lifeToDust(player, moveLife, Arrow.NULL, player,
-            game_status.getCardOwner(card_number), card_number)
-        game_status.flareToDust(player, moveFlare, Arrow.NULL, player,
-            game_status.getCardOwner(card_number), card_number)
-        game_status.auraToDust(player, moveAura, Arrow.NULL, player,
-            game_status.getCardOwner(card_number), card_number)
+        if(moveLife > 0){
+            game_status.lifeToDust(player, moveLife, Arrow.NULL, player,
+                game_status.getCardOwner(card_number), card_number)
+        }
+        if(moveFlare > 0){
+            game_status.flareToDust(player, moveFlare, Arrow.NULL, player,
+                game_status.getCardOwner(card_number), card_number)
+        }
+        if(moveAura > 0){
+            game_status.auraToDust(player, moveAura, Arrow.NULL, player,
+                game_status.getCardOwner(card_number), card_number)
+        }
         game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
         return canMove
     }
@@ -10536,7 +10533,7 @@ object CardSet {
             }
             null
         })
-        ahum.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_AFTER_BASIC_OPERATION_MOVE_AURA_OTHER){ _, player, game_status, _ ->
+        ahum.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_AFTER_BASIC_OPERATION_OTHER_MOVE_AURA){ _, player, game_status, _ ->
             if(game_status.logger.checkAhumBasicOperation(player)){
                 ahumEffect(player, game_status)
             }
@@ -10612,58 +10609,62 @@ object CardSet {
     private suspend fun backHome(player: PlayerEnum, game_status: GameStatus, card_number: Int){
         fun backHomeCardCheck(card: Card, player: PlayerEnum) = card.card_data.card_class == CardClass.NORMAL && card.player == player
 
+        suspend fun backAllCardToMemory(game_status: GameStatus, exceptCard: Int){
+            val nowPlayer = game_status.getPlayer(player)
+
+            for (memoryCard in nowPlayer.enchantmentCard.values){
+                if(backHomeCardCheck(memoryCard, player)){
+                    game_status.cardToDust(player, memoryCard.getNap(), memoryCard, false, card_number)
+                    game_status.afterDestruction(player, memoryCard.card_number, LocationEnum.MEMORY_YOUR)
+                }
+            }
+            for (memoryCard in nowPlayer.discard){
+                if(backHomeCardCheck(memoryCard, player)){
+                    game_status.popCardFrom(player, memoryCard.card_number, LocationEnum.DISCARD_YOUR, true)?.let {
+                        game_status.insertCardTo(player, it, LocationEnum.MEMORY_YOUR, true)
+                    }
+                }
+            }
+            for (memoryCard in nowPlayer.cover_card){
+                if(backHomeCardCheck(memoryCard, player)){
+                    game_status.popCardFrom(player, memoryCard.card_number, LocationEnum.COVER_CARD, false)?.let {
+                        game_status.insertCardTo(player, it, LocationEnum.MEMORY_YOUR, false)
+                    }
+                }
+            }
+            for (memoryCard in nowPlayer.normalCardDeck){
+                if(backHomeCardCheck(memoryCard, player)){
+                    game_status.popCardFrom(player, memoryCard.card_number, LocationEnum.DECK, false)?.let {
+                        game_status.insertCardTo(player, it, LocationEnum.MEMORY_YOUR, false)
+                    }
+                }
+            }
+            for (memoryCard in nowPlayer.hand.values){
+                if(backHomeCardCheck(memoryCard, player) && memoryCard.card_number != exceptCard){
+                    game_status.popCardFrom(player, memoryCard.card_number, LocationEnum.HAND, false)?.let {
+                        game_status.insertCardTo(player, it, LocationEnum.MEMORY_YOUR, false)
+                    }
+                }
+            }
+            game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
+
+            game_status.journeyToDust(player, 1, NUMBER_YATSUHA_COLORED_WORLD)
+            game_status.logger.insert(Log(player, LogText.END_EFFECT, NUMBER_YATSUHA_COLORED_WORLD, -1))
+
+            game_status.moveAdditionalCard(player, CardName.YATSUHA_SHES_CHERRY_BLOSSOM_WORLD, LocationEnum.SPECIAL_CARD)
+        }
+
+        game_status.sendCommand(player, player.opposite(), CommandEnum.END_JOURNEY_YOUR)
         while(true){
             val selected = game_status.selectCardFrom(player, player, player,
                 listOf(LocationEnum.HAND), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_YATSUHA_COLORED_WORLD){card, _ ->
                 card.card_data.card_class == CardClass.NORMAL
             }?: break
             if (selected.size == 0){
-                break
+                backAllCardToMemory(game_status, NUMBER_CARD_UNAME)
             }
             else if(selected.size == 1){
-                val nowPlayer = game_status.getPlayer(player)
-                val card = game_status.getCardFrom(player, selected[0], LocationEnum.HAND)
-
-                for (memoryCard in nowPlayer.enchantmentCard.values){
-                    if(backHomeCardCheck(memoryCard, player)){
-                        game_status.cardToDust(player, memoryCard.getNap(), memoryCard, false, card_number)
-                        game_status.afterDestruction(player, memoryCard.card_number, LocationEnum.MEMORY_YOUR)
-                    }
-                }
-                for (memoryCard in nowPlayer.discard){
-                    if(backHomeCardCheck(memoryCard, player)){
-                        game_status.popCardFrom(player, memoryCard.card_number, LocationEnum.DISCARD_YOUR, true)?.let {
-                            game_status.insertCardTo(player, it, LocationEnum.MEMORY_YOUR, true)
-                        }
-                    }
-                }
-                for (memoryCard in nowPlayer.cover_card){
-                    if(backHomeCardCheck(memoryCard, player)){
-                        game_status.popCardFrom(player, memoryCard.card_number, LocationEnum.COVER_CARD, false)?.let {
-                            game_status.insertCardTo(player, it, LocationEnum.MEMORY_YOUR, false)
-                        }
-                    }
-                }
-                for (memoryCard in nowPlayer.normalCardDeck){
-                    if(backHomeCardCheck(memoryCard, player)){
-                        game_status.popCardFrom(player, memoryCard.card_number, LocationEnum.DECK, false)?.let {
-                            game_status.insertCardTo(player, it, LocationEnum.MEMORY_YOUR, false)
-                        }
-                    }
-                }
-                for (memoryCard in nowPlayer.hand.values){
-                    if(backHomeCardCheck(memoryCard, player) && memoryCard != card){
-                        game_status.popCardFrom(player, memoryCard.card_number, LocationEnum.HAND, false)?.let {
-                            game_status.insertCardTo(player, it, LocationEnum.MEMORY_YOUR, false)
-                        }
-                    }
-                }
-                game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
-
-                game_status.journeyToDust(player, 1, NUMBER_YATSUHA_COLORED_WORLD)
-                game_status.logger.insert(Log(player, LogText.END_EFFECT, NUMBER_YATSUHA_COLORED_WORLD, -1))
-
-                game_status.moveAdditionalCard(player, CardName.YATSUHA_SHES_CHERRY_BLOSSOM_WORLD, LocationEnum.SPECIAL_CARD)
+                backAllCardToMemory(game_status, selected[0])
             }
             else{
                 continue
@@ -10729,7 +10730,7 @@ object CardSet {
             game_status.doBasicOperation(player, CommandEnum.ACTION_GO_FORWARD,
                 CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + NUMBER_YATSUHA_UNFAMILIAR_WORLD)
 
-            game_status.popCardFrom(player, card_number, LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, true)?.let {
+            game_status.popCardFrom(player, card_number, LocationEnum.ENCHANTMENT_ZONE, true)?.let {
                 game_status.insertCardTo(player, it, LocationEnum.OUT_OF_GAME, true)
             }
 
@@ -10843,7 +10844,7 @@ object CardSet {
                         }
                     }
 
-                    var zone = LocationEnum.DECK
+                    var zone = LocationEnum.HAND
 
                     val card = game_status.popCardFrom(player, list[0], LocationEnum.HAND, true)?.also {
                         game_status.insertCardTo(player, it, LocationEnum.ADDITIONAL_CARD, true)

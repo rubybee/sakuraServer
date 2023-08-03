@@ -292,7 +292,10 @@ enum class CommandEnum {
     DIVING_SHOW,
 
     SET_JOURNEY_YOUR,
-    SET_JOURNEY_OTHER;
+    SET_JOURNEY_OTHER,
+
+    END_JOURNEY_YOUR,
+    END_JOURNEY_OTHER;
 
     fun isBasicOperation() = this in basicOperationSet
 
@@ -451,6 +454,8 @@ enum class CommandEnum {
             MEMORY_OTHER -> return MEMORY_YOUR
             POP_MEMORY_YOUR -> return POP_MEMORY_OTHER
             POP_MEMORY_OTHER -> return POP_MEMORY_YOUR
+            END_JOURNEY_YOUR -> return END_JOURNEY_OTHER
+            END_JOURNEY_OTHER -> return END_JOURNEY_YOUR
             else -> TODO()
         }
     }

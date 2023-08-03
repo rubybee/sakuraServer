@@ -192,18 +192,16 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         return attack.canReactByThisCard(this, game_status, player, continuousBuffQueue)
     }
 
-    suspend fun returnNap(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?): Int{
+    private suspend fun returnNap(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?): Int{
         if(this.card_data.charge == null){
             return -1
         }
         else{
             this.card_data.effect?.let {
                 for(text in it){
-                    if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
-                        if(text.tag == TextEffectTag.ADJUST_NAP){
-                            return text.effect!!(this.card_number, player, game_status, react_attack)?: this.card_data.charge?:
-                            throw Exception("enchantment card must have charge: ${this.card_number.toCardName()}")
-                        }
+                    if(text.tag == TextEffectTag.ADJUST_NAP){
+                        return text.effect!!(this.card_number, player, game_status, react_attack)?: this.card_data.charge?:
+                        throw Exception("enchantment card must have charge: ${this.card_number.toCardName()}")
                     }
                 }
             }
@@ -560,6 +558,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         for(card in game_status.getPlayer(player.opposite()).enchantmentCard.values){
             card.effectAllValidEffect(player.opposite(), game_status, TextEffectTag.WHEN_DEPLOYMENT_OTHER)
         }
+
         var nowNeedNap = if(nap_change == -1){
             returnNap(player, game_status, react_attack) + game_status.getPlayer(player).napBuff
         } else{

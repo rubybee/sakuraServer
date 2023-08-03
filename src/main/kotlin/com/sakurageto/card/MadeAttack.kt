@@ -346,14 +346,13 @@ class MadeAttack(
     }
 
     suspend fun afterAttackProcess(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, damageSelect: DamageSelect){
-        for(card in game_status.getPlayer(player.opposite()).enchantmentCard.values){
-            if(card.canUseEffectCheck(TextEffectTag.AFTER_ATTACK_EFFECT_INVALID_OTHER)){
-                return
-            }
-        }
-
         this.effect?.let{
             for(text in it){
+                for(card in game_status.getPlayer(player.opposite()).enchantmentCard.values){
+                    if(card.canUseEffectCheck(TextEffectTag.AFTER_ATTACK_EFFECT_INVALID_OTHER)){
+                        return
+                    }
+                }
                 if(text.timing_tag == TextEffectTimingTag.AFTER_ATTACK){
                     if(text.tag == TextEffectTag.WHEN_CHOOSE_AURA_DAMAGE){
                         if(damageSelect == DamageSelect.AURA){

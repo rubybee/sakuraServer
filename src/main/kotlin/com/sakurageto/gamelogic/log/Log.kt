@@ -1,6 +1,5 @@
 package com.sakurageto.gamelogic.log
 
-import com.sakurageto.card.CardName
 import com.sakurageto.card.PlayerEnum
 import com.sakurageto.protocol.LocationEnum
 
@@ -22,6 +21,18 @@ class Log(val player: PlayerEnum, val text: LogText, val number1: Int, val numbe
     fun isTextUseCard() = this.text == LogText.USE_CARD || this.text == LogText.USE_CARD_IN_SOLDIER ||
             this.text == LogText.USE_CARD_REACT || this.text == LogText.USE_CARD_IN_COVER || this.text == LogText.USE_CARD_IN_COVER_AND_REACT
             || this.text == LogText.USE_CARD_PERJURE || this.text == LogText.USE_CARD_IN_SOLDIER_PERJURE
+
+    fun isAhumBasicOperation(ahumPlayer: PlayerEnum) =
+        text == LogText.MOVE_TOKEN && number1 == BASIC_OPERATION && isMoveAura(ahumPlayer.opposite())
+
+    fun isMoveAura(player: PlayerEnum) =
+        player == this.player && (destination == LocationEnum.YOUR_AURA || resource == LocationEnum.YOUR_AURA)
+                && number2 >= 1
+
+    fun isMoveAuraForAttack(player: PlayerEnum) =
+        player == this.player && (destination == LocationEnum.YOUR_AURA || resource == LocationEnum.YOUR_AURA ||
+                destination == LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD || resource == LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD)
+                && number2 >= 1
 
     companion object{
         const val SPECIAL_COST = 0

@@ -1882,7 +1882,9 @@ enum class CardName {
         )
 
         private val yatsuhaAA1AdditionalCardList = listOf(
-            YATSUHA_SHES_CHERRY_BLOSSOM_WORLD, YATSUHA_COLORED_WORLD
+            YATSUHA_HOLY_RAKE_HANDS, YATSUHA_ENTRANCE_OF_ABYSS, YATSUHA_TRUE_MONSTER,
+            YATSUHA_GHOST_LINK, YATSUHA_RESOLUTION, YATSUHA_PLEDGE,
+            YATSUHA_VAIN_FLOWER, YATSUHA_SHES_CHERRY_BLOSSOM_WORLD, YATSUHA_COLORED_WORLD
         )
 
         private val mizukiAdditionalCardList = listOf(

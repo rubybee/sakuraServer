@@ -9,6 +9,7 @@ import com.sakurageto.protocol.LocationEnum
 
 class YatsuhaJourney(private val startPoint: Int) {
     private var nowPoint = -1
+    private var clock = false
 
     init {
         nowPoint = startPoint
@@ -32,10 +33,11 @@ class YatsuhaJourney(private val startPoint: Int) {
         }
         val nowText = getJourneyEffect()
         nowText.effect!!(-1, player, gameStatus, null)
+        clock = true
         return true
     }
 
-    private fun isNowEffectTwice() = startPoint == nowPoint
+    private fun isNowEffectTwice() = startPoint == nowPoint && clock
 
     private fun getJourneyEffect(): Text{
         return when(nowPoint){

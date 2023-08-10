@@ -295,7 +295,10 @@ enum class CommandEnum {
     SET_JOURNEY_OTHER,
 
     END_JOURNEY_YOUR,
-    END_JOURNEY_OTHER;
+    END_JOURNEY_OTHER,
+
+    SET_MARKET_PRICE_YOUR,
+    SET_MARKET_PRICE_OTHER;
 
     fun isBasicOperation() = this in basicOperationSet
 
@@ -456,6 +459,8 @@ enum class CommandEnum {
             POP_MEMORY_OTHER -> return POP_MEMORY_YOUR
             END_JOURNEY_YOUR -> return END_JOURNEY_OTHER
             END_JOURNEY_OTHER -> return END_JOURNEY_YOUR
+            SET_MARKET_PRICE_YOUR -> return SET_MARKET_PRICE_OTHER
+            SET_MARKET_PRICE_OTHER -> return SET_MARKET_PRICE_YOUR
             else -> TODO()
         }
     }
@@ -554,7 +559,10 @@ enum class LocationEnum(var real_number: Int){
     NOT_SELECTED_NORMAL_CARD(50),
 
     MEMORY_YOUR(51),
-    MEMORY_OTHER(52);
+    MEMORY_OTHER(52),
+
+    FLOW_YOUR(53),
+    FLOW_OTHER(54);
 
     fun Opposite(): LocationEnum{
         return when(this){
@@ -589,6 +597,8 @@ enum class LocationEnum(var real_number: Int){
             ANVIL_OTHER -> ANVIL_YOUR
             MEMORY_YOUR -> MEMORY_OTHER
             MEMORY_OTHER -> MEMORY_YOUR
+            FLOW_YOUR -> FLOW_OTHER
+            FLOW_OTHER -> FLOW_YOUR
             else -> DISCARD_YOUR
         }
     }

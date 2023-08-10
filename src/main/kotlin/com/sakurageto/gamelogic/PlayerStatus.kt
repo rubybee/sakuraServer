@@ -64,6 +64,10 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
 
     var journey: YatsuhaJourney? = null
     var memory: HashMap<Int, Card>? = null
+
+    var marketPrice: Int? = null
+    fun getMarketPrice() = marketPrice?: 0
+    var flow: Int = 0
     //for megami(must be present)
 
 
@@ -86,6 +90,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var nextCostAddMegami: MegamiEnum? = null
     var afterCardUseTermination: Boolean = false
     var isUseCard: Boolean = false
+    var isRecoupThisTurn: Boolean = false
     //for some card(some day refactor may be needed)
 
     fun isLose() = (tabooGauge?: 0) >= 16 || life == 0
@@ -291,8 +296,6 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
 
 
     fun megamiOneNormalForm() = megamiOne.changeNormalMegami()
-
-    fun megamiTwoNormalForm() = megamiTwo.changeNormalMegami()
 
     fun haveSpecificMegami(megami: MegamiEnum) = megamiOne == megami || megamiTwo == megami
 

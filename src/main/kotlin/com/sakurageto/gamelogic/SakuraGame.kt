@@ -132,6 +132,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
             MegamiEnum.MEGUMI -> settingForMegumi(player)
             MegamiEnum.KANAWE -> settingForKanawe(player)
             MegamiEnum.KAMUWI -> settingForKamuwi(player)
+            MegamiEnum.AKINA -> settingForAkina(player)
             else -> {}
         }
     }
@@ -231,6 +232,20 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         nowPlayer.tabooGauge = 0
     }
 
+    private fun settingForAkina(player: PlayerEnum){
+        val nowPlayer = gameStatus.getPlayer(player)
+
+        if(nowPlayer.megamiOneNormalForm() == MegamiEnum.AKINA){
+            nowPlayer.megamiCard = Card.cardMakerByName(firstTurn == player, CardName.AKINA_AKINA, player)
+            nowPlayer.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
+        }
+        else{
+            nowPlayer.megamiCard2 = Card.cardMakerByName(firstTurn == player, CardName.AKINA_AKINA, player)
+            nowPlayer.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
+        }
+
+        nowPlayer.marketPrice = 2
+    }
 
     private fun settingForAnotherMegami(player: PlayerEnum, megami: MegamiEnum){
         when(megami){

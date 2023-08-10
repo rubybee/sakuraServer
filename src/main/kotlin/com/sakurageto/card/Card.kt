@@ -1033,4 +1033,16 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             ideaRun(player, game_status, flipped, keys)
         }
     }
+
+    /***
+     this function don't care if the umbrella is fold or unfold
+     */
+    fun isThisCardHaveTag(tag: TextEffectTag): Boolean{
+        card_data.effect?.let {
+            for(text in it){
+                if(text.tag == tag) return true
+            }
+        }
+        return false
+    }
 }

@@ -38,6 +38,7 @@ enum class TextEffectTag {
     RUN_STRATAGEM,
     FREEZE,
     CHANGE_ARROW_BOTH,
+    INVESTMENT_RIGHT,
 
     //just define what this effect do
     EFFECT_ACT,

@@ -490,7 +490,22 @@ enum class CardName {
     YATSUHA_UNFAMILIAR_WORLD,
     YATSUHA_COLORED_WORLD,
     YATSUHA_SHES_CHERRY_BLOSSOM_WORLD,
-    YATSUHA_SHES_EGO_AND_DETERMINATION;
+    YATSUHA_SHES_EGO_AND_DETERMINATION,
+
+    AKINA_AKINA,
+    AKINA_ABACUS_STONE,
+    AKINA_MENACE,
+    AKINA_TRADE,
+    AKINA_SPECULATION,
+    AKINA_ALGORITHM,
+    AKINA_TURN_OFF_TABLE,
+    AKINA_DIRECT_FINANCING,
+
+    AKINA_SPECIAL_ONE,
+    AKINA_SPECIAL_TWO,
+    AKINA_SPECIAL_THREE,
+    AKINA_AKINA_ACCURATE_CALC;
+
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -1531,6 +1546,12 @@ enum class CardName {
             RENRI_PULLING_FISHING
         )
 
+        private val akinaNormalCardList = listOf(
+            AKINA_ABACUS_STONE, AKINA_MENACE, AKINA_TRADE,
+            AKINA_SPECULATION, AKINA_ALGORITHM, AKINA_TURN_OFF_TABLE,
+            AKINA_DIRECT_FINANCING,
+        )
+
         fun returnNormalCardNameByMegami(megami_name: MegamiEnum):List<CardName>{
             return when (megami_name){
                 NONE -> emptyList
@@ -1579,6 +1600,7 @@ enum class CardName {
                 KANAWE -> kanaweNormalCardList
                 KAMUWI -> kamuwiNormalCardList
                 RENRI -> renriNormalCardList
+                AKINA -> akinaNormalCardList
             }
         }
 
@@ -1776,6 +1798,11 @@ enum class CardName {
             RENRI_RENRI_THE_END
         )
 
+        private val akinaSpecialCardList = listOf(
+            AKINA_SPECIAL_ONE, AKINA_SPECIAL_TWO, AKINA_SPECIAL_THREE,
+            AKINA_AKINA_ACCURATE_CALC
+        )
+
         fun returnSpecialCardNameByMegami(megami_name: MegamiEnum): List<CardName> {
             return when (megami_name){
                 NONE -> emptyList
@@ -1824,6 +1851,7 @@ enum class CardName {
                 KANAWE -> kanaweSpecialCardList
                 KAMUWI -> kamuwiSpecialCardList
                 RENRI -> renriSpecialCardList
+                AKINA -> akinaSpecialCardList
             }
         }
 
@@ -1952,6 +1980,7 @@ enum class CardName {
                 KANAWE -> kanaweAdditionalCardList
                 KAMUWI -> kamuwiAdditionalCardList
                 RENRI -> renriAdditionalCardList
+                AKINA -> emptyList
             }
         }
 

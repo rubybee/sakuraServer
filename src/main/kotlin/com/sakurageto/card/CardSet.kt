@@ -10899,6 +10899,67 @@ object CardSet {
         })
     }
 
+    private val akina = CardData(CardClass.SPECIAL, CardName.AKINA_AKINA, MegamiEnum.SHINRA, CardType.BEHAVIOR, SubType.NONE)
+
+    private suspend fun investment(game_status: GameStatus, player: PlayerEnum){
+        if(game_status.getPlayer(player).isRecoupThisTurn){
+            return
+        }
+        while(true){
+            val selected = game_status.selectCardFrom(player, player, player,
+                listOf(LocationEnum.DISCARD_YOUR, LocationEnum.YOUR_USED_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_AKINA_AKINA
+            ) {card, _ -> card.isThisCardHaveTag(TextEffectTag.INVESTMENT_RIGHT)}?: return
+            if (selected.size == 0){
+                break
+            }
+            else if(selected.size > 1){
+                continue
+            }
+            else{
+                game_status.popCardFrom(player, selected[0], LocationEnum.DISCARD_YOUR, true)?.let {
+                    game_status.insertCardTo(player, it, LocationEnum.COVER_CARD, true)
+                }?: if(!game_status.returnSpecialCard(player, selected[0])){ break } else {}
+
+                if(game_status.investmentTokenMove(player)){
+                    game_status.setMarketPrice(player, game_status.getPlayer(player).getMarketPrice() + 1)
+                }
+            }
+        }
+    }
+
+    private suspend fun recoup(game_status: GameStatus, player: PlayerEnum){
+        while(true){
+            val nowCommand = game_status.receiveCardEffectSelect(player, NUMBER_AKINA_AKINA)
+            if(nowCommand == CommandEnum.SELECT_ONE){
+                val nowPlayer = game_status.getPlayer(player)
+
+                if(nowPlayer.flow > 0){
+                    game_status.flowToDust(player, 1)
+                    if(game_status.recoupTokenMove(player)){
+                        game_status.setMarketPrice(player, (nowPlayer.marketPrice?: 0) - 2)
+                    }
+                    game_status.logger.insert(Log(player, LogText.END_EFFECT, NUMBER_AKINA_AKINA, -1))
+                }
+                break
+            }
+            else if(nowCommand == CommandEnum.SELECT_NOT){
+                break
+            }
+        }
+    }
+
+    fun akinaCardInit(){
+        akina.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_MAIN_PHASE_YOUR) { _, player, game_status, _ ->
+            investment(game_status, player)
+            recoup(game_status, player)
+            null
+        })
+        akina.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_DECK_RECONSTRUCT_YOUR) { _, player, game_status, _ ->
+            investment(game_status, player)
+            null
+        })
+    }
+
     fun init(){
         yurinaCardInit()
         saineCardInit()
@@ -10944,6 +11005,7 @@ object CardSet {
         hatsumiA1CardInit()
         yurinaA2CardInit()
         yatsuhaA2CardInit()
+        akinaCardInit()
 
         dataHashmapInit()
         hashMapTest()

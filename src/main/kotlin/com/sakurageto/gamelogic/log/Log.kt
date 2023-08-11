@@ -26,11 +26,11 @@ class Log(val player: PlayerEnum, val text: LogText, val number1: Int, val numbe
         text == LogText.MOVE_TOKEN && number1 == BASIC_OPERATION && isMoveAura(ahumPlayer.opposite())
 
     fun isMoveAura(player: PlayerEnum) =
-        player == this.player && (destination == LocationEnum.YOUR_AURA || resource == LocationEnum.YOUR_AURA)
+        player == this.player && (destination == LocationEnum.AURA_YOUR || resource == LocationEnum.AURA_YOUR)
                 && number2 >= 1
 
     fun isMoveAuraForAttack(player: PlayerEnum) =
-        player == this.player && (destination == LocationEnum.YOUR_AURA || resource == LocationEnum.YOUR_AURA ||
+        player == this.player && (destination == LocationEnum.AURA_YOUR || resource == LocationEnum.AURA_YOUR ||
                 destination == LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD || resource == LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD)
                 && number2 >= 1
 

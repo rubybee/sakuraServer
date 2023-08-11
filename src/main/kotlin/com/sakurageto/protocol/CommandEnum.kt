@@ -497,12 +497,12 @@ enum class TokenEnum(var real_number: Int){
 }
 
 enum class LocationEnum(var real_number: Int){
-    YOUR_AURA(0),
-    OTHER_AURA(1),
-    YOUR_FLARE(2),
-    OTHER_FLARE(3),
-    YOUR_LIFE(4),
-    OTHER_LIFE(5),
+    AURA_YOUR(0),
+    AURA_OTHER(1),
+    FLARE_YOUR(2),
+    FLARE_OTHER(3),
+    LIFE_YOUR(4),
+    LIFE_OTHER(5),
     DUST(6),
     YOUR_ENCHANTMENT_ZONE_CARD(7),
     OTHER_ENCHANTMENT_ZONE_CARD(8),
@@ -511,7 +511,6 @@ enum class LocationEnum(var real_number: Int){
     MACHINE_OTHER(27),
     MACHINE_BURN_YOUR(30),
     MACHINE_BURN_OTHER(31),
-
 
     //they are all only used to select card move location
     COVER_CARD(10),
@@ -566,12 +565,12 @@ enum class LocationEnum(var real_number: Int){
 
     fun Opposite(): LocationEnum{
         return when(this){
-            YOUR_AURA -> OTHER_AURA
-            OTHER_AURA -> YOUR_AURA
-            YOUR_FLARE -> OTHER_FLARE
-            OTHER_FLARE -> YOUR_FLARE
-            YOUR_LIFE -> OTHER_LIFE
-            OTHER_LIFE -> YOUR_LIFE
+            AURA_YOUR -> AURA_OTHER
+            AURA_OTHER -> AURA_YOUR
+            FLARE_YOUR -> FLARE_OTHER
+            FLARE_OTHER -> FLARE_YOUR
+            LIFE_YOUR -> LIFE_OTHER
+            LIFE_OTHER -> LIFE_YOUR
             DUST -> DUST
             YOUR_ENCHANTMENT_ZONE_CARD -> OTHER_ENCHANTMENT_ZONE_CARD
             OTHER_ENCHANTMENT_ZONE_CARD -> YOUR_ENCHANTMENT_ZONE_CARD
@@ -636,7 +635,8 @@ enum class LocToLoc(var real_number: Int){
     OUT_TO_DUST(24),
     LIFE_YOUR_TO_LIFE_OTHER(25),
     LIFE_YOUR_TO_OUT(26),
-    LIFE_OTHER_TO_OUT(27);
+    LIFE_OTHER_TO_OUT(27),
+    AURA_YOUR_TO_FLOW(28);
 
 
     fun encode(value: Int) = this.real_number + value * 100

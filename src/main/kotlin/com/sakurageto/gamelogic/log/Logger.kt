@@ -229,14 +229,14 @@ class Logger {
                 when(log.number1){
                     Log.IGNORE, Log.BASIC_OPERATION -> {}
                     else -> {
-                        if(log.resource == LocationEnum.YOUR_LIFE){
+                        if(log.resource == LocationEnum.LIFE_YOUR){
                             storeFrom[log.number1] = storeFrom[log.number1]?.let{
                                 it + log.number2
                             }?: run {
                                 log.number2
                             }
                         }
-                        else if(log.destination == LocationEnum.YOUR_LIFE){
+                        else if(log.destination == LocationEnum.LIFE_YOUR){
                             storeTo[log.number1] = storeTo[log.number1]?.let{
                                 it + log.number2
                             }?: run {

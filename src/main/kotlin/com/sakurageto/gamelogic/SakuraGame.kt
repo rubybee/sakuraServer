@@ -74,8 +74,8 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         val player1_data = waitUntil(player1, CommandEnum.SELECT_MEGAMI)
         val player2_data = waitUntil(player2, CommandEnum.SELECT_MEGAMI)
         if(gameMode == GameMode.SSANG_JANG_YO_LAN){
-            gameStatus.player1.setMegamiSSangjang(player1_data)
-            gameStatus.player2.setMegamiSSangjang(player2_data)
+            gameStatus.player1.setMegamiSsangjang(player1_data)
+            gameStatus.player2.setMegamiSsangjang(player2_data)
         }
         else if(gameMode == GameMode.SAM_SEUB_IL_SA){
             gameStatus.player1.setMegamiSamSep(player1_data)
@@ -333,15 +333,15 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         when(firstTurn){
             PlayerEnum.PLAYER1 -> {
                 Card.cardInitInsert(true, gameStatus.player1.normalCardDeck, card_data_player1, PlayerEnum.PLAYER1)
-                Card.cardInitInsert(true, gameStatus.player1.special_card_deck, specialcard_data_player1, PlayerEnum.PLAYER1)
+                Card.cardInitInsert(true, gameStatus.player1.specialCardDeck, specialcard_data_player1, PlayerEnum.PLAYER1)
                 Card.cardInitInsert(false, gameStatus.player2.normalCardDeck, card_data_player2, PlayerEnum.PLAYER2)
-                Card.cardInitInsert(false, gameStatus.player2.special_card_deck, specialcard_data_player2, PlayerEnum.PLAYER2)
+                Card.cardInitInsert(false, gameStatus.player2.specialCardDeck, specialcard_data_player2, PlayerEnum.PLAYER2)
             }
             PlayerEnum.PLAYER2 -> {
                 Card.cardInitInsert(false, gameStatus.player1.normalCardDeck, card_data_player1, PlayerEnum.PLAYER1)
-                Card.cardInitInsert(false, gameStatus.player1.special_card_deck, specialcard_data_player1, PlayerEnum.PLAYER1)
+                Card.cardInitInsert(false, gameStatus.player1.specialCardDeck, specialcard_data_player1, PlayerEnum.PLAYER1)
                 Card.cardInitInsert(true, gameStatus.player2.normalCardDeck, card_data_player2, PlayerEnum.PLAYER2)
-                Card.cardInitInsert(true, gameStatus.player2.special_card_deck, specialcard_data_player2, PlayerEnum.PLAYER2)
+                Card.cardInitInsert(true, gameStatus.player2.specialCardDeck, specialcard_data_player2, PlayerEnum.PLAYER2)
             }
         }
 
@@ -368,11 +368,11 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
             }
         }
 
-        gameStatus.player1.deleteNormalUsedCard(card_data_player1)
-        gameStatus.player1.deleteSpeicalUsedCard(specialcard_data_player1)
+        gameStatus.player1.deleteSelectedNormalCard(card_data_player1)
+        gameStatus.player1.deleteSelectedUsedCard(specialcard_data_player1)
 
-        gameStatus.player2.deleteNormalUsedCard(card_data_player2)
-        gameStatus.player2.deleteSpeicalUsedCard(specialcard_data_player2)
+        gameStatus.player2.deleteSelectedNormalCard(card_data_player2)
+        gameStatus.player2.deleteSelectedUsedCard(specialcard_data_player2)
     }
 
      fun selectFirst(){

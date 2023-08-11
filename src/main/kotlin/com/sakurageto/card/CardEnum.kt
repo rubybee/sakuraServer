@@ -494,7 +494,7 @@ enum class CardName {
 
     AKINA_AKINA,
     AKINA_ABACUS_STONE,
-    AKINA_MENACE,
+    AKINA_THREAT,
     AKINA_TRADE,
     AKINA_SPECULATION,
     AKINA_ALGORITHM,
@@ -1547,7 +1547,7 @@ enum class CardName {
         )
 
         private val akinaNormalCardList = listOf(
-            AKINA_ABACUS_STONE, AKINA_MENACE, AKINA_TRADE,
+            AKINA_ABACUS_STONE, AKINA_THREAT, AKINA_TRADE,
             AKINA_SPECULATION, AKINA_ALGORITHM, AKINA_TURN_OFF_TABLE,
             AKINA_DIRECT_FINANCING,
         )

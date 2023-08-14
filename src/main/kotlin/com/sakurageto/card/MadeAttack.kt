@@ -207,8 +207,8 @@ class MadeAttack(
         tempRangeBuff.clearBuff()
     }
 
-    fun addRangeBuff(buff: RangeBuff){
-        thisTempRangeBuff.addRangeBuff(buff)
+    fun addRangeBuff(buff_number: Int, buff: RangeBuff){
+        thisTempRangeBuff.addRangeBuff(buff_number, buff)
     }
 
     val tempEditedDistance = mutableListOf<Int>()

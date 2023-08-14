@@ -2611,18 +2611,27 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
+    var buffNumberCounter = 0
+
+    fun useBuffNumberCounter(): Int{
+        buffNumberCounter += 1
+        return buffNumberCounter - 1
+    }
+
     fun addThisTurnRangeBuff(player: PlayerEnum, effect: RangeBuff){
         val nowPlayer = getPlayer(player)
         val nowTempRangeBuff = getPlayerTempRangeBuff(player)
 
         when(effect.tag){
-            RangeBufTag.CARD_CHANGE, RangeBufTag.CHANGE, RangeBufTag.ADD,
-            RangeBufTag.DELETE, RangeBufTag.PLUS, RangeBufTag.MINUS-> {
-                nowPlayer.rangeBuff.addRangeBuff(effect)
+            RangeBufTag.CARD_CHANGE, RangeBufTag.CHANGE, RangeBufTag.CHANGE_AFTER,
+            RangeBufTag.ADD, RangeBufTag.DELETE, RangeBufTag.PLUS,
+            RangeBufTag.MINUS-> {
+                nowPlayer.rangeBuff.addRangeBuff(useBuffNumberCounter(), effect)
             }
-            RangeBufTag.CARD_CHANGE_IMMEDIATE, RangeBufTag.CHANGE_IMMEDIATE, RangeBufTag.ADD_IMMEDIATE,
-            RangeBufTag.DELETE_IMMEDIATE, RangeBufTag.PLUS_IMMEDIATE, RangeBufTag.MINUS_IMMEDIATE -> {
-                nowTempRangeBuff.addRangeBuff(effect)
+            RangeBufTag.CARD_CHANGE_IMMEDIATE, RangeBufTag.CHANGE_IMMEDIATE, RangeBufTag.CHANGE_AFTER_IMMEDIATE,
+            RangeBufTag.ADD_IMMEDIATE, RangeBufTag.DELETE_IMMEDIATE, RangeBufTag.PLUS_IMMEDIATE,
+            RangeBufTag.MINUS_IMMEDIATE -> {
+                nowTempRangeBuff.addRangeBuff(useBuffNumberCounter(), effect)
             }
         }
     }

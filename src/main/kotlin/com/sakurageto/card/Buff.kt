@@ -117,16 +117,19 @@ class RangeBuff(
 
 class RangeBuffQueue() {
     companion object {
-        const val buffQueueNumber = 6
+        const val buffQueueNumber = 7
         const val INDEX_CARD_CHANGE = 0
         const val INDEX_CHANGE = 1
-        const val INDEX_ADD = 2
-        const val INDEX_DELETE = 3
-        const val INDEX_PLUS = 4
-        const val INDEX_MINUS = 5
+        const val INDEX_CHANGE_AFTER = 2
+        const val INDEX_ADD = 3
+        const val INDEX_DELETE = 4
+        const val INDEX_PLUS = 5
+        const val INDEX_MINUS = 6
     }
 
-    private var rangeBuff: Array<ArrayDeque<RangeBuff>> = arrayOf(
+    private val buffNumberSet = mutableSetOf<Int>()
+    private var rangeBuff: Array<ArrayDeque<Pair<Int, RangeBuff>>> = arrayOf(
+        ArrayDeque(),
         ArrayDeque(),
         ArrayDeque(),
         ArrayDeque(),
@@ -135,20 +138,22 @@ class RangeBuffQueue() {
         ArrayDeque()
     )
 
-    fun addRangeBuff(buff: RangeBuff) {
+    fun addRangeBuff(buffNumber: Int, buff: RangeBuff) {
         when (buff.tag) {
-            RangeBufTag.CARD_CHANGE -> rangeBuff[INDEX_CARD_CHANGE].add(buff)
-            RangeBufTag.CHANGE -> rangeBuff[INDEX_CHANGE].add(buff)
-            RangeBufTag.ADD -> rangeBuff[INDEX_ADD].add(buff)
-            RangeBufTag.DELETE -> rangeBuff[INDEX_DELETE].add(buff)
-            RangeBufTag.PLUS -> rangeBuff[INDEX_PLUS].add(buff)
-            RangeBufTag.MINUS -> rangeBuff[INDEX_MINUS].add(buff)
-            RangeBufTag.CARD_CHANGE_IMMEDIATE -> rangeBuff[INDEX_CARD_CHANGE].add(buff)
-            RangeBufTag.CHANGE_IMMEDIATE -> rangeBuff[INDEX_CHANGE].add(buff)
-            RangeBufTag.ADD_IMMEDIATE -> rangeBuff[INDEX_ADD].add(buff)
-            RangeBufTag.DELETE_IMMEDIATE -> rangeBuff[INDEX_DELETE].add(buff)
-            RangeBufTag.PLUS_IMMEDIATE -> rangeBuff[INDEX_PLUS].add(buff)
-            RangeBufTag.MINUS_IMMEDIATE -> rangeBuff[INDEX_MINUS].add(buff)
+            RangeBufTag.CARD_CHANGE -> rangeBuff[INDEX_CARD_CHANGE].add(Pair(buffNumber, buff))
+            RangeBufTag.CHANGE -> rangeBuff[INDEX_CHANGE].add(Pair(buffNumber, buff))
+            RangeBufTag.CHANGE_AFTER -> rangeBuff[INDEX_CHANGE_AFTER].add(Pair(buffNumber, buff))
+            RangeBufTag.ADD -> rangeBuff[INDEX_ADD].add(Pair(buffNumber, buff))
+            RangeBufTag.DELETE -> rangeBuff[INDEX_DELETE].add(Pair(buffNumber, buff))
+            RangeBufTag.PLUS -> rangeBuff[INDEX_PLUS].add(Pair(buffNumber, buff))
+            RangeBufTag.MINUS -> rangeBuff[INDEX_MINUS].add(Pair(buffNumber, buff))
+            RangeBufTag.CARD_CHANGE_IMMEDIATE -> rangeBuff[INDEX_CARD_CHANGE].add(Pair(buffNumber, buff))
+            RangeBufTag.CHANGE_IMMEDIATE -> rangeBuff[INDEX_CHANGE].add(Pair(buffNumber, buff))
+            RangeBufTag.CHANGE_AFTER_IMMEDIATE -> rangeBuff[INDEX_CHANGE_AFTER].add(Pair(buffNumber, buff))
+            RangeBufTag.ADD_IMMEDIATE -> rangeBuff[INDEX_ADD].add(Pair(buffNumber, buff))
+            RangeBufTag.DELETE_IMMEDIATE -> rangeBuff[INDEX_DELETE].add(Pair(buffNumber, buff))
+            RangeBufTag.PLUS_IMMEDIATE -> rangeBuff[INDEX_PLUS].add(Pair(buffNumber, buff))
+            RangeBufTag.MINUS_IMMEDIATE -> rangeBuff[INDEX_MINUS].add(Pair(buffNumber, buff))
         }
     }
 
@@ -160,12 +165,17 @@ class RangeBuffQueue() {
 
     fun addAllBuff(buffQueue: RangeBuffQueue){
         for(index in 0 until buffQueueNumber){
-            rangeBuff[index].addAll(buffQueue.rangeBuff[index])
+            buffQueue.rangeBuff[index].forEach {
+                if(it.first !in buffNumberSet){
+                    buffNumberSet.add(it.first)
+                    rangeBuff[index].add(it)
+                }
+            }
         }
     }
 
     fun applyBuff(index: Int, player: PlayerEnum, game_status: GameStatus, madeAttack: MadeAttack, tempQueue: ArrayDeque<RangeBuff>){
-        for(buff in rangeBuff[index]){
+        for((_, buff) in rangeBuff[index]){
             if(buff.condition(player, game_status, madeAttack)){
                 tempQueue.add(buff)
             }
@@ -174,14 +184,17 @@ class RangeBuffQueue() {
 
     fun applyBuff(index: Int, player: PlayerEnum, game_status: GameStatus, madeAttack: MadeAttack, tempQueue: ArrayDeque<RangeBuff>, receiveQueue: RangeBuffQueue){
         for(i in 1..rangeBuff[index].size){
-            val now = rangeBuff[index].first()
+            val (number, buff) = rangeBuff[index].first()
             rangeBuff[index].removeFirst()
-            if(now.condition(player, game_status, madeAttack)){
-                tempQueue.add(now)
-                rangeBuff[index].addLast(now)
+            if(buff.condition(player, game_status, madeAttack)){
+                tempQueue.add(buff)
+                rangeBuff[index].addLast(Pair(number, buff))
+                if(buff.counter == 999){
+                    receiveQueue.rangeBuff[index].add(Pair(number, buff))
+                }
             }
             else{
-                receiveQueue.rangeBuff[index].add(now)
+                receiveQueue.rangeBuff[index].add(Pair(number, buff))
             }
         }
     }
@@ -252,7 +265,7 @@ fun cleanCostBuff(array: Array<ArrayDeque<CostBuff>>){
         }
         else{
             for(i in array[index].indices){
-                var now = array[index].first()
+                val now = array[index].first()
                 array[index].removeFirst()
                 if(now.counter < 0){
                     now.counter *= -1
@@ -300,12 +313,14 @@ enum class BufTag {
 enum class RangeBufTag {
     CARD_CHANGE,
     CHANGE,
+    CHANGE_AFTER,
     ADD,
     DELETE,
     PLUS,
     MINUS,
     CARD_CHANGE_IMMEDIATE,
     CHANGE_IMMEDIATE,
+    CHANGE_AFTER_IMMEDIATE,
     ADD_IMMEDIATE,
     DELETE_IMMEDIATE,
     PLUS_IMMEDIATE,

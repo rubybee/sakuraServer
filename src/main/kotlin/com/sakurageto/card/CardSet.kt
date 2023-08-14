@@ -4483,8 +4483,8 @@ object CardSet {
         })
         heoWi.setSpecial(3)
         heoWi.setEnchantment(3)
-        heoWi.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.REACT_ATTACK_CHANGE) { card_number, _, _, react_attack ->
-            react_attack?.addRangeBuff(RangeBuff(card_number,1, RangeBufTag.MINUS_IMMEDIATE, {_, _, _ -> true},
+        heoWi.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.REACT_ATTACK_CHANGE) { card_number, _, game_status, react_attack ->
+            react_attack?.addRangeBuff(game_status.useBuffNumberCounter(), RangeBuff(card_number,1, RangeBufTag.MINUS_IMMEDIATE, {_, _, _ -> true},
                 { _, _, attack -> attack.plusMinusRange(-1, true)
                 }))
             null
@@ -10899,13 +10899,26 @@ object CardSet {
         })
     }
 
-    private val investmentRightText = Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.INVESTMENT_RIGHT, null)
-
     private val akina = CardData(CardClass.SPECIAL, CardName.AKINA_AKINA, MegamiEnum.AKINA, CardType.BEHAVIOR, SubType.NONE)
     private val abacusStone = CardData(CardClass.NORMAL, CardName.AKINA_ABACUS_STONE, MegamiEnum.AKINA, CardType.ATTACK, SubType.NONE)
     private val threat = CardData(CardClass.NORMAL, CardName.AKINA_THREAT, MegamiEnum.AKINA, CardType.ATTACK, SubType.NONE)
     private val trade = CardData(CardClass.NORMAL, CardName.AKINA_TRADE, MegamiEnum.AKINA, CardType.ATTACK, SubType.NONE)
     private val speculation = CardData(CardClass.NORMAL, CardName.AKINA_SPECULATION, MegamiEnum.AKINA, CardType.BEHAVIOR, SubType.NONE)
+    private val calc = CardData(CardClass.NORMAL, CardName.AKINA_CALC, MegamiEnum.AKINA, CardType.BEHAVIOR, SubType.REACTION)
+
+    private val calcRangeBuffEffect: suspend (PlayerEnum, GameStatus, MadeAttack) -> Unit = { _, _, attack ->
+        val newAttackRange = mutableListOf<Int>()
+        val iterator = attack.editedDistance.iterator()
+        while(iterator.hasNext()){
+            val number = iterator.next()
+            newAttackRange.add(number - 1)
+            attack.editedDistance.remove(number)
+        }
+        for(i in newAttackRange){
+            attack.editedDistance.add(i)
+        }
+    }
+    private val investmentRightText = Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.INVESTMENT_RIGHT, null)
 
     private suspend fun investment(game_status: GameStatus, player: PlayerEnum){
         if(game_status.getPlayer(player).isRecoupThisTurn){
@@ -11058,6 +11071,22 @@ object CardSet {
                     else -> {}
                 }
             }
+            null
+        })
+        calc.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CHANGE_CONCENTRATION) {_, player, game_status, _ ->
+            game_status.addConcentration(player)
+            null
+        })
+        calc.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.REACT_ATTACK_CHANGE){ card_number, _, game_status, react_attack ->
+            react_attack?.addRangeBuff(game_status.useBuffNumberCounter(), RangeBuff(card_number,1, RangeBufTag.CHANGE_AFTER_IMMEDIATE, {_, _, _ -> true},
+                calcRangeBuffEffect))
+            null
+        })
+        calc.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, _, game_status, _ ->
+            game_status.addThisTurnRangeBuff(PlayerEnum.PLAYER1, RangeBuff(card_number,999,
+                RangeBufTag.CHANGE_AFTER, { _, _, _ -> true}, calcRangeBuffEffect))
+            game_status.addThisTurnRangeBuff(PlayerEnum.PLAYER2, RangeBuff(card_number,999,
+                RangeBufTag.CHANGE_AFTER, { _, _, _ -> true}, calcRangeBuffEffect))
             null
         })
     }

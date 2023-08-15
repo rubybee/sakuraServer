@@ -18,7 +18,8 @@ class MadeAttack(
     private val cannotReact: Boolean,
     private val chogek: Boolean,
     private val inevitable: Boolean = false,
-    val subType: SubType = SubType.NONE
+    val subType: SubType = SubType.NONE,
+    val damageNotChange: Boolean = false
 ) {
     var editedChogek = false
 
@@ -68,6 +69,9 @@ class MadeAttack(
         editedChogek = chogek
         editedAuraDamage = aura_damage; tempEditedAuraDamage = aura_damage
         editedLifeDamage = life_damage; tempEditedLifeDamage = life_damage
+        if(damageNotChange){
+            return Pair(editedAuraDamage, editedLifeDamage)
+        }
         thisTurnAttackBuff.addAllBuff(continuousAttackBuff)
         continuousAttackBuff.clearBuff()
         for(index in 0 until AttackBuffQueue.buffQueueNumber){

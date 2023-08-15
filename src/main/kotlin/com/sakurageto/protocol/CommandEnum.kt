@@ -636,7 +636,11 @@ enum class LocToLoc(var real_number: Int){
     LIFE_YOUR_TO_LIFE_OTHER(25),
     LIFE_YOUR_TO_OUT(26),
     LIFE_OTHER_TO_OUT(27),
-    AURA_YOUR_TO_FLOW(28);
+    AURA_YOUR_TO_FLOW(28),
+    LIFE_YOUR_TO_AURA_YOUR(29),
+    LIFE_YOUR_TO_AURA_OTHER(30),
+    LIFE_OTHER_TO_AURA_YOUR(31),
+    LIFE_OTHER_TO_AURA_OTHER(32);
 
 
     fun encode(value: Int) = this.real_number + value * 100

@@ -461,6 +461,17 @@ object CardSet {
         cardTempNumberHashmap[NUMBER_RENRI_ENGRAVED_GARMENT] = CardName.RENRI_ENGRAVED_GARMENT
         cardTempNumberHashmap[NUMBER_KIRIKO_SHAMANISTIC_MUSIC] = CardName.KIRIKO_SHAMANISTIC_MUSIC
 
+        cardTempNumberHashmap[NUMBER_AKINA_ABACUS_STONE] = CardName.AKINA_ABACUS_STONE
+        cardTempNumberHashmap[NUMBER_AKINA_THREAT] = CardName.AKINA_THREAT
+        cardTempNumberHashmap[NUMBER_AKINA_TRADE] = CardName.AKINA_TRADE
+        cardTempNumberHashmap[NUMBER_AKINA_SPECULATION] = CardName.AKINA_SPECULATION
+        cardTempNumberHashmap[NUMBER_AKINA_CALC] = CardName.AKINA_CALC
+        cardTempNumberHashmap[NUMBER_AKINA_TURN_OFF_TABLE] = CardName.AKINA_TURN_OFF_TABLE
+        cardTempNumberHashmap[NUMBER_AKINA_DIRECT_FINANCING] = CardName.AKINA_DIRECT_FINANCING
+        cardTempNumberHashmap[NUMBER_AKINA_OPEN_CUTTING_METHOD] = CardName.AKINA_OPEN_CUTTING_METHOD
+        cardTempNumberHashmap[NUMBER_AKINA_SU_LYO_SUL] = CardName.AKINA_SU_LYO_SUL
+        cardTempNumberHashmap[NUMBER_AKINA_AKINA_ACCURATE_CALC] = CardName.AKINA_AKINA_ACCURATE_CALC
+        cardTempNumberHashmap[NUMBER_AKINA_AKINA_ACCURATE_CALC_START_PHASE] = CardName.AKINA_AKINA_ACCURATE_CALC
 
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CARD_UNAME] = CardName.CARD_UNNAME
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_POISON_ANYTHING] = CardName.POISON_ANYTHING
@@ -851,6 +862,18 @@ object CardSet {
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_RENRI_THE_END] = CardName.RENRI_RENRI_THE_END
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_ENGRAVED_GARMENT] = CardName.RENRI_ENGRAVED_GARMENT
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_KIRIKO_SHAMANISTIC_MUSIC] = CardName.KIRIKO_SHAMANISTIC_MUSIC
+
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_AKINA_ABACUS_STONE] = CardName.AKINA_ABACUS_STONE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_AKINA_THREAT] = CardName.AKINA_THREAT
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_AKINA_TRADE] = CardName.AKINA_TRADE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_AKINA_SPECULATION] = CardName.AKINA_SPECULATION
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_AKINA_CALC] = CardName.AKINA_CALC
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_AKINA_TURN_OFF_TABLE] = CardName.AKINA_TURN_OFF_TABLE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_AKINA_DIRECT_FINANCING] = CardName.AKINA_DIRECT_FINANCING
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_AKINA_OPEN_CUTTING_METHOD] = CardName.AKINA_OPEN_CUTTING_METHOD
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_AKINA_SU_LYO_SUL] = CardName.AKINA_SU_LYO_SUL
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_AKINA_AKINA_ACCURATE_CALC] = CardName.AKINA_AKINA_ACCURATE_CALC
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_AKINA_AKINA_ACCURATE_CALC_START_PHASE] = CardName.AKINA_AKINA_ACCURATE_CALC
 
 
         return cardTempNumberHashmap.toMap()
@@ -1260,6 +1283,19 @@ object CardSet {
         cardDataHashmap[CardName.YATSUHA_COLORED_WORLD] = coloredWorld
         cardDataHashmap[CardName.YATSUHA_SHES_CHERRY_BLOSSOM_WORLD] = shesCherryBlossomWorld
         cardDataHashmap[CardName.YATSUHA_SHES_EGO_AND_DETERMINATION] = shesEgoAndDetermination
+
+        cardDataHashmap[CardName.AKINA_AKINA] = akina
+        cardDataHashmap[CardName.AKINA_ABACUS_STONE] = abacusStone
+        cardDataHashmap[CardName.AKINA_THREAT] = threat
+        cardDataHashmap[CardName.AKINA_TRADE] = trade
+        cardDataHashmap[CardName.AKINA_SPECULATION] = speculation
+        cardDataHashmap[CardName.AKINA_CALC] = calc
+        cardDataHashmap[CardName.AKINA_TURN_OFF_TABLE] = turnOffTable
+        cardDataHashmap[CardName.AKINA_DIRECT_FINANCING] = directFinancing
+        cardDataHashmap[CardName.AKINA_OPEN_CUTTING_METHOD] = openCuttingMethod
+        cardDataHashmap[CardName.AKINA_GRAND_CALC_AND_MANUAL] = grandCalcAndManual
+        cardDataHashmap[CardName.AKINA_SU_LYO_SUL] = sulyosul
+        cardDataHashmap[CardName.AKINA_AKINA_ACCURATE_CALC] = accurateCalc
     }
 
     private suspend fun selectDustToDistance(nowCommand: CommandEnum, game_status: GameStatus,
@@ -1276,7 +1312,7 @@ object CardSet {
     }
 
     val terminationText = Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.TERMINATION, null)
-    val chasm = Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CHASM, null)
+    val chasmText = Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CHASM, null)
 
     private val unused = CardData(CardClass.NORMAL, CardName.CARD_UNNAME, MegamiEnum.YURINA, CardType.UNDEFINED, SubType.NONE)
 
@@ -1345,7 +1381,7 @@ object CardSet {
             null
         })
         apdo.setEnchantment(2)
-        apdo.addtext(chasm)
+        apdo.addtext(chasmText)
         apdo.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
             if(game_status.addPreAttackZone(player, MadeAttack(CardName.YURINA_APDO,
                     NUMBER_YURINA_APDO, CardClass.NULL,
@@ -1942,7 +1978,7 @@ object CardSet {
         })
         bioactivity.setEnchantment(4)
         bioactivity.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.INSTALLATION, null))
-        bioactivity.addtext(chasm)
+        bioactivity.addtext(chasmText)
         bioactivity.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.RETURN_OTHER_CARD) {_, player, game_status, _ ->
             while(true) {
                 val selected = game_status.selectCardFrom(player, player, player,
@@ -2964,7 +3000,7 @@ object CardSet {
             null
         })
         tipToeing.setEnchantment(4)
-        tipToeing.addtext(chasm)
+        tipToeing.addtext(chasmText)
         tipToeing.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CHANGE_DISTANCE){_, _, _, _->
             -2
         })
@@ -3556,7 +3592,7 @@ object CardSet {
             null
         })
         bigGolem.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_FULL_POWER_USED_YOUR) { _, player, game_status, _ ->
-            game_status.requestAndDoBasicOperation(player, 1008)
+            game_status.requestAndDoBasicOperation(player, NUMBER_KURURU_BIG_GOLEM)
             null
         })
         industria.setSpecial(1)
@@ -6145,7 +6181,7 @@ object CardSet {
             null
         })
         clingyFlower.setEnchantment(3)
-        clingyFlower.addtext(chasm)
+        clingyFlower.addtext(chasmText)
         clingyFlower.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.THIS_CARD_NAP_CHANGE) {_, player, game_status, _ ->
             game_status.getPlayer(player).napBuff -= game_status.getMirror()
             null
@@ -7990,7 +8026,7 @@ object CardSet {
         })
         balsam.setEnchantment(1)
         balsam.growing = 2
-        balsam.addtext(chasm)
+        balsam.addtext(chasmText)
         balsam.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_MAIN_PHASE_YOUR) {card_number, player, game_status, _ ->
             if(game_status.addPreAttackZone(player, MadeAttack(CardName.MEGUMI_BALSAM,
                     NUMBER_MEGUMI_BALSAM_ADDITIONAL_1, CardClass.NULL,
@@ -9422,7 +9458,7 @@ object CardSet {
             null
         })
         bloodWave.setEnchantment(2)
-        bloodWave.addtext(chasm)
+        bloodWave.addtext(chasmText)
         bloodWave.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
             if(game_status.getPlayer(player).tabooGauge != null){
                 while(true){
@@ -10148,7 +10184,8 @@ object CardSet {
         eightMirrorVainSakura.setSpecial(1)
         eightMirrorVainSakura.addtext(terminationText)
         eightMirrorVainSakura.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.USING_CONDITION){_, _, game_status, _ ->
-            if(game_status.getAdjustDistance() <= 7) 1
+            val nowDistance = game_status.getAdjustDistance()
+            if(nowDistance in 0..7) 1
             else 0
         })
         eightMirrorVainSakura.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {_, player, game_status, _->
@@ -10419,7 +10456,7 @@ object CardSet {
 
     private fun hatsumiA1CardInit(){
         torpedo.setEnchantment(2)
-        torpedo.addtext(chasm)
+        torpedo.addtext(chasmText)
         torpedo.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.DIVING) { _, player, game_status, _ ->
             game_status.diving(player)
             null
@@ -10905,6 +10942,12 @@ object CardSet {
     private val trade = CardData(CardClass.NORMAL, CardName.AKINA_TRADE, MegamiEnum.AKINA, CardType.ATTACK, SubType.NONE)
     private val speculation = CardData(CardClass.NORMAL, CardName.AKINA_SPECULATION, MegamiEnum.AKINA, CardType.BEHAVIOR, SubType.NONE)
     private val calc = CardData(CardClass.NORMAL, CardName.AKINA_CALC, MegamiEnum.AKINA, CardType.BEHAVIOR, SubType.REACTION)
+    private val turnOffTable = CardData(CardClass.NORMAL, CardName.AKINA_TURN_OFF_TABLE, MegamiEnum.AKINA, CardType.BEHAVIOR, SubType.NONE)
+    private val directFinancing = CardData(CardClass.NORMAL, CardName.AKINA_DIRECT_FINANCING, MegamiEnum.AKINA, CardType.ENCHANTMENT, SubType.FULL_POWER)
+    private val openCuttingMethod = CardData(CardClass.SPECIAL, CardName.AKINA_OPEN_CUTTING_METHOD, MegamiEnum.AKINA, CardType.BEHAVIOR, SubType.FULL_POWER)
+    private val grandCalcAndManual = CardData(CardClass.SPECIAL, CardName.AKINA_GRAND_CALC_AND_MANUAL, MegamiEnum.AKINA, CardType.ATTACK, SubType.REACTION)
+    private val sulyosul = CardData(CardClass.SPECIAL, CardName.AKINA_SU_LYO_SUL, MegamiEnum.AKINA, CardType.ENCHANTMENT, SubType.NONE)
+    private val accurateCalc = CardData(CardClass.SPECIAL, CardName.AKINA_AKINA_ACCURATE_CALC, MegamiEnum.AKINA, CardType.BEHAVIOR, SubType.NONE)
 
     private val calcRangeBuffEffect: suspend (PlayerEnum, GameStatus, MadeAttack) -> Unit = { _, _, attack ->
         val newAttackRange = mutableListOf<Int>()
@@ -10917,6 +10960,30 @@ object CardSet {
         for(i in newAttackRange){
             attack.editedDistance.add(i)
         }
+    }
+    private val openCuttingMethodAttackText = Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_THIS_CARD_REACTED) { card_number, _, _, this_attack ->
+        this_attack?.addOtherBuff(OtherBuff(card_number, 1, OtherBuffTag.GET_IMMEDIATE, { _, _, _ ->
+            true
+        }, { _, _, attack ->
+            attack.makeNotValid()
+        }))
+        0
+    }
+    private val accurateCalcText = Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.DO_BASIC_OPERATION) { card_number, player, game_status, _ ->
+        while(true){
+            when(game_status.receiveCardEffectSelect(player, NUMBER_AKINA_AKINA_ACCURATE_CALC_START_PHASE)){
+                CommandEnum.SELECT_ONE -> {
+                    game_status.doBasicOperation(player, CommandEnum.ACTION_INCUBATE,
+                        CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + NUMBER_AKINA_AKINA_ACCURATE_CALC)
+                    break
+                }
+                CommandEnum.SELECT_NOT -> {
+                    break
+                }
+                else -> {}
+            }
+        }
+        0
     }
     private val investmentRightText = Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.INVESTMENT_RIGHT, null)
 
@@ -11087,6 +11154,136 @@ object CardSet {
                 RangeBufTag.CHANGE_AFTER, { _, _, _ -> true}, calcRangeBuffEffect))
             game_status.addThisTurnRangeBuff(PlayerEnum.PLAYER2, RangeBuff(card_number,999,
                 RangeBufTag.CHANGE_AFTER, { _, _, _ -> true}, calcRangeBuffEffect))
+            null
+        })
+        turnOffTable.setEnchantment(2)
+        turnOffTable.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.USING_CONDITION){_, _, game_status, _ ->
+            val nowDistance = game_status.getAdjustDistance()
+            if(nowDistance in 0..3) 1
+            else 0
+        })
+        turnOffTable.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
+            game_status.flareToDistance(player.opposite(), 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
+            null
+        })
+        turnOffTable.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
+            game_status.distanceToFlare(player.opposite(), 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
+            null
+        })
+        directFinancing.setEnchantment(2)
+        directFinancing.addtext(investmentRightText)
+        directFinancing.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
+            game_status.auraToAura(player.opposite(), player, 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
+            null
+        })
+        directFinancing.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MAKE_ATTACK)ret@{card_number, player, game_status, _ ->
+            while(true){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_AKINA_DIRECT_FINANCING)){
+                    CommandEnum.SELECT_NOT -> {
+                        return@ret null
+                    }
+                    CommandEnum.SELECT_ONE -> {
+                        break
+                    }
+                    else -> {}
+                }
+            }
+
+            if(game_status.addPreAttackZone(player, MadeAttack(CardName.AKINA_DIRECT_FINANCING,
+                    NUMBER_AKINA_DIRECT_FINANCING, CardClass.NULL,
+                    sortedSetOf(2, 3, 4, 5), 1,  0,  MegamiEnum.AKINA,
+                    cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
+                ), null) ){
+                game_status.afterMakeAttack(card_number, player, null)
+            }
+            null
+        })
+        openCuttingMethod.setSpecial(NUMBER_MARKET_PRICE)
+        openCuttingMethod.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_ATTACK){card_number, player, game_status, _ ->
+            if(game_status.addPreAttackZone(player, MadeAttack(CardName.AKINA_OPEN_CUTTING_METHOD,
+                    NUMBER_AKINA_OPEN_CUTTING_METHOD, CardClass.NULL,
+                    sortedSetOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 999,  1, MegamiEnum.AKINA,
+                    cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false,
+                    chogek = false, damageNotChange = true).addTextAndReturn(openCuttingMethodAttackText), null)){
+                game_status.afterMakeAttack(card_number, player, null)
+            }
+            null
+        })
+        openCuttingMethod.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD){card_number, player, game_status, _ ->
+            if(game_status.getPlayer(player).getCapital() > game_status.getPlayer(player.opposite()).getCapital()){
+                game_status.getCardFrom(player, card_number, LocationEnum.PLAYING_ZONE_YOUR)?.let {
+                    game_status.useCardFrom(player, it, LocationEnum.PLAYING_ZONE_YOUR, false, null,
+                        isCost = true, isConsume = true
+                    )
+                }
+            }
+            null
+        })
+        grandCalcAndManual.setSpecial(0)
+        grandCalcAndManual.setAttack(DistanceType.CONTINUOUS, Pair(0, 10), null, 2, 0,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        grandCalcAndManual.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
+            game_status.flareToAura(player, player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
+            game_status.flowToAura(player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
+            game_status.lifeToAura(player, player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
+            null
+        })
+        sulyosul.setSpecial(1)
+        sulyosul.setEnchantment(1)
+        sulyosul.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
+            game_status.lifeToSelfFlare(player, 4, reconstruct = false, damage = false,
+                arrow = Arrow.NULL, user = player, card_owner = game_status.getCardOwner(card_number),
+                card_number = card_number
+            )
+            null
+        })
+        sulyosul.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.DO_NOT_MOVE_TOKEN) {reason, _, _, _ ->
+            if(reason.toCardName() == CardName.AKINA_SU_LYO_SUL) 1
+            else 0
+        })
+        sulyosul.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_LOSE_GAME_ENCHANTMENT) ret@{card_number, player, game_status, _->
+            val nowPlayer = game_status.getPlayer(player)
+            if(nowPlayer.life == 0){
+                game_status.selfFlareToLife(player, 4, Arrow.NULL, player, game_status.getCardOwner(card_number), card_number)
+                game_status.getCardFrom(player, card_number, LocationEnum.ENCHANTMENT_ZONE)?.let { card ->
+                    game_status.cardToDust(player, card.getNap(), card, false, card_number)
+                    game_status.enchantmentDestruction(player, card)
+                    game_status.popCardFrom(player, card.card_number, LocationEnum.YOUR_USED_CARD, true)
+                    game_status.insertCardTo(player, card, LocationEnum.OUT_OF_GAME, true)
+                }
+                return@ret 1
+            }
+            null
+        })
+        accurateCalc.setSpecial(NUMBER_MARKET_PRICE)
+        accurateCalc.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.USING_CONDITION){_, _, game_status, _ ->
+            val nowDistance = game_status.getAdjustDistance()
+            if(nowDistance in 0..7) 1
+            else 0
+        })
+        accurateCalc.addtext(investmentRightText)
+        accurateCalc.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN){card_number, player, game_status, _ ->
+            while(true){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_AKINA_AKINA_ACCURATE_CALC)){
+                    CommandEnum.SELECT_ONE -> {
+                        recoup(game_status, player)
+                        for(i in 1..2){
+                            game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,
+                                CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + NUMBER_AKINA_AKINA_ACCURATE_CALC)
+                        }
+                        game_status.movePlayingCard(player, LocationEnum.OUT_OF_GAME, card_number)
+                        break
+                    }
+                    CommandEnum.SELECT_NOT -> {
+                        break
+                    }
+                    else -> {}
+                }
+            }
+            null
+        })
+        accurateCalc.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_START_PHASE_YOUR){card_number, _, game_status, _ ->
+            game_status.startPhaseEffect[card_number] = Pair(CardEffectLocation.USED_YOUR, accurateCalcText)
             null
         })
     }

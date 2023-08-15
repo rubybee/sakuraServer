@@ -98,7 +98,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var memory: HashMap<Int, Card>? = null
 
     var marketPrice: Int? = null
-    fun getMarketPrice() = marketPrice?: 0
+    fun getMarketPrice() = marketPrice?: 1
     var flow: Int = 0
     fun getCapital() = aura + flare + flow
 
@@ -123,7 +123,6 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var afterCardUseTermination: Boolean = false
     var isUseCard: Boolean = false
     var isRecoupThisTurn: Boolean = false
-
 
     var otherBuff: OtherBuffQueue = OtherBuffQueue()
     var attackBuff: AttackBuffQueue = AttackBuffQueue()

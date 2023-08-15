@@ -689,7 +689,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     fun chasmCheck(): Boolean{
         this.card_data.effect?.let {
             for(text in it){
-                if(text === CardSet.chasm) return true
+                if(text === CardSet.chasmText) return true
             }
         }
         return false
@@ -966,12 +966,12 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         return false
     }
 
-    suspend fun checkCanMoveToken(player: PlayerEnum, game_status: GameStatus): Boolean{
+    suspend fun checkCanMoveToken(reason: Int, player: PlayerEnum, game_status: GameStatus): Boolean{
         card_data.effect?.let {
             for(text in it){
                 if(enchantmentUsable(text) || usedEffectUsable(text)){
                     if(text.tag == TextEffectTag.DO_NOT_MOVE_TOKEN){
-                        return text.effect!!(this.card_number, player, game_status, null) == 1
+                        return text.effect!!(reason, player, game_status, null) == 1
                     }
                 }
             }

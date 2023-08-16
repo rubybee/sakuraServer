@@ -3330,14 +3330,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         logger.insert(
             Log(attack_player, LogText.ATTACK, nowAttack.card_number, when(nowAttack.card_class){
-                CardClass.POISON -> 5
-                CardClass.IDEA -> 4
-                CardClass.SOLDIER -> 3
-                CardClass.SPECIAL -> 2
-                CardClass.NORMAL -> 1
-                CardClass.NULL -> 0
-        })
-        )
+                CardClass.POISON -> 5; CardClass.IDEA -> 4; CardClass.SOLDIER -> 3
+                CardClass.SPECIAL -> 2; CardClass.NORMAL -> 1; CardClass.NULL -> 0 }))
 
         makeAttackComplete(attackerSocket, otherSocket, card_number)
         sendAttackInformation(attackerSocket, otherSocket, nowAttack.toInformation())
@@ -3351,39 +3345,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             if(!otherPlayer.endTurn && !reactCheckCancel){
                 while(true){
                     sendRequestReact(otherSocket)
-                    val react = receiveReact(otherSocket)
-                    if(react.first == CommandEnum.REACT_USE_CARD_HAND){
-                        val card = otherPlayer.getCardFromHand(react.second)?: continue
-                        if(reactCheck(attack_player.opposite(), card, nowAttack)){
-                            if(useCardFrom(attack_player.opposite(), card, LocationEnum.HAND, true, nowAttack,
-                                    isCost = true, isConsume = true)) {
-                                otherPlayer.thisTurnReact = true
-                                break
-                            }
-                        }
-
-                    }
-                    else if(react.first == CommandEnum.REACT_USE_CARD_SPECIAL){
-                        val card = otherPlayer.getCardFromSpecial(react.second)?: continue
-                        if(reactCheck(attack_player.opposite(), card, nowAttack)){
-                            if(useCardFrom(attack_player.opposite(), card, LocationEnum.SPECIAL_CARD, true, nowAttack,
-                                    isCost = true, isConsume = true)) {
-                                otherPlayer.thisTurnReact = true
-                                break
-                            }
-                        }
-                    }
-                    else if(react.first == CommandEnum.REACT_USE_CARD_SOLDIER){
-                        val card = otherPlayer.getCardFromSoldier(react.second)?: continue
-                        if(reactCheck(attack_player.opposite(), card, nowAttack)){
-                            if(useCardFrom(attack_player.opposite(), card, LocationEnum.READY_SOLDIER_ZONE, true, nowAttack,
-                                    isCost = true, isConsume = true)) {
-                                otherPlayer.thisTurnReact = true
-                                break
-                            }
-                        }
-                    }
-                    else{
+                    if(reactProcess(attack_player.opposite(), receiveReact(otherSocket), nowAttack)){
                         break
                     }
                 }
@@ -3404,11 +3366,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             if(nowAttack.isItValid){
                 if(nowAttack.isItDamage){
                     if(nowAttack.beforeProcessDamageCheck(attack_player, this, react_attack)){
+                        if (nowAttack.effectText(attack_player, this, react_attack, TextEffectTag.CAN_NOT_CHOOSE_AURA_DAMAGE) == 1){
+                            nowAttack.canNotSelectAura = true
+                        }
                         logger.insert(Log(attack_player, LogText.START_PROCESS_ATTACK_DAMAGE, nowAttack.card_number, -1))
                         val chosen = if(nowAttack.canNotSelectAura){
                             CommandEnum.CHOOSE_LIFE
-                        }
-                        else if(nowAttack.effectText(attack_player, this, react_attack, TextEffectTag.SELECT_DAMAGE_BY_ATTACKER) == 1){
+                        } else if(nowAttack.effectText(attack_player, this, react_attack, TextEffectTag.SELECT_DAMAGE_BY_ATTACKER) == 1){
                             damageSelect(attack_player, damage, false)
                         } else {
                             damageSelect(attack_player.opposite(), damage)
@@ -3416,22 +3380,36 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                         val auraReplace = nowAttack.effectText(attack_player, this, react_attack, TextEffectTag.AFTER_AURA_DAMAGE_PLACE_CHANGE)
                         val lifeReplace = nowAttack.effectText(attack_player, this, react_attack, TextEffectTag.AFTER_LIFE_DAMAGE_PLACE_CHANGE)
 
-                        if(nowAttack.bothSideDamage){
-                            selectedDamage = DamageSelect.BOTH
-                            val auraDamage = processDamage(attack_player.opposite(), CommandEnum.CHOOSE_AURA,
-                                Pair(damage.first, 999), false, auraReplace, lifeReplace, nowAttack.card_number)
-                            val lifeDamage = processDamage(attack_player.opposite(), CommandEnum.CHOOSE_LIFE,
-                                Pair(999, damage.second), false, auraReplace, lifeReplace, nowAttack.card_number)
-                            if(auraDamage == -1 && lifeDamage == -1){
-                                selectedDamage = DamageSelect.NULL
+                        if(nowAttack.isLaceration){
+                            if(nowAttack.bothSideDamage){
+                                addLacerationToken(attack_player.opposite(), attack_player, INDEX_LACERATION_AURA, damage.first)
+                                addLacerationToken(attack_player.opposite(), attack_player, INDEX_LACERATION_LIFE, damage.second)
+                            }
+                            else if(chosen == CommandEnum.CHOOSE_LIFE){
+                                addLacerationToken(attack_player.opposite(), attack_player, INDEX_LACERATION_LIFE, damage.second)
+                            }
+                            else{
+                                addLacerationToken(attack_player.opposite(), attack_player, INDEX_LACERATION_AURA, damage.first)
                             }
                         }
                         else{
-                            selectedDamage = if(chosen == CommandEnum.CHOOSE_LIFE) DamageSelect.LIFE else DamageSelect.AURA
-                            val auraDamage = processDamage(attack_player.opposite(), chosen,
-                                Pair(damage.first, damage.second), false, auraReplace, lifeReplace, nowAttack.card_number)
-                            if(auraDamage == -1){
-                                selectedDamage = DamageSelect.NULL
+                            if(nowAttack.bothSideDamage){
+                                selectedDamage = DamageSelect.BOTH
+                                val auraDamage = processDamage(attack_player.opposite(), CommandEnum.CHOOSE_AURA,
+                                    Pair(damage.first, 999), false, auraReplace, lifeReplace, nowAttack.card_number)
+                                val lifeDamage = processDamage(attack_player.opposite(), CommandEnum.CHOOSE_LIFE,
+                                    Pair(999, damage.second), false, auraReplace, lifeReplace, nowAttack.card_number)
+                                if(auraDamage == -1 && lifeDamage == -1){
+                                    selectedDamage = DamageSelect.NULL
+                                }
+                            }
+                            else{
+                                selectedDamage = if(chosen == CommandEnum.CHOOSE_LIFE) DamageSelect.LIFE else DamageSelect.AURA
+                                val auraDamage = processDamage(attack_player.opposite(), chosen,
+                                    Pair(damage.first, damage.second), false, auraReplace, lifeReplace, nowAttack.card_number)
+                                if(auraDamage == -1){
+                                    selectedDamage = DamageSelect.NULL
+                                }
                             }
                         }
                         logger.insert(Log(attack_player, LogText.END_EFFECT, nowAttack.card_number, -1))
@@ -3453,6 +3431,123 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         for(card in getPlayer(attack_player.opposite()).enchantmentCard.values){
             card.effectAllValidEffect(attack_player.opposite(), this, TextEffectTag.AFTER_OTHER_ATTACK_COMPLETE)
         }
+    }
+
+    suspend fun reactProcess(react_player: PlayerEnum, react: Pair<CommandEnum, Int>, nowAttack: MadeAttack): Boolean{
+        val reactPlayer = getPlayer(react_player)
+        if(react.first == CommandEnum.REACT_USE_CARD_HAND){
+            val card = reactPlayer.getCardFromHand(react.second)?: return false
+            if(reactCheck(react_player, card, nowAttack)){
+                if(useCardFrom(react_player, card, LocationEnum.HAND, true, nowAttack,
+                        isCost = true, isConsume = true)) {
+                    reactPlayer.thisTurnReact = true
+                    return true
+                }
+            }
+
+        }
+        else if(react.first == CommandEnum.REACT_USE_CARD_SPECIAL){
+            val card = reactPlayer.getCardFromSpecial(react.second)?: return false
+            if(reactCheck(react_player, card, nowAttack)){
+                if(useCardFrom(react_player, card, LocationEnum.SPECIAL_CARD, true, nowAttack,
+                        isCost = true, isConsume = true)) {
+                    reactPlayer.thisTurnReact = true
+                    return true
+                }
+            }
+        }
+        else if(react.first == CommandEnum.REACT_USE_CARD_SOLDIER){
+            val card = reactPlayer.getCardFromSoldier(react.second)?: return false
+            if(reactCheck(react_player.opposite(), card, nowAttack)){
+                if(useCardFrom(react_player.opposite(), card, LocationEnum.READY_SOLDIER_ZONE, true, nowAttack,
+                        isCost = true, isConsume = true)) {
+                    reactPlayer.thisTurnReact = true
+                    return true
+                }
+            }
+        }
+        else{
+            return true
+        }
+        return false
+    }
+
+    suspend fun addLacerationToken(getDamagePlayer: PlayerEnum, giveDamagePlayer: PlayerEnum, index: Int, number: Int){
+        val damagePlayer = getPlayer(getDamagePlayer)
+        val tokenList = damagePlayer.getLacerationToken(giveDamagePlayer)
+        tokenList[index] += number
+        sendCommand(getDamagePlayer, getDamagePlayer.opposite(),
+            getLacerationCommand(getDamagePlayer, giveDamagePlayer), tokenList[index] * 10 + index)
+        if(damagePlayer.getTotalLacerationToken(INDEX_LACERATION_LIFE) >= damagePlayer.life){
+            makeLacerationDamage(getDamagePlayer, null, INDEX_LACERATION_LIFE)
+        }
+    }
+
+    fun getLacerationCommand(getDamagePlayer: PlayerEnum, giveDamagePlayer: PlayerEnum) =
+        if(getDamagePlayer == giveDamagePlayer){
+            CommandEnum.SET_LACERATION_TOKEN_YOUR_YOUR
+        } else{
+            CommandEnum.SET_LACERATION_TOKEN_OTHER_OTHER
+        }
+
+    suspend fun makeLacerationDamage(getDamagePlayer: PlayerEnum, giveDamagePlayer: PlayerEnum?, index: Int){
+        val damagePlayer = getPlayer(getDamagePlayer)
+        when (index) {
+            INDEX_LACERATION_FLARE -> {
+                if(giveDamagePlayer == null){
+                    val totalDamage = damagePlayer.getTotalLacerationToken(index)
+                    logger.insert(Log(getDamagePlayer, LogText.GET_FLARE_DAMAGE, totalDamage, NUMBER_SHISUI_SHISUI))
+                    flareToDust(getDamagePlayer, totalDamage, Arrow.NULL, getDamagePlayer, getDamagePlayer, NUMBER_SHISUI_SHISUI)
+                    setLacerationToken(getDamagePlayer, PlayerEnum.PLAYER1, index, 0)
+                    setLacerationToken(getDamagePlayer, PlayerEnum.PLAYER2, index, 0)
+                }
+                else{
+                    val totalDamage = damagePlayer.getLacerationToken(giveDamagePlayer)[index]
+                    logger.insert(Log(getDamagePlayer, LogText.GET_FLARE_DAMAGE, totalDamage, NUMBER_SHISUI_SHISUI))
+                    flareToDust(getDamagePlayer, totalDamage, Arrow.NULL, getDamagePlayer, getDamagePlayer, NUMBER_SHISUI_SHISUI)
+                    setLacerationToken(getDamagePlayer, giveDamagePlayer, index, 0)
+                }
+            }
+            INDEX_LACERATION_AURA -> {
+                if(giveDamagePlayer == null){
+                    val totalDamage = damagePlayer.getTotalLacerationToken(index)
+                    processDamage(getDamagePlayer, CommandEnum.CHOOSE_AURA, Pair(totalDamage, 999), false,
+                        null, null, NUMBER_SHISUI_SHISUI)
+                    setLacerationToken(getDamagePlayer, PlayerEnum.PLAYER1, index, 0)
+                    setLacerationToken(getDamagePlayer, PlayerEnum.PLAYER2, index, 0)
+                }
+                else{
+                    val totalDamage = damagePlayer.getLacerationToken(giveDamagePlayer)[index]
+                    processDamage(getDamagePlayer, CommandEnum.CHOOSE_AURA, Pair(totalDamage, 999), false,
+                        null, null, NUMBER_SHISUI_SHISUI)
+                    setLacerationToken(getDamagePlayer, giveDamagePlayer, index, 0)
+                }
+            }
+                INDEX_LACERATION_LIFE -> {
+                if(giveDamagePlayer == null){
+                    val totalDamage = damagePlayer.getTotalLacerationToken(index)
+                    processDamage(getDamagePlayer, CommandEnum.CHOOSE_LIFE, Pair(999, totalDamage), false,
+                        null, null, NUMBER_SHISUI_SHISUI)
+                    setLacerationToken(getDamagePlayer, PlayerEnum.PLAYER1, index, 0)
+                    setLacerationToken(getDamagePlayer, PlayerEnum.PLAYER2, index, 0)
+                }
+                else{
+                    val totalDamage = damagePlayer.getLacerationToken(giveDamagePlayer)[index]
+                    processDamage(getDamagePlayer, CommandEnum.CHOOSE_LIFE, Pair(999, totalDamage), false,
+                        null, null, NUMBER_SHISUI_SHISUI)
+                    setLacerationToken(getDamagePlayer, giveDamagePlayer, index, 0)
+                }
+            }
+            else -> {
+                throw Exception("index: $index is not valid for laceration token")
+            }
+        }
+        logger.insert(Log(getDamagePlayer.opposite(), LogText.END_EFFECT, NUMBER_SHISUI_SHISUI, -1))
+    }
+
+    suspend fun setLacerationToken(player: PlayerEnum, tokenPlayer: PlayerEnum, index: Int, number: Int){
+        getPlayer(player).getLacerationToken(tokenPlayer)[index] = number
+        sendCommand(player, tokenPlayer, getLacerationCommand(player, tokenPlayer), number * 10 + index)
     }
 
     suspend fun movePlayingCard(player: PlayerEnum, place: LocationEnum?, card_number: Int){

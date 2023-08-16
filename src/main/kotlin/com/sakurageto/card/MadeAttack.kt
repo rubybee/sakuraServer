@@ -19,7 +19,8 @@ class MadeAttack(
     private val chogek: Boolean,
     private val inevitable: Boolean = false,
     val subType: SubType = SubType.NONE,
-    val damageNotChange: Boolean = false
+    val damageNotChange: Boolean = false,
+    var isLaceration: Boolean = false
 ) {
     var editedChogek = false
 

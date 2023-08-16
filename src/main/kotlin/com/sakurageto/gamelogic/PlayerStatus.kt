@@ -102,6 +102,14 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var flow: Int = 0
     fun getCapital() = aura + flare + flow
 
+    //aura, flare, life
+    private val lacerationTokenForPlayer1 = mutableListOf(0, 0, 0)
+    private val lacerationTokenForPlayer2 = mutableListOf(0, 0, 0)
+    fun getLacerationToken(player: PlayerEnum) = when(player){
+        PlayerEnum.PLAYER1 -> lacerationTokenForPlayer1
+        PlayerEnum.PLAYER2 -> lacerationTokenForPlayer2
+    }
+    fun getTotalLacerationToken(index: Int) = lacerationTokenForPlayer1[index] + lacerationTokenForPlayer2[index]
 
     //for some card(some day refactor may be needed)
     var thisTurnReact = false

@@ -10,11 +10,12 @@ class CardData(
     val sub_type: SubType,
 ) {
     //attack
-    var distance_type: DistanceType? = null
-    var distance_cont: Pair<Int, Int>? = null
-    var distance_uncont: Array<Boolean>? = null
-    var life_damage: Int? = null
-    var aura_damage: Int? = null
+    var distanceType: DistanceType? = null
+    var distanceCont: Pair<Int, Int>? = null
+    var distanceUncont: Array<Boolean>? = null
+    var lifeDamage: Int? = null
+    var auraDamage: Int? = null
+    var isLaceration: Boolean = false
 
     //Enchantment
     var charge: Int? = null
@@ -54,6 +55,29 @@ class CardData(
     //for megumi
     var growing: Int = 0
 
+    fun setAttack(distance_type: DistanceType, distance_cont: Pair<Int, Int>?, distance_uncont: MutableList<Int>?,
+                  aura_damage: Int, life_damage: Int, cannotReactNormal: Boolean, cannotReactSpecial: Boolean,
+                  cannotReact: Boolean, chogek: Boolean, inevitable: Boolean = false, isLaceration: Boolean = false){
+        this.distanceType = distance_type
+        if(distance_type == DistanceType.CONTINUOUS){
+            this.distanceCont = Pair(distance_cont!!.first, distance_cont.second)
+        }
+        else{
+            this.distanceUncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
+            for (i in distance_uncont!!){
+                this.distanceUncont!![i] = true
+            }
+        }
+        this.lifeDamage = life_damage
+        this.auraDamage = aura_damage
+        this.cannotReactNormal = cannotReactNormal
+        this.cannotReactSpecial = cannotReactSpecial
+        this.cannotReact = cannotReact
+        this.chogek = chogek
+        this.inevitable = inevitable
+        this.isLaceration = isLaceration
+    }
+
     fun setAttackFold(distance_type: DistanceType, distance_cont: Pair<Int, Int>?, distance_uncont: MutableList<Int>?,
                   aura_damage: Int, life_damage: Int){
         this.distanceTypeFold = distance_type
@@ -63,7 +87,7 @@ class CardData(
         else{
             this.distanceUncontFold = arrayOf(false, false, false, false, false, false, false, false, false, false, false)
             for (i in distance_uncont!!){
-                this.distance_uncont!![i] = true
+                this.distanceUncont!![i] = true
             }
         }
         this.lifeDamageFold = life_damage
@@ -79,7 +103,7 @@ class CardData(
         else{
             this.distanceUncontUnfold = arrayOf(false, false, false, false, false, false, false, false, false, false, false)
             for (i in distance_uncont!!){
-                this.distance_uncont!![i] = true
+                this.distanceUncont!![i] = true
             }
         }
         this.lifeDamageUnfold = life_damage
@@ -98,28 +122,6 @@ class CardData(
             this.effectUnfold = mutableListOf()
         }
         this.effectUnfold!!.add(text)
-    }
-
-    fun setAttack(distance_type: DistanceType, distance_cont: Pair<Int, Int>?, distance_uncont: MutableList<Int>?,
-                  aura_damage: Int, life_damage: Int, cannotReactNormal: Boolean, cannotReactSpecial: Boolean,
-                  cannotReact: Boolean, chogek: Boolean, inevitable: Boolean = false){
-        this.distance_type = distance_type
-        if(distance_type == DistanceType.CONTINUOUS){
-            this.distance_cont = Pair(distance_cont!!.first, distance_cont.second)
-        }
-        else{
-            this.distance_uncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
-            for (i in distance_uncont!!){
-                this.distance_uncont!![i] = true
-            }
-        }
-        this.life_damage = life_damage
-        this.aura_damage = aura_damage
-        this.cannotReactNormal = cannotReactNormal
-        this.cannotReactSpecial = cannotReactSpecial
-        this.cannotReact = cannotReact
-        this.chogek = chogek
-        this.inevitable = inevitable
     }
 
     fun setEnchantment(charge: Int){

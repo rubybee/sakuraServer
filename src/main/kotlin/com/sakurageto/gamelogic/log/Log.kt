@@ -34,6 +34,9 @@ class Log(val player: PlayerEnum, val text: LogText, val number1: Int, val numbe
                 destination == LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD || resource == LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD)
                 && number2 >= 1
 
+    fun isGetDamageLog() = this.text == LogText.GET_LIFE_DAMAGE || this.text == LogText.GET_AURA_DAMAGE
+            || this.text == LogText.GET_FLARE_DAMAGE
+
     companion object{
         const val SPECIAL_COST = 0
         const val AFTER_DESTRUCTION_PROCESS = 1
@@ -68,5 +71,6 @@ enum class LogText{
     GET_AURA_DAMAGE,
     DAMAGE_PROCESS_START,
     START_PROCESS_ATTACK_DAMAGE,
-    FAIL_DISPROVE;
+    FAIL_DISPROVE,
+    GET_FLARE_DAMAGE;
 }

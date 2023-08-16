@@ -3397,11 +3397,11 @@ object CardSet {
 
             growing = card_data.growing
 
-            distance_type = card_data.distance_type
-            distance_cont = card_data.distance_cont
-            distance_uncont = card_data.distance_uncont
-            life_damage =  card_data.life_damage
-            aura_damage = card_data.aura_damage
+            distanceType = card_data.distanceType
+            distanceCont = card_data.distanceCont
+            distanceUncont = card_data.distanceUncont
+            lifeDamage =  card_data.lifeDamage
+            auraDamage = card_data.auraDamage
 
             charge = card_data.charge
 
@@ -7053,11 +7053,11 @@ object CardSet {
 
             growing = cardData.growing
 
-            distance_type = cardData.distance_type
-            distance_cont = cardData.distance_cont
-            distance_uncont = cardData.distance_uncont
-            life_damage =  cardData.life_damage
-            aura_damage = cardData.aura_damage
+            distanceType = cardData.distanceType
+            distanceCont = cardData.distanceCont
+            distanceUncont = cardData.distanceUncont
+            lifeDamage =  cardData.lifeDamage
+            auraDamage = cardData.auraDamage
 
             charge = cardData.charge
 
@@ -7100,11 +7100,11 @@ object CardSet {
 
             growing = cardData.growing
 
-            distance_type = cardData.distance_type
-            distance_cont = cardData.distance_cont
-            distance_uncont = cardData.distance_uncont
-            life_damage =  cardData.life_damage
-            aura_damage = cardData.aura_damage
+            distanceType = cardData.distanceType
+            distanceCont = cardData.distanceCont
+            distanceUncont = cardData.distanceUncont
+            lifeDamage =  cardData.lifeDamage
+            auraDamage = cardData.auraDamage
 
             charge = cardData.charge
 
@@ -9145,11 +9145,11 @@ object CardSet {
 
             growing = card_data.growing
 
-            distance_type = card_data.distance_type
-            distance_cont = card_data.distance_cont
-            distance_uncont = card_data.distance_uncont
-            life_damage =  card_data.life_damage
-            aura_damage = card_data.aura_damage
+            distanceType = card_data.distanceType
+            distanceCont = card_data.distanceCont
+            distanceUncont = card_data.distanceUncont
+            lifeDamage =  card_data.lifeDamage
+            auraDamage = card_data.auraDamage
 
             charge = card_data.charge
 
@@ -11288,6 +11288,38 @@ object CardSet {
         })
     }
 
+    private val sawBladeCutDown = CardData(CardClass.NORMAL, CardName.SHISUI_SAW_BLADE_CUT_DOWN, MegamiEnum.SHISUI, CardType.ATTACK, SubType.NONE)
+    private val penetrateSawBlade = CardData(CardClass.NORMAL, CardName.SHISUI_PENETRATE_SAW_BLADE, MegamiEnum.SHISUI, CardType.ATTACK, SubType.NONE)
+
+    private val penetrateSawBladeAttackText = Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.CAN_NOT_CHOOSE_AURA_DAMAGE) {_, player, game_status, _ ->
+        val damagePlayer = game_status.getPlayer(player.opposite())
+        if(damagePlayer.getLacerationToken(player)[INDEX_LACERATION_AURA] >= damagePlayer.aura){
+            1
+        }
+        else{
+            0
+        }
+    }
+
+    fun shisuiCardInit(){
+        sawBladeCutDown.setAttack(DistanceType.CONTINUOUS, Pair(2, 3), null, 3, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        penetrateSawBlade.setAttack(DistanceType.CONTINUOUS, Pair(2, 3), null, 1, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false, isLaceration = true)
+        penetrateSawBlade.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
+            if(palSang(player, game_status)){
+                if(game_status.addPreAttackZone(player, MadeAttack(CardName.SHISUI_PENETRATE_SAW_BLADE,
+                        NUMBER_PENETRATE_ADDITIONAL_ATTACK, CardClass.NULL,
+                        sortedSetOf(2, 3), 1,  2,  MegamiEnum.SAINE,
+                        cannotReactNormal = false, cannotReactSpecial = false,
+                        cannotReact = false, chogek = false, isLaceration = true).addTextAndReturn(penetrateSawBladeAttackText), null)){
+                    game_status.afterMakeAttack(card_number, player, null)
+                }
+            }
+            null
+        })
+    }
+
     fun init(){
         yurinaCardInit()
         saineCardInit()
@@ -11334,6 +11366,7 @@ object CardSet {
         yurinaA2CardInit()
         yatsuhaA2CardInit()
         akinaCardInit()
+        shisuiCardInit()
 
         dataHashmapInit()
         hashMapTest()

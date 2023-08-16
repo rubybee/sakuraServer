@@ -49,7 +49,8 @@ enum class MegamiEnum(var real_number: Int) {
     KANAWE(200),
     KAMUWI(210),
     RENRI(220),
-    AKINA(230);
+    AKINA(230),
+    SHISUI(240);
 
     fun changeNormalMegami(): MegamiEnum{
         val anotherNumber = this.real_number % 10

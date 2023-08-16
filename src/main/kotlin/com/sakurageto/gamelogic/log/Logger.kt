@@ -416,4 +416,14 @@ class Logger {
         }
         return false
     }
+
+    private fun countGetDamage(player: PlayerEnum): Int{
+        var count = 0
+        for(log in logQueue){
+            if(log.player == player && log.isGetDamageLog()){
+                count += 1
+            }
+        }
+        return count
+    }
 }

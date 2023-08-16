@@ -504,8 +504,21 @@ enum class CardName {
     AKINA_OPEN_CUTTING_METHOD,
     AKINA_GRAND_CALC_AND_MANUAL,
     AKINA_SU_LYO_SUL,
-    AKINA_AKINA_ACCURATE_CALC;
+    AKINA_AKINA_ACCURATE_CALC,
 
+    SHISUI_SHISUI,
+    SHISUI_SAW_BLADE_CUT_DOWN,
+    SHISUI_PENETRATE_SAW_BLADE,
+    SHISUI_REBELLION_ATTACK,
+    SHISUI_IRON_RESISTANCE,
+    SHISUI_THORNY_PATH,
+    SHISUI_IRON_POWDER_WIND_AROUND,
+    SHISUI_BLACK_ARMOR,
+
+    SHISUI_PADMA_CUT_DOWN,
+    SHISUI_UPALA_TEAR,
+    SHISUI_ABUDA_EAT,
+    SHISUI_SHISUI_PLACE_OF_DEATH;
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -1580,6 +1593,12 @@ enum class CardName {
             AKINA_DIRECT_FINANCING,
         )
 
+        private val shisuiNormalCardList = listOf(
+            SHISUI_SAW_BLADE_CUT_DOWN, SHISUI_PENETRATE_SAW_BLADE,
+            SHISUI_REBELLION_ATTACK, SHISUI_IRON_RESISTANCE, SHISUI_THORNY_PATH,
+            SHISUI_IRON_POWDER_WIND_AROUND, SHISUI_BLACK_ARMOR,
+        )
+
         fun returnNormalCardNameByMegami(megami_name: MegamiEnum):List<CardName>{
             return when (megami_name){
                 NONE -> emptyList
@@ -1629,6 +1648,7 @@ enum class CardName {
                 KAMUWI -> kamuwiNormalCardList
                 RENRI -> renriNormalCardList
                 AKINA -> akinaNormalCardList
+                SHISUI -> shisuiNormalCardList
             }
         }
 
@@ -1831,6 +1851,11 @@ enum class CardName {
             AKINA_AKINA_ACCURATE_CALC
         )
 
+        private val shisuiSpecialCardList = listOf(
+            SHISUI_PADMA_CUT_DOWN, SHISUI_UPALA_TEAR, SHISUI_ABUDA_EAT,
+            SHISUI_SHISUI_PLACE_OF_DEATH
+        )
+
         fun returnSpecialCardNameByMegami(megami_name: MegamiEnum): List<CardName> {
             return when (megami_name){
                 NONE -> emptyList
@@ -1880,6 +1905,7 @@ enum class CardName {
                 KAMUWI -> kamuwiSpecialCardList
                 RENRI -> renriSpecialCardList
                 AKINA -> akinaSpecialCardList
+                SHISUI -> shisuiSpecialCardList
             }
         }
 
@@ -2009,6 +2035,7 @@ enum class CardName {
                 KAMUWI -> kamuwiAdditionalCardList
                 RENRI -> renriAdditionalCardList
                 AKINA -> emptyList
+                SHISUI -> emptyList
             }
         }
 

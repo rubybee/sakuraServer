@@ -297,16 +297,16 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             }
         }
         else{
-            when(card_data.distance_type){
+            when(card_data.distanceType){
                 DistanceType.DISCONTINUOUS -> {
-                    for(i in card_data.distance_uncont!!.indices){
-                        if(card_data.distance_uncont!![i]){
+                    for(i in card_data.distanceUncont!!.indices){
+                        if(card_data.distanceUncont!![i]){
                             result.add(i)
                         }
                     }
                 }
                 DistanceType.CONTINUOUS -> {
-                    for(i in card_data.distance_cont!!.first..card_data.distance_cont!!.second){
+                    for(i in card_data.distanceCont!!.first..card_data.distanceCont!!.second){
                         result.add(i)
                     }
                 }
@@ -347,7 +347,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         cannotReact = this.card_data.cannotReact,
                         chogek = this.card_data.chogek,
                         inevitable = this.card_data.inevitable,
-                        subType = subType ?: this.card_data.sub_type
+                        subType = subType ?: this.card_data.sub_type,
+                        isLaceration = this.card_data.isLaceration
                     )
                 }
                 Umbrella.UNFOLD -> {
@@ -385,8 +386,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 card_number = this.card_number,
                 card_class = this.card_data.card_class,
                 distance = getDistance(null),
-                life_damage = this.card_data.life_damage!!,
-                aura_damage = this.card_data.aura_damage!!,
+                life_damage = this.card_data.lifeDamage!!,
+                aura_damage = this.card_data.auraDamage!!,
                 megami = this.card_data.megami,
                 cannotReactNormal = this.card_data.cannotReactNormal,
                 cannotReactSpecial = this.card_data.cannotReactSpecial,
@@ -492,7 +493,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         cannotReact = false,
                         chogek = false ,
                         inevitable = this.card_data.inevitable,
-                        subType = this.card_data.sub_type
+                        subType = this.card_data.sub_type,
+                        isLaceration = this.card_data.isLaceration
                     ), react_attack)){
                     return cost
                 }

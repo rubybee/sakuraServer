@@ -1518,11 +1518,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    suspend fun distanceToDust(number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum, card_number: Int){
+    suspend fun distanceToDust(number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum, reason: Int){
         if(number <= 0) return
 
         if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) && getBothDirection(user, LocToLoc.DISTANCE_TO_DUST.encode(number))){
-            return dustToDistance(number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+            return dustToDistance(number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
         }
 
         if(arrow != Arrow.NULL && moveTokenCheckArrow(LocationEnum.DISTANCE, LocationEnum.DUST)) return
@@ -1533,7 +1533,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = distanceToken
         }
 
-        logger.insert(Log(user, LogText.MOVE_TOKEN, card_number, value,
+        logger.insert(Log(user, LogText.MOVE_TOKEN, reason, value,
             LocationEnum.DISTANCE, LocationEnum.DUST, Arrow.NULL != arrow))
         if(value != 0){
             thisTurnDistanceChange = true
@@ -3422,6 +3422,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         if(endCurrentPhase){
             return
+        }
+
+        for(text in nowAttack.afterAttackCompleteEffect){
+            text.effect?.let {
+                it(nowAttack.card_number, attack_player, this, react_attack)
+            }
         }
 
         for(card in getPlayer(attack_player.opposite()).usedSpecialCard.values){

@@ -6,16 +6,9 @@ import com.sakurageto.gamelogic.Umbrella
 import java.util.SortedSet
 
 class MadeAttack(
-    var card_name: CardName,
-    var card_number: Int,
-    var card_class: CardClass,
-    private val distance: SortedSet<Int>,
-    private val aura_damage: Int,
-    private val life_damage: Int,
-    var megami: MegamiEnum,
-    private val cannotReactNormal: Boolean,
-    private val cannotReactSpecial: Boolean,
-    private val cannotReact: Boolean,
+    var card_name: CardName, var card_number: Int, var card_class: CardClass,
+    private val distance: SortedSet<Int>, private val aura_damage: Int, private val life_damage: Int, var megami: MegamiEnum,
+    private val cannotReactNormal: Boolean, private val cannotReactSpecial: Boolean, private val cannotReact: Boolean,
     private val chogek: Boolean,
     private val inevitable: Boolean = false,
     val subType: SubType = SubType.NONE,
@@ -25,6 +18,16 @@ class MadeAttack(
     var editedChogek = false
 
     var isItReact = true
+
+    var kururuChangeRangeUpper = false
+    var kururuChangeRangeUnder = false
+    var kururuChange2X = false
+
+    var isItValid= true
+    var isItDamage = true
+    var canNotSelectAura = false
+
+    var afterAttackCompleteEffect = mutableListOf<Text>()
 
     fun Chogek(){
         editedChogek = true
@@ -88,14 +91,6 @@ class MadeAttack(
         if(!editedChogek && editedAuraDamage >= 5 && editedAuraDamage != 999) editedAuraDamage = 5
         return Pair(editedAuraDamage, editedLifeDamage)
     }
-
-    var kururuChangeRangeUpper = false
-    var kururuChangeRangeUnder = false
-    var kururuChange2X = false
-
-    var isItValid= true
-    var isItDamage = true
-    var canNotSelectAura = false
 
     fun makeNoDamage(){
         isItDamage = false

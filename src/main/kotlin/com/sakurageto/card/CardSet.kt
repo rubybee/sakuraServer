@@ -3022,8 +3022,9 @@ object CardSet {
         hankiPoison.setSpecial(2)
         hankiPoison.setEnchantment(5)
         hankiPoison.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.REACT_ATTACK_CHANGE) { card_number, _, _, react_attack ->
-            react_attack?.addOtherBuff(OtherBuff(card_number, 1, OtherBuffTag.GET_IMMEDIATE, { player, game_status, attack ->
-                val damage = attack.getDamage(game_status, player,  game_status.getPlayerAttackBuff(player))
+            react_attack?.addOtherBuff(OtherBuff(card_number, 1, OtherBuffTag.GET_IMMEDIATE,
+                { condition_player, condition_game_status, condition_attack ->
+                val damage = condition_attack.getDamage(condition_game_status, condition_player,  condition_game_status.getPlayerAttackBuff(condition_player))
                 damage.first == 999 || damage.second == 999
             }, { _, _, attack ->
                 attack.makeNotValid()
@@ -3032,8 +3033,8 @@ object CardSet {
         })
         hankiPoison.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT_OTHER){card_number, player, game_status, _ ->
             game_status.addThisTurnOtherBuff(player.opposite(), OtherBuff(card_number, 1, OtherBuffTag.GET_IMMEDIATE,
-                { nowPlayer, gameStatus, attack ->
-                    val damage = attack.getDamage(gameStatus, nowPlayer, game_status.getPlayerAttackBuff(player))
+                { condition_player, condition_game_status, condition_attack ->
+                    val damage = condition_attack.getDamage(condition_game_status, condition_player, game_status.getPlayerAttackBuff(player))
                     damage.first == 999 || damage.second == 999
                 }, { _, _, attack ->
                     attack.makeNotValid()
@@ -10739,6 +10740,7 @@ object CardSet {
         }
     }
 
+    @Suppress("UNREACHABLE_CODE")
     private fun yatsuhaA2CardInit(){
         unfamiliarWorld.setEnchantment(1)
         unfamiliarWorld.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.ADJUST_NAP) ret@{card_number, player, game_status, _ ->
@@ -11290,6 +11292,84 @@ object CardSet {
 
     private val sawBladeCutDown = CardData(CardClass.NORMAL, CardName.SHISUI_SAW_BLADE_CUT_DOWN, MegamiEnum.SHISUI, CardType.ATTACK, SubType.NONE)
     private val penetrateSawBlade = CardData(CardClass.NORMAL, CardName.SHISUI_PENETRATE_SAW_BLADE, MegamiEnum.SHISUI, CardType.ATTACK, SubType.NONE)
+    private val rebellionAttack = CardData(CardClass.NORMAL, CardName.SHISUI_REBELLION_ATTACK, MegamiEnum.SHISUI, CardType.ATTACK, SubType.REACTION)
+    private val ironResistance = CardData(CardClass.NORMAL, CardName.SHISUI_IRON_RESISTANCE, MegamiEnum.SHISUI, CardType.ATTACK, SubType.FULL_POWER)
+    private val thornyPath = CardData(CardClass.NORMAL, CardName.SHISUI_THORNY_PATH, MegamiEnum.SHISUI, CardType.BEHAVIOR, SubType.NONE)
+    private val ironPowderWindAround = CardData(CardClass.NORMAL, CardName.SHISUI_IRON_POWDER_WIND_AROUND, MegamiEnum.SHISUI, CardType.BEHAVIOR, SubType.NONE)
+    private val blackArmor = CardData(CardClass.NORMAL, CardName.SHISUI_BLACK_ARMOR, MegamiEnum.SHISUI, CardType.ENCHANTMENT, SubType.REACTION)
+
+    private val padmaCutDown = CardData(CardClass.SPECIAL, CardName.SHISUI_PADMA_CUT_DOWN, MegamiEnum.SHISUI, CardType.BEHAVIOR, SubType.REACTION)
+
+
+    private val padmaCutDownEffect = Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
+        val tokensYour = game_status.getPlayer(player).getLacerationToken(player)
+        val tokensOther = game_status.getPlayer(player.opposite()).getLacerationToken(player)
+        while(true){
+            if(tokensYour[INDEX_LACERATION_AURA] == 0 && tokensYour[INDEX_LACERATION_FLARE] == 0 && tokensYour[INDEX_LACERATION_LIFE] == 0
+                && tokensOther[INDEX_LACERATION_AURA] == 0 && tokensOther[INDEX_LACERATION_FLARE] == 0 && tokensOther[INDEX_LACERATION_LIFE] == 0){
+                break
+            }
+            when(game_status.receiveCardEffectSelect(player, NUMBER_SHISUI_PADMA_CUT_DOWN)){
+                CommandEnum.SELECT_ONE -> {
+                    if(tokensYour[INDEX_LACERATION_AURA] != 0){
+                        game_status.makeLacerationDamage(player, player, INDEX_LACERATION_AURA)
+                    }
+                }
+                CommandEnum.SELECT_TWO -> {
+                    if(tokensYour[INDEX_LACERATION_FLARE] != 0){
+                        game_status.makeLacerationDamage(player, player, INDEX_LACERATION_FLARE)
+                    }
+                }
+                CommandEnum.SELECT_THREE -> {
+                    if(tokensYour[INDEX_LACERATION_LIFE] != 0){
+                        game_status.makeLacerationDamage(player, player, INDEX_LACERATION_LIFE)
+                    }
+                }
+                CommandEnum.SELECT_FOUR -> {
+                    if(tokensOther[INDEX_LACERATION_AURA] != 0){
+                        game_status.makeLacerationDamage(player.opposite(), player, INDEX_LACERATION_AURA)
+                    }
+                }
+                CommandEnum.SELECT_FIVE -> {
+                    if(tokensOther[INDEX_LACERATION_FLARE] != 0){
+                        game_status.makeLacerationDamage(player.opposite(), player, INDEX_LACERATION_FLARE)
+                    }
+                }
+                CommandEnum.SELECT_SIX -> {
+                    if(tokensOther[INDEX_LACERATION_LIFE] != 0){
+                        game_status.makeLacerationDamage(player.opposite(), player, INDEX_LACERATION_LIFE)
+                    }
+                }
+                CommandEnum.SELECT_NOT -> {
+                    break
+                }
+                else -> {}
+            }
+        }
+        if(game_status.addPreAttackZone(player, MadeAttack(CardName.SHISUI_PADMA_CUT_DOWN,
+                NUMBER_SHISUI_PADMA_CUT_DOWN, CardClass.NULL,
+                sortedSetOf(1, 2, 3, 4), 2, 1,  MegamiEnum.SHISUI,
+                cannotReactNormal = false, cannotReactSpecial = false,
+                cannotReact = true, chogek = false, isLaceration = true).addTextAndReturn(padmaAttackText), null)){
+            game_status.afterMakeAttack(card_number, player, null)
+        }
+        null
+    }
+
+    private val padmaAttackText = Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _ ->
+        game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE,
+            {_, _, _ -> true},
+            {_, _, attack ->
+                val count = game_status.logger.countGetDamage(player)
+                val plus = if(count % 2 == 0){
+                    count / 2
+                } else{
+                    count / 2 + 1
+                }
+                attack.lifePlusMinus(plus)
+            }))
+        null
+    }
 
     private val penetrateSawBladeAttackText = Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.CAN_NOT_CHOOSE_AURA_DAMAGE) {_, player, game_status, _ ->
         val damagePlayer = game_status.getPlayer(player.opposite())
@@ -11307,14 +11387,142 @@ object CardSet {
         penetrateSawBlade.setAttack(DistanceType.CONTINUOUS, Pair(2, 3), null, 1, 1,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false, isLaceration = true)
         penetrateSawBlade.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MAKE_ATTACK) {card_number, player, game_status, _ ->
-            if(palSang(player, game_status)){
-                if(game_status.addPreAttackZone(player, MadeAttack(CardName.SHISUI_PENETRATE_SAW_BLADE,
-                        NUMBER_PENETRATE_ADDITIONAL_ATTACK, CardClass.NULL,
-                        sortedSetOf(2, 3), 1,  2,  MegamiEnum.SAINE,
-                        cannotReactNormal = false, cannotReactSpecial = false,
-                        cannotReact = false, chogek = false, isLaceration = true).addTextAndReturn(penetrateSawBladeAttackText), null)){
-                    game_status.afterMakeAttack(card_number, player, null)
+            if(game_status.addPreAttackZone(player, MadeAttack(CardName.SHISUI_PENETRATE_SAW_BLADE,
+                    NUMBER_PENETRATE_ADDITIONAL_ATTACK, CardClass.NULL,
+                    sortedSetOf(2, 3), 1,  2,  MegamiEnum.SHISUI,
+                    cannotReactNormal = false, cannotReactSpecial = false,
+                    cannotReact = false, chogek = false, isLaceration = true).addTextAndReturn(penetrateSawBladeAttackText), null)){
+                game_status.afterMakeAttack(card_number, player, null)
+            }
+            null
+        })
+        rebellionAttack.setAttack(DistanceType.CONTINUOUS, Pair(2, 4), null, 1, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false, isLaceration = true)
+        rebellionAttack.addtext((Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE,
+                {condition_player, condition_game_status, _ -> condition_game_status.logger.countGetDamage(condition_player) >= 1},
+                {_, _, attack ->
+                    attack.auraPlusMinus(1); attack.lifePlusMinus(1)
+                }))
+            null
+        }))
+        rebellionAttack.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.DO_BASIC_OPERATION) {_, player, game_status, _ ->
+            if(game_status.logger.countGetDamage(player) >= 2){
+                game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,
+                    CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + NUMBER_SHISUI_REBELLION_ATTACK)
+            }
+            null
+        })
+        ironResistance.setAttack(DistanceType.CONTINUOUS, Pair(1, 7), null, 2, 3,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = true, chogek = false, isLaceration = true)
+        ironResistance.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MAKE_SHRINK) {_, player, game_status, _ ->
+            game_status.setShrink(player.opposite())
+            while(true){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_SHISUI_IRON_RESISTANCE)){
+                    CommandEnum.SELECT_ONE -> {
+                        game_status.addLacerationToken(player, player, INDEX_LACERATION_AURA, 1)
+                        break
+                    }
+                    CommandEnum.SELECT_TWO -> {
+                        game_status.addLacerationToken(player, player, INDEX_LACERATION_FLARE, 1)
+                        break
+                    }
+                    CommandEnum.SELECT_THREE -> {
+                        game_status.addLacerationToken(player, player, INDEX_LACERATION_LIFE, 1)
+                        break
+                    }
+                    else -> {}
                 }
+            }
+            null
+        })
+        thornyPath.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
+            game_status.distanceToDust(2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
+            if(game_status.getAdjustDistance() == 0){
+                game_status.addLacerationToken(player, player, INDEX_LACERATION_LIFE, 1)
+            }
+            else{
+                while(true){
+                    when(game_status.receiveCardEffectSelect(player, NUMBER_SHISUI_THORNY_PATH)){
+                        CommandEnum.SELECT_ONE -> {
+                            game_status.addLacerationToken(player, player, INDEX_LACERATION_AURA, 1)
+                            break
+                        }
+                        CommandEnum.SELECT_TWO -> {
+                            game_status.addLacerationToken(player, player, INDEX_LACERATION_FLARE, 1)
+                            break
+                        }
+                        else -> {}
+                    }
+                }
+            }
+            null
+        })
+        ironPowderWindAround.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.DO_BASIC_OPERATION) {_, player, game_status, _ ->
+            for(i in 1..2){
+                game_status.doBasicOperation(player, CommandEnum.ACTION_WIND_AROUND,
+                    CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + NUMBER_SHISUI_REBELLION_ATTACK)
+            }
+            while(true){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_SHISUI_IRON_POWDER_WIND_AROUND)){
+                    CommandEnum.SELECT_ONE -> {
+                        game_status.addLacerationToken(player, player, INDEX_LACERATION_AURA, 1)
+                        game_status.addLacerationToken(player.opposite(), player, INDEX_LACERATION_AURA, 1)
+                        break
+                    }
+                    CommandEnum.SELECT_TWO -> {
+                        game_status.addLacerationToken(player, player, INDEX_LACERATION_FLARE, 1)
+                        game_status.addLacerationToken(player.opposite(), player, INDEX_LACERATION_FLARE, 1)
+                        break
+                    }
+                    else -> {}
+                }
+            }
+            null
+        })
+        blackArmor.setEnchantment(0)
+        blackArmor.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
+            game_status.getCardFrom(player, card_number, LocationEnum.PLAYING_ZONE_YOUR)?.let {
+                val count = game_status.logger.countGetDamage(player) * 2
+                game_status.dustToCard(player, count, it, card_number)
+                game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
+                if(count >= 4) game_status.dustToCard(player, 1, it, card_number)
+            }
+            null
+        })
+        blackArmor.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.REACT_ATTACK_CHANGE) { card_number, _, _, react_attack ->
+            react_attack?.addAttackBuff(Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, { _, _, _ ->
+                true
+            }, { _, _, attack ->
+                attack.lifePlusMinus(-1)
+            }))
+            null
+        })
+        blackArmor.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT_OTHER){card_number, player, game_status, _ ->
+            game_status.addThisTurnAttackBuff(player.opposite(), Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE,
+                { _, _, _ ->
+                    true
+                }, { _, _, attack ->
+                    attack.lifePlusMinus(-1)
+                }))
+            null
+        })
+        blackArmor.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.AFTER_OTHER_ATTACK_COMPLETE) {card_number, player, game_status, _->
+            game_status.getCardFrom(player, card_number, LocationEnum.PLAYING_ZONE_YOUR)?.let { card ->
+                game_status.cardToDust(player, 2, card, false, card_number)
+                if(card.isItDestruction()){
+                    game_status.enchantmentDestruction(player, card)
+                }
+            }
+            null
+        })
+        padmaCutDown.setSpecial(3)
+        padmaCutDown.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.AFTER_OTHER_ATTACK_COMPLETE) {card_number, player, game_status, react_attack ->
+            if(react_attack == null){
+                padmaCutDownEffect.effect!!(card_number, player, game_status, null)
+            }
+            else{
+                react_attack.afterAttackCompleteEffect.add(padmaCutDownEffect)
             }
             null
         })

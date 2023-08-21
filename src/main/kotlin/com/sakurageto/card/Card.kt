@@ -210,9 +210,9 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
     }
 
-    suspend fun getBaseCost(player: PlayerEnum, gameStatus: GameStatus): Int{
+    suspend fun getBaseCost(player: PlayerEnum, gameStatus: GameStatus): Pair<Boolean, Int>{
         var x = 10000
-        return this.card_data.cost ?: card_data.effect?.let {
+        x = this.card_data.cost?: card_data.effect?.let {
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
                     if(text.tag == TextEffectTag.COST_X){
@@ -224,6 +224,11 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             }
             x
         }?: 10000
+        return if (x < 0){
+            Pair(true, -1 * x)
+        } else{
+            Pair(false, x)
+        }
     }
 
     //true mean can use
@@ -445,11 +450,15 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             if(isCost && isConsume){
                 this.thisCardCostBuff(player, gameStatus)
                 gameStatus.addAllCardCostBuff()
-                cost = gameStatus.applyAllCostBuff(player, this.getBaseCost(player, gameStatus), this)
+                val (laceration, baseCost) = this.getBaseCost(player, gameStatus)
+                cost = gameStatus.applyAllCostBuff(player, baseCost, this)
                 if(cost < 0) cost = 0
                 if(cost > gameStatus.getPlayerFlare(player)){
                     gameStatus.cleanCostBuff()
                     return -2
+                }
+                if(laceration){
+                    cost *= -3
                 }
             }
             else{

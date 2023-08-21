@@ -3,6 +3,7 @@ package com.sakurageto.card
 import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.MegamiEnum
 import com.sakurageto.gamelogic.Umbrella
+import com.sakurageto.protocol.CommandEnum
 import java.util.SortedSet
 
 class MadeAttack(
@@ -114,6 +115,7 @@ class MadeAttack(
     var editedCannotReactNormal = false
     var editedCannotReactSpecial = false
     var editedCannotReact = false
+    var editedLaceration = false
 
     private val thisTempOtherBuff = OtherBuffQueue()
     private val thisTurnOtherBuff = OtherBuffQueue()
@@ -128,6 +130,7 @@ class MadeAttack(
     }
 
     suspend fun activeOtherBuff(game_status: GameStatus, player: PlayerEnum, continuousOtherBuff: OtherBuffQueue){
+        editedLaceration = isLaceration
         editedInevitable = inevitable
         editedCannotReactNormal = cannotReactNormal
         editedCannotReactSpecial = cannotReactSpecial
@@ -374,11 +377,11 @@ class MadeAttack(
 
     }
 
-    suspend fun beforeProcessDamageCheck(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?): Boolean{
+    suspend fun beforeProcessDamageCheck(player: PlayerEnum, game_status: GameStatus, now_attack: MadeAttack): Boolean{
         this.effect?.let {
             for(text in it){
                 if(text.tag == TextEffectTag.EFFECT_INSTEAD_DAMAGE){
-                    return text.effect!!(this.card_number, player, game_status, react_attack) != 1
+                    return text.effect!!(this.card_number, player, game_status, now_attack) != 1
                 }
             }
         }

@@ -81,6 +81,7 @@ enum class TextEffectTag {
     //description when this effect use
     WHEN_USE_BEHAVIOR_END,
     WHEN_SPECIAL_RETURN_YOUR,
+    CAN_NOT_USE_CONCENTRATION_OTHER,
     WHEN_FULL_POWER_USED_YOUR,
     WHEN_THIS_CARD_RETURN,
     WHEN_CHOOSE_AURA_DAMAGE,
@@ -127,6 +128,7 @@ enum class TextEffectTag {
     //check effect when some process is running
     CAN_NOT_CHOOSE_AURA_DAMAGE,
     CAN_NOT_WIN,
+    CAN_NOT_LOSE,
     OTHER_CARD_NAP_LOCATION_HERE,
     DO_NOT_GET_DAMAGE,
     DO_NOT_MOVE_TOKEN,

@@ -473,6 +473,17 @@ object CardSet {
         cardTempNumberHashmap[NUMBER_AKINA_AKINA_ACCURATE_CALC] = CardName.AKINA_AKINA_ACCURATE_CALC
         cardTempNumberHashmap[NUMBER_AKINA_AKINA_ACCURATE_CALC_START_PHASE] = CardName.AKINA_AKINA_ACCURATE_CALC
 
+        cardTempNumberHashmap[NUMBER_SHISUI_SAW_BLADE_CUT_DOWN] = CardName.SHISUI_SAW_BLADE_CUT_DOWN
+        cardTempNumberHashmap[NUMBER_SHISUI_PENETRATE_SAW_BLADE] = CardName.SHISUI_PENETRATE_SAW_BLADE
+        cardTempNumberHashmap[NUMBER_SHISUI_REBELLION_ATTACK] = CardName.SHISUI_REBELLION_ATTACK
+        cardTempNumberHashmap[NUMBER_SHISUI_IRON_RESISTANCE] = CardName.SHISUI_IRON_RESISTANCE
+        cardTempNumberHashmap[NUMBER_SHISUI_THORNY_PATH] = CardName.SHISUI_THORNY_PATH
+        cardTempNumberHashmap[NUMBER_SHISUI_IRON_POWDER_WIND_AROUND] = CardName.SHISUI_IRON_POWDER_WIND_AROUND
+        cardTempNumberHashmap[NUMBER_SHISUI_PADMA_CUT_DOWN] = CardName.SHISUI_PADMA_CUT_DOWN
+        cardTempNumberHashmap[NUMBER_SHISUI_UPALA_TEAR] = CardName.SHISUI_UPALA_TEAR
+        cardTempNumberHashmap[NUMBER_SHISUI_ABUDA_EAT] = CardName.SHISUI_ABUDA_EAT
+        cardTempNumberHashmap[NUMBER_SHISUI_SHISUI_PLACE_OF_DEATH] = CardName.SHISUI_SHISUI_PLACE_OF_DEATH
+
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CARD_UNAME] = CardName.CARD_UNNAME
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_POISON_ANYTHING] = CardName.POISON_ANYTHING
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_ANYTHING] = CardName.SOLDIER_ANYTHING
@@ -875,6 +886,16 @@ object CardSet {
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_AKINA_AKINA_ACCURATE_CALC] = CardName.AKINA_AKINA_ACCURATE_CALC
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_AKINA_AKINA_ACCURATE_CALC_START_PHASE] = CardName.AKINA_AKINA_ACCURATE_CALC
 
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHISUI_SAW_BLADE_CUT_DOWN] = CardName.SHISUI_SAW_BLADE_CUT_DOWN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHISUI_PENETRATE_SAW_BLADE] = CardName.SHISUI_PENETRATE_SAW_BLADE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHISUI_REBELLION_ATTACK] = CardName.SHISUI_REBELLION_ATTACK
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHISUI_IRON_RESISTANCE] = CardName.SHISUI_IRON_RESISTANCE
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHISUI_THORNY_PATH] = CardName.SHISUI_THORNY_PATH
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHISUI_IRON_POWDER_WIND_AROUND] = CardName.SHISUI_IRON_POWDER_WIND_AROUND
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHISUI_PADMA_CUT_DOWN] = CardName.SHISUI_PADMA_CUT_DOWN
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHISUI_UPALA_TEAR] = CardName.SHISUI_UPALA_TEAR
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHISUI_ABUDA_EAT] = CardName.SHISUI_ABUDA_EAT
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SHISUI_SHISUI_PLACE_OF_DEATH] = CardName.SHISUI_SHISUI_PLACE_OF_DEATH
 
         return cardTempNumberHashmap.toMap()
     }
@@ -1296,6 +1317,18 @@ object CardSet {
         cardDataHashmap[CardName.AKINA_GRAND_CALC_AND_MANUAL] = grandCalcAndManual
         cardDataHashmap[CardName.AKINA_SU_LYO_SUL] = sulyosul
         cardDataHashmap[CardName.AKINA_AKINA_ACCURATE_CALC] = accurateCalc
+
+        cardDataHashmap[CardName.SHISUI_SAW_BLADE_CUT_DOWN] = sawBladeCutDown
+        cardDataHashmap[CardName.SHISUI_PENETRATE_SAW_BLADE] = penetrateSawBlade
+        cardDataHashmap[CardName.SHISUI_REBELLION_ATTACK] = rebellionAttack
+        cardDataHashmap[CardName.SHISUI_IRON_RESISTANCE] = ironResistance
+        cardDataHashmap[CardName.SHISUI_THORNY_PATH] = thornyPath
+        cardDataHashmap[CardName.SHISUI_IRON_POWDER_WIND_AROUND] = ironPowderWindAround
+        cardDataHashmap[CardName.SHISUI_BLACK_ARMOR] = blackArmor
+        cardDataHashmap[CardName.SHISUI_PADMA_CUT_DOWN] = padmaCutDown
+        cardDataHashmap[CardName.SHISUI_UPALA_TEAR] = upalaTear
+        cardDataHashmap[CardName.SHISUI_ABUDA_EAT] = abudaEat
+        cardDataHashmap[CardName.SHISUI_SHISUI_PLACE_OF_DEATH] = shisuiPlaceOfDeath
     }
 
     private suspend fun selectDustToDistance(nowCommand: CommandEnum, game_status: GameStatus,
@@ -1420,10 +1453,10 @@ object CardSet {
             null
         })
         jjockbae.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
-            game_status.addImmediateLifeListener(player, Listener(player, card_number) {_, cardNumber, beforeLife,
+            game_status.addImmediateLifeListener(player, Listener(player, card_number) {gameStatus, cardNumber, beforeLife,
                 afterLife, _, _ ->
                 if(beforeLife > 3 && afterLife <= 3){
-                    game_status.returnSpecialCard(player, cardNumber)
+                    gameStatus.returnSpecialCard(player, cardNumber)
                     true
                 }
                 else{
@@ -2158,8 +2191,8 @@ object CardSet {
         flutteringSnowflake.setAttackFold(DistanceType.CONTINUOUS, Pair(3, 5), null, 3, 1)
         flutteringSnowflake.setAttackUnfold(DistanceType.CONTINUOUS, Pair(0, 2), null, 0, 0)
         flutteringSnowflake.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
-            game_status.addImmediateUmbrellaListener(player, Listener(player, card_number){_, cardNumber, _, _, _, _ ->
-                game_status.returnSpecialCard(player, cardNumber)
+            game_status.addImmediateUmbrellaListener(player, Listener(player, card_number){gameStatus, cardNumber, _, _, _, _ ->
+                gameStatus.returnSpecialCard(player, cardNumber)
                 true
             })
             null
@@ -2356,6 +2389,23 @@ object CardSet {
         null
     }
 
+    private suspend fun iblonEffect(player: PlayerEnum, game_status: GameStatus){
+        var index = 0
+        val cardOne = game_status.getCardFrom(player.opposite(), 0, LocationEnum.YOUR_DECK_TOP)!!
+        if(cardOne.card_data.canCover){
+            game_status.popCardFrom(player.opposite(), cardOne.card_number, LocationEnum.DECK, false)?.let {
+                game_status.insertCardTo(player.opposite(), it, LocationEnum.COVER_CARD, false)
+            }
+        }
+        else index = 1
+        val cardTwo = game_status.getCardFrom(player.opposite(), index, LocationEnum.YOUR_DECK_TOP)!!
+        if(cardTwo.card_data.canCover){
+            game_status.popCardFrom(player.opposite(), cardTwo.card_number, LocationEnum.DECK, false)?.let {
+                game_status.insertCardTo(player.opposite(), it, LocationEnum.COVER_CARD, false)
+            }
+        }
+    }
+
     private suspend fun setStratagemByUser(game_status: GameStatus, player: PlayerEnum){
         while(true){
             val nowCommand = game_status.receiveCardEffectSelect(player, NUMBER_SHINRA_SHINRA)
@@ -2380,23 +2430,28 @@ object CardSet {
         })
         iblon.setAttack(DistanceType.CONTINUOUS, Pair(2, 7), null, 2, 999,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
-        iblon.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.EFFECT_INSTEAD_DAMAGE){_, player, game_status, _ ->
+        iblon.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.EFFECT_INSTEAD_DAMAGE) ret@{_, player, game_status, attack ->
             if(game_status.getPlayer(player.opposite()).normalCardDeck.size >= 2){
-                var index = 0
-                val cardOne = game_status.getCardFrom(player.opposite(), 0, LocationEnum.YOUR_DECK_TOP)!!
-                if(cardOne.card_data.canCover){
-                    game_status.popCardFrom(player.opposite(), cardOne.card_number, LocationEnum.DECK, false)?.let {
-                        game_status.insertCardTo(player.opposite(), it, LocationEnum.COVER_CARD, false)
+                if(attack?.editedLaceration == true){
+                    while(true){
+                        when(game_status.receiveCardEffectSelect(game_status.turnPlayer, NUMBER_SELECT_DAMAGE_REPLACE_EFFECT)){
+                            CommandEnum.SELECT_ONE -> {
+                                iblonEffect(player, game_status)
+                                return@ret 1
+                            }
+                            CommandEnum.SELECT_TWO -> {
+                                return@ret 0
+                            }
+                            else -> {}
+                        }
                     }
+                    @Suppress("UNREACHABLE_CODE")
+                    1
                 }
-                else index = 1
-                val cardTwo = game_status.getCardFrom(player.opposite(), index, LocationEnum.YOUR_DECK_TOP)!!
-                if(cardTwo.card_data.canCover){
-                    game_status.popCardFrom(player.opposite(), cardTwo.card_number, LocationEnum.DECK, false)?.let {
-                        game_status.insertCardTo(player.opposite(), it, LocationEnum.COVER_CARD, false)
-                    }
+                else{
+                    iblonEffect(player, game_status)
+                    1
                 }
-                1
             }
             else{
                 0
@@ -3919,7 +3974,7 @@ object CardSet {
             null
         })
         roaring.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CHANGE_CONCENTRATION){_, player, game_status, _ ->
-            if(game_status.getPlayer(player).concentration >= 2){
+            if(game_status.getPlayer(player).concentration >= 2 && game_status.canUseConcentration(player)){
                 while(true){
                     when(game_status.receiveCardEffectSelect(player, NUMBER_THALLYA_TURBO_SWITCH)){
                         CommandEnum.SELECT_ONE -> {
@@ -4699,10 +4754,10 @@ object CardSet {
             null
         })
         duetTanJuBingMyeong.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
-            game_status.addImmediateLifeListener(player, Listener(player, card_number) {_, cardNumber, _,
+            game_status.addImmediateLifeListener(player, Listener(player, card_number) {gameStatus, cardNumber, _,
                                                                                         _, reconstruct, damage ->
                 if(!reconstruct && damage){
-                    game_status.returnSpecialCard(player, cardNumber)
+                    gameStatus.returnSpecialCard(player, cardNumber)
                     true
                 }
                 else{
@@ -4837,10 +4892,10 @@ object CardSet {
             null
         })
         duetChitanYangMyeong.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
-            game_status.addImmediateLifeListener(player, Listener(player, card_number) {_, cardNumber, _,
+            game_status.addImmediateLifeListener(player, Listener(player, card_number) {gameStatus, cardNumber, _,
                                                                                         _, reconstruct, damage ->
                 if(!reconstruct && damage){
-                    game_status.returnSpecialCard(player, cardNumber)
+                    gameStatus.returnSpecialCard(player, cardNumber)
                     true
                 }
                 else{
@@ -5389,7 +5444,7 @@ object CardSet {
         fourSeason.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
             game_status.addAdditionalListener(player, Listener(player, card_number)ret@{gameStatus, cardNumber, _, _, _, _ ->
                 while(true){
-                    when(game_status.receiveCardEffectSelect(player, NUMBER_HONOKA_FULL_BLOOM_PATH)){
+                    when(gameStatus.receiveCardEffectSelect(player, NUMBER_HONOKA_FULL_BLOOM_PATH)){
                         CommandEnum.SELECT_ONE -> {
                             break
                         }
@@ -5927,10 +5982,10 @@ object CardSet {
             null
         })
         upastum.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
-            game_status.addAuraListener(player, Listener(player, card_number) {_, cardNumber, _,
+            game_status.addAuraListener(player, Listener(player, card_number) {gameStatus, cardNumber, _,
                                                                                         _, before_full, after_full ->
                 if(!before_full && after_full){
-                    game_status.returnSpecialCard(player, cardNumber)
+                    gameStatus.returnSpecialCard(player, cardNumber)
                     true
                 }
                 else{
@@ -6960,7 +7015,7 @@ object CardSet {
         })
         oyogibiFire.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
             game_status.addDistanceListener(player, Listener(player, card_number) {gameStatus, cardNumber, _, _, _, _ ->
-                if(game_status.startTurnDistance - game_status.getAdjustDistance() >= 2){
+                if(gameStatus.startTurnDistance - gameStatus.getAdjustDistance() >= 2){
                     gameStatus.returnSpecialCard(player, cardNumber)
                     true
                 }
@@ -7270,9 +7325,9 @@ object CardSet {
             else 0
         })
         hijamaruTriplet.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
-            game_status.addTerminationListener(player, Listener(player, card_number) {_, cardNumber, _,
+            game_status.addTerminationListener(player, Listener(player, card_number) {gameStatus, cardNumber, _,
                                                                                         _, _, _ ->
-                game_status.returnSpecialCard(player, cardNumber)
+                gameStatus.returnSpecialCard(player, cardNumber)
                 true
             })
             null
@@ -8684,16 +8739,16 @@ object CardSet {
         vagueStory.setSpecial(1)
         vagueStory.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {card_number, player, game_status, _ ->
             val nowPlayer = game_status.getPlayer(player)
-            if(nowPlayer.concentration >= 1){
+            if(game_status.canUseConcentration(player) && nowPlayer.concentration >= 1){
                 while(true){
                     when(game_status.receiveCardEffectSelect(player, NUMBER_KANAWE_VAGUE_STORY)){
                         CommandEnum.SELECT_ONE -> {
-                            game_status.setConcentration(player, nowPlayer.concentration - 1)
+                            game_status.decreaseConcentration(player)
                             readyIdea(player, game_status, LocationEnum.ADDITIONAL_CARD)
                             break
                         }
                         CommandEnum.SELECT_TWO -> {
-                            game_status.setConcentration(player, nowPlayer.concentration - 1)
+                            game_status.decreaseConcentration(player)
                             if(readyIdea(player, game_status, LocationEnum.END_IDEA_YOUR)){
                                 game_status.movePlayingCard(player, LocationEnum.OUT_OF_GAME, card_number)
                             }
@@ -11299,53 +11354,13 @@ object CardSet {
     private val blackArmor = CardData(CardClass.NORMAL, CardName.SHISUI_BLACK_ARMOR, MegamiEnum.SHISUI, CardType.ENCHANTMENT, SubType.REACTION)
 
     private val padmaCutDown = CardData(CardClass.SPECIAL, CardName.SHISUI_PADMA_CUT_DOWN, MegamiEnum.SHISUI, CardType.BEHAVIOR, SubType.REACTION)
+    private val upalaTear = CardData(CardClass.SPECIAL, CardName.SHISUI_UPALA_TEAR, MegamiEnum.SHISUI, CardType.ATTACK, SubType.NONE)
+    private val abudaEat = CardData(CardClass.SPECIAL, CardName.SHISUI_ABUDA_EAT, MegamiEnum.SHISUI, CardType.BEHAVIOR, SubType.REACTION)
+    private val shisuiPlaceOfDeath = CardData(CardClass.SPECIAL, CardName.SHISUI_SHISUI_PLACE_OF_DEATH, MegamiEnum.SHISUI, CardType.BEHAVIOR, SubType.FULL_POWER)
 
 
     private val padmaCutDownEffect = Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
-        val tokensYour = game_status.getPlayer(player).getLacerationToken(player)
-        val tokensOther = game_status.getPlayer(player.opposite()).getLacerationToken(player)
-        while(true){
-            if(tokensYour[INDEX_LACERATION_AURA] == 0 && tokensYour[INDEX_LACERATION_FLARE] == 0 && tokensYour[INDEX_LACERATION_LIFE] == 0
-                && tokensOther[INDEX_LACERATION_AURA] == 0 && tokensOther[INDEX_LACERATION_FLARE] == 0 && tokensOther[INDEX_LACERATION_LIFE] == 0){
-                break
-            }
-            when(game_status.receiveCardEffectSelect(player, NUMBER_SHISUI_PADMA_CUT_DOWN)){
-                CommandEnum.SELECT_ONE -> {
-                    if(tokensYour[INDEX_LACERATION_AURA] != 0){
-                        game_status.makeLacerationDamage(player, player, INDEX_LACERATION_AURA)
-                    }
-                }
-                CommandEnum.SELECT_TWO -> {
-                    if(tokensYour[INDEX_LACERATION_FLARE] != 0){
-                        game_status.makeLacerationDamage(player, player, INDEX_LACERATION_FLARE)
-                    }
-                }
-                CommandEnum.SELECT_THREE -> {
-                    if(tokensYour[INDEX_LACERATION_LIFE] != 0){
-                        game_status.makeLacerationDamage(player, player, INDEX_LACERATION_LIFE)
-                    }
-                }
-                CommandEnum.SELECT_FOUR -> {
-                    if(tokensOther[INDEX_LACERATION_AURA] != 0){
-                        game_status.makeLacerationDamage(player.opposite(), player, INDEX_LACERATION_AURA)
-                    }
-                }
-                CommandEnum.SELECT_FIVE -> {
-                    if(tokensOther[INDEX_LACERATION_FLARE] != 0){
-                        game_status.makeLacerationDamage(player.opposite(), player, INDEX_LACERATION_FLARE)
-                    }
-                }
-                CommandEnum.SELECT_SIX -> {
-                    if(tokensOther[INDEX_LACERATION_LIFE] != 0){
-                        game_status.makeLacerationDamage(player.opposite(), player, INDEX_LACERATION_LIFE)
-                    }
-                }
-                CommandEnum.SELECT_NOT -> {
-                    break
-                }
-                else -> {}
-            }
-        }
+        game_status.processAllLacerationDamage(player)
         if(game_status.addPreAttackZone(player, MadeAttack(CardName.SHISUI_PADMA_CUT_DOWN,
                 NUMBER_SHISUI_PADMA_CUT_DOWN, CardClass.NULL,
                 sortedSetOf(1, 2, 3, 4), 2, 1,  MegamiEnum.SHISUI,
@@ -11523,6 +11538,87 @@ object CardSet {
             }
             else{
                 react_attack.afterAttackCompleteEffect.add(padmaCutDownEffect)
+            }
+            null
+        })
+        upalaTear.setSpecial(-2)
+        upalaTear.setAttack(DistanceType.CONTINUOUS, Pair(1, 4), null, 2, 1,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false, isLaceration = true)
+        upalaTear.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.WHEN_CHOOSE_LIFE_DAMAGE) {card_number, player, game_status, _ ->
+            game_status.addThisTurnOtherBuff(player, OtherBuff(card_number,1, OtherBuffTag.GET,
+                { condition_player, condition_game_status, condition_attack ->
+                    val damage = condition_attack.getDamage(condition_game_status, condition_player, condition_game_status.getPlayerAttackBuff(condition_player))
+                    damage.first <= 2
+                },
+                { _, _, attack ->
+                    attack.editedLaceration = true
+                })
+            )
+            null
+        })
+        upalaTear.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.RETURN){_, player, game_status, _ ->
+            val nowPlayer = game_status.getPlayer(player)
+            if(nowPlayer.aura + nowPlayer.flare <= 6) 1
+            else 0
+        })
+        abudaEat.setSpecial(2)
+        abudaEat.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.REACT_ATTACK_INVALID) {card_number, player, game_status, react_attack ->
+            if(react_attack != null){
+                react_attack.addOtherBuff(OtherBuff(card_number, 1, OtherBuffTag.GET_IMMEDIATE, { _, _, _ ->
+                    true
+                }, { _, _, attack ->
+                    attack.makeNotValid()
+                }))
+                val damage = react_attack.getDamage(game_status, player, game_status.getPlayerAttackBuff(player))
+                val chosen = game_status.damageSelect(player, damage)
+                if(chosen == CommandEnum.CHOOSE_LIFE){
+                    game_status.addLacerationToken(player, player, INDEX_LACERATION_LIFE, damage.second)
+                }
+                else{
+                    game_status.addLacerationToken(player, player, INDEX_LACERATION_AURA, damage.first)
+                }
+            }
+            null
+        })
+        abudaEat.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.RETURN){_, player, game_status, _ ->
+            val nowPlayer = game_status.getPlayer(player)
+            if(nowPlayer.aura + nowPlayer.flare <= 6) 11
+            else 0
+        })
+        abudaEat.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
+            game_status.addDamageListener(player, Listener(player, card_number) {gameStatus, cardNumber, _,
+                                                                                        _, _, _ ->
+                if(gameStatus.logger.countGetDamage(player) == 3) {
+                    gameStatus.returnSpecialCard(player, cardNumber)
+                    true
+                }
+                else{
+                    false
+                }
+            })
+            null
+        })
+        shisuiPlaceOfDeath.setSpecial(-2)
+        shisuiPlaceOfDeath.setEnchantment(2)
+        shisuiPlaceOfDeath.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_SAKURA_TOKEN) {card_number, player, game_status, _ ->
+            val number = game_status.getPlayerFlare(player.opposite()) - game_status.getPlayerFlare(player)
+            if(number > 0){
+                game_status.getCardFrom(player, card_number, LocationEnum.PLAYING_ZONE_YOUR)?.let {
+                    game_status.dustToCard(player, number, it, card_number)
+                }
+            }
+            null
+        })
+        shisuiPlaceOfDeath.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CAN_NOT_LOSE) {card_number, player, game_status, _ ->
+            1
+        })
+        shisuiPlaceOfDeath.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CAN_NOT_USE_CONCENTRATION_OTHER) {card_number, player, game_status, _ ->
+            if(game_status.getPlayerLife(player) == 0) 1
+            else 0
+        })
+        shisuiPlaceOfDeath.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_THIS_CARD_GET_OUT_ENCHANTMENT) { _, player, game_status, _ ->
+            if(game_status.getPlayer(player).isLose()){
+                game_status.gameEnd(player, player.opposite())
             }
             null
         })

@@ -110,6 +110,10 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
         PlayerEnum.PLAYER2 -> lacerationTokenForPlayer2
     }
     fun getTotalLacerationToken(index: Int) = lacerationTokenForPlayer1[index] + lacerationTokenForPlayer2[index]
+    fun getOnePlayersAllLacerationToken(player: PlayerEnum): Int{
+        val token = getLacerationToken(player)
+        return token[INDEX_LACERATION_AURA] + token[INDEX_LACERATION_FLARE] + token[INDEX_LACERATION_LIFE]
+    }
 
     //for some card(some day refactor may be needed)
     var thisTurnReact = false

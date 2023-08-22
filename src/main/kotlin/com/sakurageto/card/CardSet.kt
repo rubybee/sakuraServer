@@ -11072,7 +11072,7 @@ object CardSet {
 
     private suspend fun recoup(game_status: GameStatus, player: PlayerEnum){
         val nowPlayer = game_status.getPlayer(player)
-        if(nowPlayer.flow > 0){
+        if((nowPlayer.flow?: 0) > 0){
             game_status.flowToDust(player, 1)
             if(game_status.recoupTokenMove(player)){
                 game_status.setMarketPrice(player, (nowPlayer.marketPrice?: 0) - 2)
@@ -11579,11 +11579,6 @@ object CardSet {
                 }
             }
             null
-        })
-        abudaEat.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.RETURN){_, player, game_status, _ ->
-            val nowPlayer = game_status.getPlayer(player)
-            if(nowPlayer.aura + nowPlayer.flare <= 6) 11
-            else 0
         })
         abudaEat.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
             game_status.addDamageListener(player, Listener(player, card_number) {gameStatus, cardNumber, _,

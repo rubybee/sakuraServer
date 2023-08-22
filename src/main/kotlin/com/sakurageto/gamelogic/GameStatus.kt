@@ -10,6 +10,7 @@ import com.sakurageto.gamelogic.log.Logger
 import com.sakurageto.gamelogic.megamispecial.storyboard.StoryBoard
 import com.sakurageto.protocol.*
 import com.sakurageto.protocol.CommandEnum.Companion.BASIC_OPERATION_CAUSE_BY_CARD
+import com.sakurageto.protocol.TokenEnum.Companion.toLacerationLocation
 import io.ktor.websocket.*
 import kotlin.Exception
 
@@ -769,20 +770,21 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun dustToFlow(player: PlayerEnum, number: Int): Int{
         val nowPlayer = getPlayer(player)
+        if(nowPlayer.flow == 0) return 0
         var value = number
 
         if(dust < value){
             value = dust
         }
 
-        val emptyPlace = 5 - nowPlayer.flow
+        val emptyPlace = 5 - nowPlayer.flow!!
         if(emptyPlace < value){
             value = emptyPlace
         }
 
         if(value != 0){
             dust -= value
-            nowPlayer.flow += value
+            nowPlayer.flow = nowPlayer.flow!! + value
 
             logger.insert(Log(player, LogText.MOVE_TOKEN, NUMBER_AKINA_AKINA, value,
                 LocationEnum.DUST, LocationEnum.FLOW_YOUR, false))
@@ -796,6 +798,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     suspend fun auraToFlow(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum,
                            reason: Int): Int{
         val nowPlayer = getPlayer(player)
+        if(nowPlayer.flow == null) return 0
         var value = number
 
         if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
@@ -809,14 +812,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = nowPlayer.aura
         }
 
-        val emptyPlace = 5 - nowPlayer.flow
+        val emptyPlace = 5 - nowPlayer.flow!!
         if(emptyPlace < value){
             value = emptyPlace
         }
 
         if(value != 0){
             nowPlayer.aura -= value
-            nowPlayer.flow += value
+            nowPlayer.flow = nowPlayer.flow!! + value
 
             logger.insert(Log(player, LogText.MOVE_TOKEN, reason, value,
                 LocationEnum.AURA_YOUR, LocationEnum.FLOW_YOUR, false))
@@ -832,20 +835,21 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun flareToFlow(player: PlayerEnum, number: Int): Int{
         val nowPlayer = getPlayer(player)
+        if(nowPlayer.flow == null) return 0
         var value = number
 
         if(nowPlayer.flare < value){
             value = nowPlayer.flare
         }
 
-        val emptyPlace = 5 - nowPlayer.flow
+        val emptyPlace = 5 - nowPlayer.flow!!
         if(emptyPlace < value){
             value = emptyPlace
         }
 
         if(value != 0){
             nowPlayer.flare -= value
-            nowPlayer.flow += value
+            nowPlayer.flow = nowPlayer.flow!! + value
 
             logger.insert(Log(player, LogText.MOVE_TOKEN, NUMBER_AKINA_AKINA, value,
                 LocationEnum.FLARE_YOUR, LocationEnum.FLOW_YOUR, false))
@@ -858,6 +862,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun lifeToFlow(player: PlayerEnum, number: Int): Int{
         val nowPlayer = getPlayer(player)
+        if(nowPlayer.flow == null) return 0
+
         var value = number
         val before = nowPlayer.life
 
@@ -865,14 +871,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = nowPlayer.life
         }
 
-        val emptyPlace = 5 - nowPlayer.flow
+        val emptyPlace = 5 - nowPlayer.flow!!
         if(emptyPlace < value){
             value = emptyPlace
         }
 
         if(value != 0){
             dust -= value
-            nowPlayer.flow += value
+            nowPlayer.flow = nowPlayer.flow!! + value
 
             logger.insert(Log(player, LogText.MOVE_TOKEN, NUMBER_AKINA_AKINA, value,
                 LocationEnum.LIFE_YOUR, LocationEnum.FLOW_YOUR, false))
@@ -893,15 +899,16 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun flowToDust(player: PlayerEnum, number: Int){
         val nowPlayer = getPlayer(player)
+        if(nowPlayer.flow == null) return
         var value = number
 
-        if(nowPlayer.flow < value){
-            value = nowPlayer.flow
+        if(nowPlayer.flow!! < value){
+            value = nowPlayer.flow!!
         }
 
         if(value != 0){
             dust += value
-            nowPlayer.flow -= value
+            nowPlayer.flow = nowPlayer.flow!! - value
 
             logger.insert(Log(player, LogText.MOVE_TOKEN, NUMBER_AKINA_AKINA, value,
                 LocationEnum.FLOW_YOUR, LocationEnum.DUST, false))
@@ -913,15 +920,16 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun flowToFlare(player_flow: PlayerEnum, player_flare: PlayerEnum, number: Int, reason: Int){
         val flowPlayer = getPlayer(player_flow)
+        if(flowPlayer.flow == null) return
         val flarePlayer = getPlayer(player_flare)
         var value = number
 
-        if(flowPlayer.flow < value){
-            value = flowPlayer.flow
+        if(flowPlayer.flow!! < value){
+            value = flowPlayer.flow!!
         }
 
         if(value != 0){
-            flowPlayer.flow -= value
+            flowPlayer.flow = flowPlayer.flow!! - value
             flarePlayer.flare += value
 
             if(player_flow == player_flare){
@@ -942,6 +950,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     suspend fun flowToAura(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum,
                            reason: Int){
         val nowPlayer = getPlayer(player)
+        if(nowPlayer.flow == null) return
         var value = number
 
         if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
@@ -950,8 +959,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             return
         }
 
-        if(nowPlayer.flow < value){
-            value = nowPlayer.flow
+        if(nowPlayer.flow!! < value){
+            value = nowPlayer.flow!!
         }
 
         nowPlayer.setMaxAura(arrow, user)
@@ -962,7 +971,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
 
         if(value != 0){
-            nowPlayer.flow -= value
+            nowPlayer.flow = nowPlayer.flow!! - value
             nowPlayer.aura += value
 
             logger.insert(Log(player, LogText.MOVE_TOKEN, reason, value,
@@ -3542,19 +3551,23 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val damagePlayer = getPlayer(getDamagePlayer)
         val tokenList = damagePlayer.getLacerationToken(giveDamagePlayer)
         tokenList[index] += number
-        sendCommand(getDamagePlayer, getDamagePlayer.opposite(),
-            getLacerationCommand(getDamagePlayer, giveDamagePlayer), tokenList[index] * 10 + index)
+        sendMoveToken(getSocket(getDamagePlayer), getSocket(getDamagePlayer.opposite()),
+            TokenEnum.getLaceration(getDamagePlayer, giveDamagePlayer), LocationEnum.OUT_OF_GAME, index.toLacerationLocation(),
+            number, -1)
         if(damagePlayer.getTotalLacerationToken(INDEX_LACERATION_LIFE) >= damagePlayer.life){
             makeOneZoneLacerationToDamage(getDamagePlayer, null, INDEX_LACERATION_LIFE)
         }
     }
 
-    fun getLacerationCommand(getDamagePlayer: PlayerEnum, giveDamagePlayer: PlayerEnum) =
-        if(getDamagePlayer == giveDamagePlayer){
-            CommandEnum.SET_LACERATION_TOKEN_YOUR_YOUR
-        } else{
-            CommandEnum.SET_LACERATION_TOKEN_OTHER_OTHER
-        }
+    suspend fun removeLacerationToken(player: PlayerEnum, tokenPlayer: PlayerEnum, index: Int, number: Int){
+        val value = if(getPlayer(player).getLacerationToken(tokenPlayer)[index] < number){
+            getPlayer(player).getLacerationToken(tokenPlayer)[index]
+        } else number
+        getPlayer(player).getLacerationToken(tokenPlayer)[index] -= value
+        sendMoveToken(getSocket(player), getSocket(player.opposite()),
+            TokenEnum.getLaceration(player, tokenPlayer), index.toLacerationLocation(), LocationEnum.OUT_OF_GAME,
+            value, -1)
+    }
 
     suspend fun processAllLacerationDamage(player: PlayerEnum){
         val nowPlayer = getPlayer(player)
@@ -3606,46 +3619,47 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             INDEX_LACERATION_FLARE -> {
                 if(giveDamagePlayer == null){
                     val totalDamage = damagePlayer.getTotalLacerationToken(index)
+                    removeLacerationToken(getDamagePlayer, PlayerEnum.PLAYER1, index, 999)
+                    removeLacerationToken(getDamagePlayer, PlayerEnum.PLAYER2, index, 999)
                     logger.insert(Log(getDamagePlayer, LogText.GET_FLARE_DAMAGE, totalDamage, NUMBER_SHISUI_SHISUI))
                     flareToDust(getDamagePlayer, totalDamage, Arrow.NULL, getDamagePlayer, getDamagePlayer, NUMBER_SHISUI_SHISUI)
-                    setLacerationToken(getDamagePlayer, PlayerEnum.PLAYER1, index, 0)
-                    setLacerationToken(getDamagePlayer, PlayerEnum.PLAYER2, index, 0)
+
                 }
                 else{
                     val totalDamage = damagePlayer.getLacerationToken(giveDamagePlayer)[index]
+                    removeLacerationToken(getDamagePlayer, giveDamagePlayer, index, 999)
                     logger.insert(Log(getDamagePlayer, LogText.GET_FLARE_DAMAGE, totalDamage, NUMBER_SHISUI_SHISUI))
                     flareToDust(getDamagePlayer, totalDamage, Arrow.NULL, getDamagePlayer, getDamagePlayer, NUMBER_SHISUI_SHISUI)
-                    setLacerationToken(getDamagePlayer, giveDamagePlayer, index, 0)
                 }
             }
             INDEX_LACERATION_AURA -> {
                 if(giveDamagePlayer == null){
                     val totalDamage = damagePlayer.getTotalLacerationToken(index)
+                    removeLacerationToken(getDamagePlayer, PlayerEnum.PLAYER1, index, 999)
+                    removeLacerationToken(getDamagePlayer, PlayerEnum.PLAYER2, index, 999)
                     processDamage(getDamagePlayer, CommandEnum.CHOOSE_AURA, Pair(totalDamage, 999), false,
                         null, null, NUMBER_SHISUI_SHISUI)
-                    setLacerationToken(getDamagePlayer, PlayerEnum.PLAYER1, index, 0)
-                    setLacerationToken(getDamagePlayer, PlayerEnum.PLAYER2, index, 0)
                 }
                 else{
                     val totalDamage = damagePlayer.getLacerationToken(giveDamagePlayer)[index]
+                    removeLacerationToken(getDamagePlayer, giveDamagePlayer, index, 999)
                     processDamage(getDamagePlayer, CommandEnum.CHOOSE_AURA, Pair(totalDamage, 999), false,
                         null, null, NUMBER_SHISUI_SHISUI)
-                    setLacerationToken(getDamagePlayer, giveDamagePlayer, index, 0)
                 }
             }
                 INDEX_LACERATION_LIFE -> {
                 if(giveDamagePlayer == null){
                     val totalDamage = damagePlayer.getTotalLacerationToken(index)
+                    removeLacerationToken(getDamagePlayer, PlayerEnum.PLAYER1, index, 999)
+                    removeLacerationToken(getDamagePlayer, PlayerEnum.PLAYER2, index, 999)
                     processDamage(getDamagePlayer, CommandEnum.CHOOSE_LIFE, Pair(999, totalDamage), false,
                         null, null, NUMBER_SHISUI_SHISUI)
-                    setLacerationToken(getDamagePlayer, PlayerEnum.PLAYER1, index, 0)
-                    setLacerationToken(getDamagePlayer, PlayerEnum.PLAYER2, index, 0)
                 }
                 else{
                     val totalDamage = damagePlayer.getLacerationToken(giveDamagePlayer)[index]
+                    removeLacerationToken(getDamagePlayer, giveDamagePlayer, index, 999)
                     processDamage(getDamagePlayer, CommandEnum.CHOOSE_LIFE, Pair(999, totalDamage), false,
                         null, null, NUMBER_SHISUI_SHISUI)
-                    setLacerationToken(getDamagePlayer, giveDamagePlayer, index, 0)
                 }
             }
             else -> {
@@ -3653,11 +3667,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
         }
         logger.insert(Log(getDamagePlayer.opposite(), LogText.END_EFFECT, NUMBER_SHISUI_SHISUI, -1))
-    }
-
-    suspend fun setLacerationToken(player: PlayerEnum, tokenPlayer: PlayerEnum, index: Int, number: Int){
-        getPlayer(player).getLacerationToken(tokenPlayer)[index] = number
-        sendCommand(player, tokenPlayer, getLacerationCommand(player, tokenPlayer), number * 10 + index)
     }
 
     suspend fun movePlayingCard(player: PlayerEnum, place: LocationEnum?, card_number: Int){

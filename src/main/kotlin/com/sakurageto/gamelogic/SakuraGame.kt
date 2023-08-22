@@ -235,6 +235,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
     private fun settingForAkina(player: PlayerEnum){
         val nowPlayer = gameStatus.getPlayer(player)
 
+        nowPlayer.flow = 0
         if(nowPlayer.megamiOneNormalForm() == MegamiEnum.AKINA){
             nowPlayer.megamiCard = Card.cardMakerByName(firstTurn == player, CardName.AKINA_AKINA, player)
             nowPlayer.megamiCard?.special_card_state = SpecialCardEnum.PLAYED

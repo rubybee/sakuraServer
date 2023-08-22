@@ -99,8 +99,8 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
 
     var marketPrice: Int? = null
     fun getMarketPrice() = marketPrice?: 1
-    var flow: Int = 0
-    fun getCapital() = aura + flare + flow
+    var flow: Int? = null
+    fun getCapital() = aura + flare + (flow?: 0)
 
     //aura, flare, life
     private val lacerationTokenForPlayer1 = mutableListOf(0, 0, 0)

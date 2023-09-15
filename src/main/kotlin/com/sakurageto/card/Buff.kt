@@ -50,6 +50,7 @@ class AttackBuffQueue() {
             MULTIPLE_IMMEDIATE -> attackBuff[3].add(buf)
             DIVIDE_IMMEDIATE -> attackBuff[4].add(buf)
             PLUS_MINUS_IMMEDIATE -> attackBuff[5].add(buf)
+            PLUS_MINUS_TEMP_BUT_NOT_REMOVE_WHEN_UNUSED -> attackBuff[5].add(buf)
         }
     }
 
@@ -73,12 +74,29 @@ class AttackBuffQueue() {
             MULTIPLE_IMMEDIATE -> attackBuff[3].removeByNumber(card_number)
             DIVIDE_IMMEDIATE -> attackBuff[4].removeByNumber(card_number)
             PLUS_MINUS_IMMEDIATE -> attackBuff[5].removeByNumber(card_number)
+            PLUS_MINUS_TEMP_BUT_NOT_REMOVE_WHEN_UNUSED -> attackBuff[5].removeByNumber(card_number)
+        }
+    }
+
+    fun clearUnUsedBuff(){
+        for (index in 0 until buffQueueNumber){
+            if(index == 5){
+                for (i in 0 until attackBuff[index].size){
+                    val now = attackBuff[5].removeFirst()
+                    if(now.tag == PLUS_MINUS_TEMP_BUT_NOT_REMOVE_WHEN_UNUSED){
+                        attackBuff[5].addLast(now)
+                    }
+                }
+            }
+            else{
+                attackBuff[index].clear()
+            }
         }
     }
 
     fun clearBuff(){
-        for (queue in attackBuff){
-            queue.clear()
+        for (buffQueue in attackBuff){
+            buffQueue.clear()
         }
     }
 
@@ -308,6 +326,7 @@ enum class BufTag {
     MULTIPLE_IMMEDIATE,
     DIVIDE_IMMEDIATE,
     PLUS_MINUS_IMMEDIATE,
+    PLUS_MINUS_TEMP_BUT_NOT_REMOVE_WHEN_UNUSED
 }
 
 enum class RangeBufTag {

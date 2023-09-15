@@ -3,7 +3,6 @@ package com.sakurageto.card
 import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.MegamiEnum
 import com.sakurageto.gamelogic.Umbrella
-import com.sakurageto.protocol.CommandEnum
 import java.util.SortedSet
 
 class MadeAttack(
@@ -16,19 +15,40 @@ class MadeAttack(
     val damageNotChange: Boolean = false,
     var isLaceration: Boolean = false
 ) {
-    var editedChogek = false
+    var bothSideDamage = false
+    var effect: MutableList<Text>? = null
 
     var isItReact = true
-
-    var kururuChangeRangeUpper = false
-    var kururuChangeRangeUnder = false
-    var kururuChange2X = false
-
     var isItValid= true
     var isItDamage = true
     var canNotSelectAura = false
 
+    var tempEditedAuraDamage = -1
+    var tempEditedLifeDamage = -1
+    private var editedAuraDamage = -1
+    private var editedLifeDamage = -1
+    private val thisTempAttackBuff: AttackBuffQueue = AttackBuffQueue()
+    private val thisTurnAttackBuff: AttackBuffQueue = AttackBuffQueue()
+
+    var editedInevitable = false
+    var editedCannotReactNormal = false
+    var editedCannotReactSpecial = false
+    var editedCannotReact = false
+    var editedLaceration = false
+    var editedChogek = false
+    private val thisTempOtherBuff = OtherBuffQueue()
+    private val thisTurnOtherBuff = OtherBuffQueue()
+
+    var editedDistance: SortedSet<Int> = sortedSetOf()
+    private val thisTurnRangeBuff = RangeBuffQueue()
+    private val thisTempRangeBuff = RangeBuffQueue()
+
+    var kururuChangeRangeUpper = false
+    var kururuChangeRangeUnder = false
+    var kururuChange2X = false
+    var tabooGaugeAmount = 0
     var afterAttackCompleteEffect = mutableListOf<Text>()
+
 
     fun Chogek(){
         editedChogek = true
@@ -47,19 +67,10 @@ class MadeAttack(
         }
     }
 
-
-    var tempEditedAuraDamage = -1
-    var tempEditedLifeDamage = -1
-    private var editedAuraDamage = -1
-
     fun getEditedAuraDamage() = editedAuraDamage
 
-    private var editedLifeDamage = -1
 
     fun getEditedLifeDamage() = editedLifeDamage
-
-    private val thisTempAttackBuff: AttackBuffQueue = AttackBuffQueue()
-    private val thisTurnAttackBuff: AttackBuffQueue = AttackBuffQueue()
 
     fun addTempAttackBuff(tempAttackBuff: AttackBuffQueue){
         thisTempAttackBuff.addAllBuff(tempAttackBuff)
@@ -105,20 +116,9 @@ class MadeAttack(
         editedInevitable = true
     }
 
-    var bothSideDamage = false
-
     fun setBothSideDamage(){
         bothSideDamage = true
     }
-
-    var editedInevitable = false
-    var editedCannotReactNormal = false
-    var editedCannotReactSpecial = false
-    var editedCannotReact = false
-    var editedLaceration = false
-
-    private val thisTempOtherBuff = OtherBuffQueue()
-    private val thisTurnOtherBuff = OtherBuffQueue()
 
     fun addTempOtherBuff(tempOtherBuff: OtherBuffQueue){
         thisTempOtherBuff.addAllBuff(tempOtherBuff)
@@ -147,11 +147,11 @@ class MadeAttack(
         }
     }
 
-    suspend fun effectText(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, tag: TextEffectTag): Int?{
+    suspend fun effectText(player: PlayerEnum, game_status: GameStatus, attack: MadeAttack?, tag: TextEffectTag): Int?{
         this.effect?.let {
             for(text in it){
                 if(text.tag == tag){
-                    return text.effect!!(this.card_number, player, game_status, react_attack)
+                    return text.effect!!(this.card_number, player, game_status, attack)
                 }
             }
         }
@@ -195,11 +195,6 @@ class MadeAttack(
     fun canNotReact(){
         editedCannotReact = true
     }
-
-    var editedDistance: SortedSet<Int> = sortedSetOf()
-
-    private val thisTurnRangeBuff = RangeBuffQueue()
-    private val thisTempRangeBuff = RangeBuffQueue()
 
     fun returnWhenBuffDoNotUse(rangeBuff: RangeBuffQueue){
         thisTurnRangeBuff.cleanNotUsedBuff(rangeBuff)
@@ -282,9 +277,6 @@ class MadeAttack(
         }
     }
 
-    var effect: MutableList<Text>? = null
-
-
     fun addTextAndReturn(text: Text): MadeAttack{
         if(effect == null) effect = mutableListOf()
         effect!!.add(text)
@@ -348,7 +340,7 @@ class MadeAttack(
         return returnData
     }
 
-    suspend fun afterAttackProcess(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, damageSelect: DamageSelect){
+    suspend fun afterAttackProcess(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, selectedDamage: DamageSelect){
         this.effect?.let{
             for(text in it){
                 for(card in game_status.getPlayer(player.opposite()).enchantmentCard.values){
@@ -358,14 +350,17 @@ class MadeAttack(
                 }
                 if(text.timing_tag == TextEffectTimingTag.AFTER_ATTACK){
                     if(text.tag == TextEffectTag.WHEN_CHOOSE_AURA_DAMAGE){
-                        if(damageSelect == DamageSelect.AURA){
+                        if(selectedDamage == DamageSelect.BOTH || selectedDamage == DamageSelect.AURA){
                             text.effect!!(this.card_number, player, game_status, react_attack)
                         }
                     }
                     else if(text.tag == TextEffectTag.WHEN_CHOOSE_LIFE_DAMAGE){
-                        if(damageSelect == DamageSelect.LIFE){
+                        if(selectedDamage == DamageSelect.BOTH || selectedDamage == DamageSelect.LIFE){
                             text.effect!!(this.card_number, player, game_status, react_attack)
                         }
+                    }
+                    else if(text.tag == TextEffectTag.CHECK_THIS_ATTACK_VALUE){
+                        text.effect!!(this.card_number, player, game_status, this)
                     }
                     else{
                         text.effect!!(this.card_number, player, game_status, react_attack)

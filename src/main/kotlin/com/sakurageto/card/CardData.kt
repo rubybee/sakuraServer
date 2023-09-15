@@ -128,6 +128,10 @@ class CardData(
         this.charge = charge
     }
 
+    /***
+     null means cost X
+     minus value means cost is Laceration
+     */
     fun setSpecial(cost: Int?){
         this.cost = cost
     }

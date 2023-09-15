@@ -291,37 +291,37 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         gameStatus.player2.unselectedSpecialCard.addAll(CardName.returnSpecialCardNameByMegami(gameStatus.player2.megamiOne))
         gameStatus.player2.unselectedSpecialCard.addAll(CardName.returnSpecialCardNameByMegami(gameStatus.player2.megamiTwo))
 
-        val send_request_player1 = SakuraCardSetSend(CommandEnum.SELECT_CARD, gameStatus.player1.unselectedCard, gameStatus.player1.unselectedSpecialCard)
-        val send_request_player2 = SakuraCardSetSend(CommandEnum.SELECT_CARD, gameStatus.player2.unselectedCard, gameStatus.player2.unselectedSpecialCard)
+        val sendRequestPlayer1 = SakuraCardSetSend(CommandEnum.SELECT_CARD, gameStatus.player1.unselectedCard, gameStatus.player1.unselectedSpecialCard)
+        val sendRequestPlayer2 = SakuraCardSetSend(CommandEnum.SELECT_CARD, gameStatus.player2.unselectedCard, gameStatus.player2.unselectedSpecialCard)
 
-        player1.session.send(Json.encodeToString(send_request_player1))
-        player2.session.send(Json.encodeToString(send_request_player2))
+        player1.session.send(Json.encodeToString(sendRequestPlayer1))
+        player2.session.send(Json.encodeToString(sendRequestPlayer2))
 
-        val player1_data = waitCardSetUntil(player1, CommandEnum.SELECT_CARD)
-        val player2_data = waitCardSetUntil(player2, CommandEnum.SELECT_CARD)
+        val player1Data = waitCardSetUntil(player1, CommandEnum.SELECT_CARD)
+        val player2Data = waitCardSetUntil(player2, CommandEnum.SELECT_CARD)
 
         val card_data_player1: MutableList<CardName> = mutableListOf()
         val specialcard_data_player1: MutableList<CardName> = mutableListOf()
         val card_data_player2 : MutableList<CardName> = mutableListOf()
         val specialcard_data_player2 : MutableList<CardName> = mutableListOf()
 
-        if(checkCardSet(gameStatus.player1.unselectedCard, player1_data.normal_card, 7))
-            card_data_player1.addAll(player1_data.normal_card!!)
+        if(checkCardSet(gameStatus.player1.unselectedCard, player1Data.normal_card, 7))
+            card_data_player1.addAll(player1Data.normal_card!!)
         else
             card_data_player1.addAll(gameStatus.player1.unselectedCard.subList(0, 7))
 
-        if(checkCardSet(gameStatus.player2.unselectedCard, player2_data.normal_card, 7))
-            card_data_player2.addAll(player2_data.normal_card!!)
+        if(checkCardSet(gameStatus.player2.unselectedCard, player2Data.normal_card, 7))
+            card_data_player2.addAll(player2Data.normal_card!!)
         else
             card_data_player2.addAll(gameStatus.player2.unselectedCard.subList(0, 7))
 
-        if(checkCardSet(gameStatus.player1.unselectedSpecialCard, player1_data.special_card, 3))
-            specialcard_data_player1.addAll(player1_data.special_card!!)
+        if(checkCardSet(gameStatus.player1.unselectedSpecialCard, player1Data.special_card, 3))
+            specialcard_data_player1.addAll(player1Data.special_card!!)
         else
             specialcard_data_player1.addAll(gameStatus.player1.unselectedSpecialCard.subList(0, 3))
 
-        if(checkCardSet(gameStatus.player2.unselectedSpecialCard, player2_data.special_card, 3))
-            specialcard_data_player2.addAll(player2_data.special_card!!)
+        if(checkCardSet(gameStatus.player2.unselectedSpecialCard, player2Data.special_card, 3))
+            specialcard_data_player2.addAll(player2Data.special_card!!)
         else
             specialcard_data_player2.addAll(gameStatus.player2.unselectedSpecialCard.subList(0, 3))
 
@@ -423,7 +423,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         gameStatus.nowPhase = START_PHASE
         sendStartPhaseStart(getSocket(this.turnPlayer), getSocket(this.turnPlayer.opposite()))
         gameStatus.startPhaseEffectProcess(this.turnPlayer)
-        if(turnNumber == 0 || turnNumber == 1){
+        if(turnNumber == 0 || turnNumber == 1 || gameStatus.endCurrentPhase){
             return
         }
         gameStatus.startPhaseDefaultSecond(this.turnPlayer)
@@ -437,9 +437,9 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         gameStatus.endCurrentPhase = false
         gameStatus.nowPhase = MAIN_PHASE
         sendMainPhaseStart(getSocket(this.turnPlayer), getSocket(this.turnPlayer.opposite()))
-        gameStatus.mainPhaseEffectProcess(this.turnPlayer)
         if(receiveFullPowerRequest(getSocket(this.turnPlayer))){
             gameStatus.setPlayerFullAction(this.turnPlayer, true)
+            gameStatus.mainPhaseEffectProcess(this.turnPlayer)
             while (true){
                 val data = receiveFullPowerActionRequest(getSocket(this.turnPlayer))
                 if(data.first == CommandEnum.ACTION_END_TURN){
@@ -455,6 +455,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         }
         else{
             gameStatus.setPlayerFullAction(this.turnPlayer, false)
+            gameStatus.mainPhaseEffectProcess(this.turnPlayer)
             while (true){
                 if(gameStatus.endCurrentPhase || gameStatus.getEndTurn(this.turnPlayer)){
                     return
@@ -484,7 +485,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         gameStatus.nowPhase = END_PHASE
         sendEndPhaseStart(getSocket(this.turnPlayer), getSocket(this.turnPlayer.opposite()))
         gameStatus.endPhaseEffectProcess(this.turnPlayer)
-        gameStatus.endPhaseEffectProcess2()
+        gameStatus.resetTurnValue()
         gameStatus.setEndTurn(PlayerEnum.PLAYER1, false)
         gameStatus.setEndTurn(PlayerEnum.PLAYER2, false)
         gameStatus.endTurnHandCheck(this.turnPlayer)

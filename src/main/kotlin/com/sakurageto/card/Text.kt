@@ -126,6 +126,7 @@ enum class TextEffectTag {
     WHEN_END_PHASE_YOUR_IN_DISCARD,
 
     //check effect when some process is running
+    CHECK_THIS_ATTACK_VALUE,
     CAN_NOT_CHOOSE_AURA_DAMAGE,
     CAN_NOT_WIN,
     CAN_NOT_LOSE,

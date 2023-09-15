@@ -67,13 +67,19 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 if(start_turn){
                     return Card(card_name.toCardNumber(true), data, player, SpecialCardEnum.UNUSED)
                 }
-                return Card(card_name.toCardNumber(false), data, player, SpecialCardEnum.UNUSED)
+                else{
+                    return Card(card_name.toCardNumber(false), data, player, SpecialCardEnum.UNUSED)
+                }
+
             }
             else{
                 if(start_turn){
                     return Card(card_name.toCardNumber(true), data, player, null)
                 }
-                return Card(card_name.toCardNumber(false), data, player, null)
+                else{
+                    return Card(card_name.toCardNumber(false), data, player, null)
+                }
+
             }
 
         }
@@ -329,6 +335,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 }
             }
         }
+
         if(this.card_data.umbrellaMark){
             when(game_status.getUmbrella(this.player)){
                 Umbrella.FOLD -> {
@@ -377,7 +384,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         cannotReact = this.card_data.cannotReact,
                         chogek = this.card_data.chogek,
                         inevitable = this.card_data.inevitable,
-                        subType = subType ?: this.card_data.sub_type
+                        subType = subType ?: this.card_data.sub_type,
+                        isLaceration = this.card_data.isLaceration
                     )
                 }
                 null -> {
@@ -399,7 +407,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 cannotReact = this.card_data.cannotReact,
                 chogek = this.card_data.chogek,
                 inevitable = this.card_data.inevitable,
-                subType = subType ?: this.card_data.sub_type
+                subType = subType ?: this.card_data.sub_type,
+                isLaceration = this.card_data.isLaceration
             )
         }
     }
@@ -488,23 +497,26 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         }
                     }
                 }
-                if(gameStatus.addPreAttackZone(player, this.makeAttack(player, gameStatus, react_attack, this.card_data.sub_type)?.addTextAndReturn(gameStatus.getUmbrella(this.player), this.card_data)?:
-                    MadeAttack(
-                        card_name =  this.card_data.card_name,
-                        card_number = this.card_number,
-                        card_class = this.card_data.card_class,
-                        distance = sortedSetOf(),
-                        life_damage = 0,
-                        aura_damage = 0,
-                        megami = this.card_data.megami,
-                        cannotReactNormal = false,
-                        cannotReactSpecial = false,
-                        cannotReact = false,
-                        chogek = false ,
-                        inevitable = this.card_data.inevitable,
-                        subType = this.card_data.sub_type,
-                        isLaceration = this.card_data.isLaceration
-                    ), react_attack)){
+                if(gameStatus.addPreAttackZone(
+                        player,
+                        this.makeAttack(player, gameStatus, react_attack, this.card_data.sub_type)?.addTextAndReturn(gameStatus.getUmbrella(this.player), this.card_data)?:
+                            MadeAttack(
+                                card_name =  this.card_data.card_name,
+                                card_number = this.card_number,
+                                card_class = this.card_data.card_class,
+                                distance = sortedSetOf(),
+                                life_damage = 0,
+                                aura_damage = 0,
+                                megami = this.card_data.megami,
+                                cannotReactNormal = false,
+                                cannotReactSpecial = false,
+                                cannotReact = false,
+                                chogek = false ,
+                                inevitable = this.card_data.inevitable,
+                                subType = this.card_data.sub_type,
+                                isLaceration = this.card_data.isLaceration
+                            )
+                    )){
                     return cost
                 }
                 if(card_data.card_class == CardClass.SPECIAL){

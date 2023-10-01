@@ -9,18 +9,25 @@ import com.sakurageto.gamelogic.log.Log
 import com.sakurageto.gamelogic.log.LogText
 import com.sakurageto.gamelogic.megamispecial.storyboard.Act
 import com.sakurageto.protocol.CommandEnum
+import com.sakurageto.protocol.LocationEnum
 import com.sakurageto.protocol.receiveNapInformation
 import java.util.SortedSet
 import kotlin.collections.ArrayDeque
 import kotlin.collections.HashMap
 
 class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum,
-           var special_card_state: SpecialCardEnum?){
+           var special_card_state: SpecialCardEnum?, var location: LocationEnum){
     private var nap: Int? = null
     private var seedToken: Int = 0
+    var beforeCardData: CardData? = null
+    var cardUseEndEffect = HashMap<Int, Text>()
 
+    /***
+     1. can not select by other user's card effect if your soft attack in your hand
+     2. your soft attack not in hand or cover can not move to hand or deck except reconstruct
+     3. soft attack can not seal
+     */
     var isSoftAttack = false
-
     var numberForX = 0
 
     fun getNap() = nap
@@ -37,12 +44,11 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
 
         effectText(player, game_status, null, TextEffectTag.WHEN_MOVE_TOKEN)
 
-        if(sakuraToken >= value){
-            return Pair(value, 0)
-        }
-        else{
+        return if(sakuraToken >= value){
+            Pair(value, 0)
+        } else{
             seedToken = seedToken - value + sakuraToken
-            return Pair(sakuraToken, value - sakuraToken)
+            Pair(sakuraToken, value - sakuraToken)
         }
     }
 
@@ -56,28 +62,24 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
     }
 
-    var beforeCardData: CardData? = null
-
-    var cardUseEndEffect = HashMap<Int, Text>()
-
     companion object{
-        fun cardMakerByName(start_turn: Boolean, card_name: CardName, player: PlayerEnum): Card{
+        fun cardMakerByName(start_turn: Boolean, card_name: CardName, player: PlayerEnum, location: LocationEnum): Card{
             val data = card_name.toCardData()
             if (data.isItSpecial()){
                 if(start_turn){
-                    return Card(card_name.toCardNumber(true), data, player, SpecialCardEnum.UNUSED)
+                    return Card(card_name.toCardNumber(true), data, player, SpecialCardEnum.UNUSED, location)
                 }
                 else{
-                    return Card(card_name.toCardNumber(false), data, player, SpecialCardEnum.UNUSED)
+                    return Card(card_name.toCardNumber(false), data, player, SpecialCardEnum.UNUSED, location)
                 }
 
             }
             else{
                 if(start_turn){
-                    return Card(card_name.toCardNumber(true), data, player, null)
+                    return Card(card_name.toCardNumber(true), data, player, null, location)
                 }
                 else{
-                    return Card(card_name.toCardNumber(false), data, player, null)
+                    return Card(card_name.toCardNumber(false), data, player, null, location)
                 }
 
             }
@@ -87,17 +89,17 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         fun cardInitInsert(start_turn: Boolean, dest: ArrayDeque<Card>, src: MutableList<CardName>, player: PlayerEnum){
             src.shuffle()
             for(card_name in src){
-                dest.add(cardMakerByName(start_turn, card_name, player))
+                dest.add(cardMakerByName(start_turn, card_name, player, LocationEnum.DECK))
             }
         }
 
         fun cardInitInsert(start_turn: Boolean, dest: HashMap<Int, Card>, src: MutableList<CardName>, player: PlayerEnum){
             for(card_name in src){
                 if(start_turn){
-                    dest[card_name.toCardNumber(true)] = cardMakerByName(true, card_name, player)
+                    dest[card_name.toCardNumber(true)] = cardMakerByName(true, card_name, player, LocationEnum.SPECIAL_CARD)
                 }
                 else{
-                    dest[card_name.toCardNumber(false)] = cardMakerByName(false, card_name, player)
+                    dest[card_name.toCardNumber(false)] = cardMakerByName(false, card_name, player, LocationEnum.SPECIAL_CARD)
                 }
             }
         }
@@ -118,27 +120,9 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     }
 
     fun enchantmentUsable(text: Text): Boolean =
-        text.timing_tag == TextEffectTimingTag.IN_DEPLOYMENT && (nap?: 0) > 0
+        location == LocationEnum.ENCHANTMENT_ZONE && text.timing_tag == TextEffectTimingTag.IN_DEPLOYMENT && (nap?: 0) > 0
     fun usedEffectUsable(text: Text): Boolean =
         text.timing_tag == TextEffectTimingTag.USED && this.special_card_state == SpecialCardEnum.PLAYED
-
-    suspend fun reduceNapNormal(player: PlayerEnum, game_status: GameStatus): Int{
-       card_data.effect?.let {
-           for(text in it){
-               if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT || text.timing_tag == TextEffectTimingTag.IN_DEPLOYMENT){
-                   when(text.tag){
-                       TextEffectTag.DO_NOT_NAP -> {
-                           return text.effect!!(this.card_number, player, game_status, null)!!
-                       }
-                       else -> {
-                           continue
-                       }
-                   }
-               }
-           }
-       }
-        return 1
-    }
 
     suspend fun destructionEnchantmentNormaly(player: PlayerEnum, game_status: GameStatus){
         card_data.effect?.let {
@@ -184,7 +168,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         return card_data.effect?.let {
             var result = false
             for(text in it){
-                if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT && text.tag == TextEffectTag.CAN_REACTABLE){
+                if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT && text.tag == TextEffectTag.CAN_USE_REACT){
                     result =  text.effect!!(this.card_number, player, gameStatus, null)!! == 1
                     break
                 }
@@ -452,8 +436,9 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
 
         if(card_data.card_class == CardClass.SPECIAL){
-            if(nowPlayer.canNotUseCardName1?.second == card_data.card_name
-                || nowPlayer.canNotUseCardName2?.second == card_data.card_name){
+            if(gameStatus.turnPlayer == player &&
+                (nowPlayer.canNotUseCardName1?.second == card_data.card_name
+                || nowPlayer.canNotUseCardName2?.second == card_data.card_name)){
                 return -2
             }
             if(isCost && isConsume){
@@ -477,8 +462,9 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         else{
             if(card_data.card_class == CardClass.NORMAL){
                 if(gameStatus.getPlayer(player.opposite()).nowAct?.actColor == Act.COLOR_RED){
-                    if(nowPlayer.canNotUseCardName1?.second == card_data.card_name
-                        || nowPlayer.canNotUseCardName2?.second == card_data.card_name){
+                    if(gameStatus.turnPlayer == player &&
+                        (nowPlayer.canNotUseCardName1?.second == card_data.card_name
+                        || nowPlayer.canNotUseCardName2?.second == card_data.card_name)){
                         return -2
                     }
                 }
@@ -677,7 +663,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
 
         if(card_data.sub_type == SubType.FULL_POWER){
             for(card in game_status.getPlayer(player).usedSpecialCard.values){
-                card.addValidEffect(TextEffectTag.WHEN_FULL_POWER_USED_YOUR, cardUseEndEffect)
+                card.addValidEffect(TextEffectTag.WHEN_USE_FULL_POWER_YOUR_END, cardUseEndEffect)
             }
         }
         else if(card_data.sub_type == SubType.REACTION){
@@ -716,26 +702,6 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             }
         }
         return false
-    }
-
-    suspend fun swellAdjust(player: PlayerEnum, game_status: GameStatus): Int{
-        this.card_data.effect?.let {
-            for(text in it){
-                if(text.tag == TextEffectTag.CHANGE_SWELL_DISTANCE){
-                    when(text.timing_tag){
-                        TextEffectTimingTag.IN_DEPLOYMENT -> {
-                            if((this.nap ?: -1) > 0 && this.card_data.card_type == CardType.ENCHANTMENT) return text.effect!!(this.card_number, player, game_status, null)!!
-                        }
-                        TextEffectTimingTag.USED -> {
-                            if(this.special_card_state == SpecialCardEnum.PLAYED) return text.effect!!(this.card_number, player, game_status, null)!!
-                        }
-                        else -> continue
-                    }
-                }
-
-            }
-        }
-        return 0
     }
 
     fun checkAuraReplaceable(): Boolean{
@@ -824,18 +790,6 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             }
         }
         return null
-    }
-
-    suspend fun endPhaseEffect(player: PlayerEnum, game_status: GameStatus) {
-        this.card_data.effect?.let {
-            for(text in it){
-                if (usedEffectUsable(text) || enchantmentUsable(text)) {
-                    if(text.tag == TextEffectTag.WHEN_END_PHASE_YOUR){
-                        text.effect!!(this.card_number, player, game_status, null)
-                    }
-                }
-            }
-        }
     }
 
     suspend fun checkWhenUmbrellaChange(player: PlayerEnum, game_status: GameStatus){
@@ -952,23 +906,6 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         return now
     }
 
-    fun operationForbidCheck(forbidYour: Boolean, command: CommandEnum): Boolean{
-        val findTag = when(command){
-            CommandEnum.ACTION_GO_BACKWARD -> if(forbidYour) TODO() else TextEffectTag.FORBID_GO_BACKWARD_OTHER
-            CommandEnum.ACTION_BREAK_AWAY -> if(forbidYour) TODO() else TextEffectTag.FORBID_BREAK_AWAY_OTHER
-            CommandEnum.ACTION_INCUBATE -> if(forbidYour) TODO() else TextEffectTag.FORBID_INCUBATE_OTHER
-            else -> TODO()
-        }
-        card_data.effect?.let {
-            for(text in it){
-                if(enchantmentUsable(text) || usedEffectUsable(text)){
-                    if(text.tag == findTag) return true
-                }
-            }
-        }
-        return false
-    }
-
     fun canUseAtCover(): Boolean{
         card_data.effect?.let {
             for(text in it){
@@ -993,8 +930,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         card_data.effect?.let {
             for(text in it){
                 if(enchantmentUsable(text) || usedEffectUsable(text)){
-                    if(text.tag == TextEffectTag.DO_NOT_MOVE_TOKEN){
-                        return text.effect!!(reason, player, game_status, null) == 1
+                    if(text.tag == TextEffectTag.CAN_NOT_MOVE_TOKEN){
+                        return text.effect!!(reason, player, game_status, null) != 1
                     }
                 }
             }

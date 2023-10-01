@@ -55,7 +55,7 @@ class YatsuhaJourney(private val startPoint: Int) {
             null
         }
 
-        val journeyEffectTwo = Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_SAKURA_TOKEN) ret@{_, player, game_status, _->
+        val journeyEffectTwo = Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_TOKEN) ret@{ _, player, game_status, _->
             game_status.selectCardFrom(player, player, player,
                 listOf(LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.OTHER_ENCHANTMENT_ZONE_CARD),
                 CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_JOURNEY_SECOND_EFFECT, 1){ _, _ ->
@@ -104,7 +104,7 @@ class YatsuhaJourney(private val startPoint: Int) {
             null
         }
 
-        val journeyEffectFour = Text(TextEffectTimingTag.USING, TextEffectTag.DRAW_CARD) ret@{_, player, game_status, _->
+        val journeyEffectFour = Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) ret@{ _, player, game_status, _->
             game_status.drawCard(player, 1)
             null
         }

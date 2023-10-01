@@ -50,6 +50,13 @@ class Log(val player: PlayerEnum, val text: LogText, val number1: Int, val numbe
         const val STORM_FORCE = 9
         const val ACT_DAMAGE = 10
         const val END_IDEA = 11
+
+        const val ATTACK_NUMBER_NULL = 0
+        const val ATTACK_NUMBER_NORMAL = 1
+        const val ATTACK_NUMBER_SPECIAL = 2
+        const val ATTACK_NUMBER_SOLDIER = 3
+        const val ATTACK_NUMBER_IDEA = 4
+        const val ATTACK_NUMBER_POISON = 5
     }
 }
 

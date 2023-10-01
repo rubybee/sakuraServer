@@ -12,6 +12,9 @@ import kotlinx.serialization.json.Json
 
 val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
 
+val cardEffectSelectCommandSet =
+    setOf(SELECT_ONE, SELECT_TWO, SELECT_THREE, SELECT_FOUR, SELECT_FIVE, SELECT_SIX, SELECT_SEVEN, SELECT_EIGHT, SELECT_NINE, SELECT_TEN, SELECT_NOT)
+
 suspend fun waitReconnect(player: Connection){
     player.disconnectTime = System.currentTimeMillis()
     while (true){
@@ -744,9 +747,11 @@ suspend fun receiveCardEffectSelectMain(player: Connection, card_number: Int): C
                 val text = frame.readText()
                 try {
                     val data = json.decodeFromString<SakuraCardCommand>(text)
-                    when(data.command){
-                        SELECT_ONE, SELECT_TWO, SELECT_THREE, SELECT_FOUR, SELECT_FIVE, SELECT_SIX, SELECT_SEVEN, SELECT_EIGHT, SELECT_NOT -> return data.command //will be added
-                        else -> continue
+                    if(data.command in cardEffectSelectCommandSet){
+                        return data.command
+                    }
+                    else{
+                        continue
                     }
                 }catch (e: Exception){
                     continue
@@ -947,4 +952,6 @@ suspend fun receiveSimpleCommandMain(player: Connection): CommandEnum{
         }
     }
 }
+
+
 

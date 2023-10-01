@@ -55,6 +55,9 @@ class CardData(
     //for megumi
     var growing: Int = 0
 
+    /***
+     damage 999 means -, damage 1000 means X, Y
+     */
     fun setAttack(distance_type: DistanceType, distance_cont: Pair<Int, Int>?, distance_uncont: MutableList<Int>?,
                   aura_damage: Int, life_damage: Int, cannotReactNormal: Boolean, cannotReactSpecial: Boolean,
                   cannotReact: Boolean, chogek: Boolean, inevitable: Boolean = false, isLaceration: Boolean = false){
@@ -128,9 +131,10 @@ class CardData(
         this.charge = charge
     }
 
-    /***
-     null means cost X
-     minus value means cost is Laceration
+    /**
+     * @param cost : minus means laceration
+     *
+     * : null means X
      */
     fun setSpecial(cost: Int?){
         this.cost = cost
@@ -145,5 +149,21 @@ class CardData(
 
     fun isItSpecial(): Boolean{
         return this.card_class == CardClass.SPECIAL
+    }
+
+    fun returnRenriOwnNumber(): Int{
+        effect?.let {
+            for(text in it){
+                when(text.tag){
+                    TextEffectTag.RENRI_FALSE_STEP -> return NUMBER_RENRI_FALSE_STAB
+                    TextEffectTag.RENRI_TEMPORARY_EXPEDIENT -> return NUMBER_RENRI_TEMPORARY_EXPEDIENT
+                    TextEffectTag.RENRI_BLACK_AND_WHITE -> return NUMBER_RENRI_BLACK_AND_WHITE
+                    TextEffectTag.RENRI_FLOATING_CLOUDS -> return NUMBER_RENRI_FLOATING_CLOUDS
+                    TextEffectTag.RENRI_FISHING -> return NUMBER_RENRI_FISHING
+                    else -> {}
+                }
+            }
+        }
+        return 0
     }
 }

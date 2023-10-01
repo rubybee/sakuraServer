@@ -142,11 +142,11 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
 
         nowPlayer.umbrella = Umbrella.FOLD
         if(nowPlayer.megamiOneNormalForm() == MegamiEnum.YUKIHI){
-            nowPlayer.megamiCard = Card.cardMakerByName(firstTurn == player, CardName.YUKIHI_YUKIHI, player)
+            nowPlayer.megamiCard = Card.cardMakerByName(firstTurn == player, CardName.YUKIHI_YUKIHI, player, LocationEnum.YOUR_USED_CARD)
             nowPlayer.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
         }
         else{
-            nowPlayer.megamiCard2 = Card.cardMakerByName(firstTurn == player, CardName.YUKIHI_YUKIHI, player)
+            nowPlayer.megamiCard2 = Card.cardMakerByName(firstTurn == player, CardName.YUKIHI_YUKIHI, player, LocationEnum.YOUR_USED_CARD)
             nowPlayer.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
         }
     }
@@ -156,11 +156,11 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
 
         nowPlayer.stratagem = Stratagem.SHIN_SAN
         if(nowPlayer.megamiOneNormalForm() == MegamiEnum.SHINRA){
-            nowPlayer.megamiCard = Card.cardMakerByName(firstTurn == player, CardName.SHINRA_SHINRA, player)
+            nowPlayer.megamiCard = Card.cardMakerByName(firstTurn == player, CardName.SHINRA_SHINRA, player, LocationEnum.YOUR_USED_CARD)
             nowPlayer.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
         }
         else{
-            nowPlayer.megamiCard2 = Card.cardMakerByName(firstTurn == player, CardName.SHINRA_SHINRA, player)
+            nowPlayer.megamiCard2 = Card.cardMakerByName(firstTurn == player, CardName.SHINRA_SHINRA, player, LocationEnum.YOUR_USED_CARD)
             nowPlayer.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
         }
     }
@@ -170,7 +170,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         val turnCheck = firstTurn == player.opposite()
 
         for(card_name in CardName.returnPoisonCardName()){
-            val card = Card.cardMakerByName(turnCheck, card_name, player.opposite())
+            val card = Card.cardMakerByName(turnCheck, card_name, player.opposite(), LocationEnum.POISON_BAG)
             nowPlayer.poisonBag[card.card_data.card_name] = card
         }
     }
@@ -200,7 +200,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         val turnCheck = firstTurn == player
 
         for(card_name in CardName.returnSoldierCardName()){
-            val card = Card.cardMakerByName(turnCheck, card_name, player)
+            val card = Card.cardMakerByName(turnCheck, card_name, player, LocationEnum.NOT_READY_SOLDIER_ZONE)
             nowPlayer.notReadySoldierZone[card.card_number] = card
         }
     }
@@ -216,12 +216,12 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         nowPlayer.nowAct = StoryBoard.getActByNumber(0)
         if(nowPlayer.megamiOneNormalForm() == MegamiEnum.KANAWE){
             nowPlayer.megamiCard = Card.cardMakerByName(firstTurn == player,
-                CardName.KANAWE_KANAWE, player)
+                CardName.KANAWE_KANAWE, player, LocationEnum.YOUR_USED_CARD)
             nowPlayer.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
         }
         else{
             nowPlayer.megamiCard2 = Card.cardMakerByName(firstTurn == player,
-                CardName.KANAWE_KANAWE, player)
+                CardName.KANAWE_KANAWE, player, LocationEnum.YOUR_USED_CARD)
             nowPlayer.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
         }
     }
@@ -237,11 +237,11 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
 
         nowPlayer.flow = 0
         if(nowPlayer.megamiOneNormalForm() == MegamiEnum.AKINA){
-            nowPlayer.megamiCard = Card.cardMakerByName(firstTurn == player, CardName.AKINA_AKINA, player)
+            nowPlayer.megamiCard = Card.cardMakerByName(firstTurn == player, CardName.AKINA_AKINA, player, LocationEnum.YOUR_USED_CARD)
             nowPlayer.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
         }
         else{
-            nowPlayer.megamiCard2 = Card.cardMakerByName(firstTurn == player, CardName.AKINA_AKINA, player)
+            nowPlayer.megamiCard2 = Card.cardMakerByName(firstTurn == player, CardName.AKINA_AKINA, player, LocationEnum.YOUR_USED_CARD)
             nowPlayer.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
         }
 
@@ -356,7 +356,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         if(!additional_card_player1.isEmpty()){
             val turnCheck = firstTurn == PlayerEnum.PLAYER1
             for(card_name in additional_card_player1){
-                val card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER1)
+                val card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD)
                 gameStatus.player1.additionalHand[card.card_data.card_name] = card
             }
         }
@@ -364,7 +364,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         if(!additional_card_player2.isEmpty()){
             val turnCheck = firstTurn == PlayerEnum.PLAYER2
             for(card_name in additional_card_player2){
-                val card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER2)
+                val card = Card.cardMakerByName(turnCheck, card_name, PlayerEnum.PLAYER2, LocationEnum.ADDITIONAL_CARD)
                 gameStatus.player2.additionalHand[card.card_data.card_name] = card
             }
         }
@@ -393,12 +393,14 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         val data = SakuraCardCommand(CommandEnum.MULIGUN, -1)
         player1.session.send(Json.encodeToString(data))
         player2.session.send(Json.encodeToString(data))
-        val player1_data = waitCardSetUntil(player1, CommandEnum.MULIGUN)
-        val player2_data = waitCardSetUntil(player2, CommandEnum.MULIGUN)
+        val player1Data = waitCardSetUntil(player1, CommandEnum.MULIGUN)
+        val player2Data = waitCardSetUntil(player2, CommandEnum.MULIGUN)
         var count = 0
-        player1_data.normal_card?.let {
+        player1Data.normal_card?.let {
             for(card_name in it){
-                if(gameStatus.insertHandToDeck(false, true, PlayerEnum.PLAYER1, gameStatus.getCardNumber(PlayerEnum.PLAYER1, card_name))){
+                if(gameStatus.insertHandToDeck(public = false, Below = true, player = PlayerEnum.PLAYER1,
+                        card_number = gameStatus.getCardNumber(PlayerEnum.PLAYER1, card_name)
+                    )){
                     count += 1
                 }
             }
@@ -406,9 +408,11 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         gameStatus.drawCard(PlayerEnum.PLAYER1, count)
 
         count = 0
-        player2_data.normal_card?.let {
+        player2Data.normal_card?.let {
             for(card_name in it){
-                if(gameStatus.insertHandToDeck(false, true, PlayerEnum.PLAYER2, gameStatus.getCardNumber(PlayerEnum.PLAYER2, card_name))){
+                if(gameStatus.insertHandToDeck(public = false, Below = true, player = PlayerEnum.PLAYER2,
+                        card_number = gameStatus.getCardNumber(PlayerEnum.PLAYER2, card_name)
+                    )){
                     count += 1
                 }
             }
@@ -419,8 +423,8 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
 
     suspend fun startPhase(){
         gameStatus.endCurrentPhase = false
-        gameStatus.startPhaseBeforeEffect(this.turnPlayer)
         gameStatus.nowPhase = START_PHASE
+        gameStatus.startPhaseBeforeEffect(this.turnPlayer)
         sendStartPhaseStart(getSocket(this.turnPlayer), getSocket(this.turnPlayer.opposite()))
         gameStatus.startPhaseEffectProcess(this.turnPlayer)
         if(turnNumber == 0 || turnNumber == 1 || gameStatus.endCurrentPhase){
@@ -488,10 +492,13 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         gameStatus.resetTurnValue()
         gameStatus.setEndTurn(PlayerEnum.PLAYER1, false)
         gameStatus.setEndTurn(PlayerEnum.PLAYER2, false)
-        gameStatus.endTurnHandCheck(this.turnPlayer)
         gameStatus.logger.reset()
         this.turnPlayer = this.turnPlayer.opposite()
         this.turnNumber += 1
+        if(gameStatus.endCurrentPhase){
+            return
+        }
+        gameStatus.endTurnHandCheck(this.turnPlayer.opposite())
     }
 
     suspend fun gameStart(){

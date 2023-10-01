@@ -63,7 +63,7 @@ class Logger {
 
     fun checkThisTurnDoAttackNotSpecial(player: PlayerEnum): Boolean{
         for(log in logQueue){
-            if(log.player == player && log.text == LogText.ATTACK && log.number2 != 2) return true
+            if(log.player == player && log.text == LogText.ATTACK && log.number2 != Log.ATTACK_NUMBER_SPECIAL) return true
         }
         return false
     }

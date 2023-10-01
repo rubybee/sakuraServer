@@ -257,7 +257,7 @@ class MadeAttack(
         else if(number < 0){
             if(closable){
                 val min = editedDistance.first()
-                for(i in min until min + number){
+                for(i in min until min - number){
                     editedDistance.remove(i)
                 }
             }

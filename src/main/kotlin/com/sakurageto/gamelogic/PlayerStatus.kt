@@ -428,7 +428,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
             }
             LocationEnum.NOT_SELECTED_NORMAL_CARD -> {
                 unselectedCard.forEach{
-                    if(condition(Card.cardMakerByName(this.firstTurn, it, player_enum), location)){
+                    if(condition(Card.cardMakerByName(this.firstTurn, it, player_enum, LocationEnum.OUT_OF_GAME), location)){
                         destList.add(it.toCardNumber(true))
                     }
                 }

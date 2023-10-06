@@ -4,6 +4,7 @@ import com.sakurageto.card.INDEX_LACERATION_AURA
 import com.sakurageto.card.INDEX_LACERATION_FLARE
 import com.sakurageto.card.INDEX_LACERATION_LIFE
 import com.sakurageto.card.PlayerEnum
+import com.sakurageto.plugins.makeBugReportFile
 import java.lang.Exception
 import java.util.*
 
@@ -316,7 +317,7 @@ enum class CommandEnum {
         )
     }
 
-    fun Opposite(): CommandEnum{
+    suspend fun Opposite(): CommandEnum{
         when(this){
             ADD_CONCENTRATION_YOUR -> return ADD_CONCENTRATION_OTHER
             ADD_CONCENTRATION_OTHER -> return ADD_CONCENTRATION_YOUR
@@ -466,7 +467,10 @@ enum class CommandEnum {
             END_JOURNEY_OTHER -> return END_JOURNEY_YOUR
             SET_MARKET_PRICE_YOUR -> return SET_MARKET_PRICE_OTHER
             SET_MARKET_PRICE_OTHER -> return SET_MARKET_PRICE_YOUR
-            else -> TODO()
+            else -> {
+                makeBugReportFile("Opposite() do not support command: $this")
+                return NULL
+            }
         }
     }
 }

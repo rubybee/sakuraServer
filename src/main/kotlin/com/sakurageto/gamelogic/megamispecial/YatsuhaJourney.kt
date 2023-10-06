@@ -45,7 +45,7 @@ class YatsuhaJourney(private val startPoint: Int) {
             2 -> journeyEffectTwo
             3 -> journeyEffectThree
             4 -> journeyEffectFour
-            else -> throw Exception("Journey $nowPoint not supported")
+            else -> journeyEffectOne
         }
     }
 

@@ -5,6 +5,7 @@ import com.sakurageto.card.CardSet.toCardData
 import com.sakurageto.card.CardSet.toCardName
 import com.sakurageto.gamelogic.megamispecial.YatsuhaJourney
 import com.sakurageto.gamelogic.megamispecial.storyboard.Act
+import com.sakurageto.plugins.makeBugReportFile
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import com.sakurageto.protocol.SakuraSendData
@@ -358,7 +359,9 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
                     }
                 }
             }
-            else -> throw Exception("location: $location not supported")
+            else -> {
+                makeBugReportFile("insertCardNumberTwoCondition() do not support location: $location")
+            }
         }
     }
 
@@ -457,7 +460,9 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
                     }
                 }
             }
-            else -> throw Exception("location: $location not supported")
+            else -> {
+                makeBugReportFile("insertCardNumberOneCondition() do not support location: $location")
+            }
         }
     }
 

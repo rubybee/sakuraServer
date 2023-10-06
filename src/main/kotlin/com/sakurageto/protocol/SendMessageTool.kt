@@ -6,7 +6,6 @@ import com.sakurageto.gamelogic.Stratagem
 import com.sakurageto.protocol.CommandEnum.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.delay
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -27,13 +26,12 @@ suspend fun waitReconnect(player: Connection){
 
 suspend fun send(player: Connection, data: String){
     try {
-//        println("send message to ${player.socketPlayer}: $data")
         player.session.send(data)
         val frame = player.session.incoming.receive()
         if (frame is Frame.Text) {
             val text = frame.readText()
             try {
-                val ack = json.decodeFromString<SakuraCardCommand>(text)
+                json.decodeFromString<SakuraCardCommand>(text)
             }catch (e: Exception){
                 if(!(player.gameEnd)){
                     waitReconnect(player)
@@ -782,7 +780,7 @@ suspend fun receiveAuraDamageSelectMain(player: Connection, place_list: MutableL
                 try {
                     val data = json.decodeFromString<SakuraSendData>(text)
                     when(data.command){
-                        SELECT_AURA_DAMAGE_PLACE -> return data.data //will be added
+                        SELECT_AURA_DAMAGE_PLACE -> return data.data
                         else -> continue
                     }
                 }catch (e: Exception){

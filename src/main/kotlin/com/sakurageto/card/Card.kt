@@ -1,7 +1,6 @@
 package com.sakurageto.card
 
 import com.sakurageto.card.CardSet.toCardData
-import com.sakurageto.card.CardSet.toCardName
 import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.MegamiEnum
 import com.sakurageto.gamelogic.Umbrella
@@ -190,13 +189,11 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             this.card_data.effect?.let {
                 for(text in it){
                     if(text.tag == TextEffectTag.ADJUST_NAP){
-                        return text.effect!!(this.card_number, player, game_status, react_attack)?: this.card_data.charge?:
-                        throw Exception("enchantment card must have charge: ${this.card_number.toCardName()}")
+                        return text.effect!!(this.card_number, player, game_status, react_attack)?: this.card_data.charge?: 0
                     }
                 }
             }
-            return this.card_data.charge?:
-            throw Exception("enchantment card must have charge: ${this.card_number.toCardName()}")
+            return this.card_data.charge?: 0
         }
     }
 

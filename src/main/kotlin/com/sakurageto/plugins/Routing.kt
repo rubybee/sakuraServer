@@ -14,6 +14,36 @@ import java.io.FileWriter
 import java.text.SimpleDateFormat
 import java.util.*
 
+suspend fun makeBugReportFile(content: String){
+    val currentTime = Date()
+
+    val currentDirectory = System.getProperty("user.dir")
+    val directory = File("$currentDirectory/bugreport/")
+    if (!directory.exists()) {
+        directory.mkdirs() // 디렉터리 생성
+    }
+
+    val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(currentTime)
+
+    var filePath = "$currentDirectory/bugreport/file_$timestamp.txt"
+    var fileNumber = 1
+
+    while (File(filePath).exists()) {
+        filePath = "file_${timestamp}_$fileNumber.txt"
+        fileNumber++
+    }
+
+    try {
+        val file = File(filePath)
+        withContext(Dispatchers.IO) {
+            val fileWriter = FileWriter(file)
+            fileWriter.write(content)
+            fileWriter.close()
+        }
+    } catch (_: Exception) {
+    }
+}
+
 fun Application.configureRouting() {
     val roomNumberRange = (2..10000)
 
@@ -50,34 +80,7 @@ fun Application.configureRouting() {
         post("/bugreport"){
             val message = call.receive<String>()
             call.respondText("bug report stored correctly", status = HttpStatusCode.Created)
-
-            val currentTime = Date()
-
-            val currentDirectory = System.getProperty("user.dir")
-            val directory = File("$currentDirectory/bugreport/")
-            if (!directory.exists()) {
-                directory.mkdirs() // 디렉터리 생성
-            }
-
-            val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(currentTime)
-
-            var filePath = "$currentDirectory/bugreport/file_$timestamp.txt"
-            var fileNumber = 1
-
-            while (File(filePath).exists()) {
-                filePath = "file_${timestamp}_$fileNumber.txt"
-                fileNumber++
-            }
-
-            try {
-                val file = File(filePath)
-                withContext(Dispatchers.IO) {
-                    val fileWriter = FileWriter(file)
-                    fileWriter.write(message)
-                    fileWriter.close()
-                }
-            } catch (_: Exception) {
-            }
+            makeBugReportFile(message)
         }
     }
 }

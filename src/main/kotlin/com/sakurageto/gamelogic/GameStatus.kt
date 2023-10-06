@@ -8,6 +8,7 @@ import com.sakurageto.gamelogic.log.Log
 import com.sakurageto.gamelogic.log.LogText
 import com.sakurageto.gamelogic.log.Logger
 import com.sakurageto.gamelogic.megamispecial.storyboard.StoryBoard
+import com.sakurageto.plugins.makeBugReportFile
 import com.sakurageto.protocol.*
 import com.sakurageto.protocol.CommandEnum.Companion.BASIC_OPERATION_CAUSE_BY_CARD
 import com.sakurageto.protocol.TokenEnum.Companion.toLacerationLocation
@@ -53,7 +54,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     var thisTurnSwellDistance = 2
 
 
-    private suspend fun getAdjustSwellDistance(player: PlayerEnum): Int{
+    private suspend fun getAdjustSwellDistance(): Int{
         var nowSwellDistance = thisTurnSwellDistance
 
         for(card in player1.enchantmentCard.values) nowSwellDistance += card.effectAllValidEffect(PlayerEnum.PLAYER1, this, TextEffectTag.CHANGE_SWELL_DISTANCE)
@@ -730,7 +731,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     return true
                 }
             }
-            else -> {throw Exception("invalid marketPrice: ${nowPlayer.marketPrice}")}
+            else -> {
+                return true
+            }
         }
         return false
     }
@@ -767,7 +770,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     return true
                 }
             }
-            else -> {throw Exception("invalid marketPrice: ${nowPlayer.marketPrice}")}
+            else -> {}
         }
         return false
     }
@@ -1983,13 +1986,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun auraToDust(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum,
-                           card_number: Int): Int{
+                           reason: Int): Int{
         if(number <= 0) return 0
 
         if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
             if(user == player) !getBothDirection(user, LocToLoc.DUST_TO_AURA_YOUR.encode(number))
             else !getBothDirection(user, LocToLoc.DUST_TO_AURA_OTHER.encode(number))){
-            dustToAura(player, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+            dustToAura(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
             return 0
         }
 
@@ -2000,7 +2003,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = nowPlayer.aura
         }
 
-        logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, value,
+        logger.insert(Log(player, LogText.MOVE_TOKEN, reason, value,
             LocationEnum.AURA_YOUR, LocationEnum.DUST, arrow != Arrow.NULL))
 
         if(value != 0){
@@ -3724,9 +3727,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                         null, null, NUMBER_SHISUI_SHISUI)
                 }
             }
-            else -> {
-                throw Exception("index: $index is not valid for laceration token")
-            }
+            else -> {}
         }
         logger.insert(Log(getDamagePlayer.opposite(), LogText.END_EFFECT, NUMBER_SHISUI_SHISUI, -1))
     }
@@ -3770,17 +3771,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     card.special_card_state = SpecialCardEnum.PLAYED
                     insertCardTo(card.player, card, LocationEnum.YOUR_USED_CARD, true)
                 }
-                CardClass.NORMAL, CardClass.POISON  -> {
-                    insertCardTo(card.player, card, LocationEnum.DISCARD_YOUR, true)
-                }
-                CardClass.NULL -> {
-                    insertCardTo(card.player, card, LocationEnum.NOT_READY_SOLDIER_ZONE, true)
-                }
                 CardClass.SOLDIER -> {
                     insertCardTo(card.player, card, LocationEnum.NOT_READY_SOLDIER_ZONE, true)
                 }
-                CardClass.IDEA -> {
-                    TODO()
+                else -> {
+                    insertCardTo(card.player, card, LocationEnum.DISCARD_YOUR, true)
                 }
             }
         }
@@ -3790,15 +3785,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(text == null) return
         else{
             when(text.tag){
-                TextEffectTag.WHEN_USE_REACT_CARD_YOUR_END, TextEffectTag.WHEN_USE_BEHAVIOR_END,
-                TextEffectTag.WHEN_USE_FULL_POWER_YOUR_END, TextEffectTag.WHEN_AFTER_CARD_USE -> {
-                    text.effect!!(card_number, player, this, null)
-                }
                 TextEffectTag.WHEN_THIS_CARD_REACTED_AFTER -> {
                     text.effect!!(card_number, player.opposite(), this, null)
                 }
                 else -> {
-                    TODO("${text.tag} error")
+                    text.effect!!(card_number, player, this, null)
                 }
             }
         }
@@ -3843,14 +3834,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 card.special_card_state = SpecialCardEnum.PLAYED
                 insertCardTo(card.player, card, LocationEnum.YOUR_USED_CARD, true)
             }
-            CardClass.NORMAL, CardClass.POISON -> {
-                insertCardTo(card.player, card, location, true)
-            }
             CardClass.SOLDIER -> {
                 insertCardTo(card.player, card, LocationEnum.NOT_READY_SOLDIER_ZONE, true)
             }
-            CardClass.NULL, CardClass.IDEA -> {
-                TODO()
+            else -> {
+                insertCardTo(card.player, card, location, true)
             }
         }
 
@@ -4210,9 +4198,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 else {
                     when(LocationEnum.fromInt(to)){
                         LocationEnum.DISTANCE -> {
-                            auraToDistance(player, number, Arrow.NULL, PlayerEnum.PLAYER1, PlayerEnum.PLAYER2, effectCard)
+                            auraToDistance(player, number, Arrow.NULL, PlayerEnum.PLAYER1, PlayerEnum.PLAYER1, effectCard)
                         }
-                        else -> TODO()
+                        LocationEnum.DUST -> {
+                            auraToDust(player, number, Arrow.NULL, PlayerEnum.PLAYER1, PlayerEnum.PLAYER1, effectCard)
+                        }
+                        else -> {
+                            makeBugReportFile("moveTokenByInt() do not support aura to ${LocationEnum.fromInt(to)}")
+                        }
                     }
                 }
             }
@@ -4231,20 +4224,38 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                         LocationEnum.DISTANCE -> {
                             lifeToDistance(player, number, damage, Arrow.NULL, PlayerEnum.PLAYER1, PlayerEnum.PLAYER2, effectCard)
                         }
-                        else -> TODO()
+                        LocationEnum.DUST -> {
+                            lifeToDust(player, number, Arrow.NULL, PlayerEnum.PLAYER1, PlayerEnum.PLAYER1, effectCard)
+                        }
+                        else -> {
+                            makeBugReportFile("moveTokenByInt() do not support life to ${LocationEnum.fromInt(to)}")
+                        }
                     }
                 }
 
             }
             LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD -> {
-                when(LocationEnum.fromInt(to)){
-                    LocationEnum.DISTANCE -> {
-                        cardToDistance(player, number, getPlayer(player).enchantmentCard[cardNumber]!!, effectCard)
+                if(to > 99){
+                    cardToCard(player, number, getPlayer(player).enchantmentCard[cardNumber]!!,
+                        getPlayer(player).enchantmentCard[to]!!, effectCard)
+                }
+                else{
+                    when(LocationEnum.fromInt(to)){
+                        LocationEnum.DISTANCE -> {
+                            cardToDistance(player, number, getPlayer(player).enchantmentCard[cardNumber]!!, effectCard)
+                        }
+                        LocationEnum.DUST -> {
+                            cardToDust(player, number, getPlayer(player).enchantmentCard[cardNumber]!!, false, effectCard)
+                        }
+                        else -> {
+                            makeBugReportFile("moveTokenByInt() do not support card to ${LocationEnum.fromInt(to)}")
+                        }
                     }
-                    else -> TODO()
                 }
             }
-            else -> TODO()
+            else -> {
+                makeBugReportFile("moveTokenByInt() do not support card to ${LocationEnum.fromInt(to)}")
+            }
         }
 
     }
@@ -4508,7 +4519,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                         CardEffectLocation.EFFECT_LACERATION -> {
                             processAllLacerationDamage(turnPlayer)
                         }
-                        else -> TODO()
+                        else -> {
+                            makeBugReportFile("startPhaseEffectProcess() do not support effectLocation: ${result.first}")
+                        }
                     }
                     startPhaseEffect.remove(selected)
                     keys.remove(selected)
@@ -4537,7 +4550,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     CardEffectLocation.EFFECT_LACERATION -> {
                         processAllLacerationDamage(turnPlayer)
                     }
-                    else -> TODO()
+                    else -> {
+                        makeBugReportFile("startPhaseEffectProcess() do not support effectLocation: ${lastEffect.first}")
+                    }
                 }
                 startPhaseEffect.remove(keys[0])
                 keys.remove(keys[0])
@@ -5068,7 +5083,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         return when(command){
             CommandEnum.ACTION_GO_FORWARD ->
-                !(nowPlayer.aura + nowPlayer.freezeToken == nowPlayer.maxAura || distanceToken == 0 || thisTurnDistance <= getAdjustSwellDistance(player))
+                !(nowPlayer.aura + nowPlayer.freezeToken == nowPlayer.maxAura || distanceToken == 0 || thisTurnDistance <= getAdjustSwellDistance())
                         && !(getPlayer(player).canNotGoForward)
             CommandEnum.ACTION_GO_BACKWARD -> {
                 !(nowPlayer.aura == 0 || distanceToken == 10) && basicOperationEnchantmentCheck(player, CommandEnum.ACTION_GO_BACKWARD)
@@ -5077,7 +5092,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     checkAdditionalBasicOperation(player, TextEffectTag.CONDITION_ADD_DO_WIND_AROUND))
             CommandEnum.ACTION_INCUBATE -> (nowPlayer.aura != 0 || nowPlayer.freezeToken != 0) && basicOperationEnchantmentCheck(player, CommandEnum.ACTION_INCUBATE)
             CommandEnum.ACTION_BREAK_AWAY -> {
-                !(dust == 0 || getAdjustDistance() > getAdjustSwellDistance(player) || distanceToken == 10) && basicOperationEnchantmentCheck(player, CommandEnum.ACTION_BREAK_AWAY)
+                !(dust == 0 || getAdjustDistance() > getAdjustSwellDistance() || distanceToken == 10) && basicOperationEnchantmentCheck(player, CommandEnum.ACTION_BREAK_AWAY)
             }
             CommandEnum.ACTION_YAKSHA -> {
                 getPlayer(player).transformZone[CardName.FORM_YAKSHA] != null || transformBasicOperationCheck(player, CardName.FORM_YAKSHA)
@@ -5530,7 +5545,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 nowPlayer.memory?.remove(card_number)
                 return result
             }
-            else -> throw Exception("location: $location not supported")
+            else -> {
+                makeBugReportFile("popCardFrom(cardNumber) do not support location: $location")
+                return null
+            }
         }
         return null
     }
@@ -5546,7 +5564,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 nowPlayer.additionalHand.remove(card_name)
                 return result
             }
-            else -> TODO()
+            else -> {
+                makeBugReportFile("popCardFrom(cardName) do not support location: $location")
+                return null
+            }
         }
     }
 
@@ -5686,7 +5707,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 nowPlayer.memory!![card.card_number] = card
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, publicForOther, CommandEnum.MEMORY_YOUR, publicForYour)
             }
-            else -> TODO()
+            else -> {
+                makeBugReportFile("insertCardTo() do not support location: $location")
+            }
         }
     }
 
@@ -5701,7 +5724,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             CommandEnum.SHOW_HAND_YOUR -> list.add(card_number)
             CommandEnum.SHOW_SPECIAL_YOUR -> list.addAll(nowPlayer.specialCardDeck.keys)
             CommandEnum.SHOW_DECK_TOP_YOUR -> list.add(card_number)
-            else -> TODO()
+            else -> {
+                makeBugReportFile("showSome() do not support command: $command")
+            }
         }
         sendShowInformation(command, getSocket(show_player), getSocket(show_player.opposite()), list)
     }
@@ -5735,10 +5760,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    fun getCardFrom(player: PlayerEnum, card_name: CardName, location: LocationEnum): Card?{
+    suspend fun getCardFrom(player: PlayerEnum, card_name: CardName, location: LocationEnum): Card?{
         return when(location){
             LocationEnum.ADDITIONAL_CARD -> getPlayer(player).getCardFromAdditional(card_name)
-            else -> TODO()
+            else -> {
+                makeBugReportFile("getCardFrom() do not support location: $location")
+                null
+            }
         }
     }
 

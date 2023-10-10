@@ -1,8 +1,9 @@
 package com.sakurageto
 
 import com.sakurageto.gamelogic.GameStatus
+import java.util.concurrent.ConcurrentHashMap
 
-class Room(madeTime: Long){
+class Room(private val madeTime: Long){
     var waitStatus: Boolean = true
 
     var firstUserConnection: Connection? = null
@@ -12,8 +13,22 @@ class Room(madeTime: Long){
     var secondUserCode: Int = -1
 
     var game: GameStatus? = null
+
+    fun isItExpirationWhenWait(nowTime: Long): Boolean{
+        if(nowTime - madeTime > 600000){
+            return true
+        }
+        return false
+    }
+
+    fun isItExpirationWhenGameDoing(nowTime: Long): Boolean{
+        if(nowTime - madeTime > 30000000){
+            return true
+        }
+        return false
+    }
 }
 
 object RoomInformation{
-    var roomHashMap = HashMap<Int, Room>()
+    var roomHashMap = ConcurrentHashMap<Int, Room>()
 }

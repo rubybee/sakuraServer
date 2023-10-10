@@ -7,6 +7,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.websocket.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -55,6 +56,21 @@ fun Application.configureRouting() {
         get("/makeroom") {
             var nowRoomNumber = roomNumberRange.random()
             while (RoomInformation.roomHashMap.containsKey(nowRoomNumber)){
+                val nowRoom = RoomInformation.roomHashMap[nowRoomNumber]
+                if(nowRoom == null){
+                    break
+                }
+                else if(nowRoom.waitStatus){
+                    if(nowRoom.isItExpirationWhenWait(System.currentTimeMillis())){
+                        nowRoom.firstUserConnection?.session?.close()
+                        nowRoom.secondUserConnection?.session?.close()
+                    }
+                }
+                else{
+                    if(nowRoom.isItExpirationWhenGameDoing(System.currentTimeMillis())){
+                        //TODO(expiration when game is running)
+                    }
+                }
                 nowRoomNumber  = roomNumberRange.random()
             }
             RoomInformation.roomHashMap[nowRoomNumber] = Room(System.currentTimeMillis())

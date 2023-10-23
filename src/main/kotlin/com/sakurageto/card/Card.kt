@@ -2,6 +2,7 @@ package com.sakurageto.card
 
 import com.sakurageto.card.CardSet.toCardData
 import com.sakurageto.gamelogic.GameStatus
+import com.sakurageto.gamelogic.GameVersion
 import com.sakurageto.gamelogic.MegamiEnum
 import com.sakurageto.gamelogic.Umbrella
 import com.sakurageto.gamelogic.log.Log
@@ -62,43 +63,46 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     }
 
     companion object{
-        fun cardMakerByName(start_turn: Boolean, card_name: CardName, player: PlayerEnum, location: LocationEnum): Card{
-            val data = card_name.toCardData()
-            if (data.isItSpecial()){
+        fun cardMakerByName(start_turn: Boolean, card_name: CardName, player: PlayerEnum, location: LocationEnum,
+                            version: GameVersion): Card{
+            val data = card_name.toCardData(version)
+            return if (data.isItSpecial()){
                 if(start_turn){
-                    return Card(card_name.toCardNumber(true), data, player, SpecialCardEnum.UNUSED, location)
-                }
-                else{
-                    return Card(card_name.toCardNumber(false), data, player, SpecialCardEnum.UNUSED, location)
+                    Card(card_name.toCardNumber(true), data, player, SpecialCardEnum.UNUSED, location)
+                } else{
+                    Card(card_name.toCardNumber(false), data, player, SpecialCardEnum.UNUSED, location)
                 }
 
             }
             else{
                 if(start_turn){
-                    return Card(card_name.toCardNumber(true), data, player, null, location)
-                }
-                else{
-                    return Card(card_name.toCardNumber(false), data, player, null, location)
+                    Card(card_name.toCardNumber(true), data, player, null, location)
+                } else{
+                    Card(card_name.toCardNumber(false), data, player, null, location)
                 }
 
             }
 
         }
 
-        fun cardInitInsert(start_turn: Boolean, dest: ArrayDeque<Card>, src: MutableList<CardName>, player: PlayerEnum){
+        fun cardInitInsert(start_turn: Boolean, dest: ArrayDeque<Card>, src: MutableList<CardName>, player: PlayerEnum,
+            version: GameVersion){
             src.shuffle()
             for(card_name in src){
-                dest.add(cardMakerByName(start_turn, card_name, player, LocationEnum.DECK))
+                dest.add(cardMakerByName(start_turn, card_name, player, LocationEnum.DECK, version))
             }
         }
 
-        fun cardInitInsert(start_turn: Boolean, dest: HashMap<Int, Card>, src: MutableList<CardName>, player: PlayerEnum){
+        fun cardInitInsert(start_turn: Boolean, dest: HashMap<Int, Card>, src: MutableList<CardName>, player: PlayerEnum,
+            version: GameVersion){
             for(card_name in src){
                 if(start_turn){
-                    dest[card_name.toCardNumber(true)] = cardMakerByName(true, card_name, player, LocationEnum.SPECIAL_CARD)
+                    dest[card_name.toCardNumber(true)] = cardMakerByName(true, card_name, player,
+                        LocationEnum.SPECIAL_CARD, version)
                 }
                 else{
-                    dest[card_name.toCardNumber(false)] = cardMakerByName(false, card_name, player, LocationEnum.SPECIAL_CARD)
+                    dest[card_name.toCardNumber(false)] = cardMakerByName(false, card_name, player,
+                        LocationEnum.SPECIAL_CARD, version)
                 }
             }
         }
@@ -744,6 +748,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         return if (now == 0) -1
         else now
     }
+
+    fun isItAttack(): Boolean = card_data.card_type == CardType.ATTACK
 
     fun isItInstallation(): Boolean{
         this.card_data.effect?.let{

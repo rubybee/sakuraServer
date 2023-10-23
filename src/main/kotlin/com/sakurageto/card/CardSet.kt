@@ -34,9 +34,34 @@ data class Kikou(var attack: Int = 0, var behavior: Int = 0, var enchantment: In
 object CardSet {
     private val cardNumberHashmap = numberHashmapInit()
     private val cardDataHashmap = EnumMap<CardName, CardData>(CardName::class.java)
+    private val cardDataHashmapV8_1 = EnumMap<CardName, CardData>(CardName::class.java)
+    private val cardDataHashmapV8_2 = EnumMap<CardName, CardData>(CardName::class.java)
 
     fun Int.toCardName(): CardName = cardNumberHashmap[this]?: CardName.CARD_UNNAME
-    fun CardName.toCardData(): CardData = cardDataHashmap[this]?: unused
+    fun CardName.toCardData(version: GameVersion): CardData{
+        return when(version){
+            GameVersion.VERSION_7_2 -> {
+                cardDataHashmap[this]?: unused
+            }
+            GameVersion.VERSION_8_1 -> {
+                if(this in cardDataHashmapV8_1) {
+                    cardDataHashmapV8_1[this]!!
+                }
+                else{
+                    this.toCardData(GameVersion.VERSION_7_2)
+                }
+            }
+            GameVersion.VERSION_8_2 -> {
+                if(this in cardDataHashmapV8_2) {
+                    cardDataHashmapV8_2[this]!!
+                }
+                else{
+                    this.toCardData(GameVersion.VERSION_8_1)
+                }
+            }
+        }
+
+    }
 
     private fun hashMapTest(){
         val cardNameList = CardName.values()
@@ -44,7 +69,7 @@ object CardSet {
             if(cardName == CardName.CARD_UNNAME || cardName == CardName.POISON_ANYTHING || cardName == CardName.SOLDIER_ANYTHING) {
                 continue
             }
-            if(cardName.toCardData() == unused){
+            if(cardName.toCardData(GameVersion.VERSION_7_2) == unused){
                 println("cardDataHashmap don't have card name: $cardName")
             }
             val firstNumber = cardName.toCardNumber(true)
@@ -2209,7 +2234,7 @@ object CardSet {
         flutteringSnowflake.umbrellaMark = true
         flutteringSnowflake.setSpecial(2)
         flutteringSnowflake.setAttackFold(DistanceType.CONTINUOUS, Pair(3, 5), null, 3, 1)
-        flutteringSnowflake.setAttackUnfold(DistanceType.CONTINUOUS, Pair(0, 2), null, 0, 0)
+        flutteringSnowflake.setAttackUnfold(DistanceType.CONTINUOUS, Pair(0, 1), null, 0, 0)
         flutteringSnowflake.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
             game_status.addImmediateUmbrellaListener(player, Listener(player, card_number){gameStatus, cardNumber, _, _, _, _ ->
                 gameStatus.returnSpecialCard(player, cardNumber)
@@ -2234,7 +2259,12 @@ object CardSet {
                                         madeAttack.run { addRange(Pair(2, 4)); addRange(Pair(6, 8))}
                                     }
                                     CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS -> {
-                                        madeAttack.run { addRange(Pair(2, 4)); addRange(Pair(7, 8))}
+                                        if(game_status.version.isHigherThen(GameVersion.VERSION_8_1)){
+                                            madeAttack.run { addRange(Pair(2, 3)); addRange(Pair(6, 8))}
+                                        }
+                                        else{
+                                            madeAttack.run { addRange(Pair(2, 4)); addRange(Pair(7, 8))}
+                                        }
                                     }
                                     CardName.YUKIHI_PUSH_OUT_SLASH_PULL -> {
                                         madeAttack.run { addRange(Pair(2, 4)); addRange(Pair(4, 7))}
@@ -2243,7 +2273,12 @@ object CardSet {
                                         madeAttack.run { addRange(Pair(2, 4)); addRange(Pair(6, 8))}
                                     }
                                     CardName.YUKIHI_FLUTTERING_SNOWFLAKE -> {
-                                        madeAttack.run { addRange(Pair(2, 4)); addRange(Pair(5, 8))}
+                                        if(game_status.version == GameVersion.VERSION_7_2){
+                                            madeAttack.run { addRange(Pair(2, 3)); addRange(Pair(5, 7))}
+                                        }
+                                        else{
+                                            madeAttack.run { addRange(Pair(2, 4)); addRange(Pair(5, 8))}
+                                        }
                                     }
                                     CardName.YUKIHI_SWAYING_LAMPLIGHT -> {
                                         madeAttack.run { addRange(Pair(2, 2)); addRange(Pair(6, 8))}
@@ -2263,7 +2298,12 @@ object CardSet {
                                         madeAttack.run { addRange(Pair(1, 3)); addRange(Pair(5, 7))}
                                     }
                                     CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS -> {
-                                        madeAttack.run { addRange(Pair(1, 3)); addRange(Pair(6, 7))}
+                                        if(game_status.version.isHigherThen(GameVersion.VERSION_8_1)){
+                                            madeAttack.run { addRange(Pair(1, 2)); addRange(Pair(5, 7))}
+                                        }
+                                        else{
+                                            madeAttack.run { addRange(Pair(1, 3)); addRange(Pair(6, 7))}
+                                        }
                                     }
                                     CardName.YUKIHI_PUSH_OUT_SLASH_PULL -> {
                                         madeAttack.run { addRange(Pair(1, 3)); addRange(Pair(3, 6))}
@@ -2272,7 +2312,12 @@ object CardSet {
                                         madeAttack.run { addRange(Pair(1, 3)); addRange(Pair(5, 7))}
                                     }
                                     CardName.YUKIHI_FLUTTERING_SNOWFLAKE -> {
-                                        madeAttack.run { addRange(Pair(1, 3)); addRange(Pair(4, 7))}
+                                        if(game_status.version == GameVersion.VERSION_7_2){
+                                            madeAttack.run { addRange(Pair(1, 2)); addRange(Pair(4, 6))}
+                                        }
+                                        else{
+                                            madeAttack.run { addRange(Pair(1, 3)); addRange(Pair(4, 7))}
+                                        }
                                     }
                                     CardName.YUKIHI_SWAYING_LAMPLIGHT -> {
                                         madeAttack.run { addRange(Pair(1, 1)); addRange(Pair(5, 7))}
@@ -2294,7 +2339,12 @@ object CardSet {
                                         madeAttack.run { addRange(Pair(-2, 0)); addRange(Pair(2, 4))}
                                     }
                                     CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS -> {
-                                        madeAttack.run { addRange(Pair(-2, 0)); addRange(Pair(3, 4))}
+                                        if(game_status.version.isHigherThen(GameVersion.VERSION_8_1)){
+                                            madeAttack.run { addRange(Pair(-2, -1)); addRange(Pair(2, 4))}
+                                        }
+                                        else{
+                                            madeAttack.run { addRange(Pair(-2, 0)); addRange(Pair(3, 4))}
+                                        }
                                     }
                                     CardName.YUKIHI_PUSH_OUT_SLASH_PULL -> {
                                         madeAttack.run { addRange(Pair(-2, 0)); addRange(Pair(0, 3))}
@@ -2303,7 +2353,12 @@ object CardSet {
                                         madeAttack.run { addRange(Pair(-2, 0)); addRange(Pair(2, 4))}
                                     }
                                     CardName.YUKIHI_FLUTTERING_SNOWFLAKE -> {
-                                        madeAttack.run { addRange(Pair(-2, 0)); addRange(Pair(1, 4))}
+                                        if(game_status.version == GameVersion.VERSION_7_2){
+                                            madeAttack.run { addRange(Pair(-2, 0)); addRange(Pair(1, 3))}
+                                        }
+                                        else{
+                                            madeAttack.run { addRange(Pair(-2, 0)); addRange(Pair(1, 4))}
+                                        }
                                     }
                                     CardName.YUKIHI_SWAYING_LAMPLIGHT -> {
                                         madeAttack.run { addRange(Pair(-2, -2)); addRange(Pair(2, 4))}
@@ -2323,7 +2378,12 @@ object CardSet {
                                         madeAttack.run { addRange(Pair(-1, 1)); addRange(Pair(3, 5))}
                                     }
                                     CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS -> {
-                                        madeAttack.run { addRange(Pair(-1, 1)); addRange(Pair(4, 5))}
+                                        if(game_status.version.isHigherThen(GameVersion.VERSION_8_1)){
+                                            madeAttack.run { addRange(Pair(-1, 0)); addRange(Pair(3, 5))}
+                                        }
+                                        else{
+                                            madeAttack.run { addRange(Pair(-1, 1)); addRange(Pair(4, 5))}
+                                        }
                                     }
                                     CardName.YUKIHI_PUSH_OUT_SLASH_PULL -> {
                                         madeAttack.run { addRange(Pair(-1, 1)); addRange(Pair(1, 4))}
@@ -2332,7 +2392,12 @@ object CardSet {
                                         madeAttack.run { addRange(Pair(-1, 1)); addRange(Pair(3, 5))}
                                     }
                                     CardName.YUKIHI_FLUTTERING_SNOWFLAKE -> {
-                                        madeAttack.run { addRange(Pair(-1, 1)); addRange(Pair(2, 5))}
+                                        if(game_status.version == GameVersion.VERSION_7_2){
+                                            madeAttack.run { addRange(Pair(-1, 0)); addRange(Pair(2, 4))}
+                                        }
+                                        else{
+                                            madeAttack.run { addRange(Pair(-1, 1)); addRange(Pair(2, 5))}
+                                        }
                                     }
                                     CardName.YUKIHI_SWAYING_LAMPLIGHT -> {
                                         madeAttack.run { addRange(Pair(-1, -1)); addRange(Pair(3, 5))}
@@ -6410,8 +6475,8 @@ object CardSet {
                         ) ){
                         game_status.afterMakeAttack(card_number, player, null)
                     }
-                    game_status.getPlayer(player).stratagem = null
                     if(game_status.endCurrentPhase){
+                        game_status.getPlayer(player).stratagem = null
                         return@ret null
                     }
                     if(!game_status.getPlayer(player).justRunNoCondition){
@@ -6428,8 +6493,8 @@ object CardSet {
                         ) ){
                         game_status.afterMakeAttack(card_number, player, null)
                     }
-                    game_status.getPlayer(player).stratagem = null
                     if(game_status.endCurrentPhase){
+                        game_status.getPlayer(player).stratagem = null
                         return@ret null
                     }
                     if(!game_status.getPlayer(player).justRunNoCondition){
@@ -6452,8 +6517,8 @@ object CardSet {
                         ) ){
                         game_status.afterMakeAttack(card_number, player, null)
                     }
-                    game_status.getPlayer(player).stratagem = null
                     if(game_status.endCurrentPhase){
+                        game_status.getPlayer(player).stratagem = null
                         return@ret null
                     }
                     if(!game_status.getPlayer(player).justRunNoCondition){
@@ -6470,8 +6535,8 @@ object CardSet {
                         ) ){
                         game_status.afterMakeAttack(card_number, player, null)
                     }
-                    game_status.getPlayer(player).stratagem = null
                     if(game_status.endCurrentPhase){
+                        game_status.getPlayer(player).stratagem = null
                         return@ret null
                     }
                     if(!game_status.getPlayer(player).justRunNoCondition){
@@ -8797,7 +8862,8 @@ object CardSet {
                         CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_KANAWE_BEND_OVER_THIS_NIGHT, 1){_, _ -> true }?.let { normal ->
                         game_status.getPlayer(player).unselectedCard.remove(normal[0].toCardName())
                         game_status.insertCardTo(player,
-                            Card.cardMakerByName(game_status.getPlayer(player).firstTurn, normal[0].toCardName(), player, LocationEnum.HAND),
+                            Card.cardMakerByName(game_status.getPlayer(player).firstTurn, normal[0].toCardName(), player, LocationEnum.HAND,
+                            game_status.version),
                         LocationEnum.HAND, true)
                     }
                     break
@@ -8813,7 +8879,8 @@ object CardSet {
                 CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_KANAWE_DISTANT_SKY, 1){ _, _ -> true }?.let { special ->
                 game_status.getPlayer(player).unselectedSpecialCard.remove(special[0].toCardName())
                 game_status.insertCardTo(player,
-                    Card.cardMakerByName(game_status.getPlayer(player).firstTurn, special[0].toCardName(), player, LocationEnum.SPECIAL_CARD),
+                    Card.cardMakerByName(game_status.getPlayer(player).firstTurn, special[0].toCardName(), player,
+                        LocationEnum.SPECIAL_CARD, game_status.version),
                     LocationEnum.SPECIAL_CARD, true)
             }
             null
@@ -9898,7 +9965,7 @@ object CardSet {
             }?.let { selected ->
                 game_status.getPlayer(player).unselectedCard.remove(selected[0].toCardName())
                 val useCard = Card.cardMakerByName(game_status.getPlayer(player).firstTurn,
-                    selected[0].toCardName(), player, LocationEnum.OUT_OF_GAME)
+                    selected[0].toCardName(), player, LocationEnum.OUT_OF_GAME, game_status.version)
                 game_status.insertCardTo(player, useCard, LocationEnum.PLAYING_ZONE_YOUR, true)
                 game_status.getPlayer(player).usingCard.remove(useCard)
                 game_status.useCardNotFullPowerFrom(player, useCard, LocationEnum.PLAYING_ZONE_YOUR, false, react_attack,
@@ -10260,7 +10327,7 @@ object CardSet {
             changeCompleteCard(game_status, player)
             null
         })
-        eightMirrorVainSakura.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.MOVE_CARD) {_, player, game_status, _->
+        eightMirrorVainSakura.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_DECK_RECONSTRUCT_YOUR) {_, player, game_status, _->
             changeCompleteCard(game_status, player)
             null
         })
@@ -11312,7 +11379,7 @@ object CardSet {
         sulyosul.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_TOKEN){ card_number, player, game_status, _ ->
             game_status.lifeToSelfFlare(player, 4, reconstruct = false, damage = false,
                 arrow = Arrow.NULL, user = player, card_owner = game_status.getCardOwner(card_number),
-                card_number = card_number
+                reason = card_number
             )
             null
         })
@@ -11641,10 +11708,11 @@ object CardSet {
         })
     }
 
-    private val ringABellV8 = CardData(CardClass.NORMAL, CardName.HAGANE_RING_A_BELL, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
-    private val eightMirrorVainSakuraV8 = CardData(CardClass.SPECIAL, CardName.YATSUHA_EIGHT_MIRROR_VAIN_SAKURA, MegamiEnum.YATSUHA, CardType.BEHAVIOR, SubType.NONE)
-    private val callWaveV8 = CardData(CardClass.NORMAL, CardName.HATSUMI_CALL_WAVE, MegamiEnum.HATSUMI, CardType.ENCHANTMENT,SubType.NONE)
-    private val branchPossibilityV8 = CardData(CardClass.SPECIAL, CardName.MEGUMI_BRANCH_OF_POSSIBILITY, MegamiEnum.MEGUMI, CardType.ENCHANTMENT, SubType.REACTION)
+    private val ringABellV8_1 = CardData(CardClass.NORMAL, CardName.HAGANE_RING_A_BELL, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
+    private val eightMirrorVainSakuraV8_1 = CardData(CardClass.SPECIAL, CardName.YATSUHA_EIGHT_MIRROR_VAIN_SAKURA, MegamiEnum.YATSUHA, CardType.BEHAVIOR, SubType.NONE)
+    private val callWaveV8_1 = CardData(CardClass.NORMAL, CardName.HATSUMI_CALL_WAVE, MegamiEnum.HATSUMI, CardType.ENCHANTMENT,SubType.NONE)
+    private val branchPossibilityV8_1 = CardData(CardClass.SPECIAL, CardName.MEGUMI_BRANCH_OF_POSSIBILITY, MegamiEnum.MEGUMI, CardType.ENCHANTMENT, SubType.REACTION)
+    private val flutteringSnowflakeV8_1 = CardData(CardClass.SPECIAL, CardName.YUKIHI_FLUTTERING_SNOWFLAKE, MegamiEnum.YUKIHI, CardType.ATTACK, SubType.NONE)
 
     private val branchPossibilityV8Text = Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_START_PHASE_YOUR){card_number, player, game_status, _ ->
         game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ ->
@@ -11682,10 +11750,10 @@ object CardSet {
         null
     }
 
-    private fun v8CardInit(){
-        ringABellV8.addtext(centrifugalText)
-        ringABellV8.addtext(addCentrifugalLogText)
-        ringABellV8.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
+    private fun v8hypen1CardInit(){
+        ringABellV8_1.addtext(centrifugalText)
+        ringABellV8_1.addtext(addCentrifugalLogText)
+        ringABellV8_1.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { card_number, player, game_status, _->
             while(true){
                 val nowCommand = game_status.receiveCardEffectSelect(player, NUMBER_HAGANE_RING_A_BELL)
                 if(nowCommand == CommandEnum.SELECT_ONE){
@@ -11710,50 +11778,49 @@ object CardSet {
             }
             null
         })
-        branchPossibilityV8.setSpecial(3)
-        branchPossibilityV8.setEnchantment(2)
-        branchPossibilityV8.growing = 1
-        branchPossibilityV8.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.REACT_ATTACK_CHANGE) { card_number, _, _, react_attack ->
+        branchPossibilityV8_1.setSpecial(3)
+        branchPossibilityV8_1.setEnchantment(2)
+        branchPossibilityV8_1.growing = 1
+        branchPossibilityV8_1.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.REACT_ATTACK_CHANGE) { card_number, _, _, react_attack ->
             react_attack?.addAttackBuff(Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true },
                 {attackPlayer, gameStatus, attack ->
                     attack.auraPlusMinus(gameStatus.getTotalSeedNumber(attackPlayer.opposite()) * -1)
                 }))
             null
         })
-        branchPossibilityV8.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_START_PHASE_YOUR){card_number, _, game_status, _ ->
+        branchPossibilityV8_1.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_START_PHASE_YOUR){ card_number, _, game_status, _ ->
             game_status.startPhaseEffect[card_number] = Pair(CardEffectLocation.USED_YOUR, branchPossibilityV8Text)
             null
         })
-        eightMirrorVainSakuraV8.setSpecial(1)
-        eightMirrorVainSakuraV8.addtext(terminationText)
-        eightMirrorVainSakuraV8.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.USING_CONDITION){_, _, game_status, _ ->
+        eightMirrorVainSakuraV8_1.setSpecial(1)
+        eightMirrorVainSakuraV8_1.addtext(terminationText)
+        eightMirrorVainSakuraV8_1.addtext(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.USING_CONDITION){ _, _, game_status, _ ->
             val nowDistance = game_status.getAdjustDistance()
             if(nowDistance in 0..7) 1
             else 0
         })
-        eightMirrorVainSakuraV8.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) {_, player, game_status, _->
+        eightMirrorVainSakuraV8_1.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) { _, player, game_status, _->
             if(changeCompleteCard(game_status, player)){
                 game_status.setShrink(player)
             }
             null
         })
-        eightMirrorVainSakuraV8.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_DECK_RECONSTRUCT_YOUR) {_, player, game_status, _->
+        eightMirrorVainSakuraV8_1.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.WHEN_DECK_RECONSTRUCT_YOUR) { _, player, game_status, _->
             if(changeCompleteCard(game_status, player)){
                 game_status.setShrink(player)
             }
             null
         })
-        callWaveV8.setEnchantment(1)
-        callWaveV8.addtext(chasmText)
-        callWaveV8.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CAN_NOT_MOVE_TOKEN) { _, player, game_status, _ ->
+        callWaveV8_1.setEnchantment(1)
+        callWaveV8_1.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.CAN_NOT_MOVE_TOKEN) { _, player, game_status, _ ->
             if(game_status.turnPlayer == player && isTailWind(player, game_status)) 0
             else 1
         })
-        callWaveV8.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_START_PHASE_YOUR){card_number, player, game_status, _ ->
+        callWaveV8_1.addtext(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.WHEN_START_PHASE_YOUR){ card_number, player, game_status, _ ->
             game_status.startPhaseEffect[card_number] = Pair(CardEffectLocation.ENCHANTMENT_YOUR, callWaveV8Text)
             null
         })
-        callWaveV8.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MOVE_CARD){_, player, game_status, _ ->
+        callWaveV8_1.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.MOVE_CARD){ _, player, game_status, _ ->
             while (true){
                 val list = game_status.selectCardFrom(player, player, player,
                     listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
@@ -11771,11 +11838,38 @@ object CardSet {
             }
             null
         })
-        callWaveV8.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.DO_BASIC_OPERATION){_, player, game_status, _ ->
-            game_status.requestAndDoBasicOperation(player, 1706)
+        callWaveV8_1.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.DO_BASIC_OPERATION){ _, player, game_status, _ ->
+            game_status.requestAndDoBasicOperation(player, NUMBER_HATSUMI_CALL_WAVE)
+            if(game_status.addPreAttackZone(
+                    player, MadeAttack(CardName.HATSUMI_CALL_WAVE,
+                        NUMBER_HATSUMI_CALL_WAVE, CardClass.NULL,
+                        sortedSetOf(2, 3, 4, 5, 6, 7), 1,  999,  MegamiEnum.HATSUMI,
+                        cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
+                    )
+                ) ){
+                game_status.afterMakeAttack(NUMBER_HATSUMI_CALL_WAVE, player, null)
+            }
+            null
+        })
+        flutteringSnowflakeV8_1.umbrellaMark = true
+        flutteringSnowflakeV8_1.setSpecial(2)
+        flutteringSnowflakeV8_1.setAttackFold(DistanceType.CONTINUOUS, Pair(3, 6), null, 3, 1)
+        flutteringSnowflakeV8_1.setAttackUnfold(DistanceType.CONTINUOUS, Pair(0, 2), null, 0, 0)
+        flutteringSnowflakeV8_1.addTextFold(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.CHANGE_CONCENTRATION) {_, player, game_status, _ ->
+            game_status.addConcentration(player)
+            null
+        })
+        flutteringSnowflakeV8_1.addtext(Text(TextEffectTimingTag.USED, TextEffectTag.IMMEDIATE_RETURN){card_number, player, game_status, _ ->
+            game_status.addImmediateUmbrellaListener(player, Listener(player, card_number){gameStatus, cardNumber, _, _, _, _ ->
+                gameStatus.returnSpecialCard(player, cardNumber)
+                true
+            })
             null
         })
     }
+
+
+
 
     fun init(){
         yurinaCardInit()
@@ -11824,7 +11918,7 @@ object CardSet {
         yatsuhaA2CardInit()
         akinaCardInit()
         shisuiCardInit()
-        v8CardInit()
+        v8hypen1CardInit()
 
         dataHashmapInit()
         hashMapTest()

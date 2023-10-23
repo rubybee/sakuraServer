@@ -19,8 +19,9 @@ class Log(val player: PlayerEnum, val text: LogText, val number1: Int, val numbe
           val destination: LocationEnum = LocationEnum.DUST, val boolean: Boolean = false) {
 
     fun isTextUseCard() = this.text == LogText.USE_CARD || this.text == LogText.USE_CARD_IN_SOLDIER ||
-            this.text == LogText.USE_CARD_REACT || this.text == LogText.USE_CARD_IN_COVER || this.text == LogText.USE_CARD_IN_COVER_AND_REACT
-            || this.text == LogText.USE_CARD_PERJURE || this.text == LogText.USE_CARD_IN_SOLDIER_PERJURE
+            this.text == LogText.USE_CARD_REACT || this.text == LogText.USE_CARD_IN_COVER ||
+            this.text == LogText.USE_CARD_IN_COVER_AND_REACT || this.text == LogText.USE_CARD_PERJURE ||
+            this.text == LogText.USE_CARD_IN_SOLDIER_PERJURE
 
     fun isAhumBasicOperation(ahumPlayer: PlayerEnum) =
         text == LogText.MOVE_TOKEN && number1 == BASIC_OPERATION && isMoveAura(ahumPlayer.opposite())

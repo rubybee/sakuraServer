@@ -11,8 +11,11 @@ import java.util.*
 enum class CommandEnum {
     ACK,
     NULL,
+    SELECT_VERSION_YOUR,
+    SELECT_VERSION_OTHER,
     SELECT_MODE_YOUR,
     SELECT_MODE_OTHER,
+    SET_VERSION,
     END_OF_SELECTMODE,
     SELECT_MEGAMI,
     CHECK_MEGAMI,

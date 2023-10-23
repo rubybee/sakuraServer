@@ -261,6 +261,11 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
         return null
     }
 
+    fun getCardFromDeckBelow(index: Int): Card?{
+        if(normalCardDeck.size > index) return normalCardDeck[normalCardDeck.size - index - 1]
+        return null
+    }
+
     fun getCardFromPlaying(card_number: Int): Card?{
         for(card in usingCard){
             if(card.card_number == card_number) return card
@@ -365,7 +370,8 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
         }
     }
 
-    suspend fun insertCardNumberOneCondition(location: LocationEnum, destList: MutableList<Int>, condition: suspend (Card, LocationEnum) -> Boolean){
+    suspend fun insertCardNumberOneCondition(location: LocationEnum, destList: MutableList<Int>,
+                                             condition: suspend (Card, LocationEnum) -> Boolean, version: GameVersion){
         when(location){
             LocationEnum.DISCARD_YOUR -> for (card in discard) {
                 if(condition(card, location)) {
@@ -409,10 +415,10 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
                 destList.addAll(megamiOne.getAllNormalCardName().map { it.toCardNumber(true) })
                 destList.addAll(megamiTwo.getAllNormalCardName().map { it.toCardNumber(true) })
                 destList.addAll(megamiOne.getAllAdditionalCardName().filter
-                {it.toCardData().card_class == CardClass.NORMAL}.map
+                {it.toCardData(version).card_class == CardClass.NORMAL}.map
                 {it.toCardNumber(true)})
                 destList.addAll(megamiTwo.getAllAdditionalCardName().filter
-                {it.toCardData().card_class == CardClass.NORMAL}.map
+                {it.toCardData(version).card_class == CardClass.NORMAL}.map
                 {it.toCardNumber(true)})
             }
             LocationEnum.ALL -> {
@@ -431,7 +437,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
             }
             LocationEnum.NOT_SELECTED_NORMAL_CARD -> {
                 unselectedCard.forEach{
-                    if(condition(Card.cardMakerByName(this.firstTurn, it, player_enum, LocationEnum.OUT_OF_GAME), location)){
+                    if(condition(Card.cardMakerByName(this.firstTurn, it, player_enum, LocationEnum.OUT_OF_GAME, version), location)){
                         destList.add(it.toCardNumber(true))
                     }
                 }

@@ -13,22 +13,27 @@ import com.sakurageto.protocol.*
 import com.sakurageto.protocol.CommandEnum.Companion.BASIC_OPERATION_CAUSE_BY_CARD
 import com.sakurageto.protocol.TokenEnum.Companion.toLacerationLocation
 import io.ktor.websocket.*
-import kotlin.Exception
 
 class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private val player1_socket: Connection, private val player2_socket: Connection) {
 
+    var perjuryCheck = arrayOf(false, false, false, false, false, false, false)
     companion object{
         const val START_PHASE = 1
         const val MAIN_PHASE = 2
         const val END_PHASE = 3
 
-        val RENRI_FALSE_STAB = Card.cardMakerByName(true, CardName.RENRI_FALSE_STAB, PlayerEnum.PLAYER1, LocationEnum.OUT_OF_GAME)
-        val RENRI_TEMPORARY_EXPEDIENT = Card.cardMakerByName(true, CardName.RENRI_TEMPORARY_EXPEDIENT, PlayerEnum.PLAYER1, LocationEnum.OUT_OF_GAME)
-        val RENRI_BLACK_AND_WHITE = Card.cardMakerByName(true, CardName.RENRI_BLACK_AND_WHITE, PlayerEnum.PLAYER1, LocationEnum.OUT_OF_GAME)
-        val RENRI_FLOATING_CLOUDS = Card.cardMakerByName(true, CardName.RENRI_FLOATING_CLOUDS, PlayerEnum.PLAYER1, LocationEnum.OUT_OF_GAME)
-        val RENRI_FISHING = Card.cardMakerByName(true, CardName.RENRI_FISHING, PlayerEnum.PLAYER1, LocationEnum.OUT_OF_GAME)
+        val RENRI_FALSE_STAB = Card.cardMakerByName(true, CardName.RENRI_FALSE_STAB, PlayerEnum.PLAYER1,
+            LocationEnum.OUT_OF_GAME, GameVersion.VERSION_7_2)
+        val RENRI_TEMPORARY_EXPEDIENT = Card.cardMakerByName(true, CardName.RENRI_TEMPORARY_EXPEDIENT, PlayerEnum.PLAYER1,
+            LocationEnum.OUT_OF_GAME, GameVersion.VERSION_7_2)
+        val RENRI_BLACK_AND_WHITE = Card.cardMakerByName(true, CardName.RENRI_BLACK_AND_WHITE, PlayerEnum.PLAYER1,
+            LocationEnum.OUT_OF_GAME, GameVersion.VERSION_7_2)
+        val RENRI_FLOATING_CLOUDS = Card.cardMakerByName(true, CardName.RENRI_FLOATING_CLOUDS, PlayerEnum.PLAYER1,
+            LocationEnum.OUT_OF_GAME, GameVersion.VERSION_7_2)
+        val RENRI_FISHING = Card.cardMakerByName(true, CardName.RENRI_FISHING, PlayerEnum.PLAYER1, LocationEnum.OUT_OF_GAME,
+            GameVersion.VERSION_7_2)
 
-        fun getPerjuryCard(card_number: Int): Card?{
+        fun getPerjuryCard(card_number: Int, version: GameVersion): Card?{
             return when(card_number){
                 NUMBER_RENRI_FALSE_STAB -> RENRI_FALSE_STAB
                 NUMBER_RENRI_TEMPORARY_EXPEDIENT -> RENRI_TEMPORARY_EXPEDIENT
@@ -39,7 +44,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
         }
     }
-    var perjuryCheck = arrayOf(false, false, false, false, false, false, false)
+    var version = GameVersion.VERSION_8_1
 
     var turnPlayer = PlayerEnum.PLAYER1
 
@@ -614,24 +619,23 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    suspend fun bothDirectionCheck(player: PlayerEnum): Boolean{
+    suspend fun bothDirectionCheck(reason: Int, player: PlayerEnum): Boolean{
         for(card in getPlayer(player).enchantmentCard.values){
-            if(card.effectAllValidEffect(player, this, TextEffectTag.CHANGE_ARROW_BOTH) != 0){
+            if(card.effectAllValidEffect(reason, player, this, TextEffectTag.CHANGE_ARROW_BOTH) != 0){
                 return true
             }
         }
         return false
     }
 
-    suspend fun chasmProcess(player: PlayerEnum){
+    private suspend fun chasmProcess(player: PlayerEnum){
         val nowPlayer = getPlayer(player)
 
-        for(enchantment_card in nowPlayer.enchantmentCard){
-            if(enchantment_card.value.chasmCheck()){
-                enchantmentDestructionNotNormally(player, enchantment_card.value)
-            }
+        nowPlayer.enchantmentCard.values.filter {card ->
+            card.chasmCheck()
+        }.forEach{ card ->
+            enchantmentDestructionNotNormally(player, card)
         }
-
     }
 
     private suspend fun cardToDustCheck(player: PlayerEnum, number: Int, card: Card, startPhaseProcess: Boolean, card_number: Int): Boolean{
@@ -809,7 +813,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(nowPlayer.flow == null) return 0
         var value = number
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) &&
             getBothDirection(user, LocToLoc.AURA_YOUR_TO_FLOW.encode(number))){
             flowToAura(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
             return 0
@@ -961,7 +965,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(nowPlayer.flow == null) return
         var value = number
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) &&
             !getBothDirection(user, LocToLoc.AURA_YOUR_TO_FLOW.encode(number))){
             auraToFlow(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
             return
@@ -1086,7 +1090,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun auraToOut(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum,
                           reason: Int){
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) &&
             if(user == player) getBothDirection(user, LocToLoc.AURA_YOUR_TO_OUT.encode(number))
             else getBothDirection(user, LocToLoc.AURA_OTHER_TO_OUT.encode(number))){
             return outToAura(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
@@ -1114,7 +1118,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun dustToOut(number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum,
                           reason: Int){
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) &&
             getBothDirection(user, LocToLoc.DUST_TO_OUT.encode(number))){
             return outToDust(number, arrow, user, card_owner, reason)
         }
@@ -1132,7 +1136,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun outToDust(number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum,
                             reason: Int){
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) &&
             !getBothDirection(user, LocToLoc.DUST_TO_OUT.encode(number))){
             return dustToOut(number, arrow, user, card_owner, reason)
         }
@@ -1150,7 +1154,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                           reason: Int){
         if (number <= 0) return
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) &&
             if(user == player) !getBothDirection(user, LocToLoc.AURA_YOUR_TO_OUT.encode(number))
             else !getBothDirection(user, LocToLoc.AURA_OTHER_TO_OUT.encode(number))){
             return auraToOut(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
@@ -1190,15 +1194,15 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun flareToOut(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum,
-                           card_number: Int){
+                           reason: Int){
         if (number <= 0) return
 
         var value = number
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) &&
             if(user == player) getBothDirection(user, LocToLoc.FLARE_YOUR_TO_OUT.encode(number))
             else getBothDirection(user, LocToLoc.FLARE_OTHER_TO_OUT.encode(number))){
-            return outToFlare(player, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+            return outToFlare(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
         }
 
         val nowPlayer = getPlayer(player)
@@ -1207,7 +1211,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = nowPlayer.flare
         }
 
-        logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, number,
+        logger.insert(Log(player, LogText.MOVE_TOKEN, reason, number,
             LocationEnum.FLARE_YOUR, LocationEnum.OUT_OF_GAME, arrow != Arrow.NULL))
         if(value != 0){
             nowPlayer.flare -= value
@@ -1217,38 +1221,38 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun outToFlare(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum,
-                           card_number: Int){
+                           reason: Int){
         if (number <= 0) return
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) &&
             if(user == player) !getBothDirection(user, LocToLoc.FLARE_YOUR_TO_OUT.encode(number))
             else !getBothDirection(user, LocToLoc.FLARE_OTHER_TO_OUT.encode(number))){
-            return flareToOut(player, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+            return flareToOut(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
         }
 
         val nowPlayer = getPlayer(player)
 
         nowPlayer.flare += number
-        logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, number,
+        logger.insert(Log(player, LogText.MOVE_TOKEN, reason, number,
             LocationEnum.OUT_OF_GAME, LocationEnum.FLARE_YOUR, arrow != Arrow.NULL))
         sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
             LocationEnum.OUT_OF_GAME, LocationEnum.FLARE_YOUR, number, -1)
     }
 
     suspend fun auraToAura(playerGive: PlayerEnum, playerGet: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum,
-                           card_owner: PlayerEnum, card_number: Int): Int{
+                           card_owner: PlayerEnum, reason: Int): Int{
         if(number <= 0) return 0
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner)){
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner)){
             if(playerGet == user){
                 if(getBothDirection(user, LocToLoc.AURA_OTHER_TO_AURA_YOUR.encode(number))){
-                    auraToAura(playerGet, playerGive, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                    auraToAura(playerGet, playerGive, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                     return 0
                 }
             }
             else{
                 if(!getBothDirection(user, LocToLoc.AURA_OTHER_TO_AURA_YOUR.encode(number))){
-                    auraToAura(playerGet, playerGive, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                    auraToAura(playerGet, playerGive, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                     return 0
                 }
             }
@@ -1270,7 +1274,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         if(value != 0){
             if(checkWhenGetAura(playerGet)){
-                auraToDust(playerGive, value, Arrow.NULL, user, card_owner, card_number)
+                auraToDust(playerGive, value, Arrow.NULL, user, card_owner, reason)
                 afterCheckWhenGetAura(playerGet)
                 nowPlayer.maxAura = 5
                 return 0
@@ -1279,7 +1283,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             getPlayer(playerGive).aura -= value
             getPlayer(playerGet).aura += value
 
-            logger.insert(Log(playerGive, LogText.MOVE_TOKEN, card_number, number,
+            logger.insert(Log(playerGive, LogText.MOVE_TOKEN, reason, number,
                 LocationEnum.AURA_YOUR, LocationEnum.AURA_OTHER, arrow != Arrow.NULL))
             sendMoveToken(getSocket(playerGive), getSocket(playerGet), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.AURA_YOUR, LocationEnum.AURA_OTHER, value, -1)
@@ -1289,7 +1293,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
         else{
             nowPlayer.maxAura = 5
-            logger.insert(Log(playerGive, LogText.MOVE_TOKEN, card_number, number,
+            logger.insert(Log(playerGive, LogText.MOVE_TOKEN, reason, number,
                 LocationEnum.AURA_YOUR, LocationEnum.AURA_OTHER, arrow != Arrow.NULL))
         }
 
@@ -1297,13 +1301,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun auraToDistance(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum,
-                               card_number: Int){
+                               reason: Int){
         if(number <= 0) return
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) &&
             if(user == player) getBothDirection(user, LocToLoc.AURA_YOUR_TO_DISTANCE.encode(number))
             else getBothDirection(user, LocToLoc.AURA_OTHER_TO_DISTANCE.encode(number))){
-            return distanceToAura(player, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+            return distanceToAura(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
         }
 
         var value = number
@@ -1315,7 +1319,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = 10 - distanceToken
         }
 
-        logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, number,
+        logger.insert(Log(player, LogText.MOVE_TOKEN, reason, number,
             LocationEnum.AURA_YOUR, LocationEnum.DISTANCE, arrow != Arrow.NULL))
         if(value != 0){
             thisTurnDistanceChange = true
@@ -1330,21 +1334,21 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun auraToFlare(player_aura: PlayerEnum, player_flare: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum,
-                            card_owner: PlayerEnum, card_number: Int){
+                            card_owner: PlayerEnum, reason: Int){
         if(number <= 0) return
 
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner)){
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner)){
             if(player_aura == user){
                 if(player_flare == user){
                     if(getBothDirection(user, LocToLoc.AURA_YOUR_TO_FLARE_YOUR.encode(number))){
-                        flareToAura(player_flare, player_aura, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                        flareToAura(player_flare, player_aura, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                         return
                     }
                 }
                 else{
                     if(getBothDirection(user, LocToLoc.AURA_YOUR_TO_FLARE_OTHER.encode(number))){
-                        flareToAura(player_flare, player_aura, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                        flareToAura(player_flare, player_aura, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                         return
                     }
                 }
@@ -1352,13 +1356,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             else{
                 if(player_flare == user){
                     if(getBothDirection(user, LocToLoc.AURA_OTHER_TO_FLARE_YOUR.encode(number))){
-                        flareToAura(player_flare, player_aura, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                        flareToAura(player_flare, player_aura, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                         return
                     }
                 }
                 else{
                     if(getBothDirection(user, LocToLoc.AURA_OTHER_TO_FLARE_OTHER.encode(number))){
-                        flareToAura(player_flare, player_aura, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                        flareToAura(player_flare, player_aura, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                         return
                     }
                 }
@@ -1378,13 +1382,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             flarePlayer.flare += value
 
             if(player_aura == player_flare){
-                logger.insert(Log(player_aura, LogText.MOVE_TOKEN, card_number, number,
+                logger.insert(Log(player_aura, LogText.MOVE_TOKEN, reason, number,
                     LocationEnum.AURA_YOUR, LocationEnum.FLARE_YOUR, arrow != Arrow.NULL))
                 sendMoveToken(getSocket(player_aura), getSocket(player_aura.opposite()), TokenEnum.SAKURA_TOKEN,
                     LocationEnum.AURA_YOUR, LocationEnum.FLARE_YOUR, value, -1)
             }
             else{
-                logger.insert(Log(player_aura, LogText.MOVE_TOKEN, card_number, number,
+                logger.insert(Log(player_aura, LogText.MOVE_TOKEN, reason, number,
                     LocationEnum.AURA_YOUR, LocationEnum.FLARE_OTHER, arrow != Arrow.NULL))
                 sendMoveToken(getSocket(player_aura), getSocket(player_aura.opposite()), TokenEnum.SAKURA_TOKEN,
                     LocationEnum.AURA_YOUR, LocationEnum.FLARE_OTHER, value, -1)
@@ -1392,11 +1396,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
         else{
             if(player_aura == player_flare){
-                logger.insert(Log(player_aura, LogText.MOVE_TOKEN, card_number, number,
+                logger.insert(Log(player_aura, LogText.MOVE_TOKEN, reason, number,
                     LocationEnum.AURA_YOUR, LocationEnum.FLARE_YOUR, arrow != Arrow.NULL))
             }
             else{
-                logger.insert(Log(player_aura, LogText.MOVE_TOKEN, card_number, number,
+                logger.insert(Log(player_aura, LogText.MOVE_TOKEN, reason, number,
                     LocationEnum.AURA_YOUR, LocationEnum.FLARE_OTHER, arrow != Arrow.NULL))
             }
         }
@@ -1554,13 +1558,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun distanceToFlare(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum,
-                                card_number: Int){
+                                reason: Int){
         if(number <= 0) return
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) &&
             if(user == player) getBothDirection(user, LocToLoc.DISTANCE_TO_FLARE_YOUR.encode(number))
             else getBothDirection(user, LocToLoc.DISTANCE_TO_FLARE_OTHER.encode(number))){
-            return flareToDistance(player, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+            return flareToDistance(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
         }
 
         if(arrow != Arrow.NULL && moveTokenCheckArrow(LocationEnum.DISTANCE, LocationEnum.FLARE_YOUR)) return
@@ -1571,7 +1575,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = distanceToken
         }
 
-        logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, value,
+        logger.insert(Log(player, LogText.MOVE_TOKEN, reason, value,
             LocationEnum.DISTANCE, LocationEnum.FLARE_YOUR, Arrow.NULL != arrow))
         if(value != 0){
             thisTurnDistanceChange = true
@@ -1596,7 +1600,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     suspend fun distanceToDust(number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum, reason: Int){
         if(number <= 0) return
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) && getBothDirection(user, LocToLoc.DISTANCE_TO_DUST.encode(number))){
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner)
+            && getBothDirection(user, LocToLoc.DISTANCE_TO_DUST.encode(number))){
             return dustToDistance(number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
         }
 
@@ -1633,13 +1638,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun distanceToAura(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum,
-                               card_number: Int){
+                               reason: Int){
         if(number <= 0) return
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) &&
             if(user == player) !getBothDirection(user, LocToLoc.AURA_YOUR_TO_DISTANCE.encode(number))
             else !getBothDirection(user, LocToLoc.AURA_OTHER_TO_DISTANCE.encode(number))){
-            return distanceToAura(player, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+            return distanceToAura(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
         }
 
         if(arrow != Arrow.NULL && moveTokenCheckArrow(LocationEnum.DISTANCE, LocationEnum.AURA_YOUR)) return
@@ -1660,7 +1665,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         if(value != 0){
             if(checkWhenGetAura(player)){
-                distanceToDust(value, Arrow.NULL, user, card_owner, card_number)
+                distanceToDust(value, Arrow.NULL, user, card_owner, reason)
                 afterCheckWhenGetAura(player)
                 nowPlayer.maxAura = 5
                 return
@@ -1671,7 +1676,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             thisTurnDistance -= value
 
             nowPlayer.aura += value
-            logger.insert(Log(user, LogText.MOVE_TOKEN, card_number, value,
+            logger.insert(Log(user, LogText.MOVE_TOKEN, reason, value,
                 LocationEnum.DISTANCE, LocationEnum.AURA_YOUR, Arrow.NULL != arrow))
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.DISTANCE, LocationEnum.AURA_YOUR, value, -1)
@@ -1688,7 +1693,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
         else{
             nowPlayer.maxAura = 5
-            logger.insert(Log(user, LogText.MOVE_TOKEN, card_number, value,
+            logger.insert(Log(user, LogText.MOVE_TOKEN, reason, value,
                 LocationEnum.DISTANCE, LocationEnum.AURA_YOUR, Arrow.NULL != arrow))
         }
     }
@@ -1839,13 +1844,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun dustToLife(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum,
-                           card_number: Int){
+                           reason: Int){
         if(number <= 0) return
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) &&
             if(user == player) getBothDirection(user, LocToLoc.DUST_TO_LIFE_YOUR.encode(number))
             else getBothDirection(user, LocToLoc.DUST_TO_LIFE_OTHER.encode(number))){
-            lifeToDust(player, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+            lifeToDust(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
             return
         }
 
@@ -1860,7 +1865,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = dust
         }
 
-        logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, value,
+        logger.insert(Log(player, LogText.MOVE_TOKEN, reason, value,
             LocationEnum.DUST, LocationEnum.LIFE_YOUR, arrow != Arrow.NULL))
         if(value != 0){
             dust -= value
@@ -1871,11 +1876,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    suspend fun dustToDistance(number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum, card_number: Int){
+    suspend fun dustToDistance(number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum, reason: Int){
         if(number <= 0) return
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) && !getBothDirection(user, LocToLoc.DISTANCE_TO_DUST.encode(number))){
-            return distanceToDust(number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) &&
+            !getBothDirection(user, LocToLoc.DISTANCE_TO_DUST.encode(number))){
+            return distanceToDust(number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
         }
 
         var value = number
@@ -1888,7 +1894,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = dust
         }
 
-        logger.insert(Log(user, LogText.MOVE_TOKEN, card_number, value,
+        logger.insert(Log(user, LogText.MOVE_TOKEN, reason, value,
             LocationEnum.DUST, LocationEnum.DISTANCE, arrow != Arrow.NULL))
         if(value != 0){
             thisTurnDistanceChange = true
@@ -1908,11 +1914,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun dustToAura(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum,
-                           card_number: Int): Int{
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
+                           reason: Int): Int{
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) &&
             if(user == player) getBothDirection(user, LocToLoc.DUST_TO_AURA_YOUR.encode(number))
             else getBothDirection(user, LocToLoc.DUST_TO_AURA_OTHER.encode(number))){
-            auraToDust(player, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+            auraToDust(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
             return 0
         }
 
@@ -1941,7 +1947,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             nowPlayer.aura += value
             dust -= value
 
-            logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, value,
+            logger.insert(Log(player, LogText.MOVE_TOKEN, reason, value,
                 LocationEnum.DUST, LocationEnum.AURA_YOUR, arrow != Arrow.NULL))
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.DUST, LocationEnum.AURA_YOUR, value, -1)
@@ -1951,7 +1957,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
         else{
             nowPlayer.maxAura = 5
-            logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, value,
+            logger.insert(Log(player, LogText.MOVE_TOKEN, reason, value,
                 LocationEnum.DUST, LocationEnum.AURA_YOUR, arrow != Arrow.NULL))
         }
 
@@ -1959,13 +1965,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun dustToFlare(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum,
-                            card_number: Int){
+                            reason: Int){
         if (number <= 0) return
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) &&
             if(user == player) getBothDirection(user, LocToLoc.DUST_TO_FLARE_YOUR.encode(number))
             else getBothDirection(user, LocToLoc.DUST_TO_FLARE_OTHER.encode(number))){
-            flareToDust(player, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+            flareToDust(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
             return
         }
 
@@ -1975,7 +1981,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = dust
         }
 
-        logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, value,
+        logger.insert(Log(player, LogText.MOVE_TOKEN, reason, value,
             LocationEnum.DUST, LocationEnum.FLARE_YOUR, arrow != Arrow.NULL))
         if(value != 0){
             nowPlayer.flare += value
@@ -1989,7 +1995,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                            reason: Int): Int{
         if(number <= 0) return 0
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) &&
             if(user == player) !getBothDirection(user, LocToLoc.DUST_TO_AURA_YOUR.encode(number))
             else !getBothDirection(user, LocToLoc.DUST_TO_AURA_OTHER.encode(number))){
             dustToAura(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
@@ -2018,13 +2024,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun flareToDistance(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum,
-                                card_number: Int){
+                                reason: Int){
         if(number <= 0) return
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) &&
             if(user == player) !getBothDirection(user, LocToLoc.DISTANCE_TO_FLARE_YOUR.encode(number))
             else !getBothDirection(user, LocToLoc.DISTANCE_TO_FLARE_OTHER.encode(number))){
-            return distanceToFlare(player, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+            return distanceToFlare(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
         }
 
         val nowPlayer = getPlayer(player)
@@ -2037,7 +2043,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = 10 - distanceToken
         }
 
-        logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, value,
+        logger.insert(Log(player, LogText.MOVE_TOKEN, reason, value,
             LocationEnum.FLARE_YOUR, LocationEnum.DISTANCE, arrow != Arrow.NULL))
         if(value != 0){
             thisTurnDistanceChange = true
@@ -2056,13 +2062,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun flareToDust(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum,
-                            card_number: Int): Int{
+                            reason: Int): Int{
         if(number <= 0) return 0
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) &&
             if(user == player) !getBothDirection(user, LocToLoc.DUST_TO_FLARE_YOUR.encode(number))
             else !getBothDirection(user, LocToLoc.DUST_TO_FLARE_OTHER.encode(number))){
-            dustToFlare(player, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+            dustToFlare(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
             return 0
         }
 
@@ -2073,7 +2079,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = nowPlayer.flare
         }
 
-        logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, value,
+        logger.insert(Log(player, LogText.MOVE_TOKEN, reason, value,
             LocationEnum.FLARE_YOUR, LocationEnum.DUST, arrow != Arrow.NULL))
         if(value != 0){
             nowPlayer.flare -= value
@@ -2088,18 +2094,18 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun flareToAura(player_flare: PlayerEnum, player_aura: PlayerEnum, number: Int,
-                            arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum, card_number: Int): Int{
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner)){
+                            arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum, reason: Int): Int{
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner)){
             if(player_aura == user){
                 if(player_flare == user){
                     if(!getBothDirection(user, LocToLoc.AURA_YOUR_TO_FLARE_YOUR.encode(number))){
-                        auraToFlare(player_aura, player_flare, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                        auraToFlare(player_aura, player_flare, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                         return 0
                     }
                 }
                 else{
                     if(!getBothDirection(user, LocToLoc.AURA_YOUR_TO_FLARE_OTHER.encode(number))){
-                        auraToFlare(player_aura, player_flare, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                        auraToFlare(player_aura, player_flare, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                         return 0
                     }
                 }
@@ -2107,13 +2113,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             else{
                 if(player_flare == user){
                     if(!getBothDirection(user, LocToLoc.AURA_OTHER_TO_FLARE_YOUR.encode(number))){
-                        auraToFlare(player_aura, player_flare, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                        auraToFlare(player_aura, player_flare, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                         return 0
                     }
                 }
                 else{
                     if(!getBothDirection(user, LocToLoc.AURA_OTHER_TO_FLARE_OTHER.encode(number))){
-                        auraToFlare(player_aura, player_flare, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                        auraToFlare(player_aura, player_flare, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                         return 0
                     }
                 }
@@ -2138,7 +2144,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         if(value != 0){
             if(checkWhenGetAura(player_aura)){
-                flareToDust(player_flare, value, Arrow.NULL, user, card_owner, card_number)
+                flareToDust(player_flare, value, Arrow.NULL, user, card_owner, reason)
                 afterCheckWhenGetAura(player_aura)
                 auraPlayer.maxAura = 5
                 return 0
@@ -2147,13 +2153,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             auraPlayer.aura += value
 
             if(player_flare == player_aura){
-                logger.insert(Log(player_flare, LogText.MOVE_TOKEN, card_number, value,
+                logger.insert(Log(player_flare, LogText.MOVE_TOKEN, reason, value,
                     LocationEnum.FLARE_YOUR, LocationEnum.AURA_YOUR, arrow != Arrow.NULL))
                 sendMoveToken(getSocket(player_flare), getSocket(player_flare.opposite()), TokenEnum.SAKURA_TOKEN,
                     LocationEnum.FLARE_YOUR, LocationEnum.AURA_YOUR, value, -1)
             }
             else{
-                logger.insert(Log(player_flare, LogText.MOVE_TOKEN, card_number, value,
+                logger.insert(Log(player_flare, LogText.MOVE_TOKEN, reason, value,
                     LocationEnum.FLARE_YOUR, LocationEnum.AURA_OTHER, arrow != Arrow.NULL))
                 sendMoveToken(getSocket(player_flare), getSocket(player_flare.opposite()), TokenEnum.SAKURA_TOKEN,
                     LocationEnum.FLARE_YOUR, LocationEnum.AURA_OTHER, value, -1)
@@ -2164,11 +2170,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
         else{
             if(player_flare == player_aura){
-                logger.insert(Log(player_flare, LogText.MOVE_TOKEN, card_number, value,
+                logger.insert(Log(player_flare, LogText.MOVE_TOKEN, reason, value,
                     LocationEnum.FLARE_YOUR, LocationEnum.AURA_YOUR, arrow != Arrow.NULL))
             }
             else{
-                logger.insert(Log(player_flare, LogText.MOVE_TOKEN, card_number, value,
+                logger.insert(Log(player_flare, LogText.MOVE_TOKEN, reason, value,
                     LocationEnum.FLARE_YOUR, LocationEnum.AURA_OTHER, arrow != Arrow.NULL))
             }
         }
@@ -2177,13 +2183,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun lifeToDust(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum,
-                           card_number: Int, endIgnore: Boolean = false): Int{
+                           reason: Int, endIgnore: Boolean = false): Int{
         val nowPlayer = getPlayer(player)
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) &&
             if(user == player) !getBothDirection(user, LocToLoc.DUST_TO_LIFE_YOUR.encode(number))
             else !getBothDirection(user, LocToLoc.DUST_TO_LIFE_OTHER.encode(number))){
-            dustToLife(player, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+            dustToLife(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
             return 0
         }
 
@@ -2195,7 +2201,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = nowPlayer.life
         }
 
-        logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, value,
+        logger.insert(Log(player, LogText.MOVE_TOKEN, reason, value,
             LocationEnum.FLARE_YOUR, LocationEnum.DUST, arrow != Arrow.NULL))
         if(value != 0){
             nowPlayer.life -= value
@@ -2214,14 +2220,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun selfFlareToLife(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum,
-                                card_number: Int){
+                                reason: Int){
         if(number == 0) {
             return
         }
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) && !getBothDirection(user, LocToLoc.YOUR_LIFE_TO_YOUR_FLARE.encode(number))){
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) && !getBothDirection(user, LocToLoc.YOUR_LIFE_TO_YOUR_FLARE.encode(number))){
             return lifeToSelfFlare(player, number, reconstruct = false, damage = false, arrow = Arrow.BOTH_DIRECTION, user = user,
-                card_owner = card_owner, card_number = card_number
+                card_owner = card_owner, reason = reason
             )
         }
 
@@ -2236,7 +2242,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = 10 - nowPlayer.life
         }
 
-        logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, value,
+        logger.insert(Log(player, LogText.MOVE_TOKEN, reason, value,
             LocationEnum.FLARE_YOUR, LocationEnum.LIFE_YOUR, arrow != Arrow.NULL))
         if(value != 0){
             nowPlayer.life += value
@@ -2248,9 +2254,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun lifeToSelfFlare(player: PlayerEnum, number: Int, reconstruct: Boolean, damage: Boolean,
-                                arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum, card_number: Int){
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) && getBothDirection(user, LocToLoc.YOUR_LIFE_TO_YOUR_FLARE.encode(number))){
-            return selfFlareToLife(player, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                                arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum, reason: Int){
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) &&
+            getBothDirection(user, LocToLoc.YOUR_LIFE_TO_YOUR_FLARE.encode(number))){
+            return selfFlareToLife(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
         }
 
         var value = number
@@ -2262,7 +2269,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = nowPlayer.life
         }
 
-        logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, value,
+        logger.insert(Log(player, LogText.MOVE_TOKEN, reason, value,
             LocationEnum.LIFE_YOUR, LocationEnum.FLARE_YOUR, arrow != Arrow.NULL))
         if(value != 0){
             nowPlayer.life -= value
@@ -2281,18 +2288,18 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun auraToLife(player_aura: PlayerEnum, player_life: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum,
-                           card_owner: PlayerEnum, card_number: Int): Int{
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner)){
+                           card_owner: PlayerEnum, reason: Int): Int{
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner)){
             if(player_life == user){
                 if(player_aura == user){
                     if(!getBothDirection(user, LocToLoc.LIFE_YOUR_TO_AURA_YOUR.encode(number))){
-                        lifeToAura(player_aura, player_life, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                        lifeToAura(player_aura, player_life, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                         return 0
                     }
                 }
                 else{
                     if(!getBothDirection(user, LocToLoc.LIFE_YOUR_TO_AURA_OTHER.encode(number))){
-                        lifeToAura(player_aura, player_life, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                        lifeToAura(player_aura, player_life, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                         return 0
                     }
                 }
@@ -2300,13 +2307,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             else{
                 if(player_aura == user){
                     if(!getBothDirection(user, LocToLoc.LIFE_OTHER_TO_AURA_YOUR.encode(number))){
-                        lifeToAura(player_aura, player_life, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                        lifeToAura(player_aura, player_life, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                         return 0
                     }
                 }
                 else{
                     if(!getBothDirection(user, LocToLoc.LIFE_OTHER_TO_AURA_OTHER.encode(number))){
-                        lifeToAura(player_aura, player_life, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                        lifeToAura(player_aura, player_life, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                         return 0
                     }
                 }
@@ -2333,13 +2340,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             lifePlayer.life += value
 
             if(player_life == player_aura){
-                logger.insert(Log(player_life, LogText.MOVE_TOKEN, card_number, number,
+                logger.insert(Log(player_life, LogText.MOVE_TOKEN, reason, number,
                     LocationEnum.AURA_YOUR, LocationEnum.LIFE_YOUR, false))
                 sendMoveToken(getSocket(player_life), getSocket(player_life.opposite()), TokenEnum.SAKURA_TOKEN,
                     LocationEnum.AURA_YOUR, LocationEnum.LIFE_YOUR, value, -1)
             }
             else{
-                logger.insert(Log(player_life, LogText.MOVE_TOKEN, card_number, number,
+                logger.insert(Log(player_life, LogText.MOVE_TOKEN, reason, number,
                     LocationEnum.AURA_YOUR, LocationEnum.LIFE_OTHER, false))
                 sendMoveToken(getSocket(player_life), getSocket(player_life.opposite()), TokenEnum.SAKURA_TOKEN,
                     LocationEnum.AURA_YOUR, LocationEnum.LIFE_OTHER, value, -1)
@@ -2351,11 +2358,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
         else{
             if(player_life == player_aura){
-                logger.insert(Log(player_life, LogText.MOVE_TOKEN, card_number, number,
+                logger.insert(Log(player_life, LogText.MOVE_TOKEN, reason, number,
                     LocationEnum.LIFE_YOUR, LocationEnum.AURA_YOUR, false))
             }
             else{
-                logger.insert(Log(player_life, LogText.MOVE_TOKEN, card_number, number,
+                logger.insert(Log(player_life, LogText.MOVE_TOKEN, reason, number,
                     LocationEnum.LIFE_YOUR, LocationEnum.AURA_OTHER, false))
             }
         }
@@ -2364,18 +2371,18 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun lifeToAura(player_life: PlayerEnum, player_aura: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum,
-                           card_owner: PlayerEnum, card_number: Int): Int{
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner)){
+                           card_owner: PlayerEnum, reason: Int): Int{
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner)){
             if(player_life == user){
                 if(player_aura == user){
                     if(getBothDirection(user, LocToLoc.LIFE_YOUR_TO_AURA_YOUR.encode(number))){
-                        auraToLife(player_aura, player_life, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                        auraToLife(player_aura, player_life, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                         return 0
                     }
                 }
                 else{
                     if(getBothDirection(user, LocToLoc.LIFE_YOUR_TO_AURA_OTHER.encode(number))){
-                        auraToLife(player_aura, player_life, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                        auraToLife(player_aura, player_life, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                         return 0
                     }
                 }
@@ -2383,13 +2390,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             else{
                 if(player_aura == user){
                     if(getBothDirection(user, LocToLoc.LIFE_OTHER_TO_AURA_YOUR.encode(number))){
-                        auraToLife(player_aura, player_life, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                        auraToLife(player_aura, player_life, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                         return 0
                     }
                 }
                 else{
                     if(getBothDirection(user, LocToLoc.LIFE_OTHER_TO_AURA_OTHER.encode(number))){
-                        auraToLife(player_aura, player_life, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                        auraToLife(player_aura, player_life, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                         return 0
                     }
                 }
@@ -2416,13 +2423,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             auraPlayer.aura += value
 
             if(player_life == player_aura){
-                logger.insert(Log(player_life, LogText.MOVE_TOKEN, card_number, number,
+                logger.insert(Log(player_life, LogText.MOVE_TOKEN, reason, number,
                     LocationEnum.LIFE_YOUR, LocationEnum.AURA_YOUR, false))
                 sendMoveToken(getSocket(player_life), getSocket(player_life.opposite()), TokenEnum.SAKURA_TOKEN,
                     LocationEnum.LIFE_YOUR, LocationEnum.AURA_YOUR, value, -1)
             }
             else{
-                logger.insert(Log(player_life, LogText.MOVE_TOKEN, card_number, number,
+                logger.insert(Log(player_life, LogText.MOVE_TOKEN, reason, number,
                     LocationEnum.LIFE_YOUR, LocationEnum.AURA_OTHER, false))
                 sendMoveToken(getSocket(player_life), getSocket(player_life.opposite()), TokenEnum.SAKURA_TOKEN,
                     LocationEnum.LIFE_YOUR, LocationEnum.AURA_OTHER, value, -1)
@@ -2441,11 +2448,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
         else{
             if(player_life == player_aura){
-                logger.insert(Log(player_life, LogText.MOVE_TOKEN, card_number, number,
+                logger.insert(Log(player_life, LogText.MOVE_TOKEN, reason, number,
                     LocationEnum.LIFE_YOUR, LocationEnum.AURA_YOUR, false))
             }
             else{
-                logger.insert(Log(player_life, LogText.MOVE_TOKEN, card_number, number,
+                logger.insert(Log(player_life, LogText.MOVE_TOKEN, reason, number,
                     LocationEnum.LIFE_YOUR, LocationEnum.AURA_OTHER, false))
             }
         }
@@ -2454,15 +2461,15 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun distanceToLife(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum, card_owner: PlayerEnum,
-                               card_number: Int){
+                               reason: Int){
         if(number == 0){
             return
         }
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) &&
             if(user == player) !getBothDirection(user, LocToLoc.LIFE_YOUR_TO_DISTANCE.encode(number))
             else !getBothDirection(user, LocToLoc.LIFE_OTHER_TO_DISTANCE.encode(number))){
-            return lifeToDistance(player, number, false, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+            return lifeToDistance(player, number, false, Arrow.BOTH_DIRECTION, user, card_owner, reason)
         }
 
         if(arrow != Arrow.NULL && moveTokenCheckArrow(LocationEnum.DISTANCE, LocationEnum.LIFE_YOUR)) return
@@ -2478,7 +2485,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = 10 - nowPlayer.life
         }
 
-        logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, value,
+        logger.insert(Log(player, LogText.MOVE_TOKEN, reason, value,
             LocationEnum.DISTANCE, LocationEnum.LIFE_YOUR, arrow != Arrow.NULL))
         if(value != 0){
             thisTurnDistanceChange = true
@@ -2501,18 +2508,18 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun outToLife(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum,
-                            card_owner: PlayerEnum, card_number: Int){
+                          card_owner: PlayerEnum, reason: Int){
         if(number <= 0) return
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner)){
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner)){
             if(player == user){
                 if(!getBothDirection(user, LocToLoc.LIFE_YOUR_TO_OUT.encode(number))){
-                    return lifeToOut(player, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                    return lifeToOut(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                 }
             }
             else{
                 if(!getBothDirection(user, LocToLoc.LIFE_OTHER_TO_OUT.encode(number))){
-                    return lifeToOut(player, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                    return lifeToOut(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                 }
             }
         }
@@ -2525,7 +2532,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = 10 - nowPlayer.life
         }
 
-        logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, value,
+        logger.insert(Log(player, LogText.MOVE_TOKEN, reason, value,
             LocationEnum.OUT_OF_GAME, LocationEnum.LIFE_YOUR, arrow != Arrow.NULL))
         if(value != 0) {
             nowPlayer.life += value
@@ -2537,18 +2544,18 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun lifeToOut(player: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum,
-                          card_owner: PlayerEnum, card_number: Int){
+                          card_owner: PlayerEnum, reason: Int){
         if(number <= 0) return
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner)){
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner)){
             if(player == user){
                 if(getBothDirection(user, LocToLoc.LIFE_YOUR_TO_OUT.encode(number))){
-                    return outToLife(player, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                    return outToLife(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                 }
             }
             else{
                 if(getBothDirection(user, LocToLoc.LIFE_OTHER_TO_OUT.encode(number))){
-                    return outToLife(player, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                    return outToLife(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                 }
             }
         }
@@ -2562,7 +2569,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = before
         }
 
-        logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, value,
+        logger.insert(Log(player, LogText.MOVE_TOKEN, reason, value,
             LocationEnum.LIFE_YOUR, LocationEnum.OUT_OF_GAME, arrow != Arrow.NULL))
         if(value != 0) {
             nowPlayer.life -= value
@@ -2582,18 +2589,18 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun lifeToLife(playerGive: PlayerEnum, playerGet: PlayerEnum, number: Int, arrow: Arrow, user: PlayerEnum,
-                           card_owner: PlayerEnum, card_number: Int){
+                           card_owner: PlayerEnum, reason: Int){
         if(number <= 0) return
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner)){
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner)){
             if(playerGive == user){
                 if(getBothDirection(user, LocToLoc.LIFE_YOUR_TO_LIFE_OTHER.encode(number))){
-                    return lifeToLife(playerGet, playerGive, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                    return lifeToLife(playerGet, playerGive, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                 }
             }
             else{
                 if(!getBothDirection(user, LocToLoc.LIFE_YOUR_TO_LIFE_OTHER.encode(number))){
-                    return lifeToLife(playerGet, playerGive, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+                    return lifeToLife(playerGet, playerGive, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
                 }
             }
         }
@@ -2613,7 +2620,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = 10 - getPlayer.life
         }
 
-        logger.insert(Log(playerGive, LogText.MOVE_TOKEN, card_number, value,
+        logger.insert(Log(playerGive, LogText.MOVE_TOKEN, reason, value,
             LocationEnum.LIFE_YOUR, LocationEnum.LIFE_OTHER, arrow != Arrow.NULL))
         if(value != 0) {
             givePlayer.life -= value
@@ -2634,15 +2641,15 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun lifeToDistance(player: PlayerEnum, number: Int, damage: Boolean, arrow: Arrow, user: PlayerEnum,
-                               card_owner: PlayerEnum, card_number: Int) {
+                               card_owner: PlayerEnum, reason: Int) {
         if(number == 0) {
             return
         }
 
-        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(card_owner) &&
+        if(arrow == Arrow.ONE_DIRECTION && bothDirectionCheck(reason, card_owner) &&
             if(user == player) getBothDirection(user, LocToLoc.LIFE_YOUR_TO_DISTANCE.encode(number))
             else getBothDirection(user, LocToLoc.LIFE_OTHER_TO_DISTANCE.encode(number))){
-            return distanceToLife(player, number, Arrow.BOTH_DIRECTION, user, card_owner, card_number)
+            return distanceToLife(player, number, Arrow.BOTH_DIRECTION, user, card_owner, reason)
         }
 
         var value = number
@@ -2660,7 +2667,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = 10 - distanceToken
         }
 
-        logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, value,
+        logger.insert(Log(player, LogText.MOVE_TOKEN, reason, value,
             LocationEnum.LIFE_YOUR, LocationEnum.DISTANCE, arrow != Arrow.NULL))
         if(value != 0){
             thisTurnDistanceChange = true
@@ -3289,7 +3296,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     private suspend fun useCardPerjury(player: PlayerEnum, falseCard: Card, perjury_card_number: Int,
                                        location: LocationEnum): Boolean{
-        val perjuryCard = getPerjuryCard(perjury_card_number)?: return false
+        val perjuryCard = getPerjuryCard(perjury_card_number, this.version)?: return false
         if(perjuryCheck[perjury_card_number - 2200]){
             return false
         }
@@ -3584,8 +3591,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
         else if(react.first == CommandEnum.REACT_USE_CARD_SOLDIER){
             val card = reactPlayer.getCardFromSoldier(react.second)?: return false
-            if(reactCheck(react_player.opposite(), card, nowAttack)){
-                if(useCardFrom(react_player.opposite(), card, LocationEnum.READY_SOLDIER_ZONE, true, nowAttack,
+            if(reactCheck(react_player, card, nowAttack)){
+                if(useCardFrom(react_player, card, LocationEnum.READY_SOLDIER_ZONE, true, nowAttack,
                         isCost = true, isConsume = true)) {
                     reactPlayer.thisTurnReact = true
                     return true
@@ -4860,6 +4867,18 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             return
         }
 
+        for(card in getPlayer(player).usedSpecialCard.values){
+            card.effectAllValidEffect(player, this, TextEffectTag.WHEN_DECK_RECONSTRUCT_YOUR_AFTER_INSTALLATION)
+        }
+
+        for(card in getPlayer(player).enchantmentCard.values){
+            card.effectAllValidEffect(player, this, TextEffectTag.WHEN_DECK_RECONSTRUCT_YOUR_AFTER_INSTALLATION)
+        }
+
+        if(endCurrentPhase){
+            return
+        }
+
         sendDeckReconstruct(nowSocket, otherSocket)
 
         if(damage){
@@ -5324,14 +5343,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                         }
                     }
                     else{
-                        searchPlayer.insertCardNumberOneCondition(location, cardList, condition)
+                        searchPlayer.insertCardNumberOneCondition(location, cardList, condition, this.version)
                     }
                 }
                 LocationEnum.OTHER_ENCHANTMENT_ZONE_CARD -> {
-                    otherPlayer.insertCardNumberOneCondition(location, cardList, condition)
+                    otherPlayer.insertCardNumberOneCondition(location, cardList, condition, this.version)
                 }
                 else -> {
-                    searchPlayer.insertCardNumberOneCondition(location, cardList, condition)
+                    searchPlayer.insertCardNumberOneCondition(location, cardList, condition, this.version)
                 }
             }
         }
@@ -5359,14 +5378,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                         }
                     }
                     else{
-                        searchPlayer.insertCardNumberOneCondition(location, cardList, condition)
+                        searchPlayer.insertCardNumberOneCondition(location, cardList, condition, this.version)
                     }
                 }
                 LocationEnum.OTHER_ENCHANTMENT_ZONE_CARD -> {
-                    otherPlayer.insertCardNumberOneCondition(location, cardList, condition)
+                    otherPlayer.insertCardNumberOneCondition(location, cardList, condition, this.version)
                 }
                 else -> {
-                    searchPlayer.insertCardNumberOneCondition(location, cardList, condition)
+                    searchPlayer.insertCardNumberOneCondition(location, cardList, condition, this.version)
                 }
             }
         }
@@ -5739,9 +5758,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             LocationEnum.HAND -> getPlayer(player).getCardFromHand(card_number)
             LocationEnum.COVER_CARD -> getPlayer(player).getCardFromCover(card_number)
             LocationEnum.DISCARD_YOUR -> getPlayer(player).getCardFromDiscard(card_number)
+            LocationEnum.DISCARD_OTHER -> getPlayer(player.opposite()).getCardFromDiscard(card_number)
             LocationEnum.SPECIAL_CARD -> getPlayer(player).getCardFromSpecial(card_number)
             LocationEnum.YOUR_DECK_TOP -> getPlayer(player).getCardFromDeckTop(card_number)
             LocationEnum.PLAYING_ZONE_YOUR -> getPlayer(player).getCardFromPlaying(card_number)
+            LocationEnum.PLAYING_ZONE_OTHER -> getPlayer(player.opposite()).getCardFromPlaying(card_number)
             LocationEnum.ADDITIONAL_CARD -> getPlayer(player).getCardFromAdditional(card_number)
             LocationEnum.YOUR_USED_CARD -> getPlayer(player).getCardFromUsed(card_number)
             LocationEnum.ENCHANTMENT_ZONE, LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD -> {
@@ -5750,13 +5771,66 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             LocationEnum.OTHER_ENCHANTMENT_ZONE_CARD -> {
                 getPlayer(player.opposite()).getCardFromEnchantment(card_number)
             }
+            LocationEnum.IDEA_YOUR -> {
+                getPlayer(player).ideaCard
+            }
+            LocationEnum.IDEA_OTHER -> {
+                getPlayer(player.opposite()).ideaCard
+            }
             LocationEnum.END_IDEA_YOUR -> {
                 getPlayer(player).endIdeaCards[card_number]
+            }
+            LocationEnum.END_IDEA_OTHER -> {
+                getPlayer(player.opposite()).endIdeaCards[card_number]
             }
             LocationEnum.MEMORY_YOUR -> {
                 getPlayer(player).memory?.get(card_number)
             }
-            else -> throw Exception("location: $location not supported")
+            LocationEnum.MEMORY_OTHER -> {
+                getPlayer(player.opposite()).memory?.get(card_number)
+            }
+            LocationEnum.READY_SOLDIER_ZONE -> {
+                getPlayer(player).readySoldierZone[card_number]
+            }
+            LocationEnum.NOT_READY_SOLDIER_ZONE -> {
+                getPlayer(player).notReadySoldierZone[card_number]
+            }
+            LocationEnum.DECK -> {
+                getPlayer(player).normalCardDeck.filter {card ->
+                    card.card_number == card_number
+                }.getOrNull(0)
+            }
+            LocationEnum.HAND_OTHER -> {
+                getPlayer(player.opposite()).getCardFromHand(card_number)
+            }
+            LocationEnum.OTHER_DECK_TOP -> {
+                getPlayer(player.opposite()).getCardFromDeckTop(card_number)
+            }
+            LocationEnum.YOUR_DECK_BELOW -> {
+                getPlayer(player).getCardFromDeckBelow(card_number)
+            }
+            LocationEnum.OTHER_DECK_BELOW -> {
+                getPlayer(player.opposite()).getCardFromDeckBelow(card_number)
+            }
+            LocationEnum.OTHER_USED_CARD -> {
+                getPlayer(player.opposite()).getCardFromUsed(card_number)
+            }
+            LocationEnum.SEAL_ZONE -> {
+                getPlayer(player).sealZone[card_number]?: getPlayer(player.opposite()).sealZone[card_number]
+            }
+            LocationEnum.POISON_BAG -> {
+                getPlayer(player).poisonBag[card_number.toCardName()]
+            }
+            LocationEnum.TRANSFORM -> {
+                getPlayer(player).transformZone[card_number.toCardName()]
+            }
+            LocationEnum.ANVIL_YOUR -> {
+                getPlayer(player).anvil
+            }
+            LocationEnum.ANVIL_OTHER -> {
+                getPlayer(player.opposite()).anvil
+            }
+            else -> null
         }
     }
 
@@ -5887,7 +5961,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun moveOutCard(to_player: PlayerEnum, nameList: MutableList<CardName>, to_location: LocationEnum){
         for(card_name in nameList){
-            Card.cardMakerByName(getPlayer(to_player).firstTurn, card_name, to_player, to_location).let {
+            Card.cardMakerByName(getPlayer(to_player).firstTurn, card_name, to_player, to_location, this.version).let {
                 insertCardTo(to_player, it, to_location, false)
             }
         }

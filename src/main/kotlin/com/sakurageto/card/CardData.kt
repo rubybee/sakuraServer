@@ -151,19 +151,12 @@ class CardData(
         return this.card_class == CardClass.SPECIAL
     }
 
-    fun returnRenriOwnNumber(): Int{
+    fun isPerjure(): Boolean{
         effect?.let {
-            for(text in it){
-                when(text.tag){
-                    TextEffectTag.RENRI_FALSE_STEP -> return NUMBER_RENRI_FALSE_STAB
-                    TextEffectTag.RENRI_TEMPORARY_EXPEDIENT -> return NUMBER_RENRI_TEMPORARY_EXPEDIENT
-                    TextEffectTag.RENRI_BLACK_AND_WHITE -> return NUMBER_RENRI_BLACK_AND_WHITE
-                    TextEffectTag.RENRI_FLOATING_CLOUDS -> return NUMBER_RENRI_FLOATING_CLOUDS
-                    TextEffectTag.RENRI_FISHING -> return NUMBER_RENRI_FISHING
-                    else -> {}
-                }
+            for (text in it){
+                if(text === CardSet.perjureText) return true
             }
         }
-        return 0
+        return false
     }
 }

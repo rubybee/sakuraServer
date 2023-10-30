@@ -12,6 +12,7 @@ import com.sakurageto.protocol.SakuraSendData
 import java.util.*
 import kotlin.collections.ArrayDeque
 import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 
 class PlayerStatus(private val player_enum: PlayerEnum) {
     var firstTurn = false
@@ -85,6 +86,8 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var ideaCardStage = 0
     var endIdeaCards = HashMap<Int, Card>()
     var canIdeaProcess: Boolean = true
+    var perjuryInstallation: HashSet<CardName>? = null
+    var relic: HashMap<Int, Card>? = null
 
     var canNotUseCardName1: Pair<Int, CardName>? = null
     var canNotUseCardName2: Pair<Int, CardName>? = null
@@ -412,8 +415,8 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
                     }
                 }
             LocationEnum.ALL_NORMAL -> {
-                destList.addAll(megamiOne.getAllNormalCardName().map { it.toCardNumber(true) })
-                destList.addAll(megamiTwo.getAllNormalCardName().map { it.toCardNumber(true) })
+                destList.addAll(megamiOne.getAllNormalCardName(version).map { it.toCardNumber(true) })
+                destList.addAll(megamiTwo.getAllNormalCardName(version).map { it.toCardNumber(true) })
                 destList.addAll(megamiOne.getAllAdditionalCardName().filter
                 {it.toCardData(version).card_class == CardClass.NORMAL}.map
                 {it.toCardNumber(true)})
@@ -423,13 +426,17 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
             }
             LocationEnum.ALL -> {
                 if(megamiTwo == MegamiEnum.RENRI){
-                    destList.add(707); destList.add(407); destList.add(1313)
+                    destList.add(NUMBER_TOKOYO_KUON)
+                    destList.add(NUMBER_SHINRA_WANJEON_NONPA)
+                    destList.add(NUMBER_UTSURO_MANG_A)
                 }
                 else if(megamiOne == MegamiEnum.RENRI){
-                    destList.add(707); destList.add(407); destList.add(1313)
+                    destList.add(NUMBER_TOKOYO_KUON)
+                    destList.add(NUMBER_SHINRA_WANJEON_NONPA)
+                    destList.add(NUMBER_UTSURO_MANG_A)
                 }
-                destList.addAll(megamiOne.getAllNormalCardName().map { it.toCardNumber(true) })
-                destList.addAll(megamiTwo.getAllNormalCardName().map { it.toCardNumber(true) })
+                destList.addAll(megamiOne.getAllNormalCardName(version).map { it.toCardNumber(true) })
+                destList.addAll(megamiTwo.getAllNormalCardName(version).map { it.toCardNumber(true) })
                 destList.addAll(megamiOne.getAllSpecialCardName().map { it.toCardNumber(true) })
                 destList.addAll(megamiTwo.getAllSpecialCardName().map { it.toCardNumber(true) })
                 destList.addAll(megamiOne.getAllAdditionalCardName().map {it.toCardNumber(true)})
@@ -596,5 +603,17 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
             BufTag.PLUS_MINUS_IMMEDIATE -> costBuff[8].add(buf)
             else -> costBuff[11].add(buf)
         }
+    }
+
+    fun isDiscardHave(find_name: CardName) = discard.any {
+            it.card_data.card_name == find_name
+        }
+
+    fun isDeckHave(find_name: CardName) = normalCardDeck.any {
+        it.card_data.card_name == find_name
+    }
+
+    fun isCoverHave(find_name: CardName) = coverCard.any {
+        it.card_data.card_name == find_name
     }
 }

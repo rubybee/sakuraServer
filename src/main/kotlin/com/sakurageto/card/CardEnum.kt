@@ -1,5 +1,6 @@
 package com.sakurageto.card
 
+import com.sakurageto.gamelogic.GameVersion
 import com.sakurageto.gamelogic.MegamiEnum
 import com.sakurageto.gamelogic.MegamiEnum.*
 import java.util.EnumMap
@@ -169,6 +170,7 @@ enum class CardName {
     CHIKAGE_POISON_SMOKE,
     CHIKAGE_TIP_TOEING,
     CHIKAGE_MUDDLE,
+    CHIKAGE_HIDDEN_WEAPON,
 
     CHIKAGE_DEADLY_POISON,
     CHIKAGE_HAN_KI_POISON,
@@ -517,7 +519,14 @@ enum class CardName {
     SHISUI_PADMA_CUT_DOWN,
     SHISUI_UPALA_TEAR,
     SHISUI_ABUDA_EAT,
-    SHISUI_SHISUI_PLACE_OF_DEATH;
+    SHISUI_SHISUI_PLACE_OF_DEATH,
+
+    RENRI_DECEPTION_FOG,
+    RENRI_SIN_SOO,
+    RENRI_FALSE_WEAPON,
+    RENRI_ESSENCE_OF_BLADE,
+    RENRI_FIRST_SAKURA_ORDER,
+    RENRI_RI_RA_RU_RI_RA_RO;
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -678,6 +687,7 @@ enum class CardName {
             put(CHIKAGE_TRICK_UMBRELLA, NUMBER_CHIKAGE_TRICK_UMBRELLA)
             put(CHIKAGE_STRUGGLE, NUMBER_CHIKAGE_STRUGGLE)
             put(CHIKAGE_ZAN_ZE_NO_CONNECTION_POISON, NUMBER_CHIKAGE_ZAN_ZE_NO_CONNECTION_POISON)
+            put(CHIKAGE_HIDDEN_WEAPON, NUMBER_CHIKAGE_HIDDEN_WEAPON)
 
             put(POISON_PARALYTIC, NUMBER_POISON_PARALYTIC)
             put(POISON_HALLUCINOGENIC, NUMBER_POISON_HALLUCINOGENIC)
@@ -918,6 +928,12 @@ enum class CardName {
             put(RENRI_RENRI_THE_END, NUMBER_RENRI_RENRI_THE_END)
             put(RENRI_ENGRAVED_GARMENT, NUMBER_RENRI_ENGRAVED_GARMENT)
             put(KIRIKO_SHAMANISTIC_MUSIC, NUMBER_KIRIKO_SHAMANISTIC_MUSIC)
+            put(RENRI_DECEPTION_FOG, NUMBER_RENRI_DECEPTION_FOG)
+            put(RENRI_SIN_SOO, NUMBER_RENRI_SIN_SOO)
+            put(RENRI_FALSE_WEAPON, NUMBER_RENRI_FALSE_WEAPON)
+            put(RENRI_ESSENCE_OF_BLADE, NUMBER_RENRI_ESSENCE_OF_BLADE)
+            put(RENRI_FIRST_SAKURA_ORDER, NUMBER_RENRI_FIRST_SAKURA_ORDER)
+            put(RENRI_RI_RA_RU_RI_RA_RO, NUMBER_RENRI_RI_RA_RU_RI_RA_RO)
 
             put(AKINA_AKINA, NUMBER_AKINA_AKINA)
             put(AKINA_ABACUS_STONE, NUMBER_AKINA_ABACUS_STONE)
@@ -1094,6 +1110,7 @@ enum class CardName {
             put(CHIKAGE_TRICK_UMBRELLA, SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_TRICK_UMBRELLA)
             put(CHIKAGE_STRUGGLE, SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_STRUGGLE)
             put(CHIKAGE_ZAN_ZE_NO_CONNECTION_POISON, SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_ZAN_ZE_NO_CONNECTION_POISON)
+            put(CHIKAGE_HIDDEN_WEAPON, SECOND_PLAYER_START_NUMBER + NUMBER_CHIKAGE_HIDDEN_WEAPON)
 
             put(POISON_PARALYTIC, SECOND_PLAYER_START_NUMBER + NUMBER_POISON_PARALYTIC)
             put(POISON_HALLUCINOGENIC, SECOND_PLAYER_START_NUMBER + NUMBER_POISON_HALLUCINOGENIC)
@@ -1334,6 +1351,12 @@ enum class CardName {
             put(RENRI_RENRI_THE_END, SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_RENRI_THE_END)
             put(RENRI_ENGRAVED_GARMENT, SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_ENGRAVED_GARMENT)
             put(KIRIKO_SHAMANISTIC_MUSIC, SECOND_PLAYER_START_NUMBER + NUMBER_KIRIKO_SHAMANISTIC_MUSIC)
+            put(RENRI_DECEPTION_FOG, SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_DECEPTION_FOG)
+            put(RENRI_SIN_SOO, SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_SIN_SOO)
+            put(RENRI_FALSE_WEAPON, SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_FALSE_WEAPON)
+            put(RENRI_ESSENCE_OF_BLADE, SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_ESSENCE_OF_BLADE)
+            put(RENRI_FIRST_SAKURA_ORDER, SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_FIRST_SAKURA_ORDER)
+            put(RENRI_RI_RA_RU_RI_RA_RO, SECOND_PLAYER_START_NUMBER + NUMBER_RENRI_RI_RA_RU_RI_RA_RO)
 
             put(AKINA_AKINA, SECOND_PLAYER_START_NUMBER + NUMBER_AKINA_AKINA)
             put(AKINA_ABACUS_STONE, SECOND_PLAYER_START_NUMBER + NUMBER_AKINA_ABACUS_STONE)
@@ -1474,9 +1497,21 @@ enum class CardName {
             CHIKAGE_MUDDLE
         )
 
+        private val chikageNormalV8_2NormalCardList = listOf(
+            CHIKAGE_THROW_KUNAI, CHIKAGE_POISON_NEEDLE, CHIKAGE_TO_ZU_CHU,
+            CHIKAGE_HIDDEN_WEAPON, CHIKAGE_POISON_SMOKE, CHIKAGE_TIP_TOEING,
+            CHIKAGE_MUDDLE
+        )
+
         private val chikageA1NormalCardList = listOf(
             CHIKAGE_THROW_KUNAI, CHIKAGE_POISON_NEEDLE, CHIKAGE_TO_ZU_CHU,
             CHIKAGE_CUTTING_NECK,  CHIKAGE_TRICK_UMBRELLA, CHIKAGE_STRUGGLE,
+            CHIKAGE_MUDDLE
+        )
+
+        private val chikageA1V8_2NormalCardList = listOf(
+            CHIKAGE_THROW_KUNAI, CHIKAGE_POISON_NEEDLE, CHIKAGE_TO_ZU_CHU,
+            CHIKAGE_HIDDEN_WEAPON,  CHIKAGE_TRICK_UMBRELLA, CHIKAGE_STRUGGLE,
             CHIKAGE_MUDDLE
         )
 
@@ -1612,6 +1647,12 @@ enum class CardName {
             RENRI_PULLING_FISHING
         )
 
+        private val renriA1NormalCardList = listOf(
+            RENRI_FALSE_STAB, RENRI_DECEPTION_FOG, RENRI_BLACK_AND_WHITE,
+            RENRI_IRRITATING_GESTURE, RENRI_SIN_SOO, RENRI_FISHING,
+            RENRI_PULLING_FISHING
+        )
+
         private val akinaNormalCardList = listOf(
             AKINA_ABACUS_STONE, AKINA_THREAT, AKINA_TRADE,
             AKINA_SPECULATION, AKINA_CALC, AKINA_TURN_OFF_TABLE,
@@ -1624,11 +1665,13 @@ enum class CardName {
             SHISUI_IRON_POWDER_WIND_AROUND, SHISUI_BLACK_ARMOR,
         )
 
-        fun returnNormalCardNameByMegami(megami_name: MegamiEnum):List<CardName>{
+        fun returnNormalCardNameByMegami(version: GameVersion, megami_name: MegamiEnum):List<CardName>{
             return when (megami_name){
                 NONE -> emptyList
                 KIRIKO -> emptyList
                 KODAMA -> emptyList
+                ZANKA -> emptyList
+                OUKA -> emptyList
                 YURINA -> yurinaNormalCardList
                 YURINA_A1 -> yurinaA1NormalCardList
                 YURINA_A2 -> yurinaA2NormalCardList
@@ -1648,8 +1691,22 @@ enum class CardName {
                 SHINRA_A1 -> shinraA1NormalCardList
                 HAGANE -> haganeNormalCardList
                 HAGANE_A1 -> haganeA1NormalCardList
-                CHIKAGE -> chikageNormalCardList
-                CHIKAGE_A1 -> chikageA1NormalCardList
+                CHIKAGE -> {
+                    if(version.isHigherThen(GameVersion.VERSION_8_1)){
+                        chikageNormalV8_2NormalCardList
+                    }
+                    else{
+                        chikageNormalCardList
+                    }
+                }
+                CHIKAGE_A1 -> {
+                    if(version.isHigherThen(GameVersion.VERSION_8_1)){
+                        chikageA1V8_2NormalCardList
+                    }
+                    else{
+                        chikageA1NormalCardList
+                    }
+                }
                 KURURU -> kururuNormalCardList
                 KURURU_A1 -> kururuA1NormalCardList
                 KURURU_A2 -> kururuA2NormalCardList
@@ -1672,6 +1729,7 @@ enum class CardName {
                 KANAWE -> kanaweNormalCardList
                 KAMUWI -> kamuwiNormalCardList
                 RENRI -> renriNormalCardList
+                RENRI_A1 -> renriA1NormalCardList
                 AKINA -> akinaNormalCardList
                 SHISUI -> shisuiNormalCardList
             }
@@ -1871,6 +1929,11 @@ enum class CardName {
             RENRI_RENRI_THE_END
         )
 
+        private val renriA1SpecialCardList = listOf(
+            RENRI_RI_RA_RU_RI_RA_RO, RENRI_RA_NA_RA_RO_MI_RE_RI_RA, RENRI_O_RI_RE_TE_RA_RE_RU,
+            RENRI_RENRI_THE_END
+        )
+
         private val akinaSpecialCardList = listOf(
             AKINA_OPEN_CUTTING_METHOD, AKINA_GRAND_CALC_AND_MANUAL, AKINA_SU_LYO_SUL,
             AKINA_AKINA_ACCURATE_CALC
@@ -1886,6 +1949,8 @@ enum class CardName {
                 NONE -> emptyList
                 KIRIKO -> emptyList
                 KODAMA -> emptyList
+                ZANKA -> emptyList
+                OUKA -> emptyList
                 YURINA -> yurinaSpecialCardList
                 YURINA_A1 -> yurinaA1SpecialCardList
                 YURINA_A2 -> yurinaA2SpecialCardList
@@ -1929,6 +1994,7 @@ enum class CardName {
                 KANAWE -> kanaweSpecialCardList
                 KAMUWI -> kamuwiSpecialCardList
                 RENRI -> renriSpecialCardList
+                RENRI_A1 -> renriA1SpecialCardList
                 AKINA -> akinaSpecialCardList
                 SHISUI -> shisuiSpecialCardList
             }
@@ -2011,10 +2077,17 @@ enum class CardName {
             RENRI_ENGRAVED_GARMENT, KIRIKO_SHAMANISTIC_MUSIC
         )
 
+        private val renriA1AdditionalCardList = listOf(
+            RENRI_ENGRAVED_GARMENT, KIRIKO_SHAMANISTIC_MUSIC
+        )
+
         fun returnAdditionalCardNameByMegami(megami_name: MegamiEnum): List<CardName> {
             return when (megami_name){
                 NONE -> emptyList
                 KIRIKO -> emptyList
+                KODAMA -> emptyList
+                ZANKA -> emptyList
+                OUKA -> emptyList
                 YURINA -> emptyList
                 YURINA_A1 -> emptyList
                 YURINA_A2 -> emptyList
@@ -2053,28 +2126,40 @@ enum class CardName {
                 SHINRA_A1 -> emptyList
                 HATSUMI -> emptyList
                 HATSUMI_A1 -> emptyList
-                KODAMA -> emptyList
                 MIZUKI -> mizukiAdditionalCardList
                 MEGUMI -> emptyList
                 KANAWE -> kanaweAdditionalCardList
                 KAMUWI -> kamuwiAdditionalCardList
                 RENRI -> renriAdditionalCardList
+                RENRI_A1 -> renriA1AdditionalCardList
                 AKINA -> emptyList
                 SHISUI -> emptyList
             }
         }
 
+        private val poisonList = listOf(
+            POISON_PARALYTIC, POISON_HALLUCINOGENIC, POISON_RELAXATION,
+            POISON_DEADLY_1, POISON_DEADLY_2
+        )
+
         fun returnPoisonCardName(): List<CardName> {
-            return listOf(
-                POISON_PARALYTIC, POISON_HALLUCINOGENIC, POISON_RELAXATION,
-                POISON_DEADLY_1, POISON_DEADLY_2
-            )
+            return poisonList
         }
 
+        private val soldierList = listOf(
+            SOLDIER_SPEAR_1, SOLDIER_SPEAR_2, SOLDIER_SHIELD, SOLDIER_HORSE
+        )
+
         fun returnSoldierCardName(): List<CardName> {
-            return listOf(
-                SOLDIER_SPEAR_1, SOLDIER_SPEAR_2, SOLDIER_SHIELD, SOLDIER_HORSE
-            )
+            return soldierList
+        }
+
+        private val renriA1RelicList = listOf(
+            RENRI_FALSE_WEAPON, RENRI_ESSENCE_OF_BLADE, RENRI_FIRST_SAKURA_ORDER
+        )
+
+        fun returnRenriA1RelicList(): List<CardName> {
+            return renriA1RelicList
         }
     }
 }

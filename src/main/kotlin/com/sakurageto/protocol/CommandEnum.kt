@@ -52,6 +52,8 @@ enum class CommandEnum {
     ANVIL_OTHER,
     MEMORY_YOUR,
     MEMORY_OTHER,
+    RELIC_YOUR,
+    RELIC_OTHER,
 
     POP_POISON_BAG_YOUR,
     POP_POISON_BAG_OTHER,
@@ -85,6 +87,8 @@ enum class CommandEnum {
     POP_END_IDEA_OTHER,
     POP_MEMORY_YOUR,
     POP_MEMORY_OTHER,
+    POP_RELIC_YOUR,
+    POP_RELIC_OTHER,
 
     POISON_BAG_YOUR,
     POISON_BAG_OTHER,
@@ -307,7 +311,9 @@ enum class CommandEnum {
     END_JOURNEY_OTHER,
 
     SET_MARKET_PRICE_YOUR,
-    SET_MARKET_PRICE_OTHER;
+    SET_MARKET_PRICE_OTHER,
+
+    SHOW_SELECT_RESULT;
 
     fun isBasicOperation() = this in basicOperationSet
 
@@ -470,6 +476,10 @@ enum class CommandEnum {
             END_JOURNEY_OTHER -> return END_JOURNEY_YOUR
             SET_MARKET_PRICE_YOUR -> return SET_MARKET_PRICE_OTHER
             SET_MARKET_PRICE_OTHER -> return SET_MARKET_PRICE_YOUR
+            POP_RELIC_YOUR -> return POP_RELIC_OTHER
+            POP_RELIC_OTHER -> return POP_RELIC_YOUR
+            RELIC_YOUR -> return RELIC_OTHER
+            RELIC_OTHER -> return RELIC_YOUR
             else -> {
                 makeBugReportFile("Opposite() do not support command: $this")
                 return NULL
@@ -587,7 +597,10 @@ enum class LocationEnum(var real_number: Int){
     MEMORY_OTHER(52),
 
     FLOW_YOUR(53),
-    FLOW_OTHER(54);
+    FLOW_OTHER(54),
+
+    RELIC_YOUR(55),
+    RELIC_OTHER(56);
 
     fun Opposite(): LocationEnum{
         return when(this){
@@ -624,6 +637,8 @@ enum class LocationEnum(var real_number: Int){
             MEMORY_OTHER -> MEMORY_YOUR
             FLOW_YOUR -> FLOW_OTHER
             FLOW_OTHER -> FLOW_YOUR
+            RELIC_YOUR -> RELIC_OTHER
+            RELIC_OTHER -> RELIC_YOUR
             else -> DISCARD_YOUR
         }
     }

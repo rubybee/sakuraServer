@@ -16,7 +16,10 @@ import io.ktor.websocket.*
 
 class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private val player1_socket: Connection, private val player2_socket: Connection) {
 
-    var perjuryCheck = arrayOf(false, false, false, false, false, false, false)
+    var perjuryCheck =
+        arrayOf(false, false, false, false, false, false, false, false, false, false,
+                false, false, false, false, false, false, false, false, false, false
+    )
     companion object{
         const val START_PHASE = 1
         const val MAIN_PHASE = 2
@@ -30,20 +33,79 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             LocationEnum.OUT_OF_GAME, GameVersion.VERSION_7_2)
         val RENRI_FLOATING_CLOUDS = Card.cardMakerByName(true, CardName.RENRI_FLOATING_CLOUDS, PlayerEnum.PLAYER1,
             LocationEnum.OUT_OF_GAME, GameVersion.VERSION_7_2)
-        val RENRI_FISHING = Card.cardMakerByName(true, CardName.RENRI_FISHING, PlayerEnum.PLAYER1, LocationEnum.OUT_OF_GAME,
-            GameVersion.VERSION_7_2)
+        val RENRI_FISHING = Card.cardMakerByName(true, CardName.RENRI_FISHING, PlayerEnum.PLAYER1,
+            LocationEnum.OUT_OF_GAME, GameVersion.VERSION_7_2)
+        val RENRI_FISHING_V8_2 = Card.cardMakerByName(true, CardName.RENRI_FISHING, PlayerEnum.PLAYER1,
+            LocationEnum.OUT_OF_GAME, GameVersion.VERSION_8_2)
+        val RENRI_FALSE_WEAPON = Card.cardMakerByName(true, CardName.RENRI_FALSE_WEAPON, PlayerEnum.PLAYER1,
+            LocationEnum.OUT_OF_GAME, GameVersion.VERSION_8_2)
+        val RENRI_ESSENCE_OF_BLADE = Card.cardMakerByName(true, CardName.RENRI_ESSENCE_OF_BLADE, PlayerEnum.PLAYER1,
+            LocationEnum.OUT_OF_GAME, GameVersion.VERSION_8_2)
+        val RENRI_FIRST_SAKURA_ORDER = Card.cardMakerByName(true, CardName.RENRI_FIRST_SAKURA_ORDER, PlayerEnum.PLAYER1,
+            LocationEnum.OUT_OF_GAME, GameVersion.VERSION_8_2)
 
-        fun getPerjuryCard(card_number: Int, version: GameVersion): Card?{
+        fun getValidPerjuryCard(megamiEnum: MegamiEnum, card_number: Int, version: GameVersion): Card?{
             return when(card_number){
-                NUMBER_RENRI_FALSE_STAB -> RENRI_FALSE_STAB
-                NUMBER_RENRI_TEMPORARY_EXPEDIENT -> RENRI_TEMPORARY_EXPEDIENT
-                NUMBER_RENRI_BLACK_AND_WHITE -> RENRI_BLACK_AND_WHITE
-                NUMBER_RENRI_FLOATING_CLOUDS -> RENRI_FLOATING_CLOUDS
-                NUMBER_RENRI_FISHING -> RENRI_FISHING
+                NUMBER_RENRI_FALSE_STAB, NUMBER_RENRI_FALSE_STAB + SECOND_PLAYER_START_NUMBER-> {
+                    RENRI_FALSE_STAB
+                }
+                NUMBER_RENRI_TEMPORARY_EXPEDIENT, NUMBER_RENRI_TEMPORARY_EXPEDIENT + SECOND_PLAYER_START_NUMBER -> {
+                    if(megamiEnum == MegamiEnum.RENRI_A1){
+                        null
+                    }
+                    else{
+                        RENRI_TEMPORARY_EXPEDIENT
+                    }
+                }
+                NUMBER_RENRI_BLACK_AND_WHITE, NUMBER_RENRI_BLACK_AND_WHITE + SECOND_PLAYER_START_NUMBER -> {
+                    RENRI_BLACK_AND_WHITE
+                }
+                NUMBER_RENRI_FLOATING_CLOUDS, NUMBER_RENRI_FLOATING_CLOUDS + SECOND_PLAYER_START_NUMBER -> {
+                    if(megamiEnum == MegamiEnum.RENRI_A1){
+                        null
+                    }
+                    else{
+                        RENRI_FLOATING_CLOUDS
+                    }
+                }
+                NUMBER_RENRI_FISHING, NUMBER_RENRI_FISHING + SECOND_PLAYER_START_NUMBER -> {
+                    if(version.isHigherThen(GameVersion.VERSION_8_1)){
+                        RENRI_FISHING_V8_2
+                    }
+                    else{
+                        RENRI_FISHING
+                    }
+                }
+                NUMBER_RENRI_FALSE_WEAPON, NUMBER_RENRI_FALSE_WEAPON + SECOND_PLAYER_START_NUMBER -> {
+                    if(megamiEnum == MegamiEnum.RENRI){
+                        null
+                    }
+                    else{
+                        RENRI_FALSE_WEAPON
+                    }
+
+                }
+                NUMBER_RENRI_ESSENCE_OF_BLADE, NUMBER_RENRI_ESSENCE_OF_BLADE + SECOND_PLAYER_START_NUMBER -> {
+                    if(megamiEnum == MegamiEnum.RENRI){
+                        null
+                    }
+                    else{
+                        RENRI_ESSENCE_OF_BLADE
+                    }
+                }
+                NUMBER_RENRI_FIRST_SAKURA_ORDER, NUMBER_RENRI_FIRST_SAKURA_ORDER + SECOND_PLAYER_START_NUMBER -> {
+                    if(megamiEnum == MegamiEnum.RENRI){
+                        null
+                    }
+                    else{
+                        RENRI_FIRST_SAKURA_ORDER
+                    }
+                }
                 else -> null
             }
         }
     }
+
     var version = GameVersion.VERSION_8_1
 
     var turnPlayer = PlayerEnum.PLAYER1
@@ -360,6 +422,21 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     private val player1ReconstructListener: ArrayDeque<Listener> = ArrayDeque()
     private val player2ReconstructListener: ArrayDeque<Listener> = ArrayDeque()
+
+    fun removeImmediateReconstructListener(player: PlayerEnum, card_number: Int){
+        when(player){
+            PlayerEnum.PLAYER1 -> {
+                player1ReconstructListener.removeIf {
+                    it.cardNumber == card_number
+                }
+            }
+            PlayerEnum.PLAYER2 -> {
+                player2ReconstructListener.removeIf {
+                    it.cardNumber == card_number
+                }
+            }
+        }
+    }
 
     fun addImmediateReconstructListener(player: PlayerEnum, listener: Listener){
         when(player){
@@ -1779,7 +1856,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun lifeToCard(player: PlayerEnum, number: Int, card: Card, location: LocationEnum = LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD,
-                           reconstruct: Boolean, damage: Boolean, card_number: Int){
+                           reconstruct: Boolean, damage: Boolean, reason: Int){
         var value = number
         val nowPlayer = getPlayer(player)
 
@@ -1789,7 +1866,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value = nowPlayer.life
         }
 
-        logger.insert(Log(player, LogText.MOVE_TOKEN, card_number, value,
+        logger.insert(Log(player, LogText.MOVE_TOKEN, reason, value,
             LocationEnum.LIFE_YOUR, location, false))
         if(value != 0){
             nowPlayer.life -= value
@@ -2951,7 +3028,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    suspend fun tabooGaugeIncrease(player: PlayerEnum, number: Int){
+    suspend fun tabooGaugeIncrease(player: PlayerEnum, number: Int): Boolean{
         val nowPlayer = getPlayer(player)
 
         nowPlayer.tabooGauge = nowPlayer.tabooGauge?.let {
@@ -2960,11 +3037,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 gameEnd(null, player)
             }
             it + number
-        }
+        }?: return false
 
         for(card in nowPlayer.usedSpecialCard.values){
             card.effectAllValidEffect(player, this, TextEffectTag.WHEN_TABOO_CHANGE)
         }
+
+        return true
     }
 
     //call this function when use some card that have effect to change wind, thunder gauge, cannot select not increase
@@ -3127,7 +3206,15 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
 
         val cost = card.canUse(player, this, react_attack, isCost, isConsume)
-        if(cost != -2){
+
+        if(cost == -3){
+            insertCardTo(player, card, LocationEnum.DISCARD_YOUR, true)
+            return true
+        }
+        else if(cost == -4){
+            return true
+        }
+        else if(cost != -2){
             if(!getPlayer(player).notCharge){
                 gaugeIncreaseRequest(player, card)
             }
@@ -3296,8 +3383,15 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     private suspend fun useCardPerjury(player: PlayerEnum, falseCard: Card, perjury_card_number: Int,
                                        location: LocationEnum): Boolean{
-        val perjuryCard = getPerjuryCard(perjury_card_number, this.version)?: return false
-        if(perjuryCheck[perjury_card_number - 2200]){
+        val nowPlayer = getPlayer(player)
+        val megami = if (nowPlayer.megamiOne.real_number / 10 == 22){
+            nowPlayer.megamiOne
+        } else{
+            nowPlayer.megamiTwo
+        }
+
+        val perjuryCard = getValidPerjuryCard(megami, perjury_card_number, this.version)?: return false
+        if(perjuryCheck[perjury_card_number - NUMBER_RENRI_FALSE_STAB]){
             return false
         }
         val cost = perjuryCard.canUse(player, this, null, isCost = true, isConsume = true)
@@ -3308,7 +3402,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
 
             //kamuwi card cost
-            val nowPlayer = getPlayer(player)
             var cardMustPay = 0
 
             if(nowPlayer.nextCostAddMegami == perjuryCard.card_data.megami){
@@ -3317,7 +3410,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
             if(cardMustPay > 0){
                 selectCardFrom(player, player, player, listOf(LocationEnum.HAND),
-                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2111, cardMustPay
+                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_KAMUWI_LOGIC, cardMustPay
                 ) { it, _ -> nowPlayer.nextCostAddMegami == it.card_data.megami }?.let {selected ->
                     for(card_number in selected){
                         popCardFrom(player.opposite(), card_number, LocationEnum.HAND, true)?.let {
@@ -3330,36 +3423,47 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             nowPlayer.nextCostAddMegami = null
             //kamuwi card cost
 
-            perjuryCheck[perjury_card_number - 2200] = true
+            perjuryCheck[perjury_card_number - NUMBER_RENRI_FALSE_STAB] = true
             var public = false
+            var isDisprove = true
             when(receiveSelectDisprove(getSocket(player.opposite()), perjury_card_number)){
                 CommandEnum.SELECT_ONE -> {
                     public = true
                     sendSimpleCommand(player1_socket, player2_socket, CommandEnum.SHOW_DISPROVE_RESULT, falseCard.card_number)
-                    if(perjuryCard.card_number == falseCard.card_data.returnRenriOwnNumber()){
+                    if(perjuryCard.card_data.card_name == falseCard.card_data.card_name){
                         //반증에 실패
                         logger.insert(Log(player, LogText.FAIL_DISPROVE, -1, -1))
 
-                        sendChooseDamage(getSocket(player.opposite()), CommandEnum.CHOOSE_CHOJO, 1, 1)
-                        val chosen = receiveChooseDamage(getSocket(player.opposite()))
-                        processDamage(player, chosen, Pair(1, 1), false, null, null, Log.CHOJO)
-                        logger.insert(Log(player, LogText.END_EFFECT, Log.CHOJO, -1))
+                        chojoDamageProcess(player.opposite())
 
-                        perjuryCard.effectText(perjuryCard.card_number, player, this,
+                        cardForEffect = perjuryCard
+                        perjuryCard.effectText(falseCard.card_number, player, this,
                             null, TextEffectTag.WHEN_THIS_CARD_DISPROVE_FAIL)
+                        cardForEffect = null
                     }
                     else{
                         //반증에 성공
                         popCardFrom(player, falseCard.card_number, location, true)?.let {
                             insertCardTo(player, it, LocationEnum.DISCARD_YOUR, true)
                         }
-                        return false
+                        return true
                     }
                 }
                 else -> {
-                    if(perjuryCard.effectText(falseCard.card_data.returnRenriOwnNumber(),
-                        player, this, null, TextEffectTag.WHEN_THIS_CARD_NOT_DISPROVE) == 1){
+                    isDisprove = false
+                    if(perjuryCard.effectText(falseCard.card_data.card_name.toCardNumber(true),
+                        player, this, null, TextEffectTag.WHEN_THIS_CARD_WHEN_PERJURE_NOT_DISPROVE) == 1){
                         public = true
+                    }
+                    var flag = 0
+                    for(card in nowPlayer.enchantmentCard.values){
+                        flag += card.effectAllValidEffect(player, this, TextEffectTag.RIRARURIRARO_EFFECT)
+                        if(flag > 0){
+                            if(riRaRuRiRaRoEffect(falseCard, perjuryCard, player)){
+                                public = true
+                            }
+                            break
+                        }
                     }
                 }
             }
@@ -3399,7 +3503,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     insertCardTo(player, it, LocationEnum.PLAYING_ZONE_YOUR, public)
                 }
                 sendUseCardMeesage(getSocket(player), getSocket(player.opposite()), false, perjuryCard.card_number)
-                perjuryCard.use(player, this, null, false, 0)
+                perjuryCard.use(player, this, null, false, 0, isDisprove)
 
                 if(public){
                     popCardFrom(player, falseCard.card_number, LocationEnum.PLAYING_ZONE_YOUR, true)?.let {
@@ -3427,6 +3531,27 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             return true
         }
         return false
+    }
+
+    /**
+     * @return means card is public (true) or not (false
+     */
+    private suspend fun riRaRuRiRaRoEffect(falseCard: Card, perjuryCard: Card, player: PlayerEnum): Boolean{
+        while(true){
+            when(receiveCardEffectSelect(player, NUMBER_RI_RA_RU_RI_RA_RO_REVEAL_CARD)){
+                CommandEnum.SELECT_ONE -> {
+                    showPlayersSelectResult(player.opposite(), NUMBER_RENRI_RI_RA_RU_RI_RA_RO, falseCard.card_number)
+                    if(falseCard.card_data.card_name != perjuryCard.card_data.card_name){
+                        getConcentration(player)
+                    }
+                    return true
+                }
+                CommandEnum.SELECT_NOT -> {
+                    return false
+                }
+                else -> {}
+            }
+        }
     }
 
     /**
@@ -3642,6 +3767,52 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             value, -1)
     }
 
+    suspend fun processAllLacerationDamageCancelAble(player: PlayerEnum){
+        val tokensYour = getPlayer(player).getLacerationToken(player)
+        val tokensOther = getPlayer(player.opposite()).getLacerationToken(player)
+        while(true){
+            if(player1.getOnePlayersAllLacerationToken(turnPlayer) == 0 && player2.getOnePlayersAllLacerationToken(turnPlayer) == 0){
+                break
+            }
+            when(receiveCardEffectSelect(player, NUMBER_LACERATION_DAMAGE_SELECT_CANCELABLE)){
+                CommandEnum.SELECT_ONE -> {
+                    if(tokensYour[INDEX_LACERATION_AURA] != 0){
+                        makeOneZoneLacerationToDamage(player, player, INDEX_LACERATION_AURA)
+                    }
+                }
+                CommandEnum.SELECT_TWO -> {
+                    if(tokensYour[INDEX_LACERATION_FLARE] != 0){
+                        makeOneZoneLacerationToDamage(player, player, INDEX_LACERATION_FLARE)
+                    }
+                }
+                CommandEnum.SELECT_THREE -> {
+                    if(tokensYour[INDEX_LACERATION_LIFE] != 0){
+                        makeOneZoneLacerationToDamage(player, player, INDEX_LACERATION_LIFE)
+                    }
+                }
+                CommandEnum.SELECT_FOUR -> {
+                    if(tokensOther[INDEX_LACERATION_AURA] != 0){
+                        makeOneZoneLacerationToDamage(player.opposite(), player, INDEX_LACERATION_AURA)
+                    }
+                }
+                CommandEnum.SELECT_FIVE -> {
+                    if(tokensOther[INDEX_LACERATION_FLARE] != 0){
+                        makeOneZoneLacerationToDamage(player.opposite(), player, INDEX_LACERATION_FLARE)
+                    }
+                }
+                CommandEnum.SELECT_SIX -> {
+                    if(tokensOther[INDEX_LACERATION_LIFE] != 0){
+                        makeOneZoneLacerationToDamage(player.opposite(), player, INDEX_LACERATION_LIFE)
+                    }
+                }
+                CommandEnum.SELECT_NOT -> {
+                    break
+                }
+                else -> {}
+            }
+        }
+    }
+
     suspend fun processAllLacerationDamage(player: PlayerEnum){
         val tokensYour = getPlayer(player).getLacerationToken(player)
         val tokensOther = getPlayer(player.opposite()).getLacerationToken(player)
@@ -3679,6 +3850,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     if(tokensOther[INDEX_LACERATION_LIFE] != 0){
                         makeOneZoneLacerationToDamage(player.opposite(), player, INDEX_LACERATION_LIFE)
                     }
+                }
+                CommandEnum.SELECT_NOT -> {
+
                 }
                 else -> {}
             }
@@ -3739,8 +3913,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         logger.insert(Log(getDamagePlayer.opposite(), LogText.END_EFFECT, NUMBER_SHISUI_SHISUI, -1))
     }
 
-    suspend fun movePlayingCard(player: PlayerEnum, place: LocationEnum?, card_number: Int){
-        val card = popCardFrom(player, card_number, LocationEnum.PLAYING_ZONE_YOUR, true)?: return
+    suspend fun movePlayingCard(player: PlayerEnum, place: LocationEnum?, card_number: Int): Boolean{
+        val card = popCardFrom(player, card_number, LocationEnum.PLAYING_ZONE_YOUR, true)?:
+        popCardFrom(player, NUMBER_RENRI_DECEPTION_FOG, LocationEnum.PLAYING_ZONE_YOUR, true)?:
+        popCardFrom(player, NUMBER_RENRI_DECEPTION_FOG + SECOND_PLAYER_START_NUMBER, LocationEnum.PLAYING_ZONE_YOUR, true)
+        ?: return false
 
         if(place != null){
             if(card.card_data.card_class == CardClass.SPECIAL){
@@ -3786,6 +3963,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 }
             }
         }
+
+        return true
     }
 
     private suspend fun useAfterTriggerProcess(player: PlayerEnum, text: Text?, card_number: Int){
@@ -3805,8 +3984,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     var cardForEffect: Card? = null
 
     suspend fun afterCardUsed(card_number: Int, player: PlayerEnum, thisCard: Card){
-        movePlayingCard(player, null, card_number)
-
         cardForEffect = thisCard
         for(card in getPlayer(player).enchantmentCard.values){
             card.effectAllValidEffect(player, this, TextEffectTag.WHEN_AFTER_CARD_USE)
@@ -3830,6 +4007,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             useAfterTriggerProcess(player, lastEffect, keys[0])
             thisCard.cardUseEndEffect.remove(keys[0])
         }
+        movePlayingCard(player, null, card_number)
     }
 
     suspend fun afterDestruction(player: PlayerEnum, card_number: Int, location: LocationEnum){
@@ -4384,10 +4562,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
 
             if(nowPlayer.normalCardDeck.size == 0){
-                sendChooseDamage(nowSocket, CommandEnum.CHOOSE_CHOJO, 1, 1)
-                val chosen = receiveChooseDamage(nowSocket)
-                processDamage(player, chosen, Pair(1, 1), false, null, null, Log.CHOJO)
-                logger.insert(Log(player, LogText.END_EFFECT, Log.CHOJO, -1))
+                chojoDamageProcess(player)
                 continue
             }
             val drawCard = nowPlayer.normalCardDeck.first()
@@ -4631,33 +4806,88 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         nextEndPhaseEffect.clear()
     }
 
-    suspend fun endPhaseEffectProcess(player: PlayerEnum){
-        val nowPlayer = getPlayer(player)
-        val otherPlayer = getPlayer(player.opposite())
+    suspend fun endPhaseEffectDustCheck(player: PlayerEnum){
+        val keys = endPhaseEffect.keys.toMutableList()
+        if(keys.isNotEmpty()){
+            while(keys.size >= 2){
+                val selected = receiveCardEffectOrder(getSocket(player), CommandEnum.SELECT_END_PHASE_EFFECT_ORDER, keys)
+                if(selected in keys){
+                    val result = endPhaseEffect[selected]
+                    when(result!!.first){
+                        CardEffectLocation.RETURN_YOUR -> {
+                            returnSpecialCard(player, selected)
+                        }
+                        CardEffectLocation.ENCHANTMENT_OTHER -> {
+                            result.second!!.effect!!(selected, player.opposite(), this, null)
+                        }
+                        CardEffectLocation.IDEA_PLAYER1, CardEffectLocation.TEMP_PLAYER1 -> {
+                            result.second!!.effect!!(selected, PlayerEnum.PLAYER1, this, null)
+                        }
+                        CardEffectLocation.IDEA_PLAYER2, CardEffectLocation.TEMP_PLAYER2 -> {
+                            result.second!!.effect!!(selected, PlayerEnum.PLAYER2, this, null)
+                        }
+                        else -> {
+                            result.second!!.effect!!(selected, player, this, null)
+                        }
+                    }
 
-        nowPlayer.usedCardReturn(this)
-        for(card in nowPlayer.enchantmentCard.values){
-            card.effectAllValidEffect(player, this, TextEffectTag.WHEN_END_PHASE_YOUR)
-        }
-        for(card in nowPlayer.usedSpecialCard.values){
-            card.effectAllValidEffect(player, this, TextEffectTag.WHEN_END_PHASE_YOUR)
-        }
-        for(card in nowPlayer.discard){
-            card.effectText(player, this, null, TextEffectTag.WHEN_END_PHASE_YOUR_IN_DISCARD)
-        }
-        for(card in otherPlayer.enchantmentCard.values){
-            card.effectAllValidEffect(player.opposite(), this, TextEffectTag.WHEN_END_PHASE_OTHER)
+                    player1.usedSpecialCard.values.forEach { card ->
+                        card.effectAllValidEffect(PlayerEnum.PLAYER1, this, TextEffectTag.END_PHASE_EFFECT_WHEN_DUST_CHECK_PASS)
+                    }
+                    player2.enchantmentCard.values.forEach { card ->
+                        card.effectAllValidEffect(PlayerEnum.PLAYER2, this, TextEffectTag.END_PHASE_EFFECT_WHEN_DUST_CHECK_PASS)
+                    }
+
+                    endPhaseEffect.remove(selected)
+                    keys.remove(selected)
+                }
+
+                if(endCurrentPhase){
+                    cleanEndPhaseEffect()
+                    return
+                }
+            }
+
+            if(keys.size == 1){
+                val lastEffect = endPhaseEffect[keys[0]]
+                when(lastEffect!!.first){
+                    CardEffectLocation.RETURN_YOUR -> {
+                        returnSpecialCard(player, keys[0])
+                    }
+                    CardEffectLocation.ENCHANTMENT_OTHER -> {
+                        lastEffect.second!!.effect!!(keys[0], player.opposite(), this, null)
+                    }
+                    CardEffectLocation.IDEA_PLAYER1, CardEffectLocation.TEMP_PLAYER1 -> {
+                        lastEffect.second!!.effect!!(keys[0], PlayerEnum.PLAYER1, this, null)
+                    }
+                    CardEffectLocation.IDEA_PLAYER2, CardEffectLocation.TEMP_PLAYER2 -> {
+                        lastEffect.second!!.effect!!(keys[0], PlayerEnum.PLAYER2, this, null)
+                    }
+                    else -> {
+                        lastEffect.second!!.effect!!(keys[0], player, this, null)
+                    }
+                }
+                endPhaseEffect.remove(keys[0])
+                keys.remove(keys[0])
+            }
         }
 
-        nowPlayer.megamiCard?.effectAllValidEffect(player, this, TextEffectTag.WHEN_END_PHASE_YOUR)
-        nowPlayer.megamiCard2?.effectAllValidEffect(player, this, TextEffectTag.WHEN_END_PHASE_YOUR)
-        if(player1.canIdeaProcess){
-            player1.ideaCard?.ideaProcess(PlayerEnum.PLAYER1, this, player1.isIdeaCardFlipped, null)
+        player1.usedSpecialCard.values.forEach { card ->
+            card.effectAllValidEffect(PlayerEnum.PLAYER1, this, TextEffectTag.END_PHASE_EFFECT_WHEN_DUST_CHECK_PASS)
         }
-        if(player2.canIdeaProcess){
-            player2.ideaCard?.ideaProcess(PlayerEnum.PLAYER2, this, player2.isIdeaCardFlipped, null)
+        player2.enchantmentCard.values.forEach { card ->
+            card.effectAllValidEffect(PlayerEnum.PLAYER2, this, TextEffectTag.END_PHASE_EFFECT_WHEN_DUST_CHECK_PASS)
         }
 
+
+        for(key in nextEndPhaseEffect.keys){
+            endPhaseEffect[key] = nextEndPhaseEffect[key]!!
+        }
+
+        nextEndPhaseEffect.clear()
+    }
+
+    suspend fun endPhaseEffect(player: PlayerEnum){
         val keys = endPhaseEffect.keys.toMutableList()
         if(keys.isNotEmpty()){
             while(keys.size >= 2){
@@ -4720,6 +4950,52 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
 
         nextEndPhaseEffect.clear()
+    }
+
+    suspend fun endPhaseEffectProcess(player: PlayerEnum){
+        val nowPlayer = getPlayer(player)
+        val otherPlayer = getPlayer(player.opposite())
+
+        nowPlayer.usedCardReturn(this)
+        var dustCheck = false
+
+        for(card in nowPlayer.enchantmentCard.values){
+            card.effectAllValidEffect(player, this, TextEffectTag.WHEN_END_PHASE_YOUR)
+        }
+        for(card in nowPlayer.usedSpecialCard.values){
+            card.effectAllValidEffect(player, this, TextEffectTag.WHEN_END_PHASE_YOUR)
+            if(dustCheck || card.effectAllValidEffect(player, this, TextEffectTag.END_PHASE_DUST_CHECK) == 1){
+                dustCheck = true
+            }
+        }
+        for(card in nowPlayer.discard){
+            card.effectText(player, this, null, TextEffectTag.WHEN_END_PHASE_YOUR_IN_DISCARD)
+        }
+
+        for(card in otherPlayer.enchantmentCard.values){
+            card.effectAllValidEffect(player.opposite(), this, TextEffectTag.WHEN_END_PHASE_OTHER)
+        }
+        for(card in otherPlayer.usedSpecialCard.values){
+            if(dustCheck || card.effectAllValidEffect(player.opposite(), this, TextEffectTag.END_PHASE_DUST_CHECK) == 1){
+                dustCheck = true
+            }
+        }
+
+        nowPlayer.megamiCard?.effectAllValidEffect(player, this, TextEffectTag.WHEN_END_PHASE_YOUR)
+        nowPlayer.megamiCard2?.effectAllValidEffect(player, this, TextEffectTag.WHEN_END_PHASE_YOUR)
+        if(player1.canIdeaProcess){
+            player1.ideaCard?.ideaProcess(PlayerEnum.PLAYER1, this, player1.isIdeaCardFlipped, null)
+        }
+        if(player2.canIdeaProcess){
+            player2.ideaCard?.ideaProcess(PlayerEnum.PLAYER2, this, player2.isIdeaCardFlipped, null)
+        }
+
+        if(!dustCheck){
+            endPhaseEffect(player)
+        }
+        else{
+            endPhaseEffectDustCheck(player)
+        }
     }
 
     suspend fun hatsumiTailWindClear(){
@@ -4848,6 +5124,41 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return null
     }
 
+    private suspend fun perjuryInstallationProcess(player: PlayerEnum){
+        val nowPlayer = getPlayer(player)
+        if(nowPlayer.coverCard.size == 0) return
+
+        nowPlayer.perjuryInstallation?.let {
+            val selectList = mutableListOf<Int>()
+            for (cardName in it){
+                if(perjuryCheck[cardName.toCardNumber(true) - NUMBER_RENRI_FALSE_STAB]){
+                    selectList.add(cardName.toCardNumber(true))
+                }
+            }
+            if(selectList.size > 0){
+                while(true){
+                    when(receiveCardEffectSelect(player, NUMBER_PERJURY_INSTALLATION_CHOOSE_USE_CARD)){
+                        CommandEnum.SELECT_ONE -> {
+                            break
+                        }
+                        CommandEnum.SELECT_NOT -> {
+                            return
+                        }
+                        else -> {}
+                    }
+                }
+                val useCardNumber = selectCardFrom(player, selectList, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_PERJURY_INSTALLATION_CHOOSE_USE_CARD)[0]
+                val removeCardNumber = selectCardFrom(player, player, player,
+                    listOf(LocationEnum.COVER_CARD), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_PERJURY_INSTALLATION_CHOOSE_REAL_CARD, 1){_, _ -> true}!![0]
+                getCardFrom(player, removeCardNumber, LocationEnum.COVER_CARD)?.let {removeCard ->
+                    useCardPerjury(player, removeCard, useCardNumber, LocationEnum.COVER_CARD)
+                }
+            }
+        }
+    }
+
     suspend fun deckReconstruct(player: PlayerEnum, damage: Boolean){
         val nowPlayer = getPlayer(player)
 
@@ -4858,9 +5169,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             card.effectAllValidEffect(player, this, TextEffectTag.WHEN_DECK_RECONSTRUCT_YOUR)
         }
 
+        getPlayer(player).discard.forEach {card ->
+            card.effectText(player, this, null, TextEffectTag.WHEN_DECK_RECONSTRUCT_YOUR)
+        }
+
         nowPlayer.megamiCard?.effectAllValidEffect(turnPlayer, this, TextEffectTag.WHEN_DECK_RECONSTRUCT_YOUR)
         nowPlayer.megamiCard2?.effectAllValidEffect(turnPlayer, this, TextEffectTag.WHEN_DECK_RECONSTRUCT_YOUR)
 
+        perjuryInstallationProcess(player)
         installationProcess(player)
 
         if(endCurrentPhase){
@@ -4967,7 +5283,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
             //
             CommandEnum.ACTION_USE_CARD_PERJURY -> {
-                if(getPlayer(player).megamiOne == MegamiEnum.RENRI || getPlayer(player).megamiTwo == MegamiEnum.RENRI){
+                if(getPlayer(player).megamiOne.real_number / 10 == MegamiEnum.NUMBER_RENRI_ORIGIN_NUMBER
+                    || getPlayer(player).megamiTwo.real_number / 10 == MegamiEnum.NUMBER_RENRI_ORIGIN_NUMBER){
                     val realCardNumber = card_number / 100000
                     val perjuryCardNumber = card_number % 100000
                     getCardFrom(player, realCardNumber, LocationEnum.HAND)?.let {
@@ -5391,7 +5708,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
 
         if(cardList.isEmpty()) return null
-        else if(cardList.size < listSize) return cardList
+        else if(cardList.size <= listSize) return cardList
 
         while (true){
             val set = mutableSetOf<Int>()
@@ -5564,6 +5881,18 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 nowPlayer.memory?.remove(card_number)
                 return result
             }
+            LocationEnum.RELIC_YOUR -> {
+                val result = nowPlayer.relic?.get(card_number)?: return null
+                sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_RELIC_YOUR)
+                nowPlayer.relic?.remove(card_number)
+                return result
+            }
+            LocationEnum.RELIC_OTHER -> {
+                val result = otherPlayer.relic?.get(card_number)?: return null
+                sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_RELIC_OTHER)
+                otherPlayer.relic?.remove(card_number)
+                return result
+            }
             else -> {
                 makeBugReportFile("popCardFrom(cardNumber) do not support location: $location")
                 return null
@@ -5581,6 +5910,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 val result = nowPlayer.additionalHand[card_name]?: return null
                 sendPopCardZone(nowSocket, otherSocket, result.card_number, public, CommandEnum.POP_ADDITIONAL_YOUR)
                 nowPlayer.additionalHand.remove(card_name)
+                return result
+            }
+            LocationEnum.RELIC_YOUR -> {
+                val nowRelicZone = nowPlayer.relic?: return null
+                val result = nowRelicZone.remove(card_name.toCardNumber(true))?:
+                nowRelicZone.remove(card_name.toCardNumber(true))?: return null
+                sendPopCardZone(nowSocket, otherSocket, result.card_number, public, CommandEnum.POP_RELIC_YOUR)
                 return result
             }
             else -> {
@@ -5675,11 +6011,16 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
             LocationEnum.POISON_BAG -> {
                 card.location = LocationEnum.POISON_BAG
-                val poisonOwner = getPlayer(card.player.opposite())
-                val poisonOwnerSocket = getSocket(card.player.opposite())
-                val poisonOwnerOppositeSocket = getSocket(card.player)
-                poisonOwner.poisonBag[card.card_data.card_name] = card
-                sendAddCardZone(poisonOwnerSocket, poisonOwnerOppositeSocket, card.card_number, publicForOther, CommandEnum.POISON_BAG_YOUR, publicForYour)
+                if(card.card_number.isPoison()){
+                    val poisonOwner = getPlayer(card.player.opposite())
+                    val poisonOwnerSocket = getSocket(card.player.opposite())
+                    val poisonOwnerOppositeSocket = getSocket(card.player)
+                    poisonOwner.poisonBag[card.card_data.card_name] = card
+                    sendAddCardZone(poisonOwnerSocket, poisonOwnerOppositeSocket, card.card_number, publicForOther, CommandEnum.POISON_BAG_YOUR, publicForYour)
+                }
+                else{
+                    insertCardTo(player, card, LocationEnum.DISCARD_YOUR, true)
+                }
             }
             LocationEnum.OUT_OF_GAME -> {
                 card.location = LocationEnum.OUT_OF_GAME
@@ -5725,6 +6066,20 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 card.location = LocationEnum.MEMORY_YOUR
                 nowPlayer.memory!![card.card_number] = card
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, publicForOther, CommandEnum.MEMORY_YOUR, publicForYour)
+            }
+            LocationEnum.RELIC_YOUR -> {
+                card.location = LocationEnum.RELIC_YOUR
+                nowPlayer.relic?.let {
+                    it[card.card_number] = card
+                    sendAddCardZone(nowSocket, otherSocket, card.card_number, publicForOther, CommandEnum.RELIC_YOUR, publicForYour)
+                }
+            }
+            LocationEnum.RELIC_OTHER -> {
+                card.location = LocationEnum.RELIC_YOUR
+                getPlayer(player.opposite()).relic?.let {
+                    it[card.card_number] = card
+                    sendAddCardZone(nowSocket, otherSocket, card.card_number, publicForOther, CommandEnum.RELIC_OTHER, publicForYour)
+                }
             }
             else -> {
                 makeBugReportFile("insertCardTo() do not support location: $location")
@@ -6017,6 +6372,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         sendCommand(player, player.opposite(), CommandEnum.SET_ACT_YOUR, act_number)
     }
 
+    suspend fun sendCommand(player: PlayerEnum, commandEnum: CommandEnum, data: Int){
+        sendSimpleCommand(getSocket(player), commandEnum, data)
+    }
+
     suspend fun sendCommand(player1: PlayerEnum, player2: PlayerEnum, command: CommandEnum){
         sendSimpleCommand(getSocket(player1), getSocket(player2), command)
     }
@@ -6024,7 +6383,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     suspend fun sendCommand(player1: PlayerEnum, player2: PlayerEnum, command: CommandEnum, data: Int){
         sendSimpleCommand(getSocket(player1), getSocket(player2), command, data)
     }
-
 
     fun getMirror(): Int {
         var count = 0
@@ -6085,5 +6443,34 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
+    suspend fun showPlayersSelectResult(player: PlayerEnum, original_card: Int, additional_information: Int){
+        sendSimpleCommand(getSocket(player), CommandEnum.SHOW_SELECT_RESULT, original_card * 100000 + additional_information)
+    }
+
+    suspend fun chojoDamageProcess(player: PlayerEnum){
+        var now = 0
+        for(card in getPlayer(player.opposite()).enchantmentCard.values){
+            now += card.effectAllValidEffect(player.opposite(), this, TextEffectTag.CHOJO_DAMAGE_CHANGE_OTHER)
+            if(now > 0){
+                break
+            }
+        }
+
+        val aura = if(now == 0){
+            1
+        } else{
+            now / 10
+        }
+        val life = if(now == 0){
+            1
+        } else{
+            now % 10
+        }
+
+        sendChooseDamage(getSocket(player), CommandEnum.CHOOSE_CHOJO, aura, life)
+        val chosen = receiveChooseDamage(getSocket(player))
+        processDamage(player, chosen, Pair(aura, life), false, null, null, Log.CHOJO)
+        logger.insert(Log(player, LogText.END_EFFECT, Log.CHOJO, -1))
+    }
     //megami special function
 }

@@ -106,17 +106,17 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         gameStatus.player2.banMegami(player1_data)
     }
 
-    suspend fun checkFinalMegami(){
-        val player1_player1_data = gameStatus.player1.makeMegamiData(CommandEnum.CHECK_YOUR)
-        val player2_player2_data = gameStatus.player2.makeMegamiData(CommandEnum.CHECK_YOUR)
-        val player1_player2_data = gameStatus.player2.makeMegamiData(CommandEnum.CHECK_ANOTHER)
-        val player2_player1_data = gameStatus.player1.makeMegamiData(CommandEnum.CHECK_ANOTHER)
+    private suspend fun checkFinalMegami(){
+        val player1Player1Data = gameStatus.player1.makeMegamiData(CommandEnum.CHECK_YOUR)
+        val player2Player2Data = gameStatus.player2.makeMegamiData(CommandEnum.CHECK_YOUR)
+        val player1Player2Data = gameStatus.player2.makeMegamiData(CommandEnum.CHECK_ANOTHER)
+        val player2Player1Data = gameStatus.player1.makeMegamiData(CommandEnum.CHECK_ANOTHER)
 
-        player1.session.send(Json.encodeToString(player1_player1_data))
-        player2.session.send(Json.encodeToString(player2_player2_data))
+        player1.session.send(Json.encodeToString(player1Player1Data))
+        player2.session.send(Json.encodeToString(player2Player2Data))
 
-        player1.session.send(Json.encodeToString(player1_player2_data))
-        player2.session.send(Json.encodeToString(player2_player1_data))
+        player1.session.send(Json.encodeToString(player1Player2Data))
+        player2.session.send(Json.encodeToString(player2Player1Data))
 
         settingForAnotherMegami(PlayerEnum.PLAYER1, gameStatus.player1.megamiOne)
         settingForAnotherMegami(PlayerEnum.PLAYER1, gameStatus.player1.megamiTwo)
@@ -267,9 +267,22 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
     private fun settingForAnotherMegami(player: PlayerEnum, megami: MegamiEnum){
         when(megami){
             MegamiEnum.YATSUHA_AA1 -> settingForYatsuhaAA1(player)
+            MegamiEnum.RENRI_A1 -> settingForRenriA1(player)
             else -> {}
         }
     }
+
+    private fun settingForRenriA1(player: PlayerEnum){
+        val nowPlayer = gameStatus.getPlayer(player)
+        nowPlayer.relic = HashMap()
+        nowPlayer.perjuryInstallation = hashSetOf(CardName.RENRI_FALSE_WEAPON)
+        for(card_name in CardName.returnRenriA1RelicList()){
+            val card = Card.cardMakerByName(nowPlayer.firstTurn, card_name, player,
+                LocationEnum.RELIC_YOUR, gameStatus.version)
+            nowPlayer.relic!![card.card_number] = card
+        }
+    }
+
     private fun settingForYatsuhaAA1(player: PlayerEnum){
         val nowPlayer = gameStatus.getPlayer(player)
 
@@ -298,10 +311,10 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
     }
 
     private suspend fun selectCard(){
-        gameStatus.player1.unselectedCard.addAll(CardName.returnNormalCardNameByMegami(gameStatus.player1.megamiOne))
-        gameStatus.player1.unselectedCard.addAll(CardName.returnNormalCardNameByMegami(gameStatus.player1.megamiTwo))
-        gameStatus.player2.unselectedCard.addAll(CardName.returnNormalCardNameByMegami(gameStatus.player2.megamiOne))
-        gameStatus.player2.unselectedCard.addAll(CardName.returnNormalCardNameByMegami(gameStatus.player2.megamiTwo))
+        gameStatus.player1.unselectedCard.addAll(CardName.returnNormalCardNameByMegami(gameStatus.version, gameStatus.player1.megamiOne))
+        gameStatus.player1.unselectedCard.addAll(CardName.returnNormalCardNameByMegami(gameStatus.version, gameStatus.player1.megamiTwo))
+        gameStatus.player2.unselectedCard.addAll(CardName.returnNormalCardNameByMegami(gameStatus.version, gameStatus.player2.megamiOne))
+        gameStatus.player2.unselectedCard.addAll(CardName.returnNormalCardNameByMegami(gameStatus.version, gameStatus.player2.megamiTwo))
         gameStatus.player1.unselectedSpecialCard.addAll(CardName.returnSpecialCardNameByMegami(gameStatus.player1.megamiOne))
         gameStatus.player1.unselectedSpecialCard.addAll(CardName.returnSpecialCardNameByMegami(gameStatus.player1.megamiTwo))
         gameStatus.player2.unselectedSpecialCard.addAll(CardName.returnSpecialCardNameByMegami(gameStatus.player2.megamiOne))
@@ -341,11 +354,11 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         else
             specialcard_data_player2.addAll(gameStatus.player2.unselectedSpecialCard.subList(0, 3))
 
-        val end_player1_select = SakuraCardSetSend(CommandEnum.END_SELECT_CARD, card_data_player1, specialcard_data_player1)
-        val end_player2_select = SakuraCardSetSend(CommandEnum.END_SELECT_CARD, card_data_player2, specialcard_data_player2)
+        val endPlayer1Select = SakuraCardSetSend(CommandEnum.END_SELECT_CARD, card_data_player1, specialcard_data_player1)
+        val endPlayer2Select = SakuraCardSetSend(CommandEnum.END_SELECT_CARD, card_data_player2, specialcard_data_player2)
 
-        player1.session.send(Json.encodeToString(end_player1_select))
-        player2.session.send(Json.encodeToString(end_player2_select))
+        player1.session.send(Json.encodeToString(endPlayer1Select))
+        player2.session.send(Json.encodeToString(endPlayer2Select))
 
         when(firstTurn){
             PlayerEnum.PLAYER1 -> {

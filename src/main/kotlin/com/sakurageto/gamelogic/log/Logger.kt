@@ -426,4 +426,33 @@ class Logger {
         }
         return count
     }
+
+    fun cardUseCounter(player: PlayerEnum, card_number: Int): Int{
+        var result = 0
+        for (log in logQueue){
+            if(log.player == player && log.isTextUseCard()){
+                if(log.number1 == card_number){
+                    result += 1
+                }
+            }
+        }
+        return result
+    }
+
+    fun checkThisCardUseWhen(player: PlayerEnum, card_number: Int): Int{
+        var useNumber = cardUseCounter(player, card_number)
+        var cardUseCounter = 0
+        for (log in logQueue){
+            if(log.player == player && log.isTextUseCard()){
+                cardUseCounter += 1
+                if(log.number1 == card_number){
+                    useNumber -= 1
+                    if(useNumber == 0){
+                        return cardUseCounter
+                    }
+                }
+            }
+        }
+        return -1
+    }
 }

@@ -6,6 +6,8 @@ enum class MegamiEnum(var real_number: Int) {
     NONE(0),
     KODAMA(1),
     KIRIKO(2),
+    ZANKA(3),
+    OUKA(4),
     YURINA(10),
     YURINA_A1(11),
     YURINA_A2(12),
@@ -49,6 +51,7 @@ enum class MegamiEnum(var real_number: Int) {
     KANAWE(200),
     KAMUWI(210),
     RENRI(220),
+    RENRI_A1(221),
     AKINA(230),
     SHISUI(240);
 
@@ -61,8 +64,8 @@ enum class MegamiEnum(var real_number: Int) {
         }
     }
 
-    fun getAllNormalCardName(): List<CardName>{
-        return CardName.returnNormalCardNameByMegami(this)
+    fun getAllNormalCardName(version: GameVersion): List<CardName>{
+        return CardName.returnNormalCardNameByMegami(version, this)
     }
 
     fun getAllAdditionalCardName(): List<CardName>{
@@ -74,6 +77,8 @@ enum class MegamiEnum(var real_number: Int) {
     }
 
     companion object {
+        const val NUMBER_RENRI_ORIGIN_NUMBER = 22
+
         fun fromInt(value: Int) = MegamiEnum.values().first { it.real_number == value }
     }
 }

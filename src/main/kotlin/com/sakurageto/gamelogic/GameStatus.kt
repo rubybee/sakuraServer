@@ -346,7 +346,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    fun getConcentration(player: PlayerEnum): Int{
+    fun getConcentrationValue(player: PlayerEnum): Int{
         return when(player){
             PlayerEnum.PLAYER1 -> player1.concentration
             PlayerEnum.PLAYER2 -> player2.concentration
@@ -3542,7 +3542,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 CommandEnum.SELECT_ONE -> {
                     showPlayersSelectResult(player.opposite(), NUMBER_RENRI_RI_RA_RU_RI_RA_RO, falseCard.card_number)
                     if(falseCard.card_data.card_name != perjuryCard.card_data.card_name){
-                        getConcentration(player)
+                        getConcentrationValue(player)
                     }
                     return true
                 }

@@ -1,120 +1,162 @@
 # sakura arm's rule processor
-해당 프로젝트는 카드 게임 후루요니의 온라인 게임 플레이 지원을 하기 위한 서버 프로젝트로 아래에는 해당 서버를 이용하는 클라이언트 프로그램의 사용법을 간단히 기술한다.
+해당 프로젝트는 카드 게임 후루요니의 온라인 게임 플레이 지원 및 자동 자원 관리를 위한 서버 프로젝트다.
 
-## 1. 방 접속
-![main_screen](/image_for_readme/1_connect%20room/1_main_screen.PNG)
+아래에는 해당 서버를 이용하는 클라이언트 프로그램의 사용법 및 구성화면 요소를 간단히 소개한다.
 
-앱을 실행하면 위와 같은 화면이 나오고 방 만들기를 클릭하면, 방을 생성할수 있고 아래와 같은 화면이 나온다
+## 1. 시작 화면
+![main_screen](/image_for_readme/1_connect%20room/1_main_screen.jpg)
 
-![create_room](/image_for_readme/1_connect%20room/2_create_room.PNG)  
+앱을 실행하면 위와 같은 화면이 나오고, 제목 밑의 방 만들기 버튼을 누르면, 방 번호가 나오게 된다
 
-해당  방 번호를 상대방에게 알려줘서 첫화면의 참가하기 버튼을 클릭해, 아래의 화면에서 방번호를 입력해 게임을 시작할 수 있다.
+상대편은 참가하기 버튼을 눌러서 해당 방 번호를 입력해서 게임을 시작할 수 있다.
 
-![enter_room](/image_for_readme/1_connect%20room/3_enter_room.PNG)  
+## 2. 방 생성 화면
 
-## 2. 게임 시작 전 준비
-그렇게 들어가면 방 만든 사람이 아래와 같은 다이얼로그를 받을 수 있고, 2명의 케릭터를 골라서 하는 쌍장요란, 혹은 3명의 케릭터를 골라서 한
-명을 밴 하는 삼습일사 둘 중 한 모드를 고르게 된다.
+![create_room](/image_for_readme/1_connect%20room/2_create_room.jpg)
 
-![select_mode](/image_for_readme/2_before_game_start/1_select_mode.PNG) 
+## 3. 참가하기 화면
 
-모드를 고른 뒤에는 아래와 같은 케릭터 선택 창이 나오게 되고, 2명 내지 3명의 여신을 골라 선택 완료를 누르면 그 다음 단계인 카드 선택이 나오게 된다.  
+![enter_room](/image_for_readme/1_connect%20room/3_enter_room.jpg)  
 
-![select_character](/image_for_readme/2_before_game_start/2_select_character.PNG)  
+## 4. 게임 시작 전 준비
+그렇게 양 플레이어가 참여하게 되면, 사전 과정을 통해 게임의 세부사항이 결정되게 된다. (해당 사항은 방 생성자가 결정하게 됨)
 
-![select_card](/image_for_readme/2_before_game_start/3_select_card.PNG)
+아래와 같은 화면을 2번 걸쳐, 버전과 모드(밴픽 여부)를 결정하게 된다.
 
-위의 스크린 샷은 실재 카드 선택 화면으로 카드 이름에 길게 터치를 하면, 해당 카드의 실재 스크린샷이 아래와 같이 나오게 되고 이를 참고해서 일반 패 7장, 비장패 3장을 고르고 카드 선택 완료를 누르면 실재 게임 창으로 넘어간다.  
+![select_mode](/image_for_readme/2_before_game_start/1_select_detail.jpg) 
 
-![select_card_enlargement](/image_for_readme/2_before_game_start/4_select_card_enlargement.PNG)
+세부사항을 결정한 뒤에는 아래와 같은 케릭터 선택 창이 나오게 된다.
 
-## 3. 실재 게임 화면  
-![basic_game_screen](/image_for_readme/3_basic_game_information/1_basic_game_screen.PNG)
+결정한 세부사항에 따라 2명 내지 3명의 여신을 골라 양쪽 다 선택 완료를 누르게 되면 카드 선택으로 넘어가게 된다 
+(어나더 여신의 경우 원본 여신을 클릭 한뒤 선택창에서 선택 가능하다)
 
-본 게임은, 나의 비장패 영역, 그리고 나의 손패 영역에 있는 카드를 잘 사용해 상대방의 라이프를 0으로 줄이는 게임이다.
-기본 동작(집중력) 버튼을 클릭하면, 집중력을 지불해 기본 동작을 진행할수 있으며, 손패 혹은 비장패에 있는 카드를 클릭하면 아래와 같은 화면을 통해
-카드를 사용할 수 있다  
+<p align="center">  <img src="image_for_readme/2_before_game_start/2_select_character.jpg" align="center" width="49%">  <img src="image_for_readme/2_before_game_start/3_select_character_another.jpg" align="center" width="49%">
 
-![card_click](/image_for_readme/3_basic_game_information/2_card_click.PNG)  
 
-카드 이미지 위에 카드 사용 버튼을 누르면 아래와 같은 다이얼로그가 뜨면서 카드를 사용할 수 있다.  
+카드 선택 화면은 아래와 같고, 카드 선택의 경우 카드이름을 짧게 클릭, 실재 카드 이미지를 보고싶은 경우에는 카드이름을 길게 클릭하면 된다.
 
-![card_use_select](/image_for_readme/3_basic_game_information/3_card_use.PNG)
+총 7장의 일반패, 총 3장의 비장패를 선택 한 뒤, 양쪽 다 선택 완료를 누르면 실재 게임으로 넘어가게 된다.
 
-자신의 패산, 덮음패, 버림패 영역을 클릭하면, 해당 영역에 어떤 카드가 놓여있는지 아래 사진과 같이 알 수 있고, 몇 몇 카드는 조건에 따라 손패를 사용하는 것처럼 사용하기 버튼으로 사용할 수 있다.
+<p align="center">  <img src="image_for_readme/2_before_game_start/4_select_card.jpg" align="center" width="49%">  <img src="image_for_readme/2_before_game_start/5_select_card_enlargement.jpg" align="center" width="49%">
 
-![card_in_other](/image_for_readme/3_basic_game_information/4_card_image_in_other.PNG)
+## 5. 실재 게임 화면  
+![basic_game_screen](/image_for_readme/3_basic_game_information/1_basic_game_screen.jpg)
 
-상대와 나의 위축 여부는 아래와 같이 집중력 옆의 숫자의 색깔로 알 수 있다. (하얀색이면 위축)
+실재 게임화면은 위와 같습니다.
 
-![concentration](/image_for_readme/3_basic_game_information/5_cocentration.jpg)  
+1번 영역은 상대의 손패 영역으로 뒷면이 표시되어, 독과 구별할수 있습니다.
 
-여신 추가 정보 버튼과 같은 경우 아래와 같이 해당 버튼을 누르면 여신 개별로 가지고 잇는 보드 정보에 대해서 알 수 있는 스크린이 나오게 구성했다
+2번 영역은 상대의 부여패 영역으로, 상대가 사용한 활성화 된 부여패는 2번 영역으로 이동하고, 
+카드 바로 아래에 씨앗 결정(초록색)과 벚꽃 결정(분홍색)의 갯수가 표시됩니다
 
-![additional_information](/image_for_readme/3_basic_game_information/6_addtional_information.PNG)  
+3번 영역은 상대의 사용 완료된 비장패 영역으로, 상대가 사용한 비장패는 일반적으로 저장소로 이동합니다.
+이하 설명은 부여패와 같습니다.
 
-## 4. 공격과 대응
-![attack_information](/image_for_readme/4_attack/1_attack_information.PNG)  
+5번 영역은 당신의 사용 완료된 비장패 영역으로, 이하 설명은 상대의 사용 완료된 비장패와 같습니다.
 
-상대 혹은 내가 공격을 수행하면 위와 같이 버프가 적용되지 않은 공격에 대한 기본 정보고 제공되고 확인을 누르면, 아래와 같이 해당 공격에 대한 
-대응 여부를 결정할 수 있다.  
+6번 영역은 당신의 부여패 영역으로, 이하 설명은 상대의 부여패 영역과 같습니다.
 
-![react](/image_for_readme/4_attack/2_react.PNG)
+7번 영역은 당신의 손패 영역으로, 당신의 턴 중 상호작용 가능한 영역입니다. 해당 영역의 카드를 클릭시 중앙에 카드가 확대되고, 
+사용하거나, 기본동작을 하는데 사용할수 있습니다.
 
-손패와 비장패를 그냥 사용하듯이 사용하면 해당 공격에 대한 대응을 진행할 수 있고, 하고 싶지않다면 대응 취소 버튼을 눌러도 된다.  
+8번 영역은 당신의 비장패 영역으로, 당신의 턴 중 상호작용 가능한 영역입니다. 해당 영역의 카드를 클릭시 중앙에 카드가 확대되고,
+플레어를 지불해 사용할 수 있습니다.
 
-## 5. 부여패
+9번 영역의 경우 당신의 패산, 덮음패, 버림패를 클릭하면, 해당 영역에 있는 카드들이 표시가 되고 손패나 비장패와 마찬가지로
+카드를 확대하고, 사용할 수 있는 카드의 경우에 한해서만 사용할 수 있습니다.
+
+4번은 여신 추가 정보 버튼으로, 어나더 하가네, 신라와 같은 추가 보드,
+혹은 추가 영역이 필요한 여신의 경우 해당 버튼을 눌러서 나오는 패널에 표시가 됩니다. (해당 이미지는 아래에 첨부합니다)
+
+![additional_information](/image_for_readme/3_basic_game_information/2_additional_information.jpg)
+
+집중력의 경우 아래와 같이 표시되며 위축의 경우 집중력 텍스트가 하얗게 되는것으로 표시됩니다.
+
+![concentration](/image_for_readme/3_basic_game_information/9_concentration.jpg)
+
+
+## 6. 유저 상호 작용 및 세부사항
+
+![additional_information](/image_for_readme/3_basic_game_information/3_turn_screen.jpg)
+
+### 1. 기본상호작용
+
+유저가 게임진행과 관련된 상호작용할 수 있는 영역은 위와 같이 두가지가 있다. 
+첫번째는 중간에 있는 턴 종료버튼과 기본동작(집중력) 버튼
+두번째는 당신의 비장패영역과 손패영역
+
+기본동작(집중력) 버튼의 경우 누를시 집중력을 1 지불해서 기본동작을 할 수 있다.
+
+턴종료 버튼의 경우 누를시 메인 페이즈를 종료하고 당신의 엔드 페이즈로 넘어가게 된다
+
+비장패 영역과 손패 영역의 카드를 클릭시 아래와 같이 중간에 카드가 확대되고 카드 사용 버튼을 누를시 아래와 같은 다이얼로그가 뜨면서 카드를 사용하거나(카드 사용 버튼),
+손패 카드일시 뒷면으로 덮음패로 이동시켜(기본동작 버튼) 기본동작을 할 수 있다.
+
+<p align="center">  <img src="image_for_readme/3_basic_game_information/4_card_enlargement.jpg" align="center" width="49%">  <img src="image_for_readme/3_basic_game_information/5_card_use.jpg" align="center" width="49%">
+
+### 2. 공격과 대응
+
+상대 혹은 내가 카드 사용을 통해 공격을 수행하면 아래와 같이 버프가 적용되지 않은 공격에 대한 기본 정보가 제공되고 확인을 누르면, 해당 공격을 트리거한 카드가 확대되어 있다.
+공격 정보를 닫기를 통해 제거한뒤, 해당 공격에 대한 대응 여부를 결정할 수 있고, 일반적인 카드를 사용하듯 카드를 사용해 대응을 수행할 수 있다.
+
+<p align="center"> <img src="image_for_readme/3_basic_game_information/6_attacked.jpg" align="center" width="32%"> 
+<img src="image_for_readme/3_basic_game_information/7_react_cancelable.jpg" align="center" width="32%">
+<img src="image_for_readme/3_basic_game_information/8_react.jpg" align="center" width="32%">
+
+
+### 3. 부여패
 
 부여패를 사용하면 아래와 같이 납을 어떻게 진행할지 결정할 수 있는 다이얼로그를 받을 수 있는데, 더스트 옆에 빈공간에, 더스트에서
 보낼 벚꽃결정의 숫자를 입력후 확인을 누르면, 서버에서 납을 진행하게 된다. 만약 더스트에 입력한 숫자만큼 벚꽃결정이 없을시, 재요청을 하게 된다.
 
-![nap](/image_for_readme/5_enchantment/1_nap.PNG)  
+![nap](/image_for_readme/4_enchantment/1_nap.PNG)  
 
 부여패의 경우 올려진 벚꽃 결정이 0가 되면 파기를 진행하게 되는데, 개시 페이지에서 여러개의 부여패가 동시에 파기되면, 활성 플레이어(턴 플레이어)가
 부여패의 파기 순서를 결정하게 된다.
 
-![destruction](/image_for_readme/5_enchantment/2_destruction.PNG)  
+![destruction](/image_for_readme/4_enchantment/2_destruction.PNG)  
 
-위의 사진에 영역에서 나타난 부여패를 하나씩, 손패나 비장패에서 카드를 사용하듯이 선택해서 파기 시키면 된다.(사진에는 없지만, 
-상대방에게도 파기 될 부여패가 있따면 해당 영역에 나타나게 된다)
+위의 사진에 영역에서 나타난 부여패를 하나씩, 손패나 비장패에서 카드를 사용하듯이 카드 선택버튼을 눌러 파기 시키면 된다.(사진에는 없지만, 
+상대방에게도 파기 될 부여패가 있다면 해당 영역에 나타나게 된다)
 
-## 6. 카드 효과
+### 4. 카드 효과
 
 몇몇 카드는 여러 효과들 중에 하나의 효과를 선택하게 되는데 그 경우, 아래와 같은 다이얼로그가 나오게 된다. 가능한 선택지 중에서 하나를 고르면 된다.
 
-![card_effect](/image_for_readme/6_card_effect/1_select_card_effect.png)
+![card_effect](/image_for_readme/5_card_effect/1_select_card_effect.png)
 
-## 7. 카드를 선택하는 카드 효과  
+### 5. 카드를 선택하는 카드 효과  
 
 몇몇 카드는 특정 영역에서 카드를 골라서, 어떠한 효과를 불러일으키는데, 그 경우 아래와 같은 순서로, 카드를 고르게 된다.  
 
 
 ### 1. 카드 효과에 대한 안내문
-![card_select_dialog](/image_for_readme/7_card_effect_card_select/1_card_select_dialog.jpg)   
+![card_select_dialog](/image_for_readme/6_card_effect_card_select/1_card_select_dialog.jpg)   
 
 위와 같은 안내문이 나오게 되고, 해당 안내문을 참고해서, 카드를 선택한다  
 
 ### 2. 카드 선택
-![card_select_pool](/image_for_readme/7_card_effect_card_select/2_card_select_pool.jpg)  
+![card_select_pool](/image_for_readme/6_card_effect_card_select/2_card_select_pool.jpg)  
 
 부여패 처럼 왼쪽 위에 선택 가능한 카드가 나오게 되고 해당 카드들을 클릭하면 아래와 같이 카드가 확대되서 나온다.
 
-![card_enlargement](/image_for_readme/7_card_effect_card_select/3_card_enlargement_select.jpg)  
+![card_enlargement](/image_for_readme/6_card_effect_card_select/3_card_enlargement_select.jpg)  
 
 카드 선택 버튼을 누르게 되면 해당 카드는 위에서 바로 아래로 다음 이미지와 같이 이동하게 된다.  
 
-![card_move](/image_for_readme/7_card_effect_card_select/4_card_move.jpg)  
+![card_move](/image_for_readme/6_card_effect_card_select/4_card_move.jpg)  
 
 ### 3. 선택 종료  
 
-조건에 맞춰서, 카드를 선택하고 나면 선택 종료 버튼을 눌러서 선택을 마치면 된다.  
+조건에 맞춰서, 카드를 선택하고 나면 선택 종료 버튼을 눌러서 선택을 마치면 된다. (조건에 맞지 않는 선택시 재선택을 요구)  
 
-## 8. TODO
-### 1. 웹 버전?
-### 2. 효과 선택의 가시성
-상대가 카드의 효과를 선택할 때 특정 효과는 토큰의 움직임만으로 어떤 선택을 했는지 알 수 없는 경우가 존재
+## 7. TODO
+### 1. 웹 버전? 혹은 window 환경에서 구동가능한 버전?
+### 2. 효과 선택의 가시성 - 몇몇 카드에만 적용 완료
+**상대가 카드의 효과를 선택할 때 특정 효과는 토큰의 움직임만으로 어떤 선택을 했는지 알 수 없는 경우가 존재**
 ### 3. 카드의 번역명이 바뀐 케이스
 **이미지와 게임화면 상의 카드  이름이 다름**
+### 4. 여신의 도전 모드 수록
 
 
 

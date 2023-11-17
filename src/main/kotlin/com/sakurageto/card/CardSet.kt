@@ -1837,7 +1837,7 @@ object CardSet {
     }
 
     private fun kyochi(player: PlayerEnum, game_status: GameStatus): Boolean{
-        return game_status.getConcentration(player) == 2
+        return game_status.getConcentrationValue(player) == 2
     }
 
     private val bitsunerigi = CardData(CardClass.NORMAL, CardName.TOKOYO_BITSUNERIGI, MegamiEnum.TOKOYO, CardType.ATTACK, SubType.NONE)
@@ -7354,7 +7354,7 @@ object CardSet {
         })
         hoLyeong.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.CHANGE_CONCENTRATION) {_, player, game_status, _ ->
             if(game_status.getPlayer(player).lastTurnReact){
-                game_status.getConcentration(player)
+                game_status.addConcentration(player)
             }
             null
         })
@@ -8849,7 +8849,7 @@ object CardSet {
             null
         })
         seal.addtext(Text(TextEffectTimingTag.AFTER_DESTRUCTION, TextEffectTag.CHANGE_CONCENTRATION) {_, player, game_status, _ ->
-            game_status.getConcentration(player)
+            game_status.addConcentration(player)
             null
         })
         vagueStory.setSpecial(1)
@@ -9357,7 +9357,7 @@ object CardSet {
         wheelSkill.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD){ _, player, game_status, _ ->
             if(abs(game_status.getAdjustDistance() - game_status.startTurnDistance) >= 2){
                 game_status.drawCard(player, 1)
-                game_status.getConcentration(player)
+                game_status.addConcentration(player)
             }
             null
         })
@@ -9951,11 +9951,11 @@ object CardSet {
 
             null
         })
+        fishing.addtext(perjureText)
         fishing.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_TOKEN){ card_number, player, game_status, _ ->
             game_status.distanceToDust(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
             null
         })
-        fishing.addtext(perjureText)
         pullingFishing.setEnchantment(3)
         pullingFishing.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_TOKEN) { card_number, player, game_status, _ ->
             if(game_status.getAdjustDistance() >= 2){
@@ -10771,7 +10771,7 @@ object CardSet {
         questionAnswer.setAttack(DistanceType.CONTINUOUS, Pair(2, 5), null, 3, 0,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         questionAnswer.addtext(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.WHEN_CHOOSE_LIFE_DAMAGE) { _, player, game_status, _ ->
-            game_status.deckToCoverCard(player, 3)
+            game_status.deckToCoverCard(player.opposite(), 3)
             val basicOperationSelected = game_status.requestAndDoBasicOperation(player, NUMBER_YURINA_QUESTION_ANSWER)
             if(game_status.canDoBasicOperation(player.opposite(), basicOperationSelected)){
                 game_status.doBasicOperation(player.opposite(), basicOperationSelected, CommandEnum.BASIC_OPERATION_CAUSE_BY_CARD + NUMBER_YURINA_QUESTION_ANSWER)
@@ -11158,9 +11158,9 @@ object CardSet {
     private val trade = CardData(CardClass.NORMAL, CardName.AKINA_TRADE, MegamiEnum.AKINA, CardType.ATTACK, SubType.NONE)
     private val speculation = CardData(CardClass.NORMAL, CardName.AKINA_SPECULATION, MegamiEnum.AKINA, CardType.BEHAVIOR, SubType.NONE)
     private val calc = CardData(CardClass.NORMAL, CardName.AKINA_CALC, MegamiEnum.AKINA, CardType.BEHAVIOR, SubType.REACTION)
-    private val turnOffTable = CardData(CardClass.NORMAL, CardName.AKINA_TURN_OFF_TABLE, MegamiEnum.AKINA, CardType.BEHAVIOR, SubType.NONE)
+    private val turnOffTable = CardData(CardClass.NORMAL, CardName.AKINA_TURN_OFF_TABLE, MegamiEnum.AKINA, CardType.ENCHANTMENT, SubType.NONE)
     private val directFinancing = CardData(CardClass.NORMAL, CardName.AKINA_DIRECT_FINANCING, MegamiEnum.AKINA, CardType.ENCHANTMENT, SubType.FULL_POWER)
-    private val openCuttingMethod = CardData(CardClass.SPECIAL, CardName.AKINA_OPEN_CUTTING_METHOD, MegamiEnum.AKINA, CardType.BEHAVIOR, SubType.FULL_POWER)
+    private val openCuttingMethod = CardData(CardClass.SPECIAL, CardName.AKINA_OPEN_CUTTING_METHOD, MegamiEnum.AKINA, CardType.BEHAVIOR, SubType.NONE)
     private val grandCalcAndManual = CardData(CardClass.SPECIAL, CardName.AKINA_GRAND_CALC_AND_MANUAL, MegamiEnum.AKINA, CardType.ATTACK, SubType.REACTION)
     private val sulyosul = CardData(CardClass.SPECIAL, CardName.AKINA_SU_LYO_SUL, MegamiEnum.AKINA, CardType.ENCHANTMENT, SubType.NONE)
     private val accurateCalc = CardData(CardClass.SPECIAL, CardName.AKINA_AKINA_ACCURATE_CALC, MegamiEnum.AKINA, CardType.BEHAVIOR, SubType.NONE)
@@ -11271,7 +11271,7 @@ object CardSet {
             while(true){
                 when(game_status.receiveCardEffectSelect(player, NUMBER_AKINA_ABACUS_STONE)){
                     CommandEnum.SELECT_ONE -> {
-                        game_status.getConcentration(player)
+                        game_status.addConcentration(player)
                         break
                     }
                     CommandEnum.SELECT_TWO -> {
@@ -11529,11 +11529,11 @@ object CardSet {
     private val shisuiPlaceOfDeath = CardData(CardClass.SPECIAL, CardName.SHISUI_SHISUI_PLACE_OF_DEATH, MegamiEnum.SHISUI, CardType.BEHAVIOR, SubType.FULL_POWER)
 
     private val padmaCutDownEffectText = Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_TOKEN) { card_number, player, game_status, _ ->
-        game_status.processAllLacerationDamageCancelAble(player)
-        game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE,
+        game_status.processAllLacerationDamageCancelAble(player.opposite())
+        game_status.addThisTurnAttackBuff(player.opposite(), Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE,
             {_, _, _ -> true},
             {_, _, attack ->
-                val count = game_status.logger.countGetDamage(player)
+                val count = game_status.logger.countGetDamage(player.opposite())
                 val plus = if(count % 2 == 0){
                     count / 2
                 } else{
@@ -11542,13 +11542,13 @@ object CardSet {
                 attack.lifePlusMinus(plus)
             }))
         if(game_status.addPreAttackZone(
-                player, MadeAttack(CardName.SHISUI_PADMA_CUT_DOWN,
+                player.opposite(), MadeAttack(CardName.SHISUI_PADMA_CUT_DOWN,
                     NUMBER_SHISUI_PADMA_CUT_DOWN_ADDITIONAL, CardClass.NULL,
                         sortedSetOf(1, 2, 3, 4), 2, 1,  MegamiEnum.SHISUI,
                         cannotReactNormal = true, cannotReactSpecial = false,
                         cannotReact = false, chogek = false)
             )){
-            game_status.afterMakeAttack(card_number, player, null)
+            game_status.afterMakeAttack(card_number, player.opposite(), null)
         }
         null
     }
@@ -11604,7 +11604,7 @@ object CardSet {
             null
         })
         rebellionAttack.setAttack(DistanceType.CONTINUOUS, Pair(2, 4), null, 1, 1,
-            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false, isLaceration = true)
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false, isLaceration = false)
         rebellionAttack.addtext((Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) {card_number, player, game_status, _->
             game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE,
                 {condition_player, condition_game_status, _ -> condition_game_status.logger.countGetDamage(condition_player) >= 1},
@@ -12075,28 +12075,28 @@ object CardSet {
 
     private val vagueStoryV8Hypen2Text = Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_START_PHASE_OTHER) { card_number, player, game_status, _ ->
         if(game_status.returnSpecialCard(player, card_number)){
-            game_status.getConcentration(player.opposite())
+            game_status.addConcentration(player.opposite())
         }
         null
     }
 
     private val padmaCutDownV8Hypen2EffectText = Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_TOKEN) { card_number, player, game_status, _ ->
-        game_status.processAllLacerationDamage(player)
-        game_status.addThisTurnAttackBuff(player, Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE,
+        game_status.processAllLacerationDamage(player.opposite())
+        game_status.addThisTurnAttackBuff(player.opposite(), Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE,
             {_, _, _ -> true},
             {_, _, attack ->
-                val count = game_status.logger.countGetDamage(player)
+                val count = game_status.logger.countGetDamage(player.opposite())
                 val plus = count / 2
                 attack.lifePlusMinus(plus)
             }))
         if(game_status.addPreAttackZone(
-                player, MadeAttack(CardName.SHISUI_PADMA_CUT_DOWN,
+                player.opposite(), MadeAttack(CardName.SHISUI_PADMA_CUT_DOWN,
                     NUMBER_SHISUI_PADMA_CUT_DOWN_ADDITIONAL, CardClass.NULL,
                     sortedSetOf(1, 2, 3, 4), 2, 1,  MegamiEnum.SHISUI,
                     cannotReactNormal = true, cannotReactSpecial = false,
                     cannotReact = false, chogek = false)
             )){
-            game_status.afterMakeAttack(card_number, player, null)
+            game_status.afterMakeAttack(card_number, player.opposite(), null)
         }
         null
     }
@@ -12491,6 +12491,9 @@ object CardSet {
                             game_status.showPlayersSelectResult(player.opposite(), NUMBER_KAMUWI_FLUTTERING_BLADE, 2)
                             break
                         }
+                        CommandEnum.SELECT_NOT -> {
+                            break
+                        }
                         else -> {}
                     }
                 }
@@ -12531,6 +12534,7 @@ object CardSet {
             }
             null
         })
+        fishingV8_2.addtext(perjureText)
         fishingV8_2.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_TOKEN){ card_number, player, game_status, _ ->
             game_status.distanceToFlare(player, 1, Arrow.ONE_DIRECTION, player,
                 game_status.getCardOwner(card_number), card_number)
@@ -12541,11 +12545,11 @@ object CardSet {
         directFinancingV8_2.addtext(chasmText)
         directFinancingV8_2.addtext(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_TOKEN){ card_number, player, game_status, _ ->
             game_status.auraToAura(player.opposite(), player, 1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
-            if(game_status.getConcentration(player) >= 1){
+            if(game_status.getConcentrationValue(player) >= 1){
                 while(true){
                     when(game_status.receiveCardEffectSelect(player, NUMBER_AKINA_DIRECT_FINANCING_REDUCE_CONCENTRATION)){
                         CommandEnum.SELECT_ONE -> {
-                            if(game_status.getConcentration(player) == 2){
+                            if(game_status.getConcentrationValue(player) == 2){
                                 game_status.decreaseConcentration(player)
                             }
                             game_status.decreaseConcentration(player)
@@ -12628,12 +12632,19 @@ object CardSet {
             }
             null
         })
-        blackArmorV8_2.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_TOKEN) { card_number, player, game_status, react_attack ->
+        blackArmorV8_2.addtext(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_TOKEN) ret@{ card_number, player, game_status, react_attack ->
             val count = game_status.logger.countGetDamage(player)
+            val beforeSelected = hashSetOf<CommandEnum>()
+
             for(i in 1..count){
                 while(true){
-                    when(game_status.receiveCardEffectSelect(player, NUMBER_SHISUI_BLACK_ARMOR)){
+                    val nowSelect = game_status.receiveCardEffectSelect(player, NUMBER_SHISUI_BLACK_ARMOR)
+                    if(nowSelect in beforeSelected){
+                        continue
+                    }
+                    when(nowSelect){
                         CommandEnum.SELECT_ONE -> {
+                            beforeSelected.add(CommandEnum.SELECT_ONE)
                             react_attack?.addAttackBuff(Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true },
                                 {_, _, attack ->
                                     attack.lifePlusMinus(-1)
@@ -12641,17 +12652,23 @@ object CardSet {
                             break
                         }
                         CommandEnum.SELECT_TWO -> {
+                            beforeSelected.add(CommandEnum.SELECT_TWO)
                             game_status.setShrink(player.opposite())
                             break
                         }
                         CommandEnum.SELECT_THREE -> {
+                            beforeSelected.add(CommandEnum.SELECT_THREE)
                             selectLaceration(player.opposite(), player, player.opposite(), game_status, NUMBER_SHISUI_BLACK_ARMOR_SELECT_LACERATION)
                             break
+                        }
+                        CommandEnum.SELECT_NOT -> {
+                            return@ret null
                         }
                         else -> {}
                     }
                 }
             }
+
             null
         })
         padmaCutDownV8_2.setSpecial(3)
@@ -12671,7 +12688,7 @@ object CardSet {
     private val falseWeapon = CardData(CardClass.NORMAL, CardName.RENRI_FALSE_WEAPON, MegamiEnum.RENRI, CardType.ATTACK, SubType.NONE)
     private val essenceOfBlade = CardData(CardClass.NORMAL, CardName.RENRI_ESSENCE_OF_BLADE, MegamiEnum.ZANKA, CardType.BEHAVIOR, SubType.NONE)
     private val firstSakuraOrder = CardData(CardClass.NORMAL, CardName.RENRI_FIRST_SAKURA_ORDER, MegamiEnum.OUKA, CardType.BEHAVIOR, SubType.NONE)
-    private val riRaRuRiRaRo = CardData(CardClass.NORMAL, CardName.RENRI_RI_RA_RU_RI_RA_RO, MegamiEnum.RENRI, CardType.ENCHANTMENT, SubType.NONE)
+    private val riRaRuRiRaRo = CardData(CardClass.SPECIAL, CardName.RENRI_RI_RA_RU_RI_RA_RO, MegamiEnum.RENRI, CardType.ENCHANTMENT, SubType.NONE)
 
     private val returnRelicText = Text(TextEffectTimingTag.USING, TextEffectTag.WHEN_AFTER_CARD_USE) ret@{card_number, player, game_status, _->
         val relicCard = game_status.getCardFrom(player, card_number, LocationEnum.PLAYING_ZONE_YOUR)?: return@ret null
@@ -12770,7 +12787,7 @@ object CardSet {
                 }
             }
             else{
-                delay(Random(System.currentTimeMillis()).nextLong() % 1000 + 1000)
+                delay(Random(System.currentTimeMillis()).nextLong() % 4000 + 4000)
                 game_status.popCardFrom(player, card_number, LocationEnum.HAND, true)?.let {
                     game_status.insertCardTo(player, it, LocationEnum.PLAYING_ZONE_YOUR, true)
                 }

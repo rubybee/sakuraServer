@@ -66,6 +66,7 @@ enum class LogText{
     END_EFFECT,
     IDEA,
     ATTACK,
+    ATTACK_DAMAGE,
     TRANSFORM,
     USE_CARD_IN_COVER_AND_REACT,
     USE_CARD_IN_COVER,

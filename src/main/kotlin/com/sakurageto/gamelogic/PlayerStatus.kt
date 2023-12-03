@@ -127,10 +127,10 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var notCharge = false
     var readySeed: Int = 0
     var nextEnchantmentGrowing = 0
-    var justRunNoCondition: Boolean = false
+    var justRunStratagem: Boolean = false
     var isNextBasicOperationInvalid = false
     var isMoveDistanceToken = false
-    var loseCounter = false
+    var loseCounter = 0
     var canNotGoForward: Boolean = false
     var didBasicOperation: Boolean = false
     var napBuff = 0
@@ -527,16 +527,21 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
         return false
     }
 
-    fun checkAuraDamage(damage: Int): MutableList<Int>?{
+    fun checkAuraDamage(damage: Int, laceration: Boolean): MutableList<Int>?{
         val selectable = mutableListOf<Int>()
         var totalAura = this.aura
-        if(this.aura > 0){
-            selectable.add(LocationEnum.AURA_YOUR.real_number)
-        }
-        for(card in enchantmentCard.values){
-            if(card.checkAuraReplaceable()){
-                totalAura += card.getNap()!!
-                selectable.add(card.card_number)
+        if(!laceration){
+            if(this.aura > 0){
+                selectable.add(LocationEnum.AURA_YOUR.real_number)
+            }
+
+            enchantmentCard.values.forEach{ card ->
+                if(card.checkAuraReplaceable()){
+                    card.getNap()?.let { nap ->
+                        totalAura += nap
+                        selectable.add(card.card_number)
+                    }
+                }
             }
         }
         if(totalAura >= damage) return selectable
@@ -549,12 +554,16 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
             selectable.add(LocationEnum.AURA_YOUR.real_number)
             selectable.add(this.aura)
         }
-        for(card in enchantmentCard.values){
+
+        enchantmentCard.values.forEach { card ->
             if(card.checkAuraReplaceable()){
-                selectable.add(card.card_number)
-                selectable.add(card.getNap()!!)
+                card.getNap()?.let { nap ->
+                    selectable.add(card.card_number)
+                    selectable.add(nap)
+                }
             }
         }
+
         return selectable
     }
 

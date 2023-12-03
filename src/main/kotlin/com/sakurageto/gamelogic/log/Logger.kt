@@ -455,4 +455,15 @@ class Logger {
         }
         return -1
     }
+
+    fun isPlayerMakeOverAuraDamageOver3(player: PlayerEnum): Boolean{
+        for (log in logQueue){
+            if(log.player == player && log.text == LogText.ATTACK_DAMAGE){
+                if(log.number1 > 3){
+                    return true
+                }
+            }
+        }
+        return false
+    }
 }

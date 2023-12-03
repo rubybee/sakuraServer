@@ -322,7 +322,7 @@ enum class CommandEnum {
 
         private val basicOperationSet: EnumSet<CommandEnum> = EnumSet.of(
             ACTION_GO_FORWARD, ACTION_GO_BACKWARD, ACTION_WIND_AROUND, ACTION_INCUBATE, ACTION_BREAK_AWAY,
-            ACTION_NAGA, ACTION_YAKSHA, ACTION_GARUDA, ACTION_ASURA
+            ACTION_NAGA, ACTION_YAKSHA, ACTION_GARUDA, ACTION_ASURA, SELECT_NOT
         )
     }
 
@@ -684,7 +684,7 @@ enum class LocToLoc(var real_number: Int){
     LIFE_OTHER_TO_AURA_OTHER(32);
 
 
-    fun encode(value: Int) = this.real_number + value * 100
+    fun encode(value: Int) = this.real_number * 100 + value
 
     companion object {
         fun fromInt(value: Int) = LocToLoc.values().first { it.real_number == value }

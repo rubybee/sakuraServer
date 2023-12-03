@@ -685,8 +685,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         TextEffectTag.ADD_LOG -> {
                             text.effect!!(this.card_number, player, game_status, react_attack)
                         }
-                        else -> {
-                        }
+                        else -> {}
                     }
                 }
             }
@@ -744,8 +743,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         return this.card_data.effect?.let {
             var check = false
             for(text in it) {
-                if (text.timing_tag == TextEffectTimingTag.IN_DEPLOYMENT && text.tag == TextEffectTag.DAMAGE_AURA_REPLACEABLE_HERE && (nap
-                        ?: -1) > 0
+                if (text.tag == TextEffectTag.DAMAGE_AURA_REPLACEABLE_HERE && (nap ?: -1) > 0
                 ) {
                     check = true
                     break
@@ -833,7 +831,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     suspend fun checkWhenUmbrellaChange(player: PlayerEnum, game_status: GameStatus){
         this.card_data.effect?.let {
             for(text in it){
-                if (text.tag == TextEffectTag.SHOW_HAND_WHEN_CHANGE_UMBRELLA){
+                if (text.tag == TextEffectTag.WHEN_UMBRELLA_CHANGE){
                     text.effect!!(card_number, player, game_status, null)
                 }
             }

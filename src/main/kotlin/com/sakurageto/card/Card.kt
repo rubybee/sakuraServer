@@ -192,7 +192,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         else{
             this.card_data.effect?.let {
                 for(text in it){
-                    if(text.tag == TextEffectTag.ADJUST_NAP_WHEN_SOME_CONDITION){
+                    if(text.tag == TextEffectTag.ADJUST_NAP_CONTAIN_OTHER_PLACE){
                         return text.effect!!(this.card_number, player, game_status, react_attack)?: this.card_data.charge?: 0
                     }
                 }
@@ -471,7 +471,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                     return -2
                 }
                 if(laceration){
-                    cost *= -3
+                    cost *= -4
                 }
             }
             else{
@@ -532,9 +532,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 return -2
             }
             CardType.UNDEFINED -> {
-                when(this.effectText(player, gameStatus, react_attack, TextEffectTag.TREAT_AS_DIFFERENT_CARD)){
-                    1 -> return -3
-                    2 -> return -4
+                if(this.effectText(player, gameStatus, react_attack, TextEffectTag.TREAT_AS_DIFFERENT_CARD) == 1){
+                    return -3
                 }
                 return -2
             }
@@ -595,13 +594,16 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             card.effectAllValidEffect(player.opposite(), game_status, TextEffectTag.WHEN_DEPLOYMENT_OTHER)
         }
 
-        var nowNeedNap = if(nap_change == -2) {
-            returnNapWhenSomeCondition(player, game_status, react_attack) + game_status.getPlayer(player).napBuff
-        }
-        else if(nap_change == -1){
-            returnNap(player, game_status, react_attack) + game_status.getPlayer(player).napBuff
-        } else{
-            nap_change + game_status.getPlayer(player).napBuff
+        var nowNeedNap = when (nap_change) {
+            -2 -> {
+                returnNapWhenSomeCondition(player, game_status, react_attack) + game_status.getPlayer(player).napBuff
+            }
+            -1 -> {
+                returnNap(player, game_status, react_attack) + game_status.getPlayer(player).napBuff
+            }
+            else -> {
+                nap_change + game_status.getPlayer(player).napBuff
+            }
         }
 
         if(nowNeedNap < 0) nowNeedNap = 0
@@ -676,7 +678,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     }
 
     suspend fun use(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, isTermination: Boolean,
-                    nap_change: Int = -1, isDisprove: Boolean = false){
+                    nap_change: Int = -1, cardMoveCancel: Boolean, isDisprove: Boolean = false, ){
         this.card_data.effect?.let {
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
@@ -727,7 +729,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             game_status.getPlayer(player).afterCardUseTermination = false
         }
 
-        game_status.afterCardUsed(this.card_number, player, this)
+        game_status.afterCardUsed(this.card_number, player, this, cardMoveCancel)
     }
 
     fun chasmCheck(): Boolean{

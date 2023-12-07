@@ -3199,12 +3199,96 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun useCardFromNotFullAction(player: PlayerEnum, card: Card, location: LocationEnum, react: Boolean, react_attack: MadeAttack?,
-                                         isCost: Boolean, isConsume: Boolean, napChange: Int = -1): Boolean{
+                                         isCost: Boolean, isConsume: Boolean, napChange: Int = -1, cardMoveCancel: Boolean = false): Boolean{
         val preFullAction = getFullAction(player)
         setPlayerFullAction(player, false)
-        val result = useCardFrom(player, card, location , react, react_attack, isCost, isConsume, napChange)
+        val result = useCardFrom(player, card, location , react, react_attack, isCost, isConsume, napChange, cardMoveCancel)
         setPlayerFullAction(player, preFullAction)
         return result
+    }
+
+    private fun addUseCardLog(player: PlayerEnum, card: Card, useLocation: LocationEnum, react: Boolean){
+        if(useLocation == LocationEnum.READY_SOLDIER_ZONE) {
+            logger.insert(
+                Log(
+                    player, LogText.USE_CARD_IN_SOLDIER, card.card_number,
+                    card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER
+                )
+            )
+        }
+        else if(useLocation == LocationEnum.COVER_CARD && react) {
+            logger.insert(
+                Log(
+                    player, LogText.USE_CARD_IN_COVER_AND_REACT, card.card_number,
+                    card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER
+                )
+            )
+        }
+        else if(useLocation == LocationEnum.COVER_CARD) {
+            logger.insert(
+                Log(
+                    player, LogText.USE_CARD_IN_COVER, card.card_number,
+                    card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER
+                )
+            )
+        }
+        else if(react) {
+            logger.insert(
+                Log(
+                    player, LogText.USE_CARD_REACT, card.card_number,
+                    card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER
+                )
+            )
+        }
+        else {
+            logger.insert(
+                Log(
+                    player, LogText.USE_CARD, card.card_number,
+                    card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER
+                )
+            )
+        }
+    }
+
+    private suspend fun processKamuwiLogic(player: PlayerEnum, card: Card){
+        val nowPlayer = getPlayer(player)
+        val otherPlayer = getPlayer(player.opposite())
+        var cardMustPay = 0
+
+        if(card.card_data.card_class == CardClass.SPECIAL && card.card_data.card_type == CardType.BEHAVIOR){
+            for(usedCard in otherPlayer.usedSpecialCard.values){
+                cardMustPay += card.effectAllValidEffect(player.opposite(), this, TextEffectTag.KAMUWI_LOGIC)
+            }
+        }
+
+        if(nowPlayer.nextCostAddMegami == card.card_data.megami){
+            cardMustPay += 1
+        }
+
+        if(cardMustPay > 0){
+            selectCardFrom(player, player, player, listOf(LocationEnum.HAND),
+                CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_KAMUWI_LOGIC, cardMustPay
+            ) { it, _ -> nowPlayer.nextCostAddMegami == it.card_data.megami }?.let {selected ->
+                for(card_number in selected){
+                    popCardFrom(player.opposite(), card_number, LocationEnum.HAND, true)?.let {
+                        insertCardTo(player.opposite(), it, LocationEnum.DISCARD_YOUR, true)
+                    }
+                }
+            }
+        }
+
+        nowPlayer.nextCostAddMegami = null
+    }
+
+    private suspend fun payCost(player: PlayerEnum, card: Card, cost: Int){
+        if(cost < 0){
+            addLacerationToken(player, player, INDEX_LACERATION_FLARE, cost / 4 * -1)
+        }
+        else{
+            flareToDust(player, cost, Arrow.NULL, player, card.player, Log.SPECIAL_COST)
+            logger.insert(Log(player, LogText.END_EFFECT, Log.SPECIAL_COST, -1))
+        }
+        cleanAfterUseCost()
     }
 
     /**
@@ -3212,7 +3296,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
      isConsume means so mo gap
      */
     suspend fun useCardFrom(player: PlayerEnum, card: Card, location: LocationEnum, react: Boolean, react_attack: MadeAttack?,
-                            isCost: Boolean, isConsume: Boolean, napChange: Int = -1): Boolean{
+                            isCost: Boolean, isConsume: Boolean, napChange: Int = -1, cardMoveCancel: Boolean = false): Boolean{
         if(react_attack != null && !react){
             react_attack.isItReact = false
         }
@@ -3224,56 +3308,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val cost = card.canUse(player, this, react_attack, isCost, isConsume)
 
         if(cost == -3){
-            insertCardTo(player, card, LocationEnum.DISCARD_YOUR, true)
-            return true
-        }
-        else if(cost == -4){
             return true
         }
         else if(cost != -2){
-            if(!getPlayer(player).notCharge){
-                gaugeIncreaseRequest(player, card)
-            }
+            addUseCardLog(player, card, location, react)
 
-            if(location == LocationEnum.READY_SOLDIER_ZONE) {
-                logger.insert(
-                    Log(
-                        player, LogText.USE_CARD_IN_SOLDIER, card.card_number,
-                        card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER
-                    )
-                )
-            }
-            else if(location == LocationEnum.COVER_CARD && react) {
-                logger.insert(
-                    Log(
-                        player, LogText.USE_CARD_IN_COVER_AND_REACT, card.card_number,
-                        card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER
-                    )
-                )
-            }
-            else if(location == LocationEnum.COVER_CARD) {
-                logger.insert(
-                    Log(
-                        player, LogText.USE_CARD_IN_COVER, card.card_number,
-                        card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER
-                    )
-                )
-            }
-            else if(react) {
-                logger.insert(
-                    Log(
-                        player, LogText.USE_CARD_REACT, card.card_number,
-                        card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER
-                    )
-                )
-            }
-            else {
-                logger.insert(
-                    Log(
-                        player, LogText.USE_CARD, card.card_number,
-                        card.card_data.megami.real_number, boolean = card.card_data.sub_type == SubType.FULL_POWER
-                    )
-                )
+            if(!(getPlayer(player).canNotCharge)){
+                gaugeIncreaseRequest(player, card)
             }
 
             val nowPlayer = getPlayer(player)
@@ -3281,34 +3322,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             val isTermination = terminationListenerProcess(player, card)
             if(isCost) card.effectText(player, this, react_attack, TextEffectTag.COST)
 
-            //kamuwi card cost
-            val otherPlayer = getPlayer(player.opposite())
-            var cardMustPay = 0
-
-            if(card.card_data.card_class == CardClass.SPECIAL && card.card_data.card_type == CardType.BEHAVIOR){
-                for(usedCard in otherPlayer.usedSpecialCard.values){
-                    cardMustPay += card.effectAllValidEffect(player.opposite(), this, TextEffectTag.KAMUWI_LOGIC)
-                }
-            }
-
-            if(nowPlayer.nextCostAddMegami == card.card_data.megami){
-                cardMustPay += 1
-            }
-
-            if(cardMustPay > 0){
-                selectCardFrom(player, player, player, listOf(LocationEnum.HAND),
-                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, 2111, cardMustPay
-                ) { it, _ -> nowPlayer.nextCostAddMegami == it.card_data.megami }?.let {selected ->
-                    for(card_number in selected){
-                        popCardFrom(player.opposite(), card_number, LocationEnum.HAND, true)?.let {
-                            insertCardTo(player.opposite(), it, LocationEnum.DISCARD_YOUR, true)
-                        }
-                    }
-                }
-            }
-
-            nowPlayer.nextCostAddMegami = null
-            //kamuwi card cost
+            processKamuwiLogic(player, card)
 
             //kamuwi dawn
             if(react_attack?.effectText(card.card_number, player.opposite(), this, react_attack,
@@ -3318,6 +3332,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                         insertCardTo(player, it, LocationEnum.DISCARD_YOUR, true)
                     }
                     else{
+                        payCost(player, card, cost)
                         insertCardTo(player, it, LocationEnum.YOUR_USED_CARD, true)
                     }
                 }
@@ -3352,7 +3367,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                         }
                     }
                     sendUseCardMeesage(getSocket(player), getSocket(player.opposite()), react, card.card_number)
-                    card.use(player, this, react_attack, isTermination, napChange)
+                    card.use(player, this, react_attack, isTermination, napChange, cardMoveCancel)
                 }
                 //hatsumi's lighthouse work so, behavior card can not work
                 else{
@@ -3370,14 +3385,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             else{
                 nowPlayer.isUseCard = true
                 card.special_card_state = SpecialCardEnum.PLAYING
-                if(cost < 0){
-                    addLacerationToken(player, player, INDEX_LACERATION_FLARE, cost / 3 * -1)
-                }
-                else{
-                    flareToDust(player, cost, Arrow.NULL, player, card.player, Log.SPECIAL_COST)
-                    logger.insert(Log(player, LogText.END_EFFECT, Log.SPECIAL_COST, -1))
-                }
-                cleanAfterUseCost()
+
+                payCost(player, card, cost)
 
                 if(divingProcess(player, card)){
                     afterDivingSuccess(player, card, location)
@@ -3390,7 +3399,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     }
                 }
                 sendUseCardMeesage(getSocket(player), getSocket(player.opposite()), react, card.card_number)
-                card.use(player, this, react_attack, isTermination, napChange)
+                card.use(player, this, react_attack, isTermination, napChange, cardMoveCancel)
                 return true
             }
         }
@@ -3413,41 +3422,22 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val cost = perjuryCard.canUse(player, this, null, isCost = true, isConsume = true)
 
         if(cost != -2){
-            if(!getPlayer(player).notCharge){
+            if(!getPlayer(player).canNotCharge){
                 gaugeIncreaseRequest(player, perjuryCard)
             }
 
-            //kamuwi card cost
-            var cardMustPay = 0
-
-            if(nowPlayer.nextCostAddMegami == perjuryCard.card_data.megami){
-                cardMustPay += 1
-            }
-
-            if(cardMustPay > 0){
-                selectCardFrom(player, player, player, listOf(LocationEnum.HAND),
-                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_KAMUWI_LOGIC, cardMustPay
-                ) { it, _ -> nowPlayer.nextCostAddMegami == it.card_data.megami }?.let {selected ->
-                    for(card_number in selected){
-                        popCardFrom(player.opposite(), card_number, LocationEnum.HAND, true)?.let {
-                            insertCardTo(player.opposite(), it, LocationEnum.DISCARD_YOUR, true)
-                        }
-                    }
-                }
-            }
-
-            nowPlayer.nextCostAddMegami = null
-            //kamuwi card cost
+            processKamuwiLogic(player, perjuryCard)
 
             perjuryCheck[perjury_card_number - NUMBER_RENRI_FALSE_STAB] = true
             var public = false
             var isDisprove = true
+
             when(receiveSelectDisprove(getSocket(player.opposite()), perjury_card_number)){
                 CommandEnum.SELECT_ONE -> {
                     public = true
                     sendSimpleCommand(player1_socket, player2_socket, CommandEnum.SHOW_DISPROVE_RESULT, falseCard.card_number)
                     if(perjuryCard.card_data.card_name == falseCard.card_data.card_name){
-                        //반증에 실패
+                        //disprove fail
                         logger.insert(Log(player, LogText.FAIL_DISPROVE, -1, -1))
 
                         chojoDamageProcess(player.opposite())
@@ -3458,7 +3448,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                         cardForEffect = null
                     }
                     else{
-                        //반증에 성공
+                        //disprove success
                         popCardFrom(player, falseCard.card_number, location, true)?.let {
                             insertCardTo(player, it, LocationEnum.DISCARD_YOUR, true)
                         }
@@ -3519,7 +3509,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     insertCardTo(player, it, LocationEnum.PLAYING_ZONE_YOUR, public)
                 }
                 sendUseCardMeesage(getSocket(player), getSocket(player.opposite()), false, perjuryCard.card_number)
-                perjuryCard.use(player, this, null, false, 0, isDisprove)
+                perjuryCard.use(player, this, null, false, 0, false, isDisprove)
 
                 if(public){
                     popCardFrom(player, falseCard.card_number, LocationEnum.PLAYING_ZONE_YOUR, true)?.let {
@@ -3550,7 +3540,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     /**
-     * @return means card is public (true) or not (false
+     * @return means card is public (true) or not (false)
      */
     private suspend fun riRaRuRiRaRoEffect(falseCard: Card, perjuryCard: Card, player: PlayerEnum): Boolean{
         while(true){
@@ -3932,10 +3922,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun movePlayingCard(player: PlayerEnum, place: LocationEnum?, card_number: Int): Boolean{
-        val card = popCardFrom(player, card_number, LocationEnum.PLAYING_ZONE_YOUR, true)?:
-        popCardFrom(player, NUMBER_RENRI_DECEPTION_FOG, LocationEnum.PLAYING_ZONE_YOUR, true)?:
-        popCardFrom(player, NUMBER_RENRI_DECEPTION_FOG + SECOND_PLAYER_START_NUMBER, LocationEnum.PLAYING_ZONE_YOUR, true)
-        ?: return false
+        val card = popCardFrom(player, card_number, LocationEnum.PLAYING_ZONE_YOUR, true)?: return false
 
         if(place != null){
             if(card.card_data.card_class == CardClass.SPECIAL){
@@ -4001,7 +3988,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     var cardForEffect: Card? = null
 
-    suspend fun afterCardUsed(card_number: Int, player: PlayerEnum, thisCard: Card){
+    suspend fun afterCardUsed(card_number: Int, player: PlayerEnum, thisCard: Card, cardMoveCancel: Boolean){
         cardForEffect = thisCard
         for(card in getPlayer(player).enchantmentCard.values){
             card.effectAllValidEffect(player, this, TextEffectTag.WHEN_AFTER_CARD_USE)
@@ -4025,7 +4012,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             useAfterTriggerProcess(player, lastEffect, keys[0])
             thisCard.cardUseEndEffect.remove(keys[0])
         }
-        movePlayingCard(player, null, card_number)
+
+        if(!cardMoveCancel){
+            movePlayingCard(player, null, card_number)
+        }
     }
 
     suspend fun afterDestruction(player: PlayerEnum, card_number: Int, location: LocationEnum){
@@ -5397,8 +5387,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    suspend fun requestAndDoBasicOperation(player: PlayerEnum, card_number: Int, canNotSelect: HashSet<CommandEnum>):
-        CommandEnum {
+    suspend fun requestAndDoBasicOperation(player: PlayerEnum,
+                                           card_number: Int, canNotSelect: HashSet<CommandEnum>): CommandEnum {
         while(true){
             val command = receiveBasicOperation(getSocket(player), card_number)
             if(command !in canNotSelect && command.isBasicOperation()){
@@ -5479,15 +5469,22 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun doBasicOperation(player: PlayerEnum, command: CommandEnum, card: Int){
         val nowPlayer = getPlayer(player)
-        nowPlayer.didBasicOperation = true
+
         if(nowPlayer.isNextBasicOperationInvalid){
             nowPlayer.isNextBasicOperationInvalid = false
             return
         }
+
+        if(command != CommandEnum.ACTION_WIND_AROUND){
+            nowPlayer.didBasicOperation = true
+        }
+
         when(command){
             CommandEnum.ACTION_GO_FORWARD -> doGoForward(player, card)
             CommandEnum.ACTION_GO_BACKWARD -> doGoBackward(player, card)
-            CommandEnum.ACTION_WIND_AROUND -> doWindAround(player, card)
+            CommandEnum.ACTION_WIND_AROUND -> if(doWindAround(player, card)){
+                nowPlayer.didBasicOperation = true
+            }
             CommandEnum.ACTION_INCUBATE -> doIncubate(player, card)
             CommandEnum.ACTION_BREAK_AWAY -> doBreakAway(player, card)
             CommandEnum.ACTION_YAKSHA -> doYaksha(player, card)
@@ -5577,7 +5574,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     //this 5 function must call after check when select
-    private suspend fun doWindAround(player: PlayerEnum, card: Int){
+    private suspend fun doWindAround(player: PlayerEnum, card: Int): Boolean{
         if(canDoBasicOperation(player, CommandEnum.ACTION_WIND_AROUND)){
             var additionalCheck = 0
             for(usedCard in getPlayer(player).usedSpecialCard.values){
@@ -5586,7 +5583,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     break
                 }
             }
-            if(additionalCheck != 0) return
+            if(additionalCheck != 0) return false
 
             val nowSocket = getSocket(player)
             val otherSocket = getSocket(player.opposite())
@@ -5598,6 +5595,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     player.opposite(), this, TextEffectTag.WHEN_AFTER_BASIC_OPERATION_OTHER_MOVE_AURA)
             }
         }
+        return true
     }
 
     //this 5 function must call after check when select

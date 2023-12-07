@@ -348,6 +348,7 @@ class MadeAttack(
                         return
                     }
                 }
+
                 if(text.timing_tag == TextEffectTimingTag.AFTER_ATTACK){
                     if(text.tag == TextEffectTag.WHEN_CHOOSE_AURA_DAMAGE){
                         if(selectedDamage == DamageSelect.BOTH || selectedDamage == DamageSelect.AURA){

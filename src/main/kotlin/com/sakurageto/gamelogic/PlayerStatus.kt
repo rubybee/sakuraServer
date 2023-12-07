@@ -124,7 +124,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var lastTurnReact = false
     var transformNumber = 0
     var asuraUsed = false
-    var notCharge = false
+    var canNotCharge = false
     var readySeed: Int = 0
     var nextEnchantmentGrowing = 0
     var justRunStratagem: Boolean = false

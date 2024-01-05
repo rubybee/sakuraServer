@@ -415,7 +415,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         gameStatus.player2.deleteSelectedUsedCard(specialcard_data_player2)
     }
 
-     fun selectFirst(){
+     private fun selectFirst(){
         val random = Random(System.currentTimeMillis()).nextInt(2)
         if(random == 0){
             firstTurn = PlayerEnum.PLAYER1
@@ -428,7 +428,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
     }
 
     //first card is most upper
-    suspend fun muligun(){
+    private suspend fun muligun(){
         val data = SakuraCardCommand(CommandEnum.MULIGUN, -1)
         player1.session.send(Json.encodeToString(data))
         player2.session.send(Json.encodeToString(data))
@@ -460,7 +460,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         sendMuligunEnd(player1, player2)
     }
 
-    suspend fun startPhase(){
+    private suspend fun startPhase(){
         gameStatus.endCurrentPhase = false
         gameStatus.nowPhase = START_PHASE
         gameStatus.startPhaseBeforeEffect(this.turnPlayer)
@@ -472,6 +472,77 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         gameStatus.startPhaseDefaultSecond(this.turnPlayer)
     }
 
+    private fun isActionUseCard(action: CommandEnum) =
+        action in setOf(CommandEnum.ACTION_USE_CARD_HAND, CommandEnum.ACTION_USE_CARD_SPECIAL,
+            CommandEnum.ACTION_USE_CARD_COVER, CommandEnum.ACTION_USE_CARD_PERJURY, CommandEnum.ACTION_USE_CARD_SOLDIER)
+    
+    private fun isActionBasicOperation(action: CommandEnum) = 
+        action in setOf(
+            CommandEnum.ACTION_GO_FORWARD, CommandEnum.ACTION_GO_BACKWARD, CommandEnum.ACTION_WIND_AROUND,
+            CommandEnum.ACTION_INCUBATE, CommandEnum.ACTION_BREAK_AWAY,
+            CommandEnum.ACTION_GARUDA, CommandEnum.ACTION_YAKSHA, CommandEnum.ACTION_NAGA,
+            CommandEnum.ACTION_ASURA,
+        )
+
+    private suspend fun fullPowerAction(){
+        gameStatus.setPlayerFullAction(this.turnPlayer, true)
+        while (true){
+            val data = receiveFullPowerActionRequest(getSocket(this.turnPlayer))
+            if(data.first == CommandEnum.FULL_POWER_NO){
+                sendSimpleCommand(getSocket(this.turnPlayer), CommandEnum.FULL_POWER_NO)
+                normalAction()
+                return
+            }
+            else if(data.first == CommandEnum.ACTION_END_TURN){
+                return
+            }
+            else if(isActionUseCard(data.first)){
+                if(gameStatus.cardUseNormal(this.turnPlayer, data.first, data.second)){
+                    return
+                }
+            }
+        }
+    }
+
+    private suspend fun normalAction(){
+        var isThisTurnDoAction = false
+        gameStatus.setPlayerFullAction(this.turnPlayer, false)
+        while (true){
+            if(gameStatus.endCurrentPhase || gameStatus.getEndTurn(this.turnPlayer)){
+                return
+            }
+            val data = receiveActionRequest(getSocket(this.turnPlayer))
+            if(data.first == CommandEnum.ACTION_END_TURN) {
+                return
+            }
+            if(data.first == CommandEnum.FULL_POWER_YES && !isThisTurnDoAction){
+                sendSimpleCommand(getSocket(this.turnPlayer), CommandEnum.FULL_POWER_YES)
+                fullPowerAction()
+                return
+            }
+            else if(isActionUseCard(data.first)){
+                if(gameStatus.cardUseNormal(this.turnPlayer, data.first, data.second)){
+                    isThisTurnDoAction = true
+                }
+            }
+            else if(isActionBasicOperation(data.first)){
+                if(gameStatus.canDoBasicOperation(this.turnPlayer, data.first) && gameStatus.payBasicOperationCost(this.turnPlayer, data.second)){
+                    gameStatus.doBasicOperation(this.turnPlayer, data.first, if(data.second == -1) -1 else 0)
+                    isThisTurnDoAction = true
+                }
+            }
+        }
+    }
+
+    private suspend fun doMainPhaseAction(){
+        if(receiveFullPowerRequest(getSocket(this.turnPlayer))){
+            fullPowerAction()
+        }
+        else{
+            normalAction()
+        }
+    }
+
     suspend fun mainPhase(){
         if(gameStatus.getPlayer(turnPlayer).nextMainPhaseSkip){
             gameStatus.getPlayer(turnPlayer).nextMainPhaseSkip = false
@@ -480,47 +551,8 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         gameStatus.endCurrentPhase = false
         gameStatus.nowPhase = MAIN_PHASE
         sendMainPhaseStart(getSocket(this.turnPlayer), getSocket(this.turnPlayer.opposite()))
-        if(receiveFullPowerRequest(getSocket(this.turnPlayer))){
-            gameStatus.setPlayerFullAction(this.turnPlayer, true)
-            gameStatus.mainPhaseEffectProcess(this.turnPlayer)
-            while (true){
-                val data = receiveFullPowerActionRequest(getSocket(this.turnPlayer))
-                if(data.first == CommandEnum.ACTION_END_TURN){
-                    return
-                }
-                else if(gameStatus.cardUseNormal(this.turnPlayer, data.first, data.second)){
-                    return
-                }
-                else{
-                    continue
-                }
-            }
-        }
-        else{
-            gameStatus.setPlayerFullAction(this.turnPlayer, false)
-            gameStatus.mainPhaseEffectProcess(this.turnPlayer)
-            while (true){
-                if(gameStatus.endCurrentPhase || gameStatus.getEndTurn(this.turnPlayer)){
-                    return
-                }
-                val data = receiveActionRequest(getSocket(this.turnPlayer))
-                if(data.first == CommandEnum.ACTION_END_TURN) return
-                else if(data.first == CommandEnum.ACTION_USE_CARD_HAND
-                    || data.first == CommandEnum.ACTION_USE_CARD_SPECIAL
-                    || data.first == CommandEnum.ACTION_USE_CARD_COVER
-                    || data.first == CommandEnum.ACTION_USE_CARD_PERJURY
-                    || data.first == CommandEnum.ACTION_USE_CARD_SOLDIER){
-                    gameStatus.cardUseNormal(this.turnPlayer, data.first, data.second)
-                }
-                else{
-                    if(gameStatus.canDoBasicOperation(this.turnPlayer, data.first)){
-                        if(gameStatus.basicOperationCost(this.turnPlayer, data.second)){
-                            gameStatus.doBasicOperation(this.turnPlayer, data.first, if(data.second == -1) -1 else 0)
-                        }
-                    }
-                }
-            }
-        }
+        gameStatus.mainPhaseEffectProcess(this.turnPlayer)
+        doMainPhaseAction()
     }
 
     suspend fun endPhase(){

@@ -114,17 +114,15 @@ class CardData(
     }
 
     fun addTextFold(text: Text){
-        if(this.effectFold == null){
+        this.effectFold?.add(text) ?: run {
             this.effectFold = mutableListOf()
         }
-        this.effectFold!!.add(text)
     }
 
     fun addTextUnfold(text: Text){
-        if(this.effectUnfold == null){
-            this.effectUnfold = mutableListOf()
+        this.effectUnfold?.add(text) ?: run {
+            effectUnfold = mutableListOf()
         }
-        this.effectUnfold!!.add(text)
     }
 
     fun setEnchantment(charge: Int){

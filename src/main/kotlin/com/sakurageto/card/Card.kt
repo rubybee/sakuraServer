@@ -182,7 +182,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     }
 
     suspend fun canReactable(attack: MadeAttack, game_status: GameStatus, player: PlayerEnum, continuousBuffQueue: OtherBuffQueue): Boolean{
-        return attack.canReactByThisCard(this, game_status, player, continuousBuffQueue)
+        return attack.canReacted(this, game_status, player, continuousBuffQueue)
     }
 
     private suspend fun returnNapWhenSomeCondition(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?): Int{

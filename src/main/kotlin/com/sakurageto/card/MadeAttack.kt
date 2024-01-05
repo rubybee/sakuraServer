@@ -16,7 +16,7 @@ class MadeAttack(
     var isLaceration: Boolean = false
 ) {
     var bothSideDamage = false
-    var effect: MutableList<Text>? = null
+    val effect: MutableList<Text> = mutableListOf()
 
     var isItReact = true
     var isItValid= true
@@ -148,28 +148,24 @@ class MadeAttack(
     }
 
     suspend fun effectText(player: PlayerEnum, game_status: GameStatus, attack: MadeAttack?, tag: TextEffectTag): Int?{
-        this.effect?.let {
-            for(text in it){
-                if(text.tag == tag){
-                    return text.effect!!(this.card_number, player, game_status, attack)
-                }
+        for(text in effect){
+            if(text.tag == tag){
+                return text.effect!!(this.card_number, player, game_status, attack)
             }
         }
         return null
     }
 
     suspend fun effectText(card_number: Int, player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, tag: TextEffectTag): Int?{
-        this.effect?.let {
-            for(text in it){
-                if(text.tag == tag){
-                    return text.effect!!(card_number, player, game_status, react_attack)
-                }
+        for(text in effect){
+            if(text.tag == tag){
+                return text.effect!!(card_number, player, game_status, react_attack)
             }
         }
         return null
     }
 
-    suspend fun canReactByThisCard(card: Card, game_status: GameStatus, player: PlayerEnum, continuousOtherBuff: OtherBuffQueue): Boolean{
+    suspend fun canReacted(card: Card, game_status: GameStatus, player: PlayerEnum, continuousOtherBuff: OtherBuffQueue): Boolean{
         activeOtherBuff(game_status, player, continuousOtherBuff)
 
         if(this.editedCannotReactSpecial){
@@ -278,8 +274,7 @@ class MadeAttack(
     }
 
     fun addTextAndReturn(text: Text): MadeAttack{
-        if(effect == null) effect = mutableListOf()
-        effect!!.add(text)
+        effect.add(text)
         return this
     }
 
@@ -288,17 +283,15 @@ class MadeAttack(
             when(umbrella){
                 Umbrella.FOLD -> {
                     card_data.effectFold?.let {
-                        this.effect = mutableListOf()
                         for(text in it){
-                            this.effect!!.add(text)
+                            this.effect.add(text)
                         }
                     }
                 }
                 Umbrella.UNFOLD -> {
                     card_data.effectUnfold?.let {
-                        this.effect = mutableListOf()
                         for(text in it){
-                            this.effect!!.add(text)
+                            this.effect.add(text)
                         }
                     }
                 }
@@ -309,9 +302,8 @@ class MadeAttack(
         }
 
         card_data.effect?.let {
-            this.effect = mutableListOf()
             for(text in it){
-                this.effect!!.add(text)
+                this.effect.add(text)
             }
         }
         return this
@@ -341,71 +333,56 @@ class MadeAttack(
     }
 
     suspend fun afterAttackProcess(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, selectedDamage: DamageSelect){
-        this.effect?.let{
-            for(text in it){
-                for(card in game_status.getPlayer(player.opposite()).enchantmentCard.values){
-                    if(card.canUseEffectCheck(TextEffectTag.AFTER_ATTACK_EFFECT_INVALID_OTHER)){
-                        return
-                    }
+        for(text in effect){
+            for(card in game_status.getPlayer(player.opposite()).enchantmentCard.values){
+                if(card.canUseEffectCheck(TextEffectTag.AFTER_ATTACK_EFFECT_INVALID_OTHER)){
+                    return
                 }
+            }
 
-                if(text.timing_tag == TextEffectTimingTag.AFTER_ATTACK){
-                    if(text.tag == TextEffectTag.WHEN_CHOOSE_AURA_DAMAGE){
-                        if(selectedDamage == DamageSelect.BOTH || selectedDamage == DamageSelect.AURA){
-                            text.effect!!(this.card_number, player, game_status, react_attack)
-                        }
-                    }
-                    else if(text.tag == TextEffectTag.WHEN_CHOOSE_LIFE_DAMAGE){
-                        if(selectedDamage == DamageSelect.BOTH || selectedDamage == DamageSelect.LIFE){
-                            text.effect!!(this.card_number, player, game_status, react_attack)
-                        }
-                    }
-                    else if(text.tag == TextEffectTag.CHECK_THIS_ATTACK_VALUE){
-                        text.effect!!(this.card_number, player, game_status, this)
-                    }
-                    else{
+            if(text.timing_tag == TextEffectTimingTag.AFTER_ATTACK){
+                if(text.tag == TextEffectTag.WHEN_CHOOSE_AURA_DAMAGE){
+                    if(selectedDamage == DamageSelect.BOTH || selectedDamage == DamageSelect.AURA){
                         text.effect!!(this.card_number, player, game_status, react_attack)
                     }
                 }
+                else if(text.tag == TextEffectTag.WHEN_CHOOSE_LIFE_DAMAGE){
+                    if(selectedDamage == DamageSelect.BOTH || selectedDamage == DamageSelect.LIFE){
+                        text.effect!!(this.card_number, player, game_status, react_attack)
+                    }
+                }
+                else if(text.tag == TextEffectTag.CHECK_THIS_ATTACK_VALUE){
+                    text.effect!!(this.card_number, player, game_status, this)
+                }
+                else{
+                    text.effect!!(this.card_number, player, game_status, react_attack)
+                }
             }
         }
-
-
     }
 
     suspend fun beforeProcessDamageCheck(player: PlayerEnum, game_status: GameStatus, now_attack: MadeAttack): Boolean{
-        this.effect?.let {
-            for(text in it){
-                if(text.tag == TextEffectTag.EFFECT_INSTEAD_DAMAGE){
-                    return text.effect!!(this.card_number, player, game_status, now_attack) != 1
-                }
+        for(text in effect){
+            if(text.tag == TextEffectTag.EFFECT_INSTEAD_DAMAGE){
+                return text.effect!!(this.card_number, player, game_status, now_attack) != 1
             }
         }
         return true
     }
 
     fun addValidEffect(effectTag: TextEffectTag, queue: HashMap<Int, Text>){
-        this.effect?.let {
-            for(text in it){
-                if(text.tag == effectTag) {
-                    queue[this.card_number] = text
-                    return
-                }
+        for(text in effect){
+            if(text.tag == effectTag) {
+                queue[this.card_number] = text
+                return
             }
         }
     }
 
     fun copyAfterAttackTo(madeAttack: MadeAttack){
-        effect?.let {
-            for(text in it){
-                if(text.timing_tag == TextEffectTimingTag.AFTER_ATTACK){
-                    if(madeAttack.effect == null){
-                        madeAttack.effect = mutableListOf()
-                    }
-                    else{
-                        madeAttack.effect!!.add(text)
-                    }
-                }
+        for(text in effect){
+            if(text.timing_tag == TextEffectTimingTag.AFTER_ATTACK){
+                madeAttack.effect.add(text)
             }
         }
     }

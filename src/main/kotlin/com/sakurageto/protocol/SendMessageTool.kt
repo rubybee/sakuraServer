@@ -594,19 +594,7 @@ suspend fun receiveFullPowerActionRequestMain(player: Connection): Pair<CommandE
                 val text = frame.readText()
                 try{
                     val data = json.decodeFromString<SakuraCardCommand>(text)
-                    if (data.command == ACTION_USE_CARD_HAND ||
-                        data.command == ACTION_USE_CARD_SPECIAL ||
-                        data.command == ACTION_USE_CARD_COVER ||
-                        data.command == ACTION_USE_CARD_SOLDIER ||
-                        data.command == ACTION_USE_CARD_PERJURY ||
-                        data.command == ACTION_END_TURN
-                    ){
-                        return Pair(data.command, data.card)
-                    }
-                    else {
-                        sendActionRequest(player)
-                        continue
-                    }
+                    return Pair(data.command, data.card)
                 }catch (e: Exception){
                     continue
                 }
@@ -633,28 +621,7 @@ suspend fun receiveActionRequestMain(player: Connection): Pair<CommandEnum, Int>
                 val text = frame.readText()
                 try {
                     val data = json.decodeFromString<SakuraCardCommand>(text)
-                    if (data.command == ACTION_USE_CARD_HAND ||
-                        data.command == ACTION_USE_CARD_SPECIAL ||
-                        data.command == ACTION_USE_CARD_COVER ||
-                        data.command == ACTION_USE_CARD_SOLDIER ||
-                        data.command == ACTION_USE_CARD_PERJURY ||
-                        data.command == ACTION_GO_FORWARD ||
-                        data.command == ACTION_GO_BACKWARD ||
-                        data.command == ACTION_WIND_AROUND ||
-                        data.command == ACTION_INCUBATE ||
-                        data.command == ACTION_BREAK_AWAY ||
-                        data.command == ACTION_GARUDA ||
-                        data.command == ACTION_YAKSHA ||
-                        data.command == ACTION_NAGA ||
-                        data.command == ACTION_ASURA ||
-                        data.command == ACTION_END_TURN
-                    ){
-                        return Pair(data.command, data.card)
-                    }
-                    else {
-                        sendActionRequest(player)
-                        continue
-                    }
+                    return Pair(data.command, data.card)
                 }catch (e: Exception){
                     continue
                 }

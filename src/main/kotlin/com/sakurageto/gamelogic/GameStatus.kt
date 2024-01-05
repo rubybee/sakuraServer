@@ -2987,9 +2987,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(now_player.decreaseConcentration()) sendDecreaseConcentration(now_socket, other_socket)
     }
 
-    suspend fun reactCheck(player: PlayerEnum, card: Card, react_attack: MadeAttack): Boolean{
-        if(card.canUseAtReact(player, this)){
-            if(card.canReactable(react_attack, this, player, getPlayerOtherBuff(player))){
+    private suspend fun reactCheck(react_player: PlayerEnum, card: Card, attack: MadeAttack): Boolean{
+        if(card.canUseAtReact(react_player, this)){
+            if(card.canReactable(attack, this, react_player, getPlayerOtherBuff(react_player.opposite()))){
                 return true
             }
         }
@@ -3564,6 +3564,17 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
      * @param card_number only used to inform user what attack is generated
      */
     suspend fun afterMakeAttack(card_number: Int, attack_player: PlayerEnum, react_attack: MadeAttack?){
+        fun addAttackLog(attack: MadeAttack){
+            logger.insert(
+                Log(attack_player, LogText.ATTACK, attack.card_number, when(attack.card_class){
+                    CardClass.POISON -> Log.ATTACK_NUMBER_POISON
+                    CardClass.IDEA -> Log.ATTACK_NUMBER_IDEA
+                    CardClass.SOLDIER -> Log.ATTACK_NUMBER_SOLDIER
+                    CardClass.SPECIAL -> Log.ATTACK_NUMBER_SPECIAL
+                    CardClass.NORMAL -> Log.ATTACK_NUMBER_NORMAL
+                    CardClass.NULL -> Log.ATTACK_NUMBER_NULL }))
+        }
+
         val attackerSocket = getSocket(attack_player)
         val otherSocket = getSocket(attack_player.opposite())
         val attackPlayer = getPlayer(attack_player)
@@ -3576,17 +3587,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         val nowAttack = attackPlayer.preAttackCard!!
         attackPlayer.preAttackCard = null
 
-        logger.insert(
-            Log(attack_player, LogText.ATTACK, nowAttack.card_number, when(nowAttack.card_class){
-                CardClass.POISON -> Log.ATTACK_NUMBER_POISON
-                CardClass.IDEA -> Log.ATTACK_NUMBER_IDEA
-                CardClass.SOLDIER -> Log.ATTACK_NUMBER_SOLDIER
-                CardClass.SPECIAL -> Log.ATTACK_NUMBER_SPECIAL
-                CardClass.NORMAL -> Log.ATTACK_NUMBER_NORMAL
-                CardClass.NULL -> Log.ATTACK_NUMBER_NULL }))
+        addAttackLog(nowAttack)
 
         makeAttackComplete(attackerSocket, otherSocket, card_number)
         sendAttackInformation(attackerSocket, otherSocket, nowAttack.toInformation())
+
         if(react_attack == null){
             var reactCheckCancel = false
             for(card in otherPlayer.usedSpecialCard.values){
@@ -5332,7 +5337,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return true
     }
 
-    suspend fun basicOperationCost(player: PlayerEnum, card_number: Int): Boolean{
+    suspend fun payBasicOperationCost(player: PlayerEnum, card_number: Int): Boolean{
         val nowPlayer = getPlayer(player)
 
         if(card_number == -1){

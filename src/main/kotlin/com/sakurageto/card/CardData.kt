@@ -115,13 +115,13 @@ class CardData(
 
     fun addTextFold(text: Text){
         this.effectFold?.add(text) ?: run {
-            this.effectFold = mutableListOf()
+            this.effectFold = mutableListOf(text)
         }
     }
 
     fun addTextUnfold(text: Text){
         this.effectUnfold?.add(text) ?: run {
-            effectUnfold = mutableListOf()
+            this.effectUnfold = mutableListOf(text)
         }
     }
 

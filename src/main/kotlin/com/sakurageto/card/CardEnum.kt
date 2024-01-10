@@ -1653,6 +1653,12 @@ enum class CardName {
             RENRI_PULLING_FISHING
         )
 
+        private val renriA1V9NormalCardList = listOf(
+            RENRI_FALSE_STAB, RENRI_DECEPTION_FOG, RENRI_BLACK_AND_WHITE,
+            RENRI_IRRITATING_GESTURE, RENRI_FLOATING_CLOUDS, RENRI_SIN_SOO,
+            RENRI_PULLING_FISHING
+        )
+
         private val akinaNormalCardList = listOf(
             AKINA_ABACUS_STONE, AKINA_THREAT, AKINA_TRADE,
             AKINA_SPECULATION, AKINA_CALC, AKINA_TURN_OFF_TABLE,
@@ -1729,7 +1735,14 @@ enum class CardName {
                 KANAWE -> kanaweNormalCardList
                 KAMUWI -> kamuwiNormalCardList
                 RENRI -> renriNormalCardList
-                RENRI_A1 -> renriA1NormalCardList
+                RENRI_A1 -> {
+                    if(version.isHigherThen(GameVersion.VERSION_8_2)){
+                        renriA1V9NormalCardList
+                    }
+                    else{
+                        renriA1NormalCardList
+                    }
+                }
                 AKINA -> akinaNormalCardList
                 SHISUI -> shisuiNormalCardList
             }

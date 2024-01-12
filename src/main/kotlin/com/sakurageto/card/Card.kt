@@ -465,11 +465,14 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 gameStatus.addAllCardCostBuff()
                 val (laceration, baseCost) = this.getBaseCost(player, gameStatus)
                 cost = gameStatus.applyAllCostBuff(player, baseCost, this)
+
                 if(cost < 0) cost = 0
+
                 if(cost > gameStatus.getPlayerFlare(player)){
-                    gameStatus.cleanCostBuff()
+                    gameStatus.cleanCostBuffWhenUnused()
                     return -2
                 }
+
                 if(laceration){
                     cost *= -4
                 }
@@ -495,15 +498,9 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
 
         when(card_data.card_type){
             CardType.ATTACK -> {
-                for(card in gameStatus.getPlayer(player).enchantmentCard.values){
-                    card.card_data.effect?.let {
-                        for(text in it){
-                            if(card.enchantmentUsable(text)){
-                                if(text.tag == TextEffectTag.CAN_NOT_USE_ATTACK) return -2
-                            }
-                        }
-                    }
-                }
+                if(nowPlayer.canNotAttack || nowPlayer.enchantmentCard.values.any { card ->
+                    card.effectAllValidEffect(player, gameStatus, TextEffectTag.CAN_NOT_USE_ATTACK) > 0
+                }) return -2
                 if(gameStatus.addPreAttackZone(
                         player,
                         this.makeAttack(player, gameStatus, react_attack, this.card_data.sub_type)?.addTextAndReturn(gameStatus.getUmbrella(this.player), this.card_data)?:
@@ -527,7 +524,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                     return cost
                 }
                 if(card_data.card_class == CardClass.SPECIAL){
-                    gameStatus.cleanCostBuff()
+                    gameStatus.cleanCostBuffWhenUnused()
                 }
                 return -2
             }

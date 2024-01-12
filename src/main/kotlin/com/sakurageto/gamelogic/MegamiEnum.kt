@@ -8,6 +8,7 @@ enum class MegamiEnum(var real_number: Int) {
     KIRIKO(2),
     ZANKA(3),
     OUKA(4),
+    SAI_TOKO(5),
     YURINA(10),
     YURINA_A1(11),
     YURINA_A2(12),
@@ -55,6 +56,24 @@ enum class MegamiEnum(var real_number: Int) {
     AKINA(230),
     SHISUI(240);
 
+    fun equal (megami: MegamiEnum): Boolean{
+        if(this == SAI_TOKO){
+            when(megami){
+                SAINE -> return true
+                TOKOYO -> return true
+                else -> {}
+            }
+        }
+        else if(megami == SAI_TOKO){
+            when(this){
+                SAINE -> return true
+                TOKOYO -> return true
+                else -> {}
+            }
+        }
+        return this == megami
+    }
+
     fun changeNormalMegami(): MegamiEnum{
         val anotherNumber = this.real_number % 10
         return if(anotherNumber == 0){
@@ -72,8 +91,8 @@ enum class MegamiEnum(var real_number: Int) {
         return CardName.returnAdditionalCardNameByMegami(this)
     }
 
-    fun getAllSpecialCardName(): List<CardName>{
-        return CardName.returnSpecialCardNameByMegami(this)
+    fun getAllSpecialCardName(version: GameVersion): List<CardName>{
+        return CardName.returnSpecialCardNameByMegami(version, this)
     }
 
     companion object {

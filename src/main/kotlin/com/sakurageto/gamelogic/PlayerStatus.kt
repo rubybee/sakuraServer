@@ -52,8 +52,8 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var preAttackCard: MadeAttack? = null
     var usingCard = ArrayDeque<Card>()
 
-    var unselectedCard: MutableList<CardName> = mutableListOf()
-    var unselectedSpecialCard: MutableList<CardName> = mutableListOf()
+    var unselectedCard: MutableSet<CardName> = mutableSetOf()
+    var unselectedSpecialCard: MutableSet<CardName> = mutableSetOf()
 
     //for megami(must be present)
     var umbrella: Umbrella? = null
@@ -139,6 +139,8 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var afterCardUseTermination: Boolean = false
     var isUseCard: Boolean = false
     var isRecoupThisTurn: Boolean = false
+    var canNotUseConcentration: Boolean = false
+    var canNotAttack: Boolean = false
 
     var otherBuff: OtherBuffQueue = OtherBuffQueue()
     var attackBuff: AttackBuffQueue = AttackBuffQueue()
@@ -229,21 +231,15 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
         return SakuraSendData(command, mutableListOf(megamiOne.real_number, megamiTwo.real_number))
     }
 
-    fun deleteSelectedNormalCard(card: MutableList<CardName>){
-        for(name in card){
-            val now = unselectedCard.indexOf(name)
-            if(now != -1){
-                unselectedCard.removeAt(now)
-            }
+    fun deleteSelectedNormalCard(cards: MutableList<CardName>){
+        cards.forEach {card ->
+            unselectedCard.remove(card)
         }
     }
 
-    fun deleteSelectedUsedCard(card: MutableList<CardName>){
-        for(name in card){
-            val now = unselectedCard.indexOf(name)
-            if(now != -1){
-                unselectedSpecialCard.removeAt(now)
-            }
+    fun deleteSelectedSpecialCard(cards: MutableList<CardName>){
+        cards.forEach {card ->
+            unselectedSpecialCard.remove(card)
         }
     }
 
@@ -294,7 +290,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     /**
     0 success add conentration, 1 fail because shrink, 2 can not plus because full
      */
-    fun addConcentration(): Int{
+    internal fun addConcentration(): Int{
         if(shrink){
             shrink = false
             return 1
@@ -306,7 +302,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
         return 2
     }
 
-    fun decreaseConcentration(): Boolean{
+    internal fun decreaseConcentration(): Boolean{
         if(concentration == 0) return false
         concentration -= 1
         return true
@@ -437,8 +433,8 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
                 }
                 destList.addAll(megamiOne.getAllNormalCardName(version).map { it.toCardNumber(true) })
                 destList.addAll(megamiTwo.getAllNormalCardName(version).map { it.toCardNumber(true) })
-                destList.addAll(megamiOne.getAllSpecialCardName().map { it.toCardNumber(true) })
-                destList.addAll(megamiTwo.getAllSpecialCardName().map { it.toCardNumber(true) })
+                destList.addAll(megamiOne.getAllSpecialCardName(version).map { it.toCardNumber(true) })
+                destList.addAll(megamiTwo.getAllSpecialCardName(version).map { it.toCardNumber(true) })
                 destList.addAll(megamiOne.getAllAdditionalCardName().map {it.toCardNumber(true)})
                 destList.addAll(megamiTwo.getAllAdditionalCardName().map {it.toCardNumber(true)})
             }

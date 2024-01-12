@@ -526,7 +526,9 @@ enum class CardName {
     RENRI_FALSE_WEAPON,
     RENRI_ESSENCE_OF_BLADE,
     RENRI_FIRST_SAKURA_ORDER,
-    RENRI_RI_RA_RU_RI_RA_RO;
+    RENRI_RI_RA_RU_RI_RA_RO,
+
+    SAI_TOKO_ENSEMBLE;
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -575,6 +577,7 @@ enum class CardName {
             put(SAINE_BETRAYAL, NUMBER_SAINE_BETRAYAL)
             put(SAINE_FLOWING_WALL, NUMBER_SAINE_FLOWING_WALL)
             put(SAINE_JEOL_CHANG_JEOL_HWA, NUMBER_SAINE_JEOL_CHANG_JEOL_HWA)
+            put(SAI_TOKO_ENSEMBLE, NUMBER_SAI_TOKO_ENSEMBLE)
 
             put(HIMIKA_SHOOT, NUMBER_HIMIKA_SHOOT)
             put(HIMIKA_RAPIDFIRE, NUMBER_HIMIKA_RAPIDFIRE)
@@ -998,6 +1001,7 @@ enum class CardName {
             put(SAINE_BETRAYAL, SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_BETRAYAL)
             put(SAINE_FLOWING_WALL, SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_FLOWING_WALL)
             put(SAINE_JEOL_CHANG_JEOL_HWA, SECOND_PLAYER_START_NUMBER + NUMBER_SAINE_JEOL_CHANG_JEOL_HWA)
+            put(SAI_TOKO_ENSEMBLE, SECOND_PLAYER_START_NUMBER + NUMBER_SAI_TOKO_ENSEMBLE)
 
             put(HIMIKA_SHOOT, SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_SHOOT)
             put(HIMIKA_RAPIDFIRE, SECOND_PLAYER_START_NUMBER + NUMBER_HIMIKA_RAPIDFIRE)
@@ -1671,6 +1675,16 @@ enum class CardName {
             SHISUI_IRON_POWDER_WIND_AROUND, SHISUI_BLACK_ARMOR,
         )
 
+        private val tokoyoA1V9NormalCardList = listOf(
+            TOKOYO_FLOWING_PLAY, TOKOYO_WOOAHHANTAGUCK, TOKOYO_RUNNINGRABIT, SAI_TOKO_ENSEMBLE,
+            TOKOYO_FLIPFAN, TOKOYO_WINDSTAGE, TOKOYO_SUNSTAGE
+        )
+
+        private val saineA1V9NormalCardList = listOf(
+            SAI_TOKO_ENSEMBLE, SAINE_DOUBLEBEGI, SAINE_MOOGECHOO, SAINE_GANPA, SAINE_GWONYUCK,
+            SAINE_ACCOMPANIMENT, SAINE_MOOEMBUCK
+        )
+
         fun returnNormalCardNameByMegami(version: GameVersion, megami_name: MegamiEnum):List<CardName>{
             return when (megami_name){
                 NONE -> emptyList
@@ -1678,16 +1692,32 @@ enum class CardName {
                 KODAMA -> emptyList
                 ZANKA -> emptyList
                 OUKA -> emptyList
+                SAI_TOKO -> emptyList
                 YURINA -> yurinaNormalCardList
                 YURINA_A1 -> yurinaA1NormalCardList
                 YURINA_A2 -> yurinaA2NormalCardList
                 SAINE -> saineNormalCardList
-                SAINE_A1 -> saineA1NormalCardList
+                SAINE_A1 -> {
+                    if(version.isHigherThen(GameVersion.VERSION_8_2)){
+                        saineA1V9NormalCardList
+                    }
+                    else{
+                        saineA1NormalCardList
+                    }
+                }
                 SAINE_A2 -> saineA2NormalCardList
                 HIMIKA -> himikaNormalCardList
                 HIMIKA_A1 -> himikaA1NormalCardList
                 TOKOYO -> tokoyoNormalCardList
-                TOKOYO_A1 -> tokoyoA1NormalCardList
+                TOKOYO_A1 -> {
+                    if(version.isHigherThen(GameVersion.VERSION_8_2)){
+                        tokoyoA1V9NormalCardList
+                    }
+                    else{
+                        tokoyoA1NormalCardList
+                    }
+
+                }
                 TOKOYO_A2 -> tokoyoA2NormalCardList
                 OBORO -> oboroNormalCardList
                 OBORO_A1 -> oboroA1NormalCardList
@@ -1779,6 +1809,7 @@ enum class CardName {
         private val himikaA1SpecialCardList = listOf(
             HIMIKA_REDBULLET, HIMIKA_EN_TEN_HIMIKA, HIMIKA_SCARLETIMAGINE, HIMIKA_BURMILIONFIELD
         )
+
         private val tokoyoSpecialCardList = listOf(
             TOKOYO_KUON, TOKOYO_THOUSANDBIRD, TOKOYO_ENDLESSWIND, TOKOYO_TOKOYOMOON
         )
@@ -1957,23 +1988,46 @@ enum class CardName {
             SHISUI_SHISUI_PLACE_OF_DEATH
         )
 
-        fun returnSpecialCardNameByMegami(megami_name: MegamiEnum): List<CardName> {
+        private val tokoyoA1V9SpecialCardList = listOf(
+            TOKOYO_KUON, TOKOYO_THOUSANDBIRD, TOKOYO_DUET_CHI_TAN_YANG_MYEONG, TOKOYO_TOKOYOMOON
+        )
+
+        private val saineA1V9SpecialCardList = listOf(
+            SAINE_YULDONGHOGEK, SAINE_DUET_TAN_JU_BING_MYEONG, SAINE_EMMOOSHOEBING, SAINE_JONGGEK
+        )
+
+        fun returnSpecialCardNameByMegami(version: GameVersion, megami_name: MegamiEnum): List<CardName> {
             return when (megami_name){
                 NONE -> emptyList
                 KIRIKO -> emptyList
                 KODAMA -> emptyList
                 ZANKA -> emptyList
                 OUKA -> emptyList
+                SAI_TOKO -> emptyList
                 YURINA -> yurinaSpecialCardList
                 YURINA_A1 -> yurinaA1SpecialCardList
                 YURINA_A2 -> yurinaA2SpecialCardList
                 SAINE -> saineSpecialCardList
-                SAINE_A1 -> saineA1SpecialCardList
+                SAINE_A1 -> {
+                    if(version.isHigherThen(GameVersion.VERSION_8_2)){
+                        saineA1V9SpecialCardList
+                    }
+                    else{
+                        saineA1SpecialCardList
+                    }
+                }
                 SAINE_A2 -> saineA2SpecialCardList
                 HIMIKA -> himikaSpecialCardList
                 HIMIKA_A1 -> himikaA1SpecialCardList
                 TOKOYO -> tokoyoSpecialCardList
-                TOKOYO_A1 -> tokoyoA1SpecialCardList
+                TOKOYO_A1 -> {
+                    if(version.isHigherThen(GameVersion.VERSION_8_2)){
+                        tokoyoA1V9SpecialCardList
+                    }
+                    else{
+                        tokoyoA1SpecialCardList
+                    }
+                }
                 TOKOYO_A2 -> tokoyoA2SpecialCardList
                 OBORO -> oboroSpecialCardList
                 OBORO_A1 -> oboroA1SpecialCardList
@@ -2101,6 +2155,7 @@ enum class CardName {
                 KODAMA -> emptyList
                 ZANKA -> emptyList
                 OUKA -> emptyList
+                SAI_TOKO -> emptyList
                 YURINA -> emptyList
                 YURINA_A1 -> emptyList
                 YURINA_A2 -> emptyList

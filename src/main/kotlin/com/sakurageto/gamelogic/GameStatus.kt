@@ -656,7 +656,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    private suspend fun lifeListenerProcess(player: PlayerEnum, before: Int, reconstruct: Boolean, damage: Boolean){
+    private suspend fun lifeListenerProcess(player: PlayerEnum, reason: Int, before: Int, reconstruct: Boolean, damage: Boolean){
         val nowPlayer = getPlayer(player)
         when(player){
             PlayerEnum.PLAYER1 -> {
@@ -665,7 +665,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                         if(player1Listener.isEmpty()) break
                         val now = player1Listener.first()
                         player1Listener.removeFirst()
-                        if(!(now.doAction(this, before, nowPlayer.life, reconstruct, damage))){
+                        if(!(now.doAction(this, reason, before * 100 + nowPlayer.life, reconstruct, damage))){
                             player1Listener.addLast(now)
                         }
                     }
@@ -677,7 +677,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                         if(player2Listener.isEmpty()) break
                         val now = player2Listener.first()
                         player2Listener.removeFirst()
-                        if(!(now.doAction(this, before, nowPlayer.life, reconstruct, damage))){
+                        if(!(now.doAction(this, reason, before * 100 + nowPlayer.life, reconstruct, damage))){
                             player2Listener.addLast(now)
                         }
                     }
@@ -973,7 +973,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 LocationEnum.LIFE_YOUR, LocationEnum.FLOW_YOUR, false))
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.LIFE_YOUR, LocationEnum.FLOW_YOUR, value, -1)
-            lifeListenerProcess(player, before, reconstruct = false, damage = false)
+            lifeListenerProcess(player, -1, before, reconstruct = false, damage = false)
             if(nowPlayer.getTotalLacerationToken(INDEX_LACERATION_LIFE) >= nowPlayer.life){
                 makeOneZoneLacerationToDamage(player, null, INDEX_LACERATION_LIFE)
             }
@@ -1874,7 +1874,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.LIFE_YOUR, location, value, card.card_number)
-            lifeListenerProcess(player, before, reconstruct, damage)
+            lifeListenerProcess(player, reason, before, reconstruct, damage)
             if(nowPlayer.getTotalLacerationToken(INDEX_LACERATION_LIFE) >= nowPlayer.life){
                 makeOneZoneLacerationToDamage(player, null, INDEX_LACERATION_LIFE)
             }
@@ -2285,7 +2285,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             dust += value
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.LIFE_YOUR, LocationEnum.DUST, value, -1)
-            lifeListenerProcess(player, before, reconstruct = false, damage = false)
+            lifeListenerProcess(player, reason, before, reconstruct = false, damage = false)
             if(nowPlayer.getTotalLacerationToken(INDEX_LACERATION_LIFE) >= nowPlayer.life){
                 makeOneZoneLacerationToDamage(player, null, INDEX_LACERATION_LIFE)
             }
@@ -2354,7 +2354,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.LIFE_YOUR, LocationEnum.FLARE_YOUR, value, -1)
-            lifeListenerProcess(player, before, reconstruct, damage)
+            lifeListenerProcess(player, reason, before, reconstruct, damage)
             if(nowPlayer.getTotalLacerationToken(INDEX_LACERATION_LIFE) >= nowPlayer.life){
                 makeOneZoneLacerationToDamage(player, null, INDEX_LACERATION_LIFE)
             }
@@ -2431,7 +2431,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
             val afterFull = auraPlayer.checkAuraFull()
             auraListenerProcess(player_aura, beforeFull, afterFull)
-            lifeListenerProcess(player_life, beforeLife, reconstruct = false, damage = false)
+            lifeListenerProcess(player_life, reason, beforeLife, reconstruct = false, damage = false)
         }
         else{
             if(player_life == player_aura){
@@ -2515,7 +2515,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             val afterFull = auraPlayer.checkAuraFull()
             auraListenerProcess(player_aura, beforeFull, afterFull)
 
-            lifeListenerProcess(player_life, beforeLife, reconstruct = false, damage = false)
+            lifeListenerProcess(player_life, reason, beforeLife, reconstruct = false, damage = false)
             if(lifePlayer.getTotalLacerationToken(INDEX_LACERATION_LIFE) >= lifePlayer.life){
                 makeOneZoneLacerationToDamage(player_life, null, INDEX_LACERATION_LIFE)
             }
@@ -2655,7 +2655,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.LIFE_YOUR, LocationEnum.OUT_OF_GAME, value, -1
             )
-            lifeListenerProcess(player, before, reconstruct = false, damage = false)
+            lifeListenerProcess(player, reason, before, reconstruct = false, damage = false)
             if(nowPlayer.getTotalLacerationToken(INDEX_LACERATION_LIFE) >= nowPlayer.life){
                 makeOneZoneLacerationToDamage(player, null, INDEX_LACERATION_LIFE)
             }
@@ -2710,7 +2710,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             if(givePlayer.getTotalLacerationToken(INDEX_LACERATION_LIFE) >= givePlayer.life){
                 makeOneZoneLacerationToDamage(playerGive, null, INDEX_LACERATION_LIFE)
             }
-            lifeListenerProcess(playerGet, before, reconstruct = false, damage = false)
+            lifeListenerProcess(playerGet, reason, before, reconstruct = false, damage = false)
             if (givePlayer.life == 0) {
                 gameEnd(playerGive.opposite(), playerGive)
             }
@@ -2755,7 +2755,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
             sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
                 LocationEnum.LIFE_YOUR, LocationEnum.DISTANCE, value, -1)
-            lifeListenerProcess(player, before, false, damage)
+            lifeListenerProcess(player, reason, before, false, damage)
             distanceListenerProcess(PlayerEnum.PLAYER1)
             distanceListenerProcess(PlayerEnum.PLAYER2)
             if(nowPlayer.getTotalLacerationToken(INDEX_LACERATION_LIFE) >= nowPlayer.life){
@@ -2847,12 +2847,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return nowAttack.rangeCheck(getAdjustDistance(), this, player, nowBuffQueue)
     }
 
-    fun cleanAfterUseCost(){
+    fun cleanCostBuffWhenUsed(){
         cleanCostBuff(player1.costBuff)
         cleanCostBuff(player2.costBuff)
     }
 
-    fun cleanCostBuff(){
+    fun cleanCostBuffWhenUnused(){
         cleanCostTempBuff(player1.costBuff)
         cleanCostTempBuff(player2.costBuff)
     }
@@ -2870,6 +2870,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun addPreAttackZone(player: PlayerEnum, attack: MadeAttack): Boolean{
         val nowPlayer = getPlayer(player)
+        if(nowPlayer.canNotAttack) return false
 
         nowPlayer.addPreAttackZone(attack)
 
@@ -2978,13 +2979,19 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    suspend fun decreaseConcentration(player: PlayerEnum){
-        val now_player = getPlayer(player)
+    suspend fun decreaseConcentration(player: PlayerEnum): Boolean{
+        val nowPlayer = getPlayer(player)
 
-        val now_socket = getSocket(player)
-        val other_socket = getSocket(player.opposite())
+        val nowSocket = getSocket(player)
+        val otherSocket = getSocket(player.opposite())
 
-        if(now_player.decreaseConcentration()) sendDecreaseConcentration(now_socket, other_socket)
+        if(nowPlayer.decreaseConcentration()) {
+            sendDecreaseConcentration(nowSocket, otherSocket)
+            return true
+        }
+        else{
+            return false
+        }
     }
 
     private suspend fun reactCheck(react_player: PlayerEnum, card: Card, attack: MadeAttack): Boolean{
@@ -3288,7 +3295,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             flareToDust(player, cost, Arrow.NULL, player, card.player, Log.SPECIAL_COST)
             logger.insert(Log(player, LogText.END_EFFECT, Log.SPECIAL_COST, -1))
         }
-        cleanAfterUseCost()
+        cleanCostBuffWhenUsed()
     }
 
     /**
@@ -3344,12 +3351,19 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 }
                 return true
             }
-            //kamuwi dawn
 
+            //tokoyo duetChitanYangMyeong
+            if(react){
+                getPlayer(player).usedSpecialCard.values.forEach { specialCard ->
+                    specialCard.effectAllValidEffect(card.card_number, player, this, TextEffectTag.WHEN_REACT_YOUR)
+                }
+            }
+
+            //lighthouse effect
             if(cost == -1){
                 var lightHouseCheck = 0
                 if(turnPlayer == player && card.card_data.card_type != CardType.ATTACK && location == LocationEnum.HAND){
-                    for(otherUsedCard in getPlayer(player.opposite()).usedSpecialCard.values){
+                    getPlayer(player.opposite()).usedSpecialCard.values.forEach {otherUsedCard ->
                         lightHouseCheck += otherUsedCard.effectAllValidEffect(player.opposite(), this, TextEffectTag.HATSUMI_LIGHTHOUSE)
                     }
                 }
@@ -3564,6 +3578,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
      * @param card_number only used to inform user what attack is generated
      */
     suspend fun afterMakeAttack(card_number: Int, attack_player: PlayerEnum, react_attack: MadeAttack?){
+        val attackPlayer = getPlayer(attack_player)
+        if(attackPlayer.preAttackCard == null){
+            return
+        }
+
         fun addAttackLog(attack: MadeAttack){
             logger.insert(
                 Log(attack_player, LogText.ATTACK, attack.card_number, when(attack.card_class){
@@ -3577,12 +3596,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         val attackerSocket = getSocket(attack_player)
         val otherSocket = getSocket(attack_player.opposite())
-        val attackPlayer = getPlayer(attack_player)
         val otherPlayer = getPlayer(attack_player.opposite())
-
-        if(attackPlayer.preAttackCard == null){
-            return
-        }
 
         val nowAttack = attackPlayer.preAttackCard!!
         attackPlayer.preAttackCard = null
@@ -3872,7 +3886,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    suspend fun makeOneZoneLacerationToDamage(getDamagePlayer: PlayerEnum, giveDamagePlayer: PlayerEnum?, index: Int){
+    private suspend fun makeOneZoneLacerationToDamage(getDamagePlayer: PlayerEnum, giveDamagePlayer: PlayerEnum?, index: Int){
         val damagePlayer = getPlayer(getDamagePlayer)
         when (index) {
             INDEX_LACERATION_FLARE -> {
@@ -3906,7 +3920,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                         null, null, NUMBER_SHISUI_SHISUI)
                 }
             }
-                INDEX_LACERATION_LIFE -> {
+            INDEX_LACERATION_LIFE -> {
                 if(giveDamagePlayer == null){
                     val totalDamage = damagePlayer.getTotalLacerationToken(index)
                     removeLacerationToken(getDamagePlayer, PlayerEnum.PLAYER1, index, 999)
@@ -5068,6 +5082,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         player1.nextCostAddMegami = null; player2.nextCostAddMegami = null
         player1.fullAction = false; player2.fullAction = false
         player1.isRecoupThisTurn = false; player2.isRecoupThisTurn = false
+        player1.canNotUseConcentration = false; player2.canNotUseConcentration = false
+        player1.canNotAttack = false; player2.canNotAttack = false
         for(i in perjuryCheck.indices){
             perjuryCheck[i] = false
         }
@@ -5329,11 +5345,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun canUseConcentration(player: PlayerEnum): Boolean{
-        for(card in getPlayer(player.opposite()).enchantmentCard.values){
-            if(card.effectAllValidEffect(player.opposite(), this, TextEffectTag.CAN_NOT_USE_CONCENTRATION_OTHER) == 1){
-                return false
-            }
-        }
+        if(getPlayer(player).canNotUseConcentration || getPlayer(player.opposite()).enchantmentCard.values.any {card ->
+                card.effectAllValidEffect(player.opposite(), this, TextEffectTag.CAN_NOT_USE_CONCENTRATION_OTHER) == 1
+            }) return false
         return true
     }
 
@@ -6351,7 +6365,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return card
     }
 
-    suspend fun moveOutCard(to_player: PlayerEnum, nameList: MutableList<CardName>, to_location: LocationEnum){
+    suspend fun moveOutCard(to_player: PlayerEnum, nameList: MutableSet<CardName>, to_location: LocationEnum){
         for(card_name in nameList){
             Card.cardMakerByName(getPlayer(to_player).firstTurn, card_name, to_player, to_location, this.version).let {
                 insertCardTo(to_player, it, to_location, false)

@@ -22,6 +22,7 @@ enum class MegamiEnum(var real_number: Int) {
     TOKOYO_A2(42),
     OBORO(50),
     OBORO_A1(51),
+    OBORO_A2(52),
     YUKIHI(60),
     YUKIHI_A1(61),
     SHINRA(70),
@@ -54,7 +55,8 @@ enum class MegamiEnum(var real_number: Int) {
     RENRI(220),
     RENRI_A1(221),
     AKINA(230),
-    SHISUI(240);
+    SHISUI(240),
+    MISORA(250);
 
     fun equal (megami: MegamiEnum): Boolean{
         if(this == SAI_TOKO){

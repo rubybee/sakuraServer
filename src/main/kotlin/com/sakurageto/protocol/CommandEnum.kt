@@ -313,6 +313,8 @@ enum class CommandEnum {
     SET_MARKET_PRICE_YOUR,
     SET_MARKET_PRICE_OTHER,
 
+    SET_AIMING,
+
     SHOW_SELECT_RESULT;
 
     fun isBasicOperation() = this in basicOperationSet

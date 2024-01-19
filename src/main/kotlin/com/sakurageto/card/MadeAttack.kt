@@ -13,7 +13,8 @@ class MadeAttack(
     private val inevitable: Boolean = false,
     val subType: SubType = SubType.NONE,
     val damageNotChange: Boolean = false,
-    var isLaceration: Boolean = false
+    var isLaceration: Boolean = false,
+    var isTrace: Boolean = false,
 ) {
     var bothSideDamage = false
     val effect: MutableList<Text> = mutableListOf()
@@ -207,8 +208,11 @@ class MadeAttack(
 
     val tempEditedDistance = mutableListOf<Int>()
 
-    suspend fun rangeCheck(now_range: Int, game_status: GameStatus, player: PlayerEnum, continuousRangeBuff: RangeBuffQueue): Boolean{
+    fun rangeCheckAfterApplyBUff(now_range: Int) = now_range in editedDistance
+
+    suspend fun rangeCheck(now_range: Int, game_status: GameStatus, player: PlayerEnum): Boolean{
         editedDistance = distance.toSortedSet()
+        val continuousRangeBuff = game_status.getPlayerRangeBuff(player)
         thisTurnRangeBuff.addAllBuff(continuousRangeBuff)
         continuousRangeBuff.clearBuff()
         for(index in 0 until RangeBuffQueue.buffQueueNumber) {
@@ -386,5 +390,4 @@ class MadeAttack(
             }
         }
     }
-
 }

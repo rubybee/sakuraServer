@@ -528,7 +528,21 @@ enum class CardName {
     RENRI_FIRST_SAKURA_ORDER,
     RENRI_RI_RA_RU_RI_RA_RO,
 
-    SAI_TOKO_ENSEMBLE;
+    SAI_TOKO_ENSEMBLE,
+
+    MISORA_MISORA,
+    MISORA_BOW_SPILLING,
+    MISORA_AIMING_KICK,
+    MISORA_WIND_HOLE,
+    MISORA_GAP_SI_EUL_SI,
+    MISORA_PRECISION,
+    MISORA_TRACKING_ATTACK,
+    MISORA_SKY_WING,
+
+    MISORA_ENDLESS_END,
+    MISORA_CLOUD_EMBROIDERED_CLOUD,
+    MISORA_SHADOW_SHADY_SHADOW,
+    MISORA_SKY_BEYOND_SKY;
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -964,6 +978,20 @@ enum class CardName {
             put(SHISUI_UPALA_TEAR, NUMBER_SHISUI_UPALA_TEAR)
             put(SHISUI_ABUDA_EAT, NUMBER_SHISUI_ABUDA_EAT)
             put(SHISUI_SHISUI_PLACE_OF_DEATH, NUMBER_SHISUI_SHISUI_PLACE_OF_DEATH)
+
+            put(MISORA_MISORA, NUMBER_MISORA_MISORA)
+            put(MISORA_BOW_SPILLING, NUMBER_MISORA_BOW_SPILLING)
+            put(MISORA_AIMING_KICK, NUMBER_MISORA_AIMING_KICK)
+            put(MISORA_WIND_HOLE, NUMBER_MISORA_WIND_HOLE)
+            put(MISORA_GAP_SI_EUL_SI, NUMBER_MISORA_GAP_SI_EUL_SI)
+            put(MISORA_PRECISION, NUMBER_MISORA_PRECISION)
+            put(MISORA_TRACKING_ATTACK, NUMBER_MISORA_TRACKING_ATTACK)
+            put(MISORA_SKY_WING, NUMBER_MISORA_SKY_WING)
+
+            put(MISORA_ENDLESS_END, NUMBER_MISORA_ENDLESS_END)
+            put(MISORA_CLOUD_EMBROIDERED_CLOUD, NUMBER_MISORA_CLOUD_EMBROIDERED_CLOUD)
+            put(MISORA_SHADOW_SHADY_SHADOW, NUMBER_MISORA_SHADOW_SHADY_SHADOW)
+            put(MISORA_SKY_BEYOND_SKY, NUMBER_MISORA_SKY_BEYOND_SKY)
         }
         private val cardNameHashmapSecond = EnumMap<CardName, Int>(CardName::class.java).apply {
             put(YURINA_CHAM, SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_CHAM)
@@ -1388,6 +1416,20 @@ enum class CardName {
             put(SHISUI_UPALA_TEAR, SECOND_PLAYER_START_NUMBER + NUMBER_SHISUI_UPALA_TEAR)
             put(SHISUI_ABUDA_EAT, SECOND_PLAYER_START_NUMBER + NUMBER_SHISUI_ABUDA_EAT)
             put(SHISUI_SHISUI_PLACE_OF_DEATH, SECOND_PLAYER_START_NUMBER + NUMBER_SHISUI_SHISUI_PLACE_OF_DEATH)
+
+            put(MISORA_MISORA, NUMBER_MISORA_MISORA)
+            put(MISORA_BOW_SPILLING, SECOND_PLAYER_START_NUMBER + NUMBER_MISORA_BOW_SPILLING)
+            put(MISORA_AIMING_KICK, SECOND_PLAYER_START_NUMBER + NUMBER_MISORA_AIMING_KICK)
+            put(MISORA_WIND_HOLE, SECOND_PLAYER_START_NUMBER + NUMBER_MISORA_WIND_HOLE)
+            put(MISORA_GAP_SI_EUL_SI, SECOND_PLAYER_START_NUMBER + NUMBER_MISORA_GAP_SI_EUL_SI)
+            put(MISORA_PRECISION, SECOND_PLAYER_START_NUMBER + NUMBER_MISORA_PRECISION)
+            put(MISORA_TRACKING_ATTACK, SECOND_PLAYER_START_NUMBER + NUMBER_MISORA_TRACKING_ATTACK)
+            put(MISORA_SKY_WING, SECOND_PLAYER_START_NUMBER + NUMBER_MISORA_SKY_WING)
+
+            put(MISORA_ENDLESS_END, SECOND_PLAYER_START_NUMBER + NUMBER_MISORA_ENDLESS_END)
+            put(MISORA_CLOUD_EMBROIDERED_CLOUD, SECOND_PLAYER_START_NUMBER + NUMBER_MISORA_CLOUD_EMBROIDERED_CLOUD)
+            put(MISORA_SHADOW_SHADY_SHADOW, SECOND_PLAYER_START_NUMBER + NUMBER_MISORA_SHADOW_SHADY_SHADOW)
+            put(MISORA_SKY_BEYOND_SKY, SECOND_PLAYER_START_NUMBER + NUMBER_MISORA_SKY_BEYOND_SKY)
         }
 
         private val emptyList = listOf<CardName>()
@@ -1685,6 +1727,15 @@ enum class CardName {
             SAINE_ACCOMPANIMENT, SAINE_MOOEMBUCK
         )
 
+        private val misoraNormalCardList = listOf(
+            MISORA_BOW_SPILLING, MISORA_AIMING_KICK, MISORA_WIND_HOLE,
+            MISORA_GAP_SI_EUL_SI, MISORA_PRECISION, MISORA_TRACKING_ATTACK, MISORA_SKY_WING
+        )
+
+        private val oboroA2NormalCardList = listOf(
+            SAINE_YULDONGHOGEK
+        )
+
         fun returnNormalCardNameByMegami(version: GameVersion, megami_name: MegamiEnum):List<CardName>{
             return when (megami_name){
                 NONE -> emptyList
@@ -1721,6 +1772,7 @@ enum class CardName {
                 TOKOYO_A2 -> tokoyoA2NormalCardList
                 OBORO -> oboroNormalCardList
                 OBORO_A1 -> oboroA1NormalCardList
+                OBORO_A2 -> oboroA2NormalCardList
                 YUKIHI -> yukihiNormalCardList
                 YUKIHI_A1 -> yukihiA1NormalCardList
                 SHINRA -> shinraNormalCardList
@@ -1775,6 +1827,7 @@ enum class CardName {
                 }
                 AKINA -> akinaNormalCardList
                 SHISUI -> shisuiNormalCardList
+                MISORA -> misoraNormalCardList
             }
         }
 
@@ -1996,6 +2049,15 @@ enum class CardName {
             SAINE_YULDONGHOGEK, SAINE_DUET_TAN_JU_BING_MYEONG, SAINE_EMMOOSHOEBING, SAINE_JONGGEK
         )
 
+        private val misoraSpecialCardList = listOf(
+            MISORA_ENDLESS_END, MISORA_CLOUD_EMBROIDERED_CLOUD, MISORA_SHADOW_SHADY_SHADOW,
+            MISORA_SKY_BEYOND_SKY
+        )
+
+        private val oboroA2SpecialCardList = listOf(
+            SAINE_YULDONGHOGEK
+        )
+
         fun returnSpecialCardNameByMegami(version: GameVersion, megami_name: MegamiEnum): List<CardName> {
             return when (megami_name){
                 NONE -> emptyList
@@ -2031,6 +2093,7 @@ enum class CardName {
                 TOKOYO_A2 -> tokoyoA2SpecialCardList
                 OBORO -> oboroSpecialCardList
                 OBORO_A1 -> oboroA1SpecialCardList
+                OBORO_A2 -> oboroA2SpecialCardList
                 YUKIHI -> yukihiSpecialCardList
                 YUKIHI_A1 -> yukihiA1SpecialCardList
                 SHINRA -> shinraSpecialCardList
@@ -2064,6 +2127,7 @@ enum class CardName {
                 RENRI_A1 -> renriA1SpecialCardList
                 AKINA -> akinaSpecialCardList
                 SHISUI -> shisuiSpecialCardList
+                MISORA -> misoraSpecialCardList
             }
         }
 
@@ -2148,6 +2212,10 @@ enum class CardName {
             RENRI_ENGRAVED_GARMENT, KIRIKO_SHAMANISTIC_MUSIC
         )
 
+        private val oboroA2AdditionalCardList = listOf(
+            RENRI_ENGRAVED_GARMENT
+        )
+
         fun returnAdditionalCardNameByMegami(megami_name: MegamiEnum): List<CardName> {
             return when (megami_name){
                 NONE -> emptyList
@@ -2169,6 +2237,7 @@ enum class CardName {
                 TOKOYO_A2 -> emptyList
                 OBORO -> emptyList
                 OBORO_A1 -> oboroA1AdditionalCardList
+                OBORO_A2 -> oboroA2AdditionalCardList
                 YUKIHI -> emptyList
                 YUKIHI_A1 -> emptyList
                 SHINRA -> emptyList
@@ -2202,6 +2271,7 @@ enum class CardName {
                 RENRI_A1 -> renriA1AdditionalCardList
                 AKINA -> emptyList
                 SHISUI -> emptyList
+                MISORA -> emptyList
             }
         }
 

@@ -14,13 +14,12 @@ import kotlinx.serialization.json.Json
 import kotlin.random.Random
 
 
-class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Connection) {
+class SakuraGame(private val roomNumber: Int, val player1: Connection, val player2: Connection) {
     private var gameMode: GameMode //0 = no ban 1 = pick ban
     private var gameStatus: GameStatus
 
     private var turnNumber = 0
     private var firstTurn = PlayerEnum.PLAYER1
-    private var turnPlayer = PlayerEnum.PLAYER1
 
     private fun getSocket(player: PlayerEnum): Connection{
         return if(player ==  PlayerEnum.PLAYER1) player1 else player2
@@ -32,6 +31,9 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         RoomInformation.roomHashMap[roomNumber]?.game = gameStatus
     }
 
+    /***
+     * firstCode and secondCode are used to reconnect user, it is not associated with selectVersion's mechanism
+     */
     private suspend fun selectVersion(){
         val random = Random(System.currentTimeMillis())
         val firstCode = random.nextInt()
@@ -67,14 +69,14 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         }
     }
 
-    suspend fun selectEnd(){
+    private suspend fun selectEnd(){
         val data = SakuraSendData(CommandEnum.END_OF_SELECTMODE, mutableListOf(gameMode.real_number))
         val sendData = Json.encodeToString(data)
         player1.session.send(sendData)
         player2.session.send(sendData)
     }
 
-    suspend fun selectMegami(){
+    private suspend fun selectMegami(){
         val data = SakuraCardCommand(CommandEnum.SELECT_MEGAMI, -1)
         val sendData = Json.encodeToString(data)
         player1.session.send(sendData)
@@ -141,6 +143,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
             MegamiEnum.KANAWE -> settingForKanawe(player)
             MegamiEnum.KAMUWI -> settingForKamuwi(player)
             MegamiEnum.AKINA -> settingForAkina(player)
+            MegamiEnum.MISORA -> settingForMisora(player)
             else -> {}
         }
     }
@@ -262,6 +265,21 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         }
 
         nowPlayer.marketPrice = 2
+    }
+
+    private fun settingForMisora(player: PlayerEnum){
+        val nowPlayer = gameStatus.getPlayer(player)
+
+        if(nowPlayer.megamiOneNormalForm() == MegamiEnum.SHINRA){
+            nowPlayer.megamiCard = Card.cardMakerByName(firstTurn == player, CardName.MISORA_MISORA, player,
+                LocationEnum.YOUR_USED_CARD, gameStatus.version)
+            nowPlayer.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
+        }
+        else{
+            nowPlayer.megamiCard2 = Card.cardMakerByName(firstTurn == player, CardName.MISORA_MISORA, player,
+                LocationEnum.YOUR_USED_CARD, gameStatus.version)
+            nowPlayer.megamiCard2?.special_card_state = SpecialCardEnum.PLAYED
+        }
     }
 
     private fun settingForAnotherMegami(player: PlayerEnum, megami: MegamiEnum){
@@ -417,7 +435,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         gameStatus.player2.deleteSelectedSpecialCard(specialCardDataPlayer2)
     }
 
-     private fun selectFirst(){
+     private fun decideFirstTurn(){
         val random = Random(System.currentTimeMillis()).nextInt(2)
         if(random == 0){
             firstTurn = PlayerEnum.PLAYER1
@@ -462,18 +480,6 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         sendMuligunEnd(player1, player2)
     }
 
-    private suspend fun startPhase(){
-        gameStatus.endCurrentPhase = false
-        gameStatus.nowPhase = START_PHASE
-        gameStatus.startPhaseBeforeEffect(this.turnPlayer)
-        sendStartPhaseStart(getSocket(this.turnPlayer), getSocket(this.turnPlayer.opposite()))
-        gameStatus.startPhaseEffectProcess(this.turnPlayer)
-        if(turnNumber == 0 || turnNumber == 1 || gameStatus.endCurrentPhase){
-            return
-        }
-        gameStatus.startPhaseDefaultSecond(this.turnPlayer)
-    }
-
     private fun isActionUseCard(action: CommandEnum) =
         action in setOf(CommandEnum.ACTION_USE_CARD_HAND, CommandEnum.ACTION_USE_CARD_SPECIAL,
             CommandEnum.ACTION_USE_CARD_COVER, CommandEnum.ACTION_USE_CARD_PERJURY, CommandEnum.ACTION_USE_CARD_SOLDIER)
@@ -487,11 +493,11 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         )
 
     private suspend fun fullPowerAction(){
-        gameStatus.setPlayerFullAction(this.turnPlayer, true)
+        gameStatus.setPlayerFullAction(gameStatus.turnPlayer, true)
         while (true){
-            val data = receiveFullPowerActionRequest(getSocket(this.turnPlayer))
+            val data = receiveFullPowerActionRequest(getSocket(gameStatus.turnPlayer))
             if(data.first == CommandEnum.FULL_POWER_NO){
-                sendSimpleCommand(getSocket(this.turnPlayer), CommandEnum.FULL_POWER_NO)
+                sendSimpleCommand(getSocket(gameStatus.turnPlayer), CommandEnum.FULL_POWER_NO)
                 normalAction()
                 return
             }
@@ -499,7 +505,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
                 return
             }
             else if(isActionUseCard(data.first)){
-                if(gameStatus.cardUseNormal(this.turnPlayer, data.first, data.second)){
+                if(gameStatus.cardUseNormal(gameStatus.turnPlayer, data.first, data.second)){
                     return
                 }
             }
@@ -507,37 +513,36 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
     }
 
     private suspend fun normalAction(){
-        var isThisTurnDoAction = false
-        gameStatus.setPlayerFullAction(this.turnPlayer, false)
+        gameStatus.setPlayerFullAction(gameStatus.turnPlayer, false)
         while (true){
-            if(gameStatus.endCurrentPhase || gameStatus.getEndTurn(this.turnPlayer)){
+            if(gameStatus.endCurrentPhase || gameStatus.getEndTurn(gameStatus.turnPlayer)){
                 return
             }
-            val data = receiveActionRequest(getSocket(this.turnPlayer))
+            val data = receiveActionRequest(getSocket(gameStatus.turnPlayer))
             if(data.first == CommandEnum.ACTION_END_TURN) {
                 return
             }
-            if(data.first == CommandEnum.FULL_POWER_YES && !isThisTurnDoAction){
-                sendSimpleCommand(getSocket(this.turnPlayer), CommandEnum.FULL_POWER_YES)
+            if(data.first == CommandEnum.FULL_POWER_YES || !gameStatus.isThisTurnDoAction){
+                sendSimpleCommand(getSocket(gameStatus.turnPlayer), CommandEnum.FULL_POWER_YES)
                 fullPowerAction()
                 return
             }
             else if(isActionUseCard(data.first)){
-                if(gameStatus.cardUseNormal(this.turnPlayer, data.first, data.second)){
-                    isThisTurnDoAction = true
+                if(gameStatus.cardUseNormal(gameStatus.turnPlayer, data.first, data.second)){
+                    gameStatus.isThisTurnDoAction = true
                 }
             }
             else if(isActionBasicOperation(data.first)){
-                if(gameStatus.canDoBasicOperation(this.turnPlayer, data.first) && gameStatus.payBasicOperationCost(this.turnPlayer, data.second)){
-                    gameStatus.doBasicOperation(this.turnPlayer, data.first, if(data.second == -1) -1 else 0)
-                    isThisTurnDoAction = true
+                if(gameStatus.canDoBasicOperation(gameStatus.turnPlayer, data.first) && gameStatus.payBasicOperationCost(gameStatus.turnPlayer, data.second)){
+                    gameStatus.doBasicOperation(gameStatus.turnPlayer, data.first, if(data.second == -1) -1 else 0)
+                    gameStatus.isThisTurnDoAction = true
                 }
             }
         }
     }
 
     private suspend fun doMainPhaseAction(){
-        if(receiveFullPowerRequest(getSocket(this.turnPlayer))){
+        if(receiveFullPowerRequest(getSocket(gameStatus.turnPlayer))){
             fullPowerAction()
         }
         else{
@@ -545,38 +550,54 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
         }
     }
 
-    suspend fun mainPhase(){
-        if(gameStatus.getPlayer(turnPlayer).nextMainPhaseSkip){
-            gameStatus.getPlayer(turnPlayer).nextMainPhaseSkip = false
+    private suspend fun startPhase(){
+        gameStatus.endCurrentPhase = false
+        gameStatus.nowPhase = START_PHASE
+        gameStatus.beforeStartPhaseEffectProcess()
+
+        sendStartPhaseStart(getSocket(gameStatus.turnPlayer), getSocket(gameStatus.turnPlayer.opposite()))
+        gameStatus.startPhaseEffectProcess()
+        if(turnNumber == 0 || turnNumber == 1 || gameStatus.endCurrentPhase){
             return
         }
-        gameStatus.endCurrentPhase = false
-        gameStatus.nowPhase = MAIN_PHASE
-        sendMainPhaseStart(getSocket(this.turnPlayer), getSocket(this.turnPlayer.opposite()))
-        gameStatus.mainPhaseEffectProcess(this.turnPlayer)
-        doMainPhaseAction()
+        gameStatus.startPhaseDefaultSecond()
     }
 
-    suspend fun endPhase(){
+    private suspend fun mainPhase(){
         gameStatus.endCurrentPhase = false
-        gameStatus.nowPhase = END_PHASE
-        sendEndPhaseStart(getSocket(this.turnPlayer), getSocket(this.turnPlayer.opposite()))
-        gameStatus.endPhaseEffectProcess(this.turnPlayer)
-        gameStatus.resetTurnValue()
-        gameStatus.setEndTurn(PlayerEnum.PLAYER1, false)
-        gameStatus.setEndTurn(PlayerEnum.PLAYER2, false)
-        gameStatus.logger.reset()
-        this.turnPlayer = this.turnPlayer.opposite()
-        this.turnNumber += 1
+        gameStatus.nowPhase = MAIN_PHASE
+        if(gameStatus.getPlayer(gameStatus.turnPlayer).nextMainPhaseSkip){
+            gameStatus.getPlayer(gameStatus.turnPlayer).nextMainPhaseSkip = false
+            return
+        }
+
+        sendMainPhaseStart(getSocket(gameStatus.turnPlayer), getSocket(gameStatus.turnPlayer.opposite()))
+        gameStatus.mainPhaseEffectProcess()
+        doMainPhaseAction()
         if(gameStatus.endCurrentPhase){
             return
         }
-        gameStatus.endTurnHandCheck(this.turnPlayer.opposite())
+        gameStatus.mainPhaseEndProcess()
     }
 
-    suspend fun gameStart(){
-        this.turnPlayer = this.firstTurn
+    private suspend fun endPhase(){
+        gameStatus.endCurrentPhase = false
+        gameStatus.nowPhase = END_PHASE
 
+        sendEndPhaseStart(getSocket(gameStatus.turnPlayer), getSocket(gameStatus.turnPlayer.opposite()))
+        gameStatus.endPhaseEffectProcess()
+        gameStatus.resetTurnValue()
+        gameStatus.logger.reset()
+        this.turnNumber += 1
+        if(gameStatus.endCurrentPhase){
+            gameStatus.changeTurnPlayer()
+            return
+        }
+        gameStatus.endTurnHandCheck()
+        gameStatus.changeTurnPlayer()
+    }
+
+    private suspend fun gameStart(){
         while(true){
             startPhase()
             mainPhase()
@@ -596,7 +617,7 @@ class SakuraGame(val roomNumber: Int, val player1: Connection, val player2: Conn
             checkMegami()
             selectBan()
         }
-        selectFirst()
+        decideFirstTurn()
         checkFinalMegami()
         selectCard()
         gameStatus.drawCard(PlayerEnum.PLAYER1, 3)

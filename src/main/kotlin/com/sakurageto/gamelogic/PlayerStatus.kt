@@ -102,6 +102,9 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var memory: HashMap<Int, Card>? = null
 
     var marketPrice: Int? = null
+
+    var aiming: Int? = null
+
     fun getMarketPrice() = marketPrice?: 1
     var flow: Int? = null
     fun getCapital() = aura + flare + (flow?: 0)
@@ -142,6 +145,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var canNotUseConcentration: Boolean = false
     var canNotAttack: Boolean = false
 
+    //buff queue
     var otherBuff: OtherBuffQueue = OtherBuffQueue()
     var attackBuff: AttackBuffQueue = AttackBuffQueue()
     var rangeBuff: RangeBuffQueue = RangeBuffQueue()
@@ -387,6 +391,11 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
                     destList.add(card.card_number)
                 }
             }
+            LocationEnum.SPECIAL_CARD -> for (card in specialCardDeck.values) {
+                if(condition(card, location)){
+                    destList.add(card.card_number)
+                }
+            }
             LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.ENCHANTMENT_ZONE, LocationEnum.OTHER_ENCHANTMENT_ZONE_CARD  -> {
                 for (card in enchantmentCard.values){
                     if(condition(card, location)){
@@ -611,8 +620,12 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     }
 
     fun isDiscardHave(find_name: CardName) = discard.any {
-            it.card_data.card_name == find_name
-        }
+        it.card_data.card_name == find_name
+    }
+
+    fun isDiscardHave(card_number: Int) = discard.any {
+        it.card_number == card_number
+    }
 
     fun isDeckHave(find_name: CardName) = normalCardDeck.any {
         it.card_data.card_name == find_name

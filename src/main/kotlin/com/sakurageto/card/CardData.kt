@@ -16,6 +16,7 @@ class CardData(
     var lifeDamage: Int? = null
     var auraDamage: Int? = null
     var isLaceration: Boolean = false
+    var isTrace: Boolean = false
 
     //Enchantment
     var charge: Int? = null
@@ -60,15 +61,18 @@ class CardData(
      */
     fun setAttack(distance_type: DistanceType, distance_cont: Pair<Int, Int>?, distance_uncont: MutableList<Int>?,
                   aura_damage: Int, life_damage: Int, cannotReactNormal: Boolean, cannotReactSpecial: Boolean,
-                  cannotReact: Boolean, chogek: Boolean, inevitable: Boolean = false, isLaceration: Boolean = false){
+                  cannotReact: Boolean, chogek: Boolean, inevitable: Boolean = false, isLaceration: Boolean = false,
+                  isTrace: Boolean = false){
         this.distanceType = distance_type
         if(distance_type == DistanceType.CONTINUOUS){
             this.distanceCont = Pair(distance_cont!!.first, distance_cont.second)
         }
         else{
-            this.distanceUncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
-            for (i in distance_uncont!!){
-                this.distanceUncont!![i] = true
+            this.distanceUncont = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
+            distance_uncont?.let {
+                for (i in it){
+                    this.distanceUncont!![i] = true
+                }
             }
         }
         this.lifeDamage = life_damage
@@ -79,6 +83,7 @@ class CardData(
         this.chogek = chogek
         this.inevitable = inevitable
         this.isLaceration = isLaceration
+        this.isTrace = isTrace
     }
 
     fun setAttackFold(distance_type: DistanceType, distance_cont: Pair<Int, Int>?, distance_uncont: MutableList<Int>?,
@@ -88,7 +93,7 @@ class CardData(
             this.distanceContFold = Pair(distance_cont!!.first, distance_cont.second)
         }
         else{
-            this.distanceUncontFold = arrayOf(false, false, false, false, false, false, false, false, false, false, false)
+            this.distanceUncontFold = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
             for (i in distance_uncont!!){
                 this.distanceUncont!![i] = true
             }
@@ -104,7 +109,7 @@ class CardData(
             this.distanceContUnfold = Pair(distance_cont!!.first, distance_cont.second)
         }
         else{
-            this.distanceUncontUnfold = arrayOf(false, false, false, false, false, false, false, false, false, false, false)
+            this.distanceUncontUnfold = arrayOf(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)
             for (i in distance_uncont!!){
                 this.distanceUncont!![i] = true
             }

@@ -361,7 +361,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         chogek = this.card_data.chogek,
                         inevitable = this.card_data.inevitable,
                         subType = subType ?: this.card_data.sub_type,
-                        isLaceration = this.card_data.isLaceration
+                        isLaceration = this.card_data.isLaceration,
+                        isTrace = this.card_data.isTrace
                     )
                 }
                 Umbrella.UNFOLD -> {
@@ -386,7 +387,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         chogek = this.card_data.chogek,
                         inevitable = this.card_data.inevitable,
                         subType = subType ?: this.card_data.sub_type,
-                        isLaceration = this.card_data.isLaceration
+                        isLaceration = this.card_data.isLaceration,
+                        isTrace = this.card_data.isTrace
                     )
                 }
                 null -> {
@@ -409,7 +411,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 chogek = this.card_data.chogek,
                 inevitable = this.card_data.inevitable,
                 subType = subType ?: this.card_data.sub_type,
-                isLaceration = this.card_data.isLaceration
+                isLaceration = this.card_data.isLaceration,
+                isTrace = this.card_data.isTrace
             )
         }
     }
@@ -518,7 +521,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                                 chogek = false ,
                                 inevitable = this.card_data.inevitable,
                                 subType = this.card_data.sub_type,
-                                isLaceration = this.card_data.isLaceration
+                                isLaceration = this.card_data.isLaceration,
+                                isTrace = this.card_data.isTrace
                             )
                     )){
                     return cost
@@ -584,7 +588,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
     }
 
-    suspend fun enchantmentUseNormal(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, nap_change: Int = -1) {
+    private suspend fun enchantmentUseNormal(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, nap_change: Int = -1) {
         val nowPlayer = game_status.getPlayer(player)
 
         for(card in game_status.getPlayer(player.opposite()).enchantmentCard.values){
@@ -727,6 +731,9 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
 
         game_status.afterCardUsed(this.card_number, player, this, cardMoveCancel)
+        if(this.card_data.card_type == CardType.ENCHANTMENT && !cardMoveCancel){
+            this.effectText(player, game_status, react_attack, TextEffectTag.AFTER_DEPLOYMENT)
+        }
     }
 
     fun chasmCheck(): Boolean{

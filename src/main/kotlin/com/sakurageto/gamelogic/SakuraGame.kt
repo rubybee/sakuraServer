@@ -184,7 +184,7 @@ class SakuraGame(private val roomNumber: Int, val player1: Connection, val playe
         val nowPlayer = gameStatus.getPlayer(player)
         val turnCheck = firstTurn == player.opposite()
 
-        for(card_name in CardName.returnPoisonCardName()){
+        for(card_name in CardName.poisonList){
             val card = Card.cardMakerByName(turnCheck, card_name, player.opposite(),
                 LocationEnum.POISON_BAG, gameStatus.version)
             nowPlayer.poisonBag[card.card_data.card_name] = card
@@ -215,7 +215,7 @@ class SakuraGame(private val roomNumber: Int, val player1: Connection, val playe
         val nowPlayer = gameStatus.getPlayer(player)
         val turnCheck = firstTurn == player
 
-        for(card_name in CardName.returnSoldierCardName()){
+        for(card_name in CardName.soldierList){
             val card = Card.cardMakerByName(turnCheck, card_name, player,
                 LocationEnum.NOT_READY_SOLDIER_ZONE, gameStatus.version)
             nowPlayer.notReadySoldierZone[card.card_number] = card
@@ -286,6 +286,7 @@ class SakuraGame(private val roomNumber: Int, val player1: Connection, val playe
         when(megami){
             MegamiEnum.YATSUHA_AA1 -> settingForYatsuhaAA1(player)
             MegamiEnum.RENRI_A1 -> settingForRenriA1(player)
+            MegamiEnum.OBORO_A2 -> settingForOboroA2(player)
             else -> {}
         }
     }
@@ -294,7 +295,7 @@ class SakuraGame(private val roomNumber: Int, val player1: Connection, val playe
         val nowPlayer = gameStatus.getPlayer(player)
         nowPlayer.relic = HashMap()
         nowPlayer.perjuryInstallation = hashSetOf(CardName.RENRI_FALSE_WEAPON)
-        for(card_name in CardName.returnRenriA1RelicList()){
+        for(card_name in CardName.relicList){
             val card = Card.cardMakerByName(nowPlayer.firstTurn, card_name, player,
                 LocationEnum.RELIC_YOUR, gameStatus.version)
             nowPlayer.relic!![card.card_number] = card
@@ -305,6 +306,20 @@ class SakuraGame(private val roomNumber: Int, val player1: Connection, val playe
         val nowPlayer = gameStatus.getPlayer(player)
 
         nowPlayer.memory = hashMapOf()
+    }
+
+    private fun settingForOboroA2(player: PlayerEnum){
+        val nowPlayer = gameStatus.getPlayer(player)
+
+        nowPlayer.assemblyMainZone = hashMapOf()
+        nowPlayer.assemblyCustomZone = hashMapOf()
+        nowPlayer.unassemblyZone = hashMapOf()
+
+        for(card_name in CardName.partsList){
+            val card = Card.cardMakerByName(nowPlayer.firstTurn, card_name, player,
+                LocationEnum.UNASSEMBLY_YOUR, gameStatus.version)
+            nowPlayer.unassemblyZone!![card.card_number] = card
+        }
     }
 
     private fun checkCardSet(bigger: MutableSet<CardName>, smaller: MutableList<CardName>?, size: Int): Boolean{

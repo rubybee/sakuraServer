@@ -1,6 +1,7 @@
 package com.sakurageto.card
 
 import com.sakurageto.gamelogic.MegamiEnum
+import java.util.SortedSet
 
 class CardData(
     val card_class: CardClass,
@@ -143,7 +144,7 @@ class CardData(
         this.cost = cost
     }
 
-    fun addtext(text: Text){
+    fun addText(text: Text){
         if(this.effect == null){
             this.effect = mutableListOf()
         }
@@ -161,5 +162,29 @@ class CardData(
             }
         }
         return false
+    }
+
+    fun getDistance(): SortedSet<Int>{
+        val result = sortedSetOf<Int>()
+        when(distanceType){
+            DistanceType.CONTINUOUS -> {
+                distanceCont?.let {
+                    for(i in it.first..it.second){
+                        result.add(i)
+                    }
+                }
+            }
+            DistanceType.DISCONTINUOUS -> {
+                distanceUncont?.let {
+                    for(i in it.indices){
+                        if(it[i]){
+                            result.add(i)
+                        }
+                    }
+                }
+            }
+            null -> {}
+        }
+        return result
     }
 }

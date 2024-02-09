@@ -6,7 +6,7 @@ import com.sakurageto.gamelogic.GameStatus
 class CostBuff(
     val cardNumber: Int, var counter: Int, val tag: BufTag,
     val condition: suspend (PlayerEnum, GameStatus, Card) -> Boolean,
-    val effect: suspend (Int) -> Int
+    val effect: suspend (Int, PlayerEnum, GameStatus) -> Int
 )
 
 

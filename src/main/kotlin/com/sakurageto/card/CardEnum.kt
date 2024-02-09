@@ -30,6 +30,8 @@ enum class CardClass {
     SOLDIER,
     IDEA,
     POISON,
+    MAIN_PARTS,
+    CUSTOM_PARTS,
     NULL
 }
 
@@ -542,7 +544,20 @@ enum class CardName {
     MISORA_ENDLESS_END,
     MISORA_CLOUD_EMBROIDERED_CLOUD,
     MISORA_SHADOW_SHADY_SHADOW,
-    MISORA_SKY_BEYOND_SKY;
+    MISORA_SKY_BEYOND_SKY,
+
+    OBORO_HOLOGRAM_KUNAI,
+    OBORO_GIGASUKE,
+    OBORO_BLURRY_DOCUMENT_ELECTRICSOUCHI,
+
+    OBORO_MAIN_PARTS_X,
+    OBORO_MAIN_PARTS_Y,
+    OBORO_MAIN_PARTS_Z,
+    OBORO_CUSTOM_PARTS_A,
+    OBORO_CUSTOM_PARTS_B,
+    OBORO_CUSTOM_PARTS_C,
+    OBORO_CUSTOM_PARTS_D;
+
 
     fun toCardNumber(firstTurn: Boolean): Int{
         return if(firstTurn){
@@ -641,6 +656,16 @@ enum class CardName {
             put(OBORO_AMBUSH, NUMBER_OBORO_AMBUSH)
             put(OBORO_BRANCH_OF_DIVINE, NUMBER_OBORO_BRANCH_OF_DIVINE)
             put(OBORO_LAST_CRYSTAL, NUMBER_OBORO_LAST_CRYSTAL)
+            put(OBORO_HOLOGRAM_KUNAI, NUMBER_OBORO_HOLOGRAM_KUNAI)
+            put(OBORO_GIGASUKE, NUMBER_OBORO_GIGASUKE)
+            put(OBORO_BLURRY_DOCUMENT_ELECTRICSOUCHI, NUMBER_OBORO_BLURRY_DOCUMENT_ELECTRICSOUCHI)
+            put(OBORO_MAIN_PARTS_X, NUMBER_OBORO_MAIN_PARTS_X)
+            put(OBORO_MAIN_PARTS_Y, NUMBER_OBORO_MAIN_PARTS_Y)
+            put(OBORO_MAIN_PARTS_Z, NUMBER_OBORO_MAIN_PARTS_Z)
+            put(OBORO_CUSTOM_PARTS_A, NUMBER_OBORO_CUSTOM_PARTS_A)
+            put(OBORO_CUSTOM_PARTS_B, NUMBER_OBORO_CUSTOM_PARTS_B)
+            put(OBORO_CUSTOM_PARTS_C, NUMBER_OBORO_CUSTOM_PARTS_C)
+            put(OBORO_CUSTOM_PARTS_D, NUMBER_OBORO_CUSTOM_PARTS_D)
 
             put(YUKIHI_YUKIHI, NUMBER_YUKIHI_YUKIHI)
             put(YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE, NUMBER_YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE)
@@ -1079,6 +1104,16 @@ enum class CardName {
             put(OBORO_AMBUSH, SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_AMBUSH)
             put(OBORO_BRANCH_OF_DIVINE, SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_BRANCH_OF_DIVINE)
             put(OBORO_LAST_CRYSTAL, SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_LAST_CRYSTAL)
+            put(OBORO_HOLOGRAM_KUNAI, SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_HOLOGRAM_KUNAI)
+            put(OBORO_GIGASUKE, SECOND_PLAYER_START_NUMBER +  NUMBER_OBORO_GIGASUKE)
+            put(OBORO_BLURRY_DOCUMENT_ELECTRICSOUCHI, SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_BLURRY_DOCUMENT_ELECTRICSOUCHI)
+            put(OBORO_MAIN_PARTS_X, SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_MAIN_PARTS_X)
+            put(OBORO_MAIN_PARTS_Y, SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_MAIN_PARTS_Y)
+            put(OBORO_MAIN_PARTS_Z, SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_MAIN_PARTS_Z)
+            put(OBORO_CUSTOM_PARTS_A, SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_CUSTOM_PARTS_A)
+            put(OBORO_CUSTOM_PARTS_B, SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_CUSTOM_PARTS_B)
+            put(OBORO_CUSTOM_PARTS_C, SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_CUSTOM_PARTS_C)
+            put(OBORO_CUSTOM_PARTS_D, SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_CUSTOM_PARTS_D)
 
             put(YUKIHI_YUKIHI, SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_YUKIHI)
             put(YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE, SECOND_PLAYER_START_NUMBER + NUMBER_YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE)
@@ -1733,7 +1768,8 @@ enum class CardName {
         )
 
         private val oboroA2NormalCardList = listOf(
-            SAINE_YULDONGHOGEK
+            OBORO_HOLOGRAM_KUNAI, OBORO_SHADOWCALTROP, OBORO_ZANGEKIRANBU, OBORO_NINJAWALK,
+            OBORO_INDUCE, OBORO_CLONE, OBORO_BIOACTIVITY
         )
 
         fun returnNormalCardNameByMegami(version: GameVersion, megami_name: MegamiEnum):List<CardName>{
@@ -2055,7 +2091,7 @@ enum class CardName {
         )
 
         private val oboroA2SpecialCardList = listOf(
-            SAINE_YULDONGHOGEK
+            OBORO_GIGASUKE, OBORO_TOBIKAGE, OBORO_BLURRY_DOCUMENT_ELECTRICSOUCHI, OBORO_MIKAZRA
         )
 
         fun returnSpecialCardNameByMegami(version: GameVersion, megami_name: MegamiEnum): List<CardName> {
@@ -2275,30 +2311,23 @@ enum class CardName {
             }
         }
 
-        private val poisonList = listOf(
+        val poisonList = listOf(
             POISON_PARALYTIC, POISON_HALLUCINOGENIC, POISON_RELAXATION,
             POISON_DEADLY_1, POISON_DEADLY_2
         )
 
-        fun returnPoisonCardName(): List<CardName> {
-            return poisonList
-        }
-
-        private val soldierList = listOf(
+        val soldierList = listOf(
             SOLDIER_SPEAR_1, SOLDIER_SPEAR_2, SOLDIER_SHIELD, SOLDIER_HORSE
         )
 
-        fun returnSoldierCardName(): List<CardName> {
-            return soldierList
-        }
-
-        private val renriA1RelicList = listOf(
+        val relicList = listOf(
             RENRI_FALSE_WEAPON, RENRI_ESSENCE_OF_BLADE, RENRI_FIRST_SAKURA_ORDER
         )
 
-        fun returnRenriA1RelicList(): List<CardName> {
-            return renriA1RelicList
-        }
+        val partsList = listOf(
+            OBORO_MAIN_PARTS_X, OBORO_MAIN_PARTS_Y, OBORO_MAIN_PARTS_Z, OBORO_CUSTOM_PARTS_A, OBORO_CUSTOM_PARTS_B,
+            OBORO_CUSTOM_PARTS_C, OBORO_CUSTOM_PARTS_D
+        )
     }
 }
 

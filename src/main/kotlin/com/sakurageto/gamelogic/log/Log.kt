@@ -58,6 +58,7 @@ class Log(val player: PlayerEnum, val text: LogText, val number1: Int, val numbe
         const val ATTACK_NUMBER_SOLDIER = 3
         const val ATTACK_NUMBER_IDEA = 4
         const val ATTACK_NUMBER_POISON = 5
+        const val ATTACK_NUMBER_PARTS = 6
     }
 }
 

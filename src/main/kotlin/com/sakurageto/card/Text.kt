@@ -24,6 +24,8 @@ enum class TextEffectTimingTag {
 }
 
 enum class TextEffectTag {
+    NULL,
+
     //basic tag that exist in real game
     CHASM,
     RETURN,
@@ -118,6 +120,7 @@ enum class TextEffectTag {
     WHEN_MAIN_PHASE_END_YOUR,
     RIRARURIRARO_EFFECT,
     AFTER_DEPLOYMENT,
+    WHEN_AFTER_CARD_USE_AND_MOVE_DISCARD,
 
     CONDITION_ADD_DO_WIND_AROUND,
 
@@ -129,6 +132,11 @@ enum class TextEffectTag {
     WHEN_MAIN_PHASE_YOUR,
     WHEN_MAIN_PHASE_OTHER,
     WHEN_END_PHASE_YOUR_IN_DISCARD,
+
+    CUSTOM_PART_LV_1,
+    CUSTOM_PART_LV_2,
+    CUSTOM_PART_LV_3,
+    CUSTOM_PART_LV_4,
 
     //check effect when some process is running
     END_PHASE_ADDITIONAL_CHECK,
@@ -176,6 +184,7 @@ enum class TextEffectTag {
     ACTIVE_TRANSFORM_BELOW_THIS_CARD,
     SELECT_DAMAGE_BY_ATTACKER,
     CHOJO_DAMAGE_CHANGE_OTHER,
+    WHEN_AFTER_CARD_USE_AND_MOVE_DISCARD_CONDITION,
 
     TREAT_AS_DIFFERENT_CARD,
     HATSUMI_LIGHTHOUSE,

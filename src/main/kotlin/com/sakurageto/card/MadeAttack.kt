@@ -32,6 +32,9 @@ class MadeAttack(
     private val thisTurnAttackBuff: AttackBuffQueue = AttackBuffQueue()
 
     var editedInevitable = false
+    var editedCannotReactEnchantment = false
+    var editedCannotReactAttack = false
+    var editedCannotReactBehavior = false
     var editedCannotReactNormal = false
     var editedCannotReactSpecial = false
     var editedCannotReact = false
@@ -169,20 +172,56 @@ class MadeAttack(
     suspend fun canReacted(card: Card, game_status: GameStatus, player: PlayerEnum, continuousOtherBuff: OtherBuffQueue): Boolean{
         activeOtherBuff(game_status, player, continuousOtherBuff)
 
-        if(this.editedCannotReactSpecial){
-            if(card.card_data.card_class == CardClass.SPECIAL){
-                return false
-            }
-        }
-        else if(this.editedCannotReact){
+        if(this.editedCannotReact){
             return false
         }
-        else if(this.editedCannotReactNormal){
-            if(card.card_data.card_class == CardClass.NORMAL){
-                return false
+
+        when(card.card_data.card_class){
+            CardClass.SPECIAL -> {
+                if(card.card_data.card_class == CardClass.SPECIAL){
+                    return false
+                }
             }
+            CardClass.NORMAL -> {
+                if(card.card_data.card_class == CardClass.NORMAL){
+                    return false
+                }
+            }
+            else -> {}
         }
+
+        when(card.card_data.card_type){
+            CardType.ENCHANTMENT -> {
+                if(card.card_data.card_type == CardType.ENCHANTMENT){
+                    return false
+                }
+            }
+            CardType.ATTACK -> {
+                if(card.card_data.card_type == CardType.ATTACK){
+                    return false
+                }
+            }
+            CardType.BEHAVIOR -> {
+                if(card.card_data.card_type == CardType.BEHAVIOR){
+                    return false
+                }
+            }
+            else -> {}
+        }
+
         return true
+    }
+
+    fun canNotReactEnchantment(){
+        editedCannotReactEnchantment = true
+    }
+
+    fun canNotReactAttack(){
+        editedCannotReactAttack = true
+    }
+
+    fun canNotReactBehavior(){
+        editedCannotReactBehavior = true
     }
 
     fun canNotReactNormal(){

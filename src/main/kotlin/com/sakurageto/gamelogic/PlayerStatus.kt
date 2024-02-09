@@ -105,6 +105,13 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
 
     var aiming: Int? = null
 
+    var unassemblyZone: HashMap<Int, Card>? = null
+    var assemblyCustomZone: HashMap<Int, Card>? = null
+    var assemblyMainZone: HashMap<Int, Card>? = null
+
+    fun getAssemblyZoneSize() = (assemblyCustomZone?.size ?: 0) + (assemblyMainZone?.size ?: 0)
+
+
     fun getMarketPrice() = marketPrice?: 1
     var flow: Int? = null
     fun getCapital() = aura + flare + (flow?: 0)
@@ -367,6 +374,25 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
                     }
                 }
             }
+            LocationEnum.ASSEMBLY_YOUR -> {
+                assemblyMainZone?.values?.forEach {
+                    if(condition(it, location) && condition2(it)){
+                        destList.add(it.card_number)
+                    }
+                }
+                assemblyCustomZone?.values?.forEach {
+                    if(condition(it, location) && condition2(it)){
+                        destList.add(it.card_number)
+                    }
+                }
+            }
+            LocationEnum.UNASSEMBLY_YOUR -> {
+                unassemblyZone?.values?.forEach {
+                    if(condition(it, location) && condition2(it)){
+                        destList.add(it.card_number)
+                    }
+                }
+            }
             else -> {
                 makeBugReportFile("insertCardNumberTwoCondition() do not support location: $location")
             }
@@ -473,6 +499,25 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
             }
             LocationEnum.MEMORY_YOUR -> {
                 memory?.values?.forEach{
+                    if(condition(it, location)){
+                        destList.add(it.card_number)
+                    }
+                }
+            }
+            LocationEnum.ASSEMBLY_YOUR -> {
+                assemblyMainZone?.values?.forEach {
+                    if(condition(it, location)){
+                        destList.add(it.card_number)
+                    }
+                }
+                assemblyCustomZone?.values?.forEach {
+                    if(condition(it, location)){
+                        destList.add(it.card_number)
+                    }
+                }
+            }
+            LocationEnum.UNASSEMBLY_YOUR -> {
+                unassemblyZone?.values?.forEach {
                     if(condition(it, location)){
                         destList.add(it.card_number)
                     }

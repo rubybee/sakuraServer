@@ -82,8 +82,8 @@ suspend fun sendDestructionEnchant(mine: Connection, other: Connection, card_num
 
 suspend fun sendPopCardZone(mine: Connection, other: Connection, card_number: Int, public: Boolean, command: CommandEnum){
     val dataYour = SakuraCardCommand(command, card_number)
-    val dataOther = if(public) SakuraCardCommand(command.Opposite(), card_number)
-    else SakuraCardCommand(command.Opposite(), card_number.toPrivate())
+    val dataOther = if(public) SakuraCardCommand(command.oppositeCommand(), card_number)
+    else SakuraCardCommand(command.oppositeCommand(), card_number.toPrivate())
     send(mine, Json.encodeToString(dataYour))
     send(other, Json.encodeToString(dataOther))
 }
@@ -91,8 +91,8 @@ suspend fun sendPopCardZone(mine: Connection, other: Connection, card_number: In
 suspend fun sendAddCardZone(mine: Connection, other: Connection, card_number: Int, publicForOther: Boolean, command: CommandEnum, publicForYour: Boolean = true){
     val dataYour = if(publicForYour)SakuraCardCommand(command, card_number)
     else SakuraCardCommand(command, card_number.toPrivate())
-    val dataOther = if(publicForOther) SakuraCardCommand(command.Opposite(), card_number)
-    else SakuraCardCommand(command.Opposite(), card_number.toPrivate())
+    val dataOther = if(publicForOther) SakuraCardCommand(command.oppositeCommand(), card_number)
+    else SakuraCardCommand(command.oppositeCommand(), card_number.toPrivate())
     send(mine, Json.encodeToString(dataYour))
     send(other, Json.encodeToString(dataOther))
 }
@@ -131,7 +131,7 @@ suspend fun sendMoveToken(mine: Connection, other: Connection, what: TokenEnum, 
     send(mine, Json.encodeToString(preData))
     send(other, Json.encodeToString(preData))
     val dataYour = SakuraSendData(MOVE_TOKEN, mutableListOf(what.real_number, from.real_number, to.real_number, number, card_number, card_number2))
-    val dataOther = SakuraSendData(MOVE_TOKEN, mutableListOf(what.opposite().real_number, from.Opposite().real_number, to.Opposite().real_number, number, card_number, card_number2))
+    val dataOther = SakuraSendData(MOVE_TOKEN, mutableListOf(what.opposite().real_number, from.oppositeLocation().real_number, to.oppositeLocation().real_number, number, card_number, card_number2))
     send(mine, Json.encodeToString(dataYour))
     send(other, Json.encodeToString(dataOther))
 }
@@ -237,7 +237,7 @@ suspend fun sendActionRequest(mine: Connection){
 
 suspend fun sendDoBasicAction(mine: Connection, other: Connection, command: CommandEnum, card: Int){
     val dataYour = SakuraCardCommand(command, if(card == -1) -1 else if(card >= 200000) card - 200000 else card)
-    val dataOther = SakuraCardCommand(command.Opposite(), if(card == -1) -1 else if(card >= 200000) card - 200000 else 0)
+    val dataOther = SakuraCardCommand(command.oppositeCommand(), if(card == -1) -1 else if(card >= 200000) card - 200000 else 0)
     send(mine, Json.encodeToString(dataYour))
     send(other, Json.encodeToString(dataOther))
 }
@@ -290,8 +290,8 @@ suspend fun sendSimpleSakuraData(player: Connection, list: MutableList<Int>, rea
 
 suspend fun sendShowInformation(command: CommandEnum, show_player: Connection, look_player: Connection, list: MutableList<Int>){
     val preDataShow = SakuraCardCommand(command)
-    val preDataLook = SakuraCardCommand(command.Opposite())
-    val data = SakuraSendData(command.Opposite(), list)
+    val preDataLook = SakuraCardCommand(command.oppositeCommand())
+    val data = SakuraSendData(command.oppositeCommand(), list)
     send(show_player, Json.encodeToString(preDataShow))
     send(look_player, Json.encodeToString(preDataLook))
     send(look_player, Json.encodeToString(data))
@@ -335,14 +335,14 @@ suspend fun sendSimpleCommand(mine: Connection, command: CommandEnum, card_numbe
 
 suspend fun sendSimpleCommand(mine: Connection, other: Connection, command: CommandEnum){
     val dataYour = SakuraCardCommand(command, -1)
-    val dataOther = SakuraCardCommand(command.Opposite(), -1)
+    val dataOther = SakuraCardCommand(command.oppositeCommand(), -1)
     send(mine, Json.encodeToString(dataYour))
     send(other, Json.encodeToString(dataOther))
 }
 
 suspend fun sendSimpleCommand(mine: Connection, other: Connection, command: CommandEnum, subNumber: Int){
     val dataYour = SakuraCardCommand(command, subNumber)
-    val dataOther = SakuraCardCommand(command.Opposite(), subNumber)
+    val dataOther = SakuraCardCommand(command.oppositeCommand(), subNumber)
     send(mine, Json.encodeToString(dataYour))
     send(other, Json.encodeToString(dataOther))
 }

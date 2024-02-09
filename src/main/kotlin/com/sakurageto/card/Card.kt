@@ -678,6 +678,17 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
     }
 
+    suspend fun useCustomPart(player: PlayerEnum, game_status: GameStatus, customPartUseNumber: Int, main_attack: MadeAttack?){
+        val usingTag = when(customPartUseNumber){
+            1 -> TextEffectTag.CUSTOM_PART_LV_1
+            2 -> TextEffectTag.CUSTOM_PART_LV_2
+            3 -> TextEffectTag.CUSTOM_PART_LV_3
+            4 -> TextEffectTag.CUSTOM_PART_LV_4
+            else -> TextEffectTag.NULL
+        }
+        effectText(player, game_status, main_attack, usingTag)
+    }
+
     suspend fun use(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, isTermination: Boolean,
                     nap_change: Int = -1, cardMoveCancel: Boolean, isDisprove: Boolean = false, ){
         this.card_data.effect?.let {
@@ -812,6 +823,10 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         return false
     }
 
+    suspend fun checkConditionText(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, conditionTag: TextEffectTag): Int?{
+        return effectText(player, game_status, react_attack, conditionTag)
+    }
+
     suspend fun effectText(card_number: Int, player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, tag: TextEffectTag): Int?{
         this.card_data.effect?.let {
             for(text in it){
@@ -844,8 +859,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
     }
 
-    // It is assumed that no more than two are added
-    fun addValidEffect(effectTag: TextEffectTag, queue: HashMap<Int, Text>){
+    // It is assumed that only one effect added so, if want to add more then one effect make new mechanism
+    private fun addValidEffect(effectTag: TextEffectTag, queue: HashMap<Int, Text>){
         card_data.effect?.let {
             for(text in it){
                 if(usedEffectUsable(text) || enchantmentUsable(text)){
@@ -853,6 +868,18 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         queue[this.card_number] = text
                         return
                     }
+                }
+            }
+        }
+    }
+
+    // It is assumed that only one effect added so, if want to add more then one effect make new mechanism
+    fun addEffect(effectTag: TextEffectTag, queue: HashMap<Int, Text>){
+        card_data.effect?.let {
+            for(text in it){
+                if(text.tag == effectTag) {
+                    queue[this.card_number] = text
+                    return
                 }
             }
         }

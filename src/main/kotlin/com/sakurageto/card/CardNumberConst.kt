@@ -3,6 +3,7 @@ package com.sakurageto.card
 const val NUMBER_CARD_UNAME = 0
 const val NUMBER_POISON_ANYTHING = 1
 const val NUMBER_SOLDIER_ANYTHING = 2
+const val NUMBER_PARTS_ANYTHING = 3
 
 const val NUMBER_YURINA_CHAM = 100
 const val NUMBER_YURINA_ILSUM = 101

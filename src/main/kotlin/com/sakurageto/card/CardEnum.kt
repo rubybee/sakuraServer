@@ -58,6 +58,7 @@ enum class CardName {
     POISON_ANYTHING,
     CARD_UNNAME,
     SOLDIER_ANYTHING,
+    PARTS_ANYTHING,
 
     YURINA_CHAM,
     YURINA_ILSUM,

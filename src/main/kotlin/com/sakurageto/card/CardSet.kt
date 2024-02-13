@@ -75,8 +75,10 @@ object CardSet {
 
     private fun hashMapTest(){
         val cardNameList = CardName.values()
+        val exceptionSet = setOf(CardName.CARD_UNNAME, CardName.POISON_ANYTHING, CardName.SOLDIER_ANYTHING,
+            CardName.PARTS_ANYTHING)
         for(cardName in cardNameList){
-            if(cardName == CardName.CARD_UNNAME || cardName == CardName.POISON_ANYTHING || cardName == CardName.SOLDIER_ANYTHING) {
+            if(cardName in exceptionSet) {
                 continue
             }
             if(cardName.toCardData(GameVersion.VERSION_7_2) == unused){
@@ -155,6 +157,7 @@ object CardSet {
         cardTempNumberHashmap[NUMBER_CARD_UNAME] = CardName.CARD_UNNAME
         cardTempNumberHashmap[NUMBER_POISON_ANYTHING] = CardName.POISON_ANYTHING
         cardTempNumberHashmap[NUMBER_SOLDIER_ANYTHING] = CardName.SOLDIER_ANYTHING
+        cardTempNumberHashmap[NUMBER_PARTS_ANYTHING] = CardName.PARTS_ANYTHING
 
         cardTempNumberHashmap[NUMBER_YURINA_CHAM] = CardName.YURINA_CHAM
         cardTempNumberHashmap[NUMBER_YURINA_ILSUM] = CardName.YURINA_ILSUM
@@ -600,6 +603,7 @@ object CardSet {
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_CARD_UNAME] = CardName.CARD_UNNAME
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_POISON_ANYTHING] = CardName.POISON_ANYTHING
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_SOLDIER_ANYTHING] = CardName.SOLDIER_ANYTHING
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_PARTS_ANYTHING] = CardName.PARTS_ANYTHING
 
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_CHAM] = CardName.YURINA_CHAM
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_YURINA_ILSUM] = CardName.YURINA_ILSUM
@@ -14506,8 +14510,8 @@ object CardSet {
             listOf(LocationEnum.ASSEMBLY_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, reason)
         {_, _ -> true} ?.let { selected ->
             for (card_number in selected){
-                game_status.popCardFrom(player, card_number, LocationEnum.ASSEMBLY_YOUR, false)?.let{
-                    game_status.insertCardTo(player, it, LocationEnum.UNASSEMBLY_YOUR, false)
+                game_status.popCardFrom(player, card_number, LocationEnum.ASSEMBLY_YOUR, true)?.let{
+                    game_status.insertCardTo(player, it, LocationEnum.UNASSEMBLY_YOUR, true)
                 }
             }
         }
@@ -14821,13 +14825,29 @@ private val perjureSet = setOf(
 
 fun Int.isPerjure() = this in perjureSet
 
+private val customPartsSet = setOf(
+    NUMBER_OBORO_CUSTOM_PARTS_A, NUMBER_OBORO_CUSTOM_PARTS_B, NUMBER_OBORO_CUSTOM_PARTS_C, NUMBER_OBORO_CUSTOM_PARTS_D,
+    NUMBER_OBORO_MAIN_PARTS_X, NUMBER_OBORO_MAIN_PARTS_Y, NUMBER_OBORO_MAIN_PARTS_Z,
+    SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_CUSTOM_PARTS_A,
+    SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_CUSTOM_PARTS_B,
+    SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_CUSTOM_PARTS_C,
+    SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_CUSTOM_PARTS_D,
+    SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_MAIN_PARTS_X,
+    SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_MAIN_PARTS_Y,
+    SECOND_PLAYER_START_NUMBER + NUMBER_OBORO_MAIN_PARTS_Z,
+)
+
+fun Int.isParts() = this in customPartsSet
+
 fun Int.toPrivate(): Int{
     return if(this.isPoison()){
-        1
+        NUMBER_POISON_ANYTHING
     } else if(this.isSoldier()){
-        2
+        NUMBER_SOLDIER_ANYTHING
+    } else if(this.isParts()){
+        NUMBER_PARTS_ANYTHING
     } else{
-        0
+        NUMBER_CARD_UNAME
     }
 }
 

@@ -2987,10 +2987,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     private suspend fun reactCheck(react_player: PlayerEnum, card: Card, attack: MadeAttack): Boolean{
-        if(card.canUseAtReact(react_player, this)){
-            if(card.canReactable(attack, this, react_player, getPlayerOtherBuff(react_player.opposite()))){
-                return true
-            }
+        if(card.canUseAtReact(react_player, this) &&
+            card.canReactAt(attack, this, react_player, getPlayerOtherBuff(react_player.opposite()))){
+            return true
         }
         return false
     }
@@ -3160,7 +3159,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         nowPlayer.preAttackCard = null
     }
 
-    suspend fun divingProcess(player: PlayerEnum, card: Card?): Boolean{
+    private suspend fun divingProcess(player: PlayerEnum, card: Card?): Boolean{
         val otherPlayer = getPlayer(player.opposite())
 
         when(otherPlayer.forwardDiving){
@@ -3172,13 +3171,14 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 sendSimpleCommand(getSocket(player), CommandEnum.DIVING_FORWARD)
                 addThisTurnDistance(-1)
                 addThisTurnSwellDistance(-1)
-
+                otherPlayer.forwardDiving = null
             }
             false -> {
                 sendSimpleCommand(getSocket(player.opposite()), CommandEnum.DIVING_SHOW)
                 sendSimpleCommand(getSocket(player), CommandEnum.DIVING_BACKWARD)
                 addThisTurnDistance(1)
                 addThisTurnSwellDistance(1)
+                otherPlayer.forwardDiving = null
             }
         }
 
@@ -3711,40 +3711,22 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
+    /**
+     * @return 1. true means player's command is valid, so proceed remain process
+     * 2. false means player command is invalid, so request again
+     */
     private suspend fun reactProcess(react_player: PlayerEnum, react: Pair<CommandEnum, Int>, nowAttack: MadeAttack): Boolean{
         val reactPlayer = getPlayer(react_player)
-        if(react.first == CommandEnum.REACT_USE_CARD_HAND){
-            val card = reactPlayer.getCardFromHand(react.second)?: return false
-            if(reactCheck(react_player, card, nowAttack)){
-                if(useCardFrom(react_player, card, LocationEnum.HAND, true, nowAttack,
-                        isCost = true, isConsume = true)) {
-                    reactPlayer.thisTurnReact = true
-                    return true
-                }
-            }
-
+        val location = when (react.first) {
+            CommandEnum.REACT_USE_CARD_HAND -> LocationEnum.HAND
+            CommandEnum.REACT_USE_CARD_SPECIAL -> LocationEnum.SPECIAL_CARD
+            CommandEnum.REACT_USE_CARD_SOLDIER -> LocationEnum.READY_SOLDIER_ZONE
+            CommandEnum.REACT_NO -> return true
+            else -> return false
         }
-        else if(react.first == CommandEnum.REACT_USE_CARD_SPECIAL){
-            val card = reactPlayer.getCardFromSpecial(react.second)?: return false
-            if(reactCheck(react_player, card, nowAttack)){
-                if(useCardFrom(react_player, card, LocationEnum.SPECIAL_CARD, true, nowAttack,
-                        isCost = true, isConsume = true)) {
-                    reactPlayer.thisTurnReact = true
-                    return true
-                }
-            }
-        }
-        else if(react.first == CommandEnum.REACT_USE_CARD_SOLDIER){
-            val card = reactPlayer.getCardFromSoldier(react.second)?: return false
-            if(reactCheck(react_player, card, nowAttack)){
-                if(useCardFrom(react_player, card, LocationEnum.READY_SOLDIER_ZONE, true, nowAttack,
-                        isCost = true, isConsume = true)) {
-                    reactPlayer.thisTurnReact = true
-                    return true
-                }
-            }
-        }
-        else{
+        val card = getCardFrom(react_player, react.second, location)?: return false
+        if(reactCheck(react_player, card, nowAttack) && useCardFrom(react_player, card, location, true, nowAttack, isCost = true, isConsume = true)){
+            reactPlayer.thisTurnReact = true
             return true
         }
         return false
@@ -4692,7 +4674,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 removeArtificialToken()
             }
             CardEffectLocation.DIVING -> {
-                divingProcess(turnPlayer.opposite(), null)
+                divingProcess(turnPlayer, null)
             }
             CardEffectLocation.EFFECT_LACERATION -> {
                 processAllLacerationDamage(turnPlayer)
@@ -4714,18 +4696,18 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         when(turnPlayer){
             PlayerEnum.PLAYER1 -> {
                 if(player1ArtificialTokenOn != 0 || player1ArtificialTokenOut != 0) {
-                    startPhaseEffect[0] = Pair(CardEffectLocation.ARTIFICIAL_TOKEN, null)
+                    startPhaseEffect[NUMBER_CARD_UNAME] = Pair(CardEffectLocation.ARTIFICIAL_TOKEN, null)
                 }
                 if(player1.forwardDiving != null){
-                    startPhaseEffect[1] = Pair(CardEffectLocation.DIVING, null)
+                    startPhaseEffect[NUMBER_POISON_ANYTHING] = Pair(CardEffectLocation.DIVING, null)
                 }
             }
             PlayerEnum.PLAYER2 -> {
                 if(player2ArtificialTokenOn != 0 || player2ArtificialTokenOut != 0) {
-                    startPhaseEffect[0] = Pair(CardEffectLocation.ARTIFICIAL_TOKEN, null)
+                    startPhaseEffect[NUMBER_CARD_UNAME] = Pair(CardEffectLocation.ARTIFICIAL_TOKEN, null)
                 }
                 if(player2.forwardDiving != null){
-                    startPhaseEffect[1] = Pair(CardEffectLocation.DIVING, null)
+                    startPhaseEffect[NUMBER_POISON_ANYTHING] = Pair(CardEffectLocation.DIVING, null)
                 }
             }
         }
@@ -4736,10 +4718,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         for(card in nowPlayer.usedSpecialCard.values){
             card.effectAllValidEffect(turnPlayer, this, TextEffectTag.WHEN_START_PHASE_YOUR)
         }
+
         for(card in otherPlayer.enchantmentCard.values){
             card.effectAllValidEffect(turnPlayer.opposite(), this, TextEffectTag.WHEN_START_PHASE_OTHER)
         }
-        for(card in otherPlayer.enchantmentCard.values){
+        for(card in otherPlayer.usedSpecialCard.values){
             card.effectAllValidEffect(turnPlayer.opposite(), this, TextEffectTag.WHEN_START_PHASE_OTHER)
         }
 
@@ -4860,7 +4843,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                         }
                     }
                     CardEffectLocation.DISCARD_YOUR -> {
-                        if(nowPlayer.isDiscardHave(nowKey)){
+                        if(!(nowPlayer.isDiscardHave(nowKey))){
                             return@ret null
                         }
                     }
@@ -5206,16 +5189,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     private suspend fun disassembleAll(player: PlayerEnum){
         val nowPlayer = getPlayer(player)
 
-        nowPlayer.assemblyMainZone?.let { mainParts ->
-            for (card_number in mainParts.keys){
-                popCardFrom(player, card_number, LocationEnum.ASSEMBLY_YOUR, true)?.let {
-                    insertCardTo(player, it, LocationEnum.UNASSEMBLY_YOUR, true)
-                }
-            }
-        }
-
-        nowPlayer.unassemblyZone?.let { customParts ->
-            for (card_number in customParts.keys){
+        nowPlayer.assemblyZone?.let { parts ->
+            for (card_number in parts.keys.toList()){
                 popCardFrom(player, card_number, LocationEnum.ASSEMBLY_YOUR, true)?.let {
                     insertCardTo(player, it, LocationEnum.UNASSEMBLY_YOUR, true)
                 }
@@ -5253,7 +5228,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     private suspend fun digitalInstallation(player: PlayerEnum): Boolean{
         val nowPlayer = getPlayer(player)
-        nowPlayer.assemblyMainZone?.let ret@{assemblyZone ->
+        nowPlayer.assemblyZone?.let ret@{assemblyZone ->
             if(assemblyZone.size == 0) return@ret null
 
             while(true){
@@ -5658,12 +5633,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             sendDoBasicAction(nowSocket, otherSocket, CommandEnum.ACTION_GO_FORWARD_YOUR, card)
             distanceToAura(player, 1, Arrow.NULL, PlayerEnum.PLAYER1, PlayerEnum.PLAYER2, Log.BASIC_OPERATION)
             for(enchantmentCard in getPlayer(player.opposite()).enchantmentCard.values){
-                enchantmentCard.effectAllValidEffect(enchantmentCard.card_number,
-                    player.opposite(), this, TextEffectTag.WHEN_AFTER_BASIC_OPERATION_OTHER_MOVE_AURA)
+                enchantmentCard.effectAllValidEffect(player.opposite(), this, TextEffectTag.WHEN_AFTER_BASIC_OPERATION_OTHER_MOVE_AURA)
             }
         }
-
-
     }
 
     //this 5 function must call after check when select
@@ -5675,8 +5647,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             sendDoBasicAction(nowSocket, otherSocket, CommandEnum.ACTION_GO_BACKWARD_YOUR, card)
             auraToDistance(player, 1 , Arrow.NULL, PlayerEnum.PLAYER1, PlayerEnum.PLAYER2, Log.BASIC_OPERATION)
             for(enchantmentCard in getPlayer(player.opposite()).enchantmentCard.values){
-                enchantmentCard.effectAllValidEffect(enchantmentCard.card_number,
-                    player.opposite(), this, TextEffectTag.WHEN_AFTER_BASIC_OPERATION_OTHER_MOVE_AURA)
+                enchantmentCard.effectAllValidEffect(player.opposite(), this, TextEffectTag.WHEN_AFTER_BASIC_OPERATION_OTHER_MOVE_AURA)
             }
         }
     }
@@ -5699,8 +5670,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             sendDoBasicAction(nowSocket, otherSocket, CommandEnum.ACTION_WIND_AROUND_YOUR, card)
             dustToAura(player, 1, Arrow.NULL, PlayerEnum.PLAYER1 , PlayerEnum.PLAYER2, Log.BASIC_OPERATION)
             for(enchantmentCard in getPlayer(player.opposite()).enchantmentCard.values){
-                enchantmentCard.effectAllValidEffect(enchantmentCard.card_number,
-                    player.opposite(), this, TextEffectTag.WHEN_AFTER_BASIC_OPERATION_OTHER_MOVE_AURA)
+                enchantmentCard.effectAllValidEffect(player.opposite(), this, TextEffectTag.WHEN_AFTER_BASIC_OPERATION_OTHER_MOVE_AURA)
             }
         }
         return true
@@ -5723,8 +5693,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             else{
                 auraToFlare(player, player, 1, Arrow.NULL, PlayerEnum.PLAYER1, PlayerEnum.PLAYER2, Log.BASIC_OPERATION)
                 for(enchantmentCard in getPlayer(player.opposite()).enchantmentCard.values){
-                    enchantmentCard.effectAllValidEffect(enchantmentCard.card_number,
-                        player.opposite(), this, TextEffectTag.WHEN_AFTER_BASIC_OPERATION_OTHER_MOVE_AURA)
+                    enchantmentCard.effectAllValidEffect(player.opposite(), this, TextEffectTag.WHEN_AFTER_BASIC_OPERATION_OTHER_MOVE_AURA)
                 }
             }
         }
@@ -5737,11 +5706,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             val otherSocket = getSocket(player.opposite())
 
             sendDoBasicAction(nowSocket, otherSocket, CommandEnum.ACTION_BREAK_AWAY_YOUR, card)
-            dust -= 1
-            distanceToken += 1
-            sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
-                LocationEnum.DUST, LocationEnum.DISTANCE, 1, -1)
-            whenDistanceChange()
+            dustToDistance(1, Arrow.NULL, PlayerEnum.PLAYER1, PlayerEnum.PLAYER2, Log.BASIC_OPERATION)
         }
     }
 
@@ -6043,23 +6008,15 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 return result
             }
             LocationEnum.ASSEMBLY_YOUR -> {
-                val result = nowPlayer.assemblyMainZone?.get(card_number)?.apply {
-                    sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_MAIN_ASSEMBLY_YOUR)
-                    nowPlayer.assemblyMainZone?.remove(card_number)
-                }?: nowPlayer.unassemblyZone?.get(card_number)?.apply {
-                    sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_CUSTOM_ASSEMBLY_YOUR)
-                    nowPlayer.assemblyCustomZone?.remove(card_number)
-                }
+                val result = nowPlayer.assemblyZone?.get(card_number)?: return null
+                sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_ASSEMBLY_YOUR)
+                nowPlayer.assemblyZone?.remove(card_number)
                 return result
             }
             LocationEnum.ASSEMBLY_OTHER -> {
-                val result = otherPlayer.assemblyMainZone?.get(card_number)?.apply {
-                    sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_MAIN_ASSEMBLY_OTHER)
-                    otherPlayer.assemblyMainZone?.remove(card_number)
-                }?: otherPlayer.unassemblyZone?.get(card_number)?.apply {
-                    sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_CUSTOM_ASSEMBLY_OTHER)
-                    otherPlayer.assemblyCustomZone?.remove(card_number)
-                }
+                val result = otherPlayer.assemblyZone?.get(card_number)?: return null
+                sendPopCardZone(nowSocket, otherSocket, card_number, public, CommandEnum.POP_ASSEMBLY_OTHER)
+                otherPlayer.assemblyZone?.remove(card_number)
                 return result
             }
             else -> {
@@ -6266,34 +6223,17 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
             LocationEnum.ASSEMBLY_YOUR -> {
                 card.location = LocationEnum.ASSEMBLY_YOUR
-                if(card.card_data.card_class == CardClass.MAIN_PARTS){
-                    getPlayer(player).assemblyMainZone?.let {
-                        it[card.card_number] = card
-                        sendAddCardZone(nowSocket, otherSocket, card.card_number, publicForOther, CommandEnum.MAIN_ASSEMBLY_YOUR, publicForYour)
-                    }
-                }
-                else{
-                    getPlayer(player).assemblyCustomZone?.let {
-                        it[card.card_number] = card
-                        sendAddCardZone(nowSocket, otherSocket, card.card_number, publicForOther, CommandEnum.CUSTOM_ASSEMBLY_YOUR, publicForYour)
-                    }
+                getPlayer(player).assemblyZone?.let {
+                    it[card.card_number] = card
+                    sendAddCardZone(nowSocket, otherSocket, card.card_number, publicForOther, CommandEnum.ASSEMBLY_YOUR, publicForYour)
                 }
             }
             LocationEnum.ASSEMBLY_OTHER -> {
                 card.location = LocationEnum.ASSEMBLY_YOUR
-                if(card.card_data.card_class == CardClass.MAIN_PARTS){
-                    getPlayer(player.opposite()).assemblyMainZone?.let {
-                        it[card.card_number] = card
-                        sendAddCardZone(nowSocket, otherSocket, card.card_number, publicForOther, CommandEnum.MAIN_ASSEMBLY_OTHER, publicForYour)
-                    }
+                getPlayer(player.opposite()).assemblyZone?.let {
+                    it[card.card_number] = card
+                    sendAddCardZone(nowSocket, otherSocket, card.card_number, publicForOther, CommandEnum.ASSEMBLY_OTHER, publicForYour)
                 }
-                else{
-                    getPlayer(player.opposite()).assemblyCustomZone?.let {
-                        it[card.card_number] = card
-                        sendAddCardZone(nowSocket, otherSocket, card.card_number, publicForOther, CommandEnum.CUSTOM_ASSEMBLY_OTHER, publicForYour)
-                    }
-                }
-
             }
             else -> {
                 makeBugReportFile("insertCardTo() do not support location: $location")
@@ -6311,11 +6251,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             CommandEnum.SHOW_HAND_YOUR -> list.addAll(nowPlayer.hand.keys)
             CommandEnum.SHOW_SPECIAL_YOUR -> list.addAll(nowPlayer.specialCardDeck.keys)
             CommandEnum.SHOW_ASSEMBLY_YOUR -> {
-                nowPlayer.assemblyMainZone?.let { mainParts ->
+                nowPlayer.assemblyZone?.let { mainParts ->
                     list.addAll(mainParts.keys)
-                }
-                nowPlayer.assemblyCustomZone?.let { customParts ->
-                    list.addAll(customParts.keys)
                 }
             }
             else -> {
@@ -6420,7 +6357,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 otherPlayer.anvil
             }
             LocationEnum.ASSEMBLY_YOUR -> {
-                nowPlayer.assemblyMainZone?.get(card_number)?: nowPlayer.assemblyCustomZone?.get(card_number)
+                nowPlayer.assemblyZone?.get(card_number)
             }
             LocationEnum.UNASSEMBLY_YOUR -> {
                 nowPlayer.unassemblyZone?.get(card_number)

@@ -178,12 +178,12 @@ class MadeAttack(
 
         when(card.card_data.card_class){
             CardClass.SPECIAL -> {
-                if(card.card_data.card_class == CardClass.SPECIAL){
+                if(this.editedCannotReactSpecial){
                     return false
                 }
             }
             CardClass.NORMAL -> {
-                if(card.card_data.card_class == CardClass.NORMAL){
+                if(this.editedCannotReactNormal){
                     return false
                 }
             }
@@ -192,17 +192,17 @@ class MadeAttack(
 
         when(card.card_data.card_type){
             CardType.ENCHANTMENT -> {
-                if(card.card_data.card_type == CardType.ENCHANTMENT){
+                if(this.editedCannotReactEnchantment){
                     return false
                 }
             }
             CardType.ATTACK -> {
-                if(card.card_data.card_type == CardType.ATTACK){
+                if(this.editedCannotReactAttack){
                     return false
                 }
             }
             CardType.BEHAVIOR -> {
-                if(card.card_data.card_type == CardType.BEHAVIOR){
+                if(this.editedCannotReactBehavior){
                     return false
                 }
             }

@@ -8,11 +8,28 @@ import io.ktor.websocket.*
 import kotlinx.coroutines.delay
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 val json = Json { ignoreUnknownKeys = true; coerceInputValues = true}
 
 val cardEffectSelectCommandSet =
     setOf(SELECT_ONE, SELECT_TWO, SELECT_THREE, SELECT_FOUR, SELECT_FIVE, SELECT_SIX, SELECT_SEVEN, SELECT_EIGHT, SELECT_NINE, SELECT_TEN, SELECT_NOT)
+
+val logger: Logger = LoggerFactory.getLogger("WebSocketLogger")
+
+suspend fun receiveData(player: Connection): Frame{
+    val frame = player.session.incoming.receive()
+    if(frame is Frame.Text){
+        logger.info("(GameRoom${player.roomNumber}) receive message from ${player.socketPlayer}: ${frame.readText()}")
+    }
+    return frame
+}
+
+suspend fun sendData(player: Connection, data: String){
+    logger.info("(GameRoom${player.roomNumber}) send message to ${player.socketPlayer}: $data")
+    player.session.send(data)
+}
 
 suspend fun waitReconnect(player: Connection){
     player.disconnectTime = System.currentTimeMillis()
@@ -26,8 +43,8 @@ suspend fun waitReconnect(player: Connection){
 
 suspend fun send(player: Connection, data: String){
     try {
-        player.session.send(data)
-        val frame = player.session.incoming.receive()
+        sendData(player, data)
+        val frame = receiveData(player)
         if (frame is Frame.Text) {
             val text = frame.readText()
             try {
@@ -353,7 +370,7 @@ suspend fun waitUntil(player: Connection, wait_command: CommandEnum): SakuraSend
 
     while (true) {
         try {
-            val frame = player.session.incoming.receive()
+            val frame = receiveData(player)
             if (frame is Frame.Text) {
                 val text = frame.readText()
                 try {
@@ -377,7 +394,7 @@ suspend fun waitCardSetUntil(player: Connection, wait_command: CommandEnum): Sak
 
     while (true){
         try {
-            val frame = player.session.incoming.receive()
+            val frame = receiveData(player)
             if (frame is Frame.Text) {
                 val text = frame.readText()
                 try{
@@ -401,7 +418,7 @@ suspend fun receiveEnchantment(player: Connection): Pair<CommandEnum, Int> {
 
     while (true){
         try {
-            val frame = player.session.incoming.receive()
+            val frame = receiveData(player)
             if (frame is Frame.Text) {
                 val text = frame.readText()
                 try {
@@ -428,7 +445,7 @@ suspend fun receiveReact(player: Connection): Pair<CommandEnum, Int> {
 
     while (true){
         try {
-            val frame = player.session.incoming.receive()
+            val frame = receiveData(player)
             if (frame is Frame.Text) {
                 val text = frame.readText()
                 try {
@@ -455,7 +472,7 @@ suspend fun receiveChooseDamage(player: Connection): CommandEnum {
 
     while (true){
         try {
-            val frame = player.session.incoming.receive()
+            val frame = receiveData(player)
             if (frame is Frame.Text) {
                 val text = frame.readText()
                 try {
@@ -478,8 +495,8 @@ suspend fun receiveChooseDamage(player: Connection): CommandEnum {
 }
 
 suspend fun receiveNapInformation(player: Connection, total: Int, card_number: Int, command: CommandEnum): Pair<Int, Int> {
-    player.session.send(Json.encodeToString(SakuraCardCommand(command, card_number)))
-    player.session.send(Json.encodeToString(SakuraSendData(command, mutableListOf(total))))
+    send(player, Json.encodeToString(SakuraCardCommand(command, card_number)))
+    send(player, Json.encodeToString(SakuraSendData(command, mutableListOf(total))))
     return receiveNapInformationMain(player, total, card_number, command)
 }
 
@@ -488,7 +505,7 @@ suspend fun receiveNapInformationMain(player: Connection, total: Int, card_numbe
 
     while (true){
         try {
-            val frame = player.session.incoming.receive()
+            val frame = receiveData(player)
             if (frame is Frame.Text) {
                 val text = frame.readText()
                 try {
@@ -515,7 +532,7 @@ suspend fun receiveNapInformationMain(player: Connection, total: Int, card_numbe
 }
 
 suspend fun receiveReconstructRequest(player: Connection): Boolean{
-    player.session.send(Json.encodeToString(SakuraCardCommand(DECK_RECONSTRUCT_REQUEST, -1)))
+    send(player, Json.encodeToString(SakuraCardCommand(DECK_RECONSTRUCT_REQUEST, -1)))
     return receiveReconstructRequestMain(player)
 }
 
@@ -524,7 +541,7 @@ suspend fun receiveReconstructRequestMain(player: Connection): Boolean{
 
     while (true){
         try {
-            val frame = player.session.incoming.receive()
+            val frame = receiveData(player)
             if (frame is Frame.Text) {
                 val text = frame.readText()
                 return try {
@@ -556,7 +573,7 @@ suspend fun receiveFullPowerRequestMain(player: Connection): Boolean {
     val json = Json { ignoreUnknownKeys = true; coerceInputValues = true }
     while (true) {
         try {
-            val frame = player.session.incoming.receive()
+            val frame = receiveData(player)
             if (frame is Frame.Text) {
                 val text = frame.readText()
                 return try {
@@ -589,7 +606,7 @@ suspend fun receiveFullPowerActionRequestMain(player: Connection): Pair<CommandE
 
     while (true) {
         try {
-            val frame = player.session.incoming.receive()
+            val frame = receiveData(player)
             if (frame is Frame.Text) {
                 val text = frame.readText()
                 try{
@@ -616,7 +633,7 @@ suspend fun receiveActionRequestMain(player: Connection): Pair<CommandEnum, Int>
 
     while (true) {
         try {
-            val frame = player.session.incoming.receive()
+            val frame = receiveData(player)
             if (frame is Frame.Text) {
                 val text = frame.readText()
                 try {
@@ -643,7 +660,7 @@ suspend fun receiveCardEffectOrderMain(player: Connection, command: CommandEnum,
 
     while (true) {
         try {
-            val frame = player.session.incoming.receive()
+            val frame = receiveData(player)
             if (frame is Frame.Text) {
                 val text = frame.readText()
                 try {
@@ -675,7 +692,7 @@ suspend fun receiveCoverCardSelectMain(player: Connection, list: MutableList<Int
 
     while (true) {
         try {
-            val frame = player.session.incoming.receive()
+            val frame = receiveData(player)
             if (frame is Frame.Text) {
                 val text = frame.readText()
                 try {
@@ -707,7 +724,7 @@ suspend fun receiveCardEffectSelectMain(player: Connection, card_number: Int): C
 
     while (true) {
         try {
-            val frame = player.session.incoming.receive()
+            val frame = receiveData(player)
             if (frame is Frame.Text) {
                 val text = frame.readText()
                 try {
@@ -741,7 +758,7 @@ suspend fun receiveAuraDamageSelectMain(player: Connection, place_list: MutableL
 
     while (true) {
         try {
-            val frame = player.session.incoming.receive()
+            val frame = receiveData(player)
             if (frame is Frame.Text) {
                 val text = frame.readText()
                 try {
@@ -772,7 +789,7 @@ suspend fun receiveSelectCardMain(player: Connection, card_list: MutableList<Int
 
     while (true) {
         try {
-            val frame = player.session.incoming.receive()
+            val frame = receiveData(player)
             if (frame is Frame.Text) {
                 val text = frame.readText()
                 try {
@@ -812,7 +829,7 @@ suspend fun receiveBasicOperationMain(player: Connection): CommandEnum{
 
     while (true) {
         try {
-            val frame = player.session.incoming.receive()
+            val frame = receiveData(player)
             if (frame is Frame.Text) {
                 val text = frame.readText()
                 return try {
@@ -840,7 +857,7 @@ suspend fun receiveSelectActMain(player: Connection, act_list: MutableList<Int>,
 
     while (true) {
         try {
-            val frame = player.session.incoming.receive()
+            val frame = receiveData(player)
             if (frame is Frame.Text) {
                 val text = frame.readText()
                 try {
@@ -871,7 +888,7 @@ suspend fun receiveSelectDisproveMain(player: Connection, card_number: Int): Com
 
     while (true) {
         try {
-            val frame = player.session.incoming.receive()
+            val frame = receiveData(player)
             if (frame is Frame.Text) {
                 val text = frame.readText()
                 try {
@@ -901,7 +918,7 @@ suspend fun receiveSimpleCommandMain(player: Connection): CommandEnum{
 
     while (true) {
         try {
-            val frame = player.session.incoming.receive()
+            val frame = receiveData(player)
             if (frame is Frame.Text) {
                 val text = frame.readText()
                 try {

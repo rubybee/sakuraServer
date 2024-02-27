@@ -11,6 +11,7 @@ import com.sakurageto.card.PlayerEnum
 import com.sakurageto.gamelogic.SakuraGame
 import kotlinx.coroutines.delay
 import java.lang.NumberFormatException
+import org.slf4j.LoggerFactory
 
 fun Application.configureSockets() {
     install(WebSockets) {
@@ -41,6 +42,7 @@ fun Application.configureSockets() {
 
         webSocket("/play/{roomNumber}") {
             try {
+                val logger = LoggerFactory.getLogger("WebSocketLogger")
                 call.parameters["roomNumber"]?.toInt()?.let {
                     RoomInformation.roomHashMap[it]?.let { room ->
                         if(room.waitStatus){
@@ -65,6 +67,7 @@ fun Application.configureSockets() {
                                 val now1 = room.firstUserConnection!!
                                 val now2 = room.secondUserConnection!!
                                 val game = SakuraGame(it, now1, now2)
+                                logger.info("GameRoom Num$it: startGame()")
                                 game.startGame()
                             }
                         }
@@ -81,12 +84,13 @@ fun Application.configureSockets() {
                     RoomInformation.roomHashMap[roomNumber]?.let { room ->
                         call.parameters["userCode"]?.toInt()?.let { userCode ->
                             if(room.firstUserCode == userCode){
-                                println("player1 reconnect")
                                 room.firstUserConnection?.session?.incoming?.cancel()
                                 room.firstUserConnection?.session?.close()
                                 while(room.firstUserConnection?.disconnectTime == -1L){
                                     delay(500)
                                 }
+                                val logger = LoggerFactory.getLogger("WebSocketLogger")
+                                logger.info("GameRoom Num$roomNumber: reconnect Player1")
                                 room.firstUserConnection?.session = this
                                 room.firstUserConnection?.disconnectTime = -1L
                                 while(true){
@@ -97,7 +101,6 @@ fun Application.configureSockets() {
                                 }
                             }
                             else if(room.secondUserCode == userCode){
-                                println("player2 reconnect")
                                 room.secondUserConnection?.session?.incoming?.cancel()
                                 room.secondUserConnection?.session?.close()
                                 while(room.secondUserConnection?.disconnectTime == -1L){
@@ -106,6 +109,8 @@ fun Application.configureSockets() {
                                     }
                                     delay(500)
                                 }
+                                val logger = LoggerFactory.getLogger("WebSocketLogger")
+                                logger.info("GameRoom Num$roomNumber: reconnect Player2")
                                 room.secondUserConnection?.session = this
                                 room.secondUserConnection?.disconnectTime = -1L
                                 while(true){

@@ -106,10 +106,9 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var aiming: Int? = null
 
     var unassemblyZone: HashMap<Int, Card>? = null
-    var assemblyCustomZone: HashMap<Int, Card>? = null
-    var assemblyMainZone: HashMap<Int, Card>? = null
+    var assemblyZone: HashMap<Int, Card>? = null
 
-    fun getAssemblyZoneSize() = (assemblyCustomZone?.size ?: 0) + (assemblyMainZone?.size ?: 0)
+    fun getAssemblyZoneSize() = assemblyZone?.size ?: 0
 
 
     fun getMarketPrice() = marketPrice?: 1
@@ -255,7 +254,6 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     }
 
     //game logic function(get card information)
-    fun getCardFromSoldier(card_number: Int) = readySoldierZone[card_number]
     fun getCardFromHand(card_number: Int) = hand[card_number]
     fun getCardFromEnchantment(card_number: Int) = enchantmentCard[card_number]
     fun getCardFromSpecial(card_number: Int) = specialCardDeck[card_number]
@@ -375,12 +373,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
                 }
             }
             LocationEnum.ASSEMBLY_YOUR -> {
-                assemblyMainZone?.values?.forEach {
-                    if(condition(it, location) && condition2(it)){
-                        destList.add(it.card_number)
-                    }
-                }
-                assemblyCustomZone?.values?.forEach {
+                assemblyZone?.values?.forEach {
                     if(condition(it, location) && condition2(it)){
                         destList.add(it.card_number)
                     }
@@ -505,12 +498,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
                 }
             }
             LocationEnum.ASSEMBLY_YOUR -> {
-                assemblyMainZone?.values?.forEach {
-                    if(condition(it, location)){
-                        destList.add(it.card_number)
-                    }
-                }
-                assemblyCustomZone?.values?.forEach {
+                assemblyZone?.values?.forEach {
                     if(condition(it, location)){
                         destList.add(it.card_number)
                     }

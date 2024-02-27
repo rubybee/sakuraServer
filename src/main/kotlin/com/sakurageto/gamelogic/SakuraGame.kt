@@ -8,7 +8,6 @@ import com.sakurageto.gamelogic.GameStatus.Companion.MAIN_PHASE
 import com.sakurageto.gamelogic.GameStatus.Companion.START_PHASE
 import com.sakurageto.gamelogic.megamispecial.storyboard.StoryBoard
 import com.sakurageto.protocol.*
-import io.ktor.websocket.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.random.Random
@@ -43,13 +42,13 @@ class SakuraGame(private val roomNumber: Int, val player1: Connection, val playe
         val json = Json { ignoreUnknownKeys = true; coerceInputValues = true; encodeDefaults = true;}
         val dataPlayer1 = SakuraCardCommand(CommandEnum.SELECT_VERSION_OTHER, firstCode)
         val dataPlayer2 = SakuraCardCommand(CommandEnum.SELECT_VERSION_YOUR, secondCode)
-        player1.session.send(json.encodeToString(dataPlayer1))
-        player2.session.send(json.encodeToString(dataPlayer2))
+        send(player1, json.encodeToString(dataPlayer1))
+        send(player2, json.encodeToString(dataPlayer2))
         val dataGet = waitUntil(player2, CommandEnum.SELECT_VERSION_YOUR).data?: mutableListOf(0)
         val version = if(dataGet.size != 0) GameVersion.fromInt(dataGet[0]) else GameVersion.VERSION_7_2
         val endData = SakuraCardCommand(CommandEnum.SET_VERSION, version.real_number)
-        player1.session.send(json.encodeToString(endData))
-        player2.session.send(json.encodeToString(endData))
+        send(player1, json.encodeToString(endData))
+        send(player2, json.encodeToString(endData))
         gameStatus.version = version
     }
 
@@ -57,8 +56,8 @@ class SakuraGame(private val roomNumber: Int, val player1: Connection, val playe
         val json = Json { ignoreUnknownKeys = true; coerceInputValues = true; encodeDefaults = true;}
         val dataPlayer1 = SakuraCardCommand(CommandEnum.SELECT_MODE_OTHER)
         val dataPlayer2 = SakuraCardCommand(CommandEnum.SELECT_MODE_YOUR)
-        player1.session.send(json.encodeToString(dataPlayer1))
-        player2.session.send(json.encodeToString(dataPlayer2))
+        send(player1, json.encodeToString(dataPlayer1))
+        send(player2, json.encodeToString(dataPlayer2))
         val dataGet = waitUntil(player2, CommandEnum.SELECT_MODE_YOUR).data?: mutableListOf(0)
         val mode = if (dataGet.isEmpty()) 0 else dataGet[0]
         if(mode == 0){
@@ -72,15 +71,15 @@ class SakuraGame(private val roomNumber: Int, val player1: Connection, val playe
     private suspend fun selectEnd(){
         val data = SakuraSendData(CommandEnum.END_OF_SELECTMODE, mutableListOf(gameMode.real_number))
         val sendData = Json.encodeToString(data)
-        player1.session.send(sendData)
-        player2.session.send(sendData)
+        send(player1, sendData)
+        send(player2, sendData)
     }
 
     private suspend fun selectMegami(){
         val data = SakuraCardCommand(CommandEnum.SELECT_MEGAMI, -1)
         val sendData = Json.encodeToString(data)
-        player1.session.send(sendData)
-        player2.session.send(sendData)
+        send(player1, sendData)
+        send(player2, sendData)
         val player1Data = waitUntil(player1, CommandEnum.SELECT_MEGAMI)
         val player2Data = waitUntil(player2, CommandEnum.SELECT_MEGAMI)
         if(gameMode == GameMode.SSANG_JANG_YO_LAN){
@@ -96,8 +95,8 @@ class SakuraGame(private val roomNumber: Int, val player1: Connection, val playe
     private suspend fun checkMegami(){
         val checkDataPlayer1 = SakuraSendData(CommandEnum.CHECK_MEGAMI, gameStatus.player1.returnListMegami3())
         val checkDataPlayer2 = SakuraSendData(CommandEnum.CHECK_MEGAMI, gameStatus.player2.returnListMegami3())
-        player1.session.send(Json.encodeToString(checkDataPlayer2))
-        player2.session.send(Json.encodeToString(checkDataPlayer1))
+        send(player1, Json.encodeToString(checkDataPlayer2))
+        send(player2, Json.encodeToString(checkDataPlayer1))
     }
 
     private suspend fun selectBan(){
@@ -114,11 +113,11 @@ class SakuraGame(private val roomNumber: Int, val player1: Connection, val playe
         val player1Player2Data = gameStatus.player2.makeMegamiData(CommandEnum.CHECK_ANOTHER)
         val player2Player1Data = gameStatus.player1.makeMegamiData(CommandEnum.CHECK_ANOTHER)
 
-        player1.session.send(Json.encodeToString(player1Player1Data))
-        player2.session.send(Json.encodeToString(player2Player2Data))
+        send(player1, Json.encodeToString(player1Player1Data))
+        send(player2, Json.encodeToString(player2Player2Data))
 
-        player1.session.send(Json.encodeToString(player1Player2Data))
-        player2.session.send(Json.encodeToString(player2Player1Data))
+        send(player1, Json.encodeToString(player1Player2Data))
+        send(player2, Json.encodeToString(player2Player1Data))
 
         settingForAnotherMegami(PlayerEnum.PLAYER1, gameStatus.player1.megamiOne)
         settingForAnotherMegami(PlayerEnum.PLAYER1, gameStatus.player1.megamiTwo)
@@ -270,7 +269,7 @@ class SakuraGame(private val roomNumber: Int, val player1: Connection, val playe
     private fun settingForMisora(player: PlayerEnum){
         val nowPlayer = gameStatus.getPlayer(player)
 
-        if(nowPlayer.megamiOneNormalForm() == MegamiEnum.SHINRA){
+        if(nowPlayer.megamiOneNormalForm() == MegamiEnum.MISORA){
             nowPlayer.megamiCard = Card.cardMakerByName(firstTurn == player, CardName.MISORA_MISORA, player,
                 LocationEnum.YOUR_USED_CARD, gameStatus.version)
             nowPlayer.megamiCard?.special_card_state = SpecialCardEnum.PLAYED
@@ -311,8 +310,7 @@ class SakuraGame(private val roomNumber: Int, val player1: Connection, val playe
     private fun settingForOboroA2(player: PlayerEnum){
         val nowPlayer = gameStatus.getPlayer(player)
 
-        nowPlayer.assemblyMainZone = hashMapOf()
-        nowPlayer.assemblyCustomZone = hashMapOf()
+        nowPlayer.assemblyZone = hashMapOf()
         nowPlayer.unassemblyZone = hashMapOf()
 
         for(card_name in CardName.partsList){
@@ -358,8 +356,8 @@ class SakuraGame(private val roomNumber: Int, val player1: Connection, val playe
         val sendRequestPlayer2 = SakuraCardSetSend(CommandEnum.SELECT_CARD,
             gameStatus.player2.unselectedCard.toMutableList(), gameStatus.player2.unselectedSpecialCard.toMutableList())
 
-        player1.session.send(Json.encodeToString(sendRequestPlayer1))
-        player2.session.send(Json.encodeToString(sendRequestPlayer2))
+        send(player1, Json.encodeToString(sendRequestPlayer1))
+        send(player2, Json.encodeToString(sendRequestPlayer2))
 
         val player1Data = waitCardSetUntil(player1, CommandEnum.SELECT_CARD)
         val player2Data = waitCardSetUntil(player2, CommandEnum.SELECT_CARD)
@@ -392,8 +390,8 @@ class SakuraGame(private val roomNumber: Int, val player1: Connection, val playe
         val endPlayer1Select = SakuraCardSetSend(CommandEnum.END_SELECT_CARD, cardDataPlayer1, specialCardDataPlayer1)
         val endPlayer2Select = SakuraCardSetSend(CommandEnum.END_SELECT_CARD, cardDataPlayer2, specialCardDataPlayer2)
 
-        player1.session.send(Json.encodeToString(endPlayer1Select))
-        player2.session.send(Json.encodeToString(endPlayer2Select))
+        send(player1, Json.encodeToString(endPlayer1Select))
+        send(player2, Json.encodeToString(endPlayer2Select))
 
         when(firstTurn){
             PlayerEnum.PLAYER1 -> {
@@ -465,8 +463,8 @@ class SakuraGame(private val roomNumber: Int, val player1: Connection, val playe
     //first card is most upper
     private suspend fun muligun(){
         val data = SakuraCardCommand(CommandEnum.MULIGUN, -1)
-        player1.session.send(Json.encodeToString(data))
-        player2.session.send(Json.encodeToString(data))
+        send(player1, Json.encodeToString(data))
+        send(player2, Json.encodeToString(data))
         val player1Data = waitCardSetUntil(player1, CommandEnum.MULIGUN)
         val player2Data = waitCardSetUntil(player2, CommandEnum.MULIGUN)
         var count = 0
@@ -534,23 +532,29 @@ class SakuraGame(private val roomNumber: Int, val player1: Connection, val playe
                 return
             }
             val data = receiveActionRequest(getSocket(gameStatus.turnPlayer))
-            if(data.first == CommandEnum.ACTION_END_TURN) {
-                return
-            }
-            if(data.first == CommandEnum.FULL_POWER_YES || !gameStatus.isThisTurnDoAction){
-                sendSimpleCommand(getSocket(gameStatus.turnPlayer), CommandEnum.FULL_POWER_YES)
-                fullPowerAction()
-                return
-            }
-            else if(isActionUseCard(data.first)){
-                if(gameStatus.cardUseNormal(gameStatus.turnPlayer, data.first, data.second)){
-                    gameStatus.isThisTurnDoAction = true
+            when(data.first){
+                CommandEnum.ACTION_END_TURN -> {
+                    return
                 }
-            }
-            else if(isActionBasicOperation(data.first)){
-                if(gameStatus.canDoBasicOperation(gameStatus.turnPlayer, data.first) && gameStatus.payBasicOperationCost(gameStatus.turnPlayer, data.second)){
-                    gameStatus.doBasicOperation(gameStatus.turnPlayer, data.first, if(data.second == -1) -1 else 0)
-                    gameStatus.isThisTurnDoAction = true
+                CommandEnum.FULL_POWER_YES -> {
+                    if(!gameStatus.isThisTurnDoAction){
+                        sendSimpleCommand(getSocket(gameStatus.turnPlayer), CommandEnum.FULL_POWER_YES)
+                        fullPowerAction()
+                        return
+                    }
+                }
+                else -> {
+                    if(isActionUseCard(data.first)){
+                        if(gameStatus.cardUseNormal(gameStatus.turnPlayer, data.first, data.second)){
+                            gameStatus.isThisTurnDoAction = true
+                        }
+                    }
+                    else if(isActionBasicOperation(data.first)){
+                        if(gameStatus.canDoBasicOperation(gameStatus.turnPlayer, data.first) && gameStatus.payBasicOperationCost(gameStatus.turnPlayer, data.second)){
+                            gameStatus.doBasicOperation(gameStatus.turnPlayer, data.first, if(data.second == -1) -1 else 0)
+                            gameStatus.isThisTurnDoAction = true
+                        }
+                    }
                 }
             }
         }

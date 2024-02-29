@@ -517,6 +517,12 @@ enum class CommandEnum() {
             POP_UNASSEMBLY_YOUR to POP_UNASSEMBLY_OTHER,
             POP_UNASSEMBLY_OTHER to POP_UNASSEMBLY_YOUR
         )
+
+        val cardEffectSelectCommandSet =
+            setOf(SELECT_ONE, SELECT_TWO, SELECT_THREE, SELECT_FOUR, SELECT_FIVE, SELECT_SIX, SELECT_SEVEN, SELECT_EIGHT, SELECT_NINE, SELECT_TEN, SELECT_NOT)
+
+        val reactCommandSet =
+            setOf(REACT_USE_CARD_HAND, REACT_USE_CARD_SPECIAL, REACT_USE_CARD_SOLDIER)
     }
 }
 

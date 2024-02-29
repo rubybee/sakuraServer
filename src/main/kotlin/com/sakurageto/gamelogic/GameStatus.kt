@@ -7,6 +7,8 @@ import com.sakurageto.card.CardSet.toCardName
 import com.sakurageto.gamelogic.log.Log
 import com.sakurageto.gamelogic.log.LogText
 import com.sakurageto.gamelogic.log.Logger
+import com.sakurageto.gamelogic.megamispecial.Stratagem
+import com.sakurageto.gamelogic.megamispecial.Umbrella
 import com.sakurageto.gamelogic.megamispecial.storyboard.StoryBoard
 import com.sakurageto.plugins.makeBugReportFile
 import com.sakurageto.protocol.*
@@ -15,7 +17,6 @@ import com.sakurageto.protocol.TokenEnum.Companion.toLacerationLocation
 import io.ktor.websocket.*
 
 class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private val player1_socket: Connection, private val player2_socket: Connection) {
-
     var perjuryCheck =
         arrayOf(false, false, false, false, false, false, false, false, false, false,
                 false, false, false, false, false, false, false, false, false, false
@@ -120,7 +121,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     var isThisTurnDistanceChange = false
 
     var thisTurnSwellDistance = 2
-
 
     private suspend fun getAdjustSwellDistance(): Int{
         var nowSwellDistance = thisTurnSwellDistance
@@ -773,7 +773,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             else -> {
                 while(true){
                     val receiveData = receiveSelectCard(getSocket(turnPlayer), locationList, CommandEnum.SELECT_NAP_LOCATION, -1)
-                    if(receiveData == null || receiveData.size != 1){
+                    if(receiveData.size != 1){
                         continue
                     }
                     moveTokenCardToSome(player, receiveData[0], number, card, card_number)
@@ -5083,7 +5083,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(list.isEmpty()) return 2
 
         while(true){
-            val receive = receiveSelectCard(nowSocket, list, CommandEnum.SELECT_CARD_REASON_INSTALLATION, -1)?: continue
+            val receive = receiveSelectCard(nowSocket, list, CommandEnum.SELECT_CARD_REASON_INSTALLATION, -1)
             if (receive.size == 1){
                 val card = nowPlayer.getCardFromCover(receive[0])?: continue
                 if (useCardFrom(player, card, LocationEnum.COVER_CARD, false, null,
@@ -5773,7 +5773,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(cardList.isEmpty()) return null
 
         while (true){
-            return receiveSelectCard(getSocket(select_player), cardList, reason, card_number) ?: continue
+            return receiveSelectCard(getSocket(select_player), cardList, reason, card_number)
         }
     }
 
@@ -5814,7 +5814,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
         while (true){
             val set = mutableSetOf<Int>()
-            val list = receiveSelectCard(getSocket(select_player), cardList, reason, card_number) ?: continue
+            val list = receiveSelectCard(getSocket(select_player), cardList, reason, card_number)
             set.addAll(list)
             if(set.size == listSize) return list
         }
@@ -5825,7 +5825,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(cardList.size <= listSize) return cardList
         while (true){
             val set = mutableSetOf<Int>()
-            val list = receiveSelectCard(getSocket(player), cardList, reason, card_number) ?: continue
+            val list = receiveSelectCard(getSocket(player), cardList, reason, card_number)
             set.addAll(list)
             if(set.size == listSize) return list
         }
@@ -5833,7 +5833,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     suspend fun selectCardFrom(player: PlayerEnum, cardList: MutableList<Int>, reason: CommandEnum, card_number: Int): MutableList<Int>{
         while (true) {
-            return receiveSelectCard(getSocket(player), cardList, reason, card_number) ?: continue
+            return receiveSelectCard(getSocket(player), cardList, reason, card_number)
         }
     }
 

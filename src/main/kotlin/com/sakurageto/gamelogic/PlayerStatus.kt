@@ -3,12 +3,14 @@ package com.sakurageto.gamelogic
 import com.sakurageto.card.*
 import com.sakurageto.card.CardSet.toCardData
 import com.sakurageto.card.CardSet.toCardName
+import com.sakurageto.gamelogic.megamispecial.Stratagem
+import com.sakurageto.gamelogic.megamispecial.Umbrella
 import com.sakurageto.gamelogic.megamispecial.YatsuhaJourney
 import com.sakurageto.gamelogic.megamispecial.storyboard.Act
 import com.sakurageto.plugins.makeBugReportFile
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
-import com.sakurageto.protocol.SakuraSendData
+import com.sakurageto.protocol.SakuraArrayData
 import java.util.*
 import kotlin.collections.ArrayDeque
 import kotlin.collections.HashMap
@@ -161,7 +163,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
 
     //game init function
     fun megamiOneNormalForm() = megamiOne.changeNormalMegami()
-    fun setMegamiSsangjang(data: SakuraSendData){
+    fun setMegamiSsangjang(data: SakuraArrayData){
         megamiOne = try{
             MegamiEnum.fromInt(data.data?.get(0)?: 10)
         }catch (e: NoSuchElementException){
@@ -182,7 +184,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
         }
     }
 
-    fun setMegamiSamSep(data: SakuraSendData){
+    fun setMegamiSamSep(data: SakuraArrayData){
         megamiOne = try{
             MegamiEnum.fromInt(data.data?.get(0)?: 10)
         }catch (e: NoSuchElementException){
@@ -225,7 +227,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
         return mutableListOf(megamiOne.real_number, megamiTwo.real_number, megamiBanned.real_number)
     }
 
-    fun banMegami(data: SakuraSendData){
+    fun banMegami(data: SakuraArrayData){
         val benMegami = data.data?.get(0)?: megamiOne
         if (benMegami != megamiBanned.real_number){
             if(benMegami == megamiOne.real_number){
@@ -237,8 +239,8 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
         }
     }
 
-    fun makeMegamiData(command: CommandEnum): SakuraSendData {
-        return SakuraSendData(command, mutableListOf(megamiOne.real_number, megamiTwo.real_number))
+    fun makeMegamiData(command: CommandEnum): SakuraArrayData {
+        return SakuraArrayData(command, mutableListOf(megamiOne.real_number, megamiTwo.real_number))
     }
 
     fun deleteSelectedNormalCard(cards: MutableList<CardName>){

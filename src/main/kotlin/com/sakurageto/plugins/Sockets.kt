@@ -21,7 +21,7 @@ fun Application.configureSockets() {
     }
 
     routing {
-        webSocket("/waitroom/{roomnumber}") { // websocketSession
+        webSocket("/waitroom/{roomnumber}") {
             try {
                 call.parameters["roomnumber"]?.toInt()?.let {
                     RoomInformation.roomHashMap[it]?.let {room ->

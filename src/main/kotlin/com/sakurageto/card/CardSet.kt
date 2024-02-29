@@ -5,6 +5,8 @@ import com.sakurageto.gamelogic.GameStatus.Companion.END_PHASE
 import com.sakurageto.gamelogic.GameStatus.Companion.START_PHASE
 import com.sakurageto.gamelogic.log.Log
 import com.sakurageto.gamelogic.log.LogText
+import com.sakurageto.gamelogic.megamispecial.Stratagem
+import com.sakurageto.gamelogic.megamispecial.Umbrella
 import com.sakurageto.gamelogic.megamispecial.YatsuhaJourney
 import com.sakurageto.gamelogic.megamispecial.storyboard.Act
 import com.sakurageto.protocol.*
@@ -2812,7 +2814,7 @@ object CardSet {
         val nowPlayer = game_status.getPlayer(player)
         val otherPlayer = game_status.getPlayer(player.opposite())
         nowPlayer.sealInformation[seal_card_number]?.let { sealedList ->
-            for(sealedCardNumber in sealedList){
+            sealedList.toList().forEach { sealedCardNumber ->
                 game_status.popCardFrom(player, sealedCardNumber, LocationEnum.SEAL_ZONE, true)?.let {
                     game_status.insertCardTo(it.player, it, returnPlace, true)
                 }
@@ -2821,7 +2823,7 @@ object CardSet {
         nowPlayer.sealInformation.remove(seal_card_number)
 
         otherPlayer.sealInformation[seal_card_number]?.let { sealedList ->
-            for(sealedCardNumber in sealedList){
+            sealedList.toList().forEach { sealedCardNumber ->
                 game_status.popCardFrom(player.opposite(), sealedCardNumber, LocationEnum.SEAL_ZONE, true)?.let {
                     game_status.insertCardTo(it.player, it, returnPlace, true)
                 }
@@ -8293,7 +8295,7 @@ object CardSet {
         })
 
         formKinnari.addText(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.WHEN_TRANSFORM) { _, player, game_status, _ ->
-            for(i in 1..game_status.getPlayer(player.opposite()).normalCardDeck.size){
+            while(game_status.getPlayer(player.opposite()).normalCardDeck.isNotEmpty()){
                 game_status.popCardFrom(player.opposite(), 1, LocationEnum.YOUR_DECK_TOP, false)?.let {
                     game_status.insertCardTo(player.opposite(), it, LocationEnum.COVER_CARD, false)
                 }
@@ -11445,45 +11447,59 @@ object CardSet {
     }
 
     private suspend fun backHome(player: PlayerEnum, game_status: GameStatus, card_number: Int){
-        fun backHomeCardCheck(card: Card, player: PlayerEnum) = card.card_data.card_class == CardClass.NORMAL && card.player == player
+        fun backHomeCardCheck(card: Card, player: PlayerEnum) =
+            card.card_data.card_class == CardClass.NORMAL && card.player == player
 
         suspend fun backAllCardToMemory(game_status: GameStatus, exceptCard: Int){
             val nowPlayer = game_status.getPlayer(player)
 
-            for (memoryCard in nowPlayer.enchantmentCard.values){
-                if(backHomeCardCheck(memoryCard, player)){
-                    game_status.cardToDust(player, memoryCard.getNap(), memoryCard, false, card_number)
-                    game_status.afterDestruction(player, memoryCard.card_number, LocationEnum.MEMORY_YOUR)
+            nowPlayer.enchantmentCard.values.filter {card ->
+                backHomeCardCheck(card, player)
+            }.forEach { card ->
+                game_status.cardToDust(player, card.getNap(), card, false, card_number)
+                game_status.afterDestruction(player, card.card_number, LocationEnum.MEMORY_YOUR)
+            }
+
+            nowPlayer.discard.filter {card ->
+                backHomeCardCheck(card, player)
+            }.forEach { card ->
+                game_status.popCardFrom(player, card.card_number, LocationEnum.DISCARD_YOUR, true)?.let {
+                    game_status.insertCardTo(player, it, LocationEnum.MEMORY_YOUR, true)
                 }
             }
-            for (memoryCard in nowPlayer.discard){
-                if(backHomeCardCheck(memoryCard, player)){
-                    game_status.popCardFrom(player, memoryCard.card_number, LocationEnum.DISCARD_YOUR, true)?.let {
-                        game_status.insertCardTo(player, it, LocationEnum.MEMORY_YOUR, true)
-                    }
+
+            nowPlayer.coverCard.filter { card ->
+                backHomeCardCheck(card, player)
+            }.forEach { card ->
+                game_status.popCardFrom(player, card.card_number, LocationEnum.COVER_CARD, false)?.let {
+                    game_status.insertCardTo(player, card, LocationEnum.MEMORY_YOUR, false)
                 }
             }
-            for (memoryCard in nowPlayer.coverCard){
-                if(backHomeCardCheck(memoryCard, player)){
-                    game_status.popCardFrom(player, memoryCard.card_number, LocationEnum.COVER_CARD, false)?.let {
-                        game_status.insertCardTo(player, it, LocationEnum.MEMORY_YOUR, false)
-                    }
+
+            nowPlayer.coverCard.filter { card ->
+                backHomeCardCheck(card, player)
+            }.forEach { card ->
+                game_status.popCardFrom(player, card.card_number, LocationEnum.COVER_CARD, false)?.let {
+                    game_status.insertCardTo(player, card, LocationEnum.MEMORY_YOUR, false)
                 }
             }
-            for (memoryCard in nowPlayer.normalCardDeck){
-                if(backHomeCardCheck(memoryCard, player)){
-                    game_status.popCardFrom(player, memoryCard.card_number, LocationEnum.DECK, false)?.let {
-                        game_status.insertCardTo(player, it, LocationEnum.MEMORY_YOUR, false)
-                    }
+
+            nowPlayer.normalCardDeck.filter { card ->
+                backHomeCardCheck(card, player)
+            }.forEach { card ->
+                game_status.popCardFrom(player, card.card_number, LocationEnum.DECK, false)?.let {
+                    game_status.insertCardTo(player, card, LocationEnum.MEMORY_YOUR, false)
                 }
             }
-            for (memoryCard in nowPlayer.hand.values){
-                if(backHomeCardCheck(memoryCard, player) && memoryCard.card_number != exceptCard){
-                    game_status.popCardFrom(player, memoryCard.card_number, LocationEnum.HAND, false)?.let {
-                        game_status.insertCardTo(player, it, LocationEnum.MEMORY_YOUR, false)
-                    }
+
+            nowPlayer.hand.values.filter { card ->
+                backHomeCardCheck(card, player) && card.card_number != exceptCard
+            }.forEach { card ->
+                game_status.popCardFrom(player, card.card_number, LocationEnum.HAND, false)?.let {
+                    game_status.insertCardTo(player, it, LocationEnum.MEMORY_YOUR, false)
                 }
             }
+
             game_status.logger.insert(Log(player, LogText.END_EFFECT, card_number, -1))
 
             game_status.journeyToDust(player, 1, NUMBER_YATSUHA_COLORED_WORLD)

@@ -4,7 +4,7 @@ import com.sakurageto.card.CardSet.toCardData
 import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.GameVersion
 import com.sakurageto.gamelogic.MegamiEnum
-import com.sakurageto.gamelogic.Umbrella
+import com.sakurageto.gamelogic.megamispecial.Umbrella
 import com.sakurageto.gamelogic.log.Log
 import com.sakurageto.gamelogic.log.LogText
 import com.sakurageto.gamelogic.megamispecial.storyboard.Act

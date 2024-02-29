@@ -2,7 +2,7 @@ package com.sakurageto.card
 
 import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.MegamiEnum
-import com.sakurageto.gamelogic.Umbrella
+import com.sakurageto.gamelogic.megamispecial.Umbrella
 import java.util.SortedSet
 
 class MadeAttack(

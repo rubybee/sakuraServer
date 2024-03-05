@@ -20,7 +20,7 @@ object StoryBoard {
 
     private val actHashMap = HashMap<Int, Act>()
 
-    fun init(){
+    init{
         actHashMap[0] = act0
         actHashMap[1] = act1
         actHashMap[2] = act2

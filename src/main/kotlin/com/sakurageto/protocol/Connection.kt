@@ -1,4 +1,4 @@
-package com.sakurageto
+package com.sakurageto.protocol
 
 import com.sakurageto.card.PlayerEnum
 import io.ktor.server.websocket.*

@@ -1,14 +1,14 @@
 package com.sakurageto.plugins
 
-import com.sakurageto.Connection
+import com.sakurageto.protocol.Connection
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
 import java.time.Duration
 import io.ktor.server.application.*
-import com.sakurageto.RoomInformation
+import com.sakurageto.protocol.RoomInformation
 import com.sakurageto.card.PlayerEnum
-import com.sakurageto.gamelogic.SakuraGame
+import com.sakurageto.gamelogic.GameFactory
 import kotlinx.coroutines.delay
 import java.lang.NumberFormatException
 import org.slf4j.LoggerFactory
@@ -24,7 +24,7 @@ fun Application.configureSockets() {
         webSocket("/waitroom/{roomnumber}") {
             try {
                 call.parameters["roomnumber"]?.toInt()?.let {
-                    RoomInformation.roomHashMap[it]?.let {room ->
+                    RoomInformation.roomHashMap[it]?.let { room ->
                         while (true){
                             if(!room.waitStatus){
                                 this.send("player match success")
@@ -66,9 +66,9 @@ fun Application.configureSockets() {
                                 }
                                 val now1 = room.firstUserConnection!!
                                 val now2 = room.secondUserConnection!!
-                                val game = SakuraGame(it, now1, now2)
-                                logger.info("GameRoom Num$it: startGame()")
-                                game.startGame()
+                                val game = GameFactory(it, now1, now2).makeGame()
+                                logger.info("GameRoom Num$it: start game")
+                                game.start()
                             }
                         }
                     }?: close(CloseReason(CloseReason.Codes.PROTOCOL_ERROR, "invalid room number"))

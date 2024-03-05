@@ -1,7 +1,7 @@
 package com.sakurageto.plugins
 
-import com.sakurageto.Room
-import com.sakurageto.RoomInformation
+import com.sakurageto.protocol.Room
+import com.sakurageto.protocol.RoomInformation
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*

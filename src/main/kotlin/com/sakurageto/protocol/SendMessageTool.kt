@@ -1,6 +1,5 @@
 package com.sakurageto.protocol
 
-import com.sakurageto.Connection
 import com.sakurageto.card.toPrivate
 import com.sakurageto.gamelogic.megamispecial.Stratagem
 import com.sakurageto.protocol.CommandEnum.*

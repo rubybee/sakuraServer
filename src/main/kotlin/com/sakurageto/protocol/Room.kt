@@ -1,7 +1,6 @@
-package com.sakurageto
+package com.sakurageto.protocol
 
 import com.sakurageto.gamelogic.GameStatus
-import java.util.concurrent.ConcurrentHashMap
 
 class Room(private val madeTime: Long){
     var waitStatus: Boolean = true
@@ -27,8 +26,4 @@ class Room(private val madeTime: Long){
         }
         return false
     }
-}
-
-object RoomInformation{
-    var roomHashMap = ConcurrentHashMap<Int, Room>()
 }

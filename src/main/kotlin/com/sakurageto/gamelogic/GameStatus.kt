@@ -245,7 +245,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         changeTurnPlayer()
     }
 
-    private suspend fun getAdjustSwellDistance(): Int{
+    suspend fun getAdjustSwellDistance(): Int{
         var nowSwellDistance = thisTurnSwellDistance
 
         for(card in player1.enchantmentCard.values) nowSwellDistance += card.effectAllValidEffect(PlayerEnum.PLAYER1, this, TextEffectTag.CHANGE_SWELL_DISTANCE)

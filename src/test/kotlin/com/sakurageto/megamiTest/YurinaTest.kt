@@ -188,4 +188,25 @@ class YurinaTest: ApplicationTest() {
         assertEquals(0, gameStatus.player2.normalCardDeck.size)
         assertEquals(9, gameStatus.player2.life)
     }
+
+    @Test
+    fun kanzaDoTest() = runTest {
+        resetValue(0, 4, 10, 10, 5, 5)
+        gameStatus.player1.flare = 5; gameStatus.player1.fullAction = true
+        for(i in 1..5){
+            player1Connection.putReceiveData(makeData(CommandEnum.SELECT_ONE))
+        }
+        player1Connection.putReceiveData(makeData(PlayerEnum.PLAYER1, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+            mutableListOf(CardName.YURINA_POBARAM, CardName.YURINA_WOLYUNGNACK)
+        ))
+        player2Connection.putReceiveData(makeData(CommandEnum.REACT_NO))
+        player2Connection.putReceiveData(makeData(CommandEnum.CHOOSE_AURA))
+        addCard(PlayerEnum.PLAYER1, CardName.YURINA_POBARAM, LocationEnum.YOUR_USED_CARD)
+        addCard(PlayerEnum.PLAYER1, CardName.YURINA_WOLYUNGNACK, LocationEnum.YOUR_USED_CARD)
+        addCard(PlayerEnum.PLAYER1, CardName.YURINA_KANZA_DO, LocationEnum.SPECIAL_CARD)
+        useCard(PlayerEnum.PLAYER1, CardName.YURINA_KANZA_DO, LocationEnum.SPECIAL_CARD)
+        assertEquals(5, gameStatus.player1.aura)
+        assertEquals(2, gameStatus.player1.specialCardDeck.size)
+        assertEquals(8, gameStatus.player2.life)
+    }
 }

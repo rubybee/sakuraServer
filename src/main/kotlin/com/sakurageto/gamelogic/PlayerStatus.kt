@@ -267,7 +267,8 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     }
 
     fun getCardFromDeckTop(index: Int): Card?{
-        if(normalCardDeck.size > index) return normalCardDeck[index]
+        val x = if(index < 0) 0 else index
+        if(normalCardDeck.size > x) return normalCardDeck[x]
         return null
     }
 

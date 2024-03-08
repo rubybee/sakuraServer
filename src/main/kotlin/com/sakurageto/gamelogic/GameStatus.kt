@@ -3762,9 +3762,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                         val chosen = if(nowAttack.canNotSelectAura){
                             CommandEnum.CHOOSE_LIFE
                         } else if(nowAttack.effectText(attack_player, this, react_attack, TextEffectTag.SELECT_DAMAGE_BY_ATTACKER) == 1){
-                            damageSelect(attack_player, damage, laceration = nowAttack.editedLaceration, your = false)
+                            damageSelect(attack_player, CommandEnum.CHOOSE_CARD_DAMAGE_OTHER, damage, laceration = nowAttack.editedLaceration)
                         } else {
-                            damageSelect(attack_player.opposite(), damage, laceration = nowAttack.editedLaceration, your = true)
+                            damageSelect(attack_player.opposite(), CommandEnum.CHOOSE_CARD_DAMAGE, damage, laceration = nowAttack.editedLaceration)
                         }
                         val auraReplace = nowAttack.effectText(attack_player, this, react_attack, TextEffectTag.AFTER_AURA_DAMAGE_PLACE_CHANGE)
                         val lifeReplace = nowAttack.effectText(attack_player, this, react_attack, TextEffectTag.AFTER_LIFE_DAMAGE_PLACE_CHANGE)
@@ -4372,7 +4372,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
             while(true){
                 val selected = selectCardFrom(loser, loseProtectCards.map { card -> card.card_number }.toMutableList(),
-                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_SELECT_CARD_WHEN_LOSE_GAME)
+                    CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, NUMBER_SELECT_CARD_WHEN_LOSE_GAME, 1)
                 if(selected.size > 1){
                     continue
                 }
@@ -4487,26 +4487,24 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    suspend fun damageSelect(player: PlayerEnum, damage: Pair<Int, Int>, laceration: Boolean, your: Boolean = true): CommandEnum{
-        suspend fun damageSelect(get_damage_player: PlayerEnum, damage: Pair<Int, Int>, select_player: PlayerEnum, laceration: Boolean): CommandEnum{
+    suspend fun damageSelect(player: PlayerEnum, command: CommandEnum, damage: Pair<Int, Int>, laceration: Boolean): CommandEnum{
+        suspend fun damageSelect(get_damage_player: PlayerEnum, command: CommandEnum, damage: Pair<Int, Int>, select_player: PlayerEnum, laceration: Boolean): CommandEnum{
             if(damage.first == 999) return CommandEnum.CHOOSE_LIFE
 
             if(damage.second == 999) return CommandEnum.CHOOSE_AURA
 
             if(getPlayer(get_damage_player).checkAuraDamage(damage.first, laceration) == null) return CommandEnum.CHOOSE_LIFE
 
-            sendChooseDamage(getSocket(select_player),
-                if(get_damage_player == select_player) CommandEnum.CHOOSE_CARD_DAMAGE else CommandEnum.CHOOSE_CARD_DAMAGE_OTHER
-                ,damage.first, damage.second)
+            sendChooseDamage(getSocket(select_player), command, damage.first, damage.second)
 
             return receiveChooseDamage(getSocket(select_player))
         }
 
-        return if(your){
-            damageSelect(player, damage, player, laceration)
+        return if(command == CommandEnum.CHOOSE_CARD_DAMAGE_OTHER){
+            damageSelect(player.opposite(), command, damage, player, laceration)
         }
         else{
-            damageSelect(player.opposite(), damage, player, laceration)
+            damageSelect(player, command, damage, player, laceration)
         }
     }
 
@@ -5531,7 +5529,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         return true
     }
 
-    suspend fun payBasicOperationCost(player: PlayerEnum, card_number: Int): Boolean{
+    private suspend fun payBasicOperationCost(player: PlayerEnum, card_number: Int): Boolean{
         val nowPlayer = getPlayer(player)
 
         if(card_number == -1){
@@ -6768,8 +6766,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             now % 10
         }
 
-        sendChooseDamage(getSocket(player), CommandEnum.CHOOSE_CHOJO, aura, life)
-        val chosen = receiveChooseDamage(getSocket(player))
+        val chosen = damageSelect(player, CommandEnum.CHOOSE_CHOJO, Pair(aura, life), laceration = false)
         processDamage(player, chosen, Pair(aura, life), false, null, null, EventLog.CHOJO)
         gameLogger.insert(EventLog(player, LogText.END_EFFECT, EventLog.CHOJO, -1))
     }

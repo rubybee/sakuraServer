@@ -121,7 +121,7 @@ class SaineTest: ApplicationTest() {
     fun emmooshoebingTest() = runTest {
         resetValue(0, 0, 10, 10, 3, 10)
         gameStatus.player2.flare = 2
-        addDataReact(PlayerEnum.PLAYER2, CardName.SAINE_EMMOOSHOEBING, LocationEnum.SPECIAL_CARD)
+        addReactData(PlayerEnum.PLAYER2, CardName.SAINE_EMMOOSHOEBING, LocationEnum.SPECIAL_CARD)
         addCard(PlayerEnum.PLAYER1, CardName.YURINA_ILSUM, LocationEnum.HAND)
         addCard(PlayerEnum.PLAYER2, CardName.SAINE_EMMOOSHOEBING, LocationEnum.SPECIAL_CARD)
         useCard(PlayerEnum.PLAYER1, CardName.YURINA_ILSUM, LocationEnum.HAND)
@@ -147,7 +147,7 @@ class SaineTest: ApplicationTest() {
     @Test
     fun ensembleSaineTest() = runTest {
         resetValue(0, 1, 10, 10, 3, 3)
-        addDataReact(PlayerEnum.PLAYER2, CardName.CARD_UNNAME, LocationEnum.HAND)
+        addReactData(PlayerEnum.PLAYER2, CardName.CARD_UNNAME, LocationEnum.HAND)
         addCard(PlayerEnum.PLAYER1, CardName.SAI_TOKO_ENSEMBLE, LocationEnum.HAND)
         addCard(PlayerEnum.PLAYER1, CardName.SAINE_EMMOOSHOEBING, LocationEnum.YOUR_USED_CARD)
         useCard(PlayerEnum.PLAYER1, CardName.SAI_TOKO_ENSEMBLE, LocationEnum.HAND)
@@ -157,27 +157,27 @@ class SaineTest: ApplicationTest() {
 
     @Test
     fun accompanimentTest() = runTest {
-        resetValue(0, 0, 10, 10, 5, 5)
-        gameStatus.player1.flare = 3; gameStatus.player2.flare = 1
+        resetValue(0, 3, 10, 10, 5, 5)
+        gameStatus.player1.flare = 3; gameStatus.player2.flare = 2
         player1Connection.putReceiveData(makeData(CommandEnum.SELECT_NAP, mutableListOf(0, 4)))
         addCard(PlayerEnum.PLAYER1, CardName.SAINE_ACCOMPANIMENT, LocationEnum.HAND)
         addCard(PlayerEnum.PLAYER1, CardName.YURINA_POBARAM, LocationEnum.YOUR_USED_CARD)
         addCard(PlayerEnum.PLAYER1, CardName.SAINE_JONGGEK, LocationEnum.YOUR_USED_CARD)
         addCard(PlayerEnum.PLAYER1, CardName.SAINE_EMMOOSHOEBING, LocationEnum.SPECIAL_CARD)
-        addDataReact(PlayerEnum.PLAYER2, CardName.CARD_UNNAME, LocationEnum.HAND)
+        addReactData(PlayerEnum.PLAYER2, CardName.CARD_UNNAME, LocationEnum.HAND)
         useCard(PlayerEnum.PLAYER1, CardName.SAINE_ACCOMPANIMENT, LocationEnum.HAND)
         useCard(PlayerEnum.PLAYER1, CardName.SAINE_EMMOOSHOEBING, LocationEnum.SPECIAL_CARD)
-        assertEquals(9, gameStatus.player2.life)
+        assertEquals(2, gameStatus.player2.aura)
         assertEquals(2, gameStatus.player1.flare)
 
-        gameStatus.endPhase(); startPhase(); gameStatus.player2.fullAction = true;
-        addDataReact(PlayerEnum.PLAYER1, CardName.SAINE_EMMOOSHOEBING, LocationEnum.SPECIAL_CARD)
+        gameStatus.endPhase(); startPhase(); gameStatus.player2.fullAction = true
+        addReactData(PlayerEnum.PLAYER1, CardName.SAINE_EMMOOSHOEBING, LocationEnum.SPECIAL_CARD)
         for(i in 1..5){
             player2Connection.putReceiveData(makeData(CommandEnum.SELECT_ONE))
         }
         addCard(PlayerEnum.PLAYER2, CardName.YURINA_KANZA_DO, LocationEnum.SPECIAL_CARD)
         useCard(PlayerEnum.PLAYER2, CardName.YURINA_KANZA_DO, LocationEnum.SPECIAL_CARD)
-        assertEquals(8, gameStatus.player2.life)
+        assertEquals(9, gameStatus.player2.life)
         assertEquals(10, gameStatus.player1.life)
     }
 
@@ -188,7 +188,7 @@ class SaineTest: ApplicationTest() {
         addCard(PlayerEnum.PLAYER1, CardName.HIMIKA_SHOOT, LocationEnum.HAND)
         addCard(PlayerEnum.PLAYER1, CardName.SAINE_DUET_TAN_JU_BING_MYEONG, LocationEnum.SPECIAL_CARD)
         useCard(PlayerEnum.PLAYER1, CardName.SAINE_DUET_TAN_JU_BING_MYEONG, LocationEnum.SPECIAL_CARD)
-        addDataReact(PlayerEnum.PLAYER2, CardName.CARD_UNNAME, LocationEnum.HAND)
+        addReactData(PlayerEnum.PLAYER2, CardName.CARD_UNNAME, LocationEnum.HAND)
         useCard(PlayerEnum.PLAYER1, CardName.HIMIKA_SHOOT, LocationEnum.HAND)
         assertEquals(1, gameStatus.player1.flare)
         assertNotEquals(null, getCard(PlayerEnum.PLAYER1, CardName.HIMIKA_SHOOT, LocationEnum.HAND))
@@ -196,7 +196,7 @@ class SaineTest: ApplicationTest() {
         gameStatus.endPhase(); startPhase()
         gameStatus.endPhase(); startPhase()
 
-        addDataReact(PlayerEnum.PLAYER2, CardName.CARD_UNNAME, LocationEnum.HAND)
+        addReactData(PlayerEnum.PLAYER2, CardName.CARD_UNNAME, LocationEnum.HAND)
         useCard(PlayerEnum.PLAYER1, CardName.HIMIKA_SHOOT, LocationEnum.HAND)
         assertEquals(8, gameStatus.player2.life)
     }
@@ -205,7 +205,7 @@ class SaineTest: ApplicationTest() {
     fun betrayerTest() = runTest {
         resetValue(0, 0, 10, 10, 5, 5)
         gameStatus.player2.flare = 2
-        addDataReact(PlayerEnum.PLAYER2, CardName.SAINE_EMMOOSHOEBING, LocationEnum.SPECIAL_CARD)
+        addReactData(PlayerEnum.PLAYER2, CardName.SAINE_EMMOOSHOEBING, LocationEnum.SPECIAL_CARD)
         addCard(PlayerEnum.PLAYER1, CardName.SAINE_BETRAYAL, LocationEnum.HAND)
         addCard(PlayerEnum.PLAYER2, CardName.SAINE_EMMOOSHOEBING, LocationEnum.SPECIAL_CARD)
         useCard(PlayerEnum.PLAYER1, CardName.SAINE_BETRAYAL, LocationEnum.HAND)
@@ -215,8 +215,8 @@ class SaineTest: ApplicationTest() {
     @Test
     fun flowingWallTest() = runTest {
         resetValue(0,2, 10, 10, 5, 0)
-        addDataReact(PlayerEnum.PLAYER2, CardName.CARD_UNNAME, LocationEnum.HAND)
-        addDataReact(PlayerEnum.PLAYER2, CardName.CARD_UNNAME, LocationEnum.HAND)
+        addReactData(PlayerEnum.PLAYER2, CardName.CARD_UNNAME, LocationEnum.HAND)
+        addReactData(PlayerEnum.PLAYER2, CardName.CARD_UNNAME, LocationEnum.HAND)
         addCard(PlayerEnum.PLAYER1, CardName.SAINE_FLOWING_WALL, LocationEnum.HAND)
         addCard(PlayerEnum.PLAYER1, CardName.SAINE_BETRAYAL, LocationEnum.HAND)
         useCard(PlayerEnum.PLAYER1, CardName.SAINE_FLOWING_WALL, LocationEnum.HAND)
@@ -229,7 +229,7 @@ class SaineTest: ApplicationTest() {
     fun julChangWhaTest() = runTest{
         resetValue(2,3, 10, 10, 5, 5)
         gameStatus.player2.flare = 1
-        addDataReact(PlayerEnum.PLAYER2, CardName.SAINE_JEOL_CHANG_JEOL_HWA, LocationEnum.SPECIAL_CARD)
+        addReactData(PlayerEnum.PLAYER2, CardName.SAINE_JEOL_CHANG_JEOL_HWA, LocationEnum.SPECIAL_CARD)
         addCard(PlayerEnum.PLAYER2, CardName.SAINE_JEOL_CHANG_JEOL_HWA, LocationEnum.SPECIAL_CARD)
         addCard(PlayerEnum.PLAYER1, CardName.SAINE_HURUBEGI, LocationEnum.HAND)
         useCard(PlayerEnum.PLAYER1, CardName.SAINE_HURUBEGI, LocationEnum.HAND)

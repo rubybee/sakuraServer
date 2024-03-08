@@ -215,7 +215,7 @@ object CardSet {
 
         cardTempNumberHashmap[NUMBER_TOKOYO_BITSUNERIGI] = CardName.TOKOYO_BITSUNERIGI
         cardTempNumberHashmap[NUMBER_TOKOYO_WOOAHHANTAGUCK] = CardName.TOKOYO_WOOAHHANTAGUCK
-        cardTempNumberHashmap[NUMBER_TOKOYO_RUNNINGRABIT] = CardName.TOKOYO_RUNNINGRABIT
+        cardTempNumberHashmap[NUMBER_TOKOYO_RUNNING_RABBIT] = CardName.TOKOYO_RUNNING_RABBIT
         cardTempNumberHashmap[NUMBER_TOKOYO_POETDANCE] = CardName.TOKOYO_POETDANCE
         cardTempNumberHashmap[NUMBER_TOKOYO_FLIPFAN] = CardName.TOKOYO_FLIPFAN
         cardTempNumberHashmap[NUMBER_TOKOYO_WINDSTAGE] = CardName.TOKOYO_WINDSTAGE
@@ -661,7 +661,7 @@ object CardSet {
 
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_BITSUNERIGI] = CardName.TOKOYO_BITSUNERIGI
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_WOOAHHANTAGUCK] = CardName.TOKOYO_WOOAHHANTAGUCK
-        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_RUNNINGRABIT] = CardName.TOKOYO_RUNNINGRABIT
+        cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_RUNNING_RABBIT] = CardName.TOKOYO_RUNNING_RABBIT
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_POETDANCE] = CardName.TOKOYO_POETDANCE
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_FLIPFAN] = CardName.TOKOYO_FLIPFAN
         cardTempNumberHashmap[SECOND_PLAYER_START_NUMBER + NUMBER_TOKOYO_WINDSTAGE] = CardName.TOKOYO_WINDSTAGE
@@ -1096,7 +1096,7 @@ object CardSet {
 
         cardDataHashmap[CardName.TOKOYO_BITSUNERIGI] = bitsunerigi
         cardDataHashmap[CardName.TOKOYO_WOOAHHANTAGUCK] = wooahhantaguck
-        cardDataHashmap[CardName.TOKOYO_RUNNINGRABIT] = runningrabit
+        cardDataHashmap[CardName.TOKOYO_RUNNING_RABBIT] = runningrabbit
         cardDataHashmap[CardName.TOKOYO_POETDANCE] = poetdance
         cardDataHashmap[CardName.TOKOYO_FLIPFAN] = flipfan
         cardDataHashmap[CardName.TOKOYO_WINDSTAGE] = windstage
@@ -1937,6 +1937,7 @@ object CardSet {
         shoot.setAttack(DistanceType.CONTINUOUS, Pair(4, 10), null, 2, 1,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
 
+
         rapidfire.setAttack(DistanceType.CONTINUOUS, Pair(6, 8), null, 2, 1,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         rapidfire.addText((Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { card_number, player, game_status, _->
@@ -1948,6 +1949,7 @@ object CardSet {
             null
         }))
 
+
         magnumcanon.setAttack(DistanceType.CONTINUOUS, Pair(5, 8), null, 3, 2,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         magnumcanon.addText(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_TOKEN) { card_number, player, game_status, _ ->
@@ -1955,6 +1957,7 @@ object CardSet {
                 card_number)
             null
         })
+
 
         fullburst.setAttack(DistanceType.CONTINUOUS, Pair(5, 9), null, 3, 1,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
@@ -1966,6 +1969,7 @@ object CardSet {
             null
         }))
 
+
         backstep.addText(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) { _, player, game_status, _ ->
             game_status.drawCard(player, 1)
             null
@@ -1974,6 +1978,7 @@ object CardSet {
             game_status.dustToDistance(1, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
             null
         })
+
 
         backdraft.addText(Text(TextEffectTimingTag.USING, TextEffectTag.CHANGE_CONCENTRATION) { _, player, game_status, _ ->
             game_status.setShrink(player.opposite())
@@ -1991,15 +1996,17 @@ object CardSet {
             null
         })
 
+
         smoke.setEnchantment(3)
         smoke.addText(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.FORBID_MOVE_TOKEN_USING_ARROW){ _, _, _, _ ->
             LocationEnum.DISTANCE.real_number * 100 + 99
-            null
         })
+
 
         redbullet.setSpecial(0)
         redbullet.setAttack(DistanceType.CONTINUOUS, Pair(5, 10), null, 3, 1,
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+
 
         crimsonzero.setSpecial(5)
         crimsonzero.setAttack(DistanceType.CONTINUOUS, Pair(0, 2), null, 2, 2,
@@ -2021,6 +2028,7 @@ object CardSet {
             null
         }))
 
+
         scarletimagine.setSpecial(3)
         scarletimagine.addText(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) { _, player, game_status, _->
             game_status.drawCard(player, 2)
@@ -2030,6 +2038,7 @@ object CardSet {
             game_status.coverCard(player, player, NUMBER_HIMIKA_SCARLETIMAGINE)
             null
         })
+
 
         burmilionfield.setSpecial(2)
         burmilionfield.addText(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_CARD) { card_number, player, game_status, _->
@@ -2050,7 +2059,7 @@ object CardSet {
 
     private val bitsunerigi = CardData(CardClass.NORMAL, CardName.TOKOYO_BITSUNERIGI, MegamiEnum.TOKOYO, CardType.ATTACK, SubType.NONE)
     private val wooahhantaguck = CardData(CardClass.NORMAL, CardName.TOKOYO_WOOAHHANTAGUCK, MegamiEnum.TOKOYO, CardType.ATTACK, SubType.REACTION)
-    private val runningrabit = CardData(CardClass.NORMAL, CardName.TOKOYO_RUNNINGRABIT, MegamiEnum.TOKOYO, CardType.BEHAVIOR, SubType.NONE)
+    private val runningrabbit = CardData(CardClass.NORMAL, CardName.TOKOYO_RUNNING_RABBIT, MegamiEnum.TOKOYO, CardType.BEHAVIOR, SubType.NONE)
     private val poetdance = CardData(CardClass.NORMAL, CardName.TOKOYO_POETDANCE, MegamiEnum.TOKOYO, CardType.BEHAVIOR, SubType.REACTION)
     private val flipfan = CardData(CardClass.NORMAL, CardName.TOKOYO_FLIPFAN, MegamiEnum.TOKOYO, CardType.BEHAVIOR, SubType.FULL_POWER)
     private val windstage = CardData(CardClass.NORMAL, CardName.TOKOYO_WINDSTAGE, MegamiEnum.TOKOYO, CardType.ENCHANTMENT, SubType.NONE)
@@ -2085,7 +2094,7 @@ object CardSet {
         })
 
 
-        runningrabit.addText(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_TOKEN) { card_number, player, game_status, _->
+        runningrabbit.addText(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_TOKEN) { card_number, player, game_status, _->
             if(game_status.getAdjustDistance() <= 3){
                 game_status.dustToDistance(2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
             }
@@ -5421,7 +5430,7 @@ object CardSet {
         })
         flowingPlay.addText(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) { card_number, player, game_status, _ ->
             if(kyochi(player, game_status) && isUsedSomeOtherMegamisSpecial(game_status, player, MegamiEnum.TOKOYO)){
-                if(thisCardMoveTextCheck(card_number.toCardName(), CardName.TOKOYO_FLOWING_PLAY) && kyochi(player, game_status)){
+                if(thisCardMoveTextCheck(card_number.toCardName(), CardName.TOKOYO_FLOWING_PLAY)){
                     game_status.movePlayingCard(player, LocationEnum.YOUR_DECK_TOP, card_number)
                 }
             }
@@ -9531,17 +9540,20 @@ object CardSet {
             }
         })
         passingFear.addText(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.REACT_ATTACK_STATUS_CHANGE){ card_number, _, _, reactedAttack ->
-            reactedAttack?.addAttackBuff(Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true },
-                {_, gameStatus, madeAttack ->
-                    madeAttack.apply {
-                        val (aura, life) = gameStatus.gameLogger.findGetDamageByThisAttack(card_number)
+            if(reactedAttack?.card_class != CardClass.SPECIAL){
+                reactedAttack?.addAttackBuff(Buff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ -> true },
+                    {_, gameStatus, madeAttack ->
                         madeAttack.apply {
-                            auraPlusMinus(aura * -1); lifePlusMinus(life * -1)
+                            val (aura, life) = gameStatus.gameLogger.findGetDamageByThisAttack(card_number)
+                            madeAttack.apply {
+                                auraPlusMinus(aura * -1); lifePlusMinus(life * -1)
+                            }
                         }
-                    }
-                }))
+                    }))
+            }
             null
         })
+
 
         relicEye.setSpecial(1)
         relicEye.setAttack(DistanceType.CONTINUOUS, Pair(3, 5), null, 1, 1,
@@ -9555,6 +9567,7 @@ object CardSet {
             if(game_status.getPlayer(player.opposite()).concentration == 1) 1
             else 0
         })
+
 
         eightSakuraInVain.setSpecial(4)
         eightSakuraInVain.addText(Text(TextEffectTimingTag.USING, TextEffectTag.DO_BASIC_OPERATION){ _, player, game_status, _->
@@ -12426,7 +12439,7 @@ object CardSet {
                     attack.makeNotValid()
                 }))
                 val damage = react_attack.getDamage(game_status, player, game_status.getPlayerAttackBuff(player))
-                val chosen = game_status.damageSelect(player, damage, laceration = true)
+                val chosen = game_status.damageSelect(player, CommandEnum.CHOOSE_CARD_DAMAGE, damage, laceration = true)
                 if(chosen == CommandEnum.CHOOSE_LIFE){
                     game_status.addLacerationToken(player, player, INDEX_LACERATION_LIFE, damage.second)
                 }
@@ -13959,7 +13972,7 @@ object CardSet {
         })
         flowingPlayV9.addText(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) { card_number, player, game_status, _ ->
             if(kyochi(player, game_status) || isUsedSomeOtherMegamisSpecial(game_status, player, MegamiEnum.TOKOYO)) {
-                if(thisCardMoveTextCheck(card_number.toCardName(), CardName.TOKOYO_FLOWING_PLAY) && kyochi(player, game_status)){
+                if(thisCardMoveTextCheck(card_number.toCardName(), CardName.TOKOYO_FLOWING_PLAY)){
                     game_status.movePlayingCard(player, LocationEnum.YOUR_DECK_TOP, card_number)
                 }
             }
@@ -13967,7 +13980,7 @@ object CardSet {
         })
 
 
-        duetChitanYangMyeongV9.setSpecial(1)
+        duetChitanYangMyeongV9.setSpecial(2)
         duetChitanYangMyeongV9.addText(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.COST_BUFF){ card_number, player, game_status, _ ->
             if(kyochi(player, game_status)){
                 game_status.addThisTurnCostBuff(player, CostBuff(card_number, 1, BufTag.PLUS_MINUS_IMMEDIATE, {_, _, _ ->

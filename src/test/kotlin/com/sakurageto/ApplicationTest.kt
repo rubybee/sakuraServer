@@ -88,7 +88,7 @@ open class ApplicationTest {
         return SakuraArrayData(command, result)
     }
 
-    protected fun addDataReact(playerEnum: PlayerEnum, card_name: CardName, location: LocationEnum){
+    protected fun addReactData(playerEnum: PlayerEnum, card_name: CardName, location: LocationEnum){
         val nowPlayer = when(playerEnum){
             PLAYER1 -> player1Connection
             PLAYER2 -> player2Connection

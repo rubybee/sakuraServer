@@ -181,8 +181,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }?: false
     }
 
-    suspend fun canReactAt(attack: MadeAttack, game_status: GameStatus, player: PlayerEnum, continuousBuffQueue: OtherBuffQueue): Boolean{
-        return attack.canReacted(this, game_status, player, continuousBuffQueue)
+    suspend fun canReactAt(attack: MadeAttack, game_status: GameStatus, react_player: PlayerEnum, continuousBuffQueue: OtherBuffQueue): Boolean{
+        return attack.canReacted(this, game_status, react_player.opposite(), continuousBuffQueue)
     }
 
     private suspend fun returnNapWhenSomeCondition(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?): Int{

@@ -6237,7 +6237,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 cardOwner.coverCard.addFirst(card)
                 sendAddCardZone(cardOwnerSocket, cardOwnerOppositeSocket, card.card_number, publicForOther, CommandEnum.COVER_CARD_YOUR, publicForYour)
             }
-            LocationEnum.ENCHANTMENT_ZONE -> {
+            LocationEnum.ENCHANTMENT_ZONE, LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD -> {
                 card.location = LocationEnum.ENCHANTMENT_ZONE
                 nowPlayer.enchantmentCard[card.card_number] = card
                 sendAddCardZone(nowSocket, otherSocket, card.card_number, publicForOther, CommandEnum.ENCHANTMENT_CARD_YOUR, publicForYour)

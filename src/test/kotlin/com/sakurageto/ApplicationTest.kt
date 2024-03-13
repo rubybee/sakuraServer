@@ -18,8 +18,17 @@ open class ApplicationTest {
     protected suspend fun addCard(playerEnum: PlayerEnum, card_name: CardName, location: LocationEnum){
         val player = gameStatus.getPlayer(playerEnum)
         val card = Card.cardMakerByName(player.firstTurn, card_name, playerEnum, location, gameStatus.version)
-        if(location == LocationEnum.YOUR_USED_CARD){
-            card.special_card_state = SpecialCardEnum.PLAYED
+        when (location) {
+            LocationEnum.YOUR_USED_CARD -> {
+                card.special_card_state = SpecialCardEnum.PLAYED
+            }
+            LocationEnum.ADDITIONAL_CARD -> {
+                gameStatus.getPlayer(playerEnum).additionalHand[card_name] = card
+            }
+            LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD, LocationEnum.ENCHANTMENT_ZONE -> {
+                card.addNap(card.card_data.charge?: 0, false)
+            }
+            else -> {}
         }
         gameStatus.insertCardTo(playerEnum, card, location, false)
     }
@@ -105,6 +114,7 @@ open class ApplicationTest {
         nowPlayer.putReceiveData(makeData(CommandEnum.REACT_NO))
         nowPlayer.putReceiveData(makeData(CommandEnum.CHOOSE_AURA))
     }
+
 
     @Before
     open fun reset() {

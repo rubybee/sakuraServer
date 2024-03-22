@@ -5257,7 +5257,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     }
                 }
             }
-            println("quickchange: ${result[0]}")
             return result
         }
 
@@ -5722,7 +5721,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             sendDoBasicAction(getSocket(player), getSocket(player.opposite()), CommandEnum.ACTION_YAKSHA_YOUR, card)
             if(addPreAttackZone(
                     player, MadeAttack(CardName.FORM_YAKSHA, NUMBER_FORM_YAKSHA, CardClass.NULL,
-                            sortedSetOf(2, 4, 6, 8), 1,  1, MegamiEnum.THALLYA,
+                            sortedSetOf(2, 4, 6, 8), 2,  1, MegamiEnum.THALLYA,
                             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false
                         ).addTextAndReturn(CardSet.afterAttackManeuverBaseActionText)
                 ) ){
@@ -6202,7 +6201,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 cardOwner.normalCardDeck.addLast(card)
                 sendAddCardZone(cardOwnerSocket, cardOwnerOppositeSocket, card.card_number, publicForOther, CommandEnum.DECK_BELOW_YOUR, publicForYour)
             }
-            LocationEnum.YOUR_DECK_TOP -> {
+            LocationEnum.YOUR_DECK_TOP, LocationEnum.DECK -> {
                 card.location = LocationEnum.DECK
                 cardOwner.normalCardDeck.addFirst(card)
                 sendAddCardZone(cardOwnerSocket, cardOwnerOppositeSocket, card.card_number, publicForOther, CommandEnum.DECK_TOP_YOUR, publicForYour)

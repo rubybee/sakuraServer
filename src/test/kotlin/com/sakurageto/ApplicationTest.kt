@@ -85,6 +85,10 @@ open class ApplicationTest {
         return SakuraBaseData(command, 0)
     }
 
+    protected fun makeData(command: CommandEnum, data: Int): SakuraData{
+        return SakuraBaseData(command, data)
+    }
+
     protected fun makeData(command: CommandEnum, data: MutableList<Int>): SakuraData{
         return SakuraArrayData(command, data)
     }
@@ -111,6 +115,16 @@ open class ApplicationTest {
         if(card_name != CardName.CARD_UNNAME){
             nowPlayer.putReceiveData(SakuraBaseData(command, card_name.toCardNumber(gameStatus.getPlayer(playerEnum).firstTurn)))
         }
+        nowPlayer.putReceiveData(makeData(CommandEnum.REACT_NO))
+        nowPlayer.putReceiveData(makeData(CommandEnum.CHOOSE_AURA))
+    }
+
+    protected fun addReactData(playerEnum: PlayerEnum){
+        val nowPlayer = when(playerEnum){
+            PLAYER1 -> player1Connection
+            PLAYER2 -> player2Connection
+        }
+
         nowPlayer.putReceiveData(makeData(CommandEnum.REACT_NO))
         nowPlayer.putReceiveData(makeData(CommandEnum.CHOOSE_AURA))
     }

@@ -8,6 +8,7 @@ import com.sakurageto.gamelogic.PlayerStatus
 import com.sakurageto.protocol.*
 import io.mockk.mockk
 import org.junit.Before
+import kotlin.test.assertEquals
 
 open class ApplicationTest {
     protected var player1Connection = ConnectionTest(PLAYER1, mockk())
@@ -142,6 +143,14 @@ open class ApplicationTest {
         gameStatus.turnNumber = 3
         gameStatus.firstTurnPlayer = PLAYER1; gameStatus.player1.firstTurn = true; gameStatus.player2.firstTurn = false
         gameStatus.player1.fullAction = false; gameStatus.player2.fullAction = false
+    }
+
+    fun cardTypeTest(card_name: CardName, cardClass: CardClass, mainType: CardType, subType: SubType){
+        val card = Card.cardMakerByName(true, card_name, PLAYER1, LocationEnum.OUT_OF_GAME,
+            gameStatus.version)
+        assertEquals(mainType, card.card_data.card_type)
+        assertEquals(subType, card.card_data.sub_type)
+        assertEquals(cardClass, card.card_data.card_class)
     }
 
 //    fun testRoot() = testApplication {

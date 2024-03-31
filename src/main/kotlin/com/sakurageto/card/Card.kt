@@ -127,7 +127,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     fun usedEffectUsable(text: Text): Boolean =
         text.timing_tag == TextEffectTimingTag.USED && this.special_card_state == SpecialCardEnum.PLAYED
 
-    suspend fun destructionEnchantmentNormaly(player: PlayerEnum, game_status: GameStatus){
+    suspend fun destructionEnchantmentNormal(player: PlayerEnum, game_status: GameStatus){
         card_data.effect?.let {
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.AFTER_DESTRUCTION){
@@ -154,11 +154,11 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
     }
 
-    suspend fun thisCardCostBuff(player: PlayerEnum, game_status: GameStatus){
+    suspend fun thisCardCostBuff(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?){
         card_data.effect?.let {
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
-                    if(text.tag == TextEffectTag.COST_BUFF) text.effect!!(this.card_number, player, game_status, null)
+                    if(text.tag == TextEffectTag.COST_BUFF) text.effect!!(this.card_number, player, game_status, react_attack)
                 }
             }
         }
@@ -464,7 +464,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 }
             }
             if(isCost && isConsume){
-                this.thisCardCostBuff(player, gameStatus)
+                this.thisCardCostBuff(player, gameStatus, react_attack)
                 gameStatus.addAllCardCostBuff()
                 val (laceration, baseCost) = this.getBaseCost(player, gameStatus)
                 cost = gameStatus.applyAllCostBuff(player, baseCost, this)
@@ -894,7 +894,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
     }
 
-    suspend fun effectAllValidEffect(card_number: Int, player: PlayerEnum, game_status: GameStatus, effectTag: TextEffectTag): Int{
+    suspend fun effectAllValidEffect(card_number: Int, player: PlayerEnum, game_status: GameStatus, effectTag: TextEffectTag,
+        react_attack: MadeAttack? = null): Int{
         var now = 0
         if(this.card_data.umbrellaMark) {
             when (game_status.getUmbrella(this.player)) {
@@ -902,7 +903,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                     card_data.effectFold?.let {
                         for(text in it){
                             if(usedEffectUsable(text) || enchantmentUsable(text)){
-                                if(text.tag == effectTag) text.effect!!(card_number, player, game_status, null)?.let { result ->
+                                if(text.tag == effectTag) text.effect!!(card_number, player, game_status, react_attack)?.let { result ->
                                     now += result
                                 }
                             }
@@ -913,7 +914,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                     card_data.effectUnfold?.let {
                         for(text in it){
                             if(usedEffectUsable(text) || enchantmentUsable(text)){
-                                if(text.tag == effectTag) text.effect!!(card_number, player, game_status, null)?.let { result ->
+                                if(text.tag == effectTag) text.effect!!(card_number, player, game_status, react_attack)?.let { result ->
                                     now += result
                                 }
                             }
@@ -928,7 +929,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             card_data.effect?.let {
                 for(text in it){
                     if(usedEffectUsable(text) || enchantmentUsable(text)){
-                        if(text.tag == effectTag) text.effect!!(card_number, player, game_status, null)?.let { result ->
+                        if(text.tag == effectTag) text.effect!!(card_number, player, game_status, react_attack)?.let { result ->
                             now += result
                         }
                     }
@@ -939,7 +940,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         return now
     }
 
-    suspend fun effectAllValidEffect(player: PlayerEnum, game_status: GameStatus, effectTag: TextEffectTag): Int{
+    suspend fun effectAllValidEffect(player: PlayerEnum, game_status: GameStatus, effectTag: TextEffectTag, react_attack: MadeAttack? = null): Int{
         var now = 0
         if(this.card_data.umbrellaMark) {
             when (game_status.getUmbrella(this.player)) {
@@ -947,7 +948,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                     card_data.effectFold?.let {
                         for(text in it){
                             if(usedEffectUsable(text) || enchantmentUsable(text)){
-                                if(text.tag == effectTag) text.effect!!(this.card_number, player, game_status, null)?.let { result ->
+                                if(text.tag == effectTag) text.effect!!(this.card_number, player, game_status, react_attack)?.let { result ->
                                     now += result
                                 }
                             }
@@ -958,7 +959,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                     card_data.effectUnfold?.let {
                         for(text in it){
                             if(usedEffectUsable(text) || enchantmentUsable(text)){
-                                if(text.tag == effectTag) text.effect!!(this.card_number, player, game_status, null)?.let { result ->
+                                if(text.tag == effectTag) text.effect!!(this.card_number, player, game_status, react_attack)?.let { result ->
                                     now += result
                                 }
                             }
@@ -973,7 +974,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             card_data.effect?.let {
                 for(text in it){
                     if(usedEffectUsable(text) || enchantmentUsable(text)){
-                        if(text.tag == effectTag) text.effect!!(this.card_number, player, game_status, null)?.let { result ->
+                        if(text.tag == effectTag) text.effect!!(this.card_number, player, game_status, react_attack)?.let { result ->
                             now += result
                         }
                     }

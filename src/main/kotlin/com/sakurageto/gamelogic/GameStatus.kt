@@ -854,6 +854,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         nowPlayer.enchantmentCard.values.filter {card ->
             card.chasmCheck()
         }.forEach{ card ->
+            cardToDust(player, card.getNap(), card, false, card.card_number)
             enchantmentDestructionNotNormally(player, card)
         }
     }
@@ -3725,8 +3726,9 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         if(react_attack == null){
             var reactCheckCancel = false
             for(card in otherPlayer.usedSpecialCard.values){
-                if (card.effectAllValidEffect(attack_player.opposite(), this, TextEffectTag.WHEN_GET_ATTACK) == 1){
+                if (card.effectAllValidEffect(attack_player.opposite(), this, TextEffectTag.WHEN_GET_ATTACK, nowAttack) == 1){
                     reactCheckCancel = true
+                    break
                 }
             }
             if(!otherPlayer.endTurn && !reactCheckCancel){
@@ -4141,8 +4143,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun afterDestruction(player: PlayerEnum, card_number: Int, location: LocationEnum){
-        val card = popCardFrom(player, card_number, LocationEnum.ENCHANTMENT_ZONE, true)?: return
+        val card = getCardFrom(player, card_number, LocationEnum.ENCHANTMENT_ZONE)?: return
+        if ((card.getNap()?:0) >= 1) return
+
+        popCardFrom(player, card_number, LocationEnum.ENCHANTMENT_ZONE, true)
         card.effectText(player, this, null, TextEffectTag.WHEN_THIS_CARD_GET_OUT_ENCHANTMENT)
+
         when(card.card_data.card_class){
             CardClass.SPECIAL -> {
                 card.addReturnListener(card.player, this)
@@ -4157,7 +4163,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
         }
 
-        cardToDust(card.player, card.getNap(), card, false, EventLog.AFTER_DESTRUCTION_PROCESS)
         gameLogger.insert(EventLog(player, LogText.END_EFFECT, EventLog.AFTER_DESTRUCTION_PROCESS, -1))
     }
 
@@ -4172,7 +4177,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
         }
         if(checkValid){
-            card.destructionEnchantmentNormaly(player, this)
+            card.destructionEnchantmentNormal(player, this)
             gameLogger.insert(EventLog(PlayerEnum.PLAYER1, LogText.END_EFFECT, card.card_number, -1))
         }
 
@@ -4643,10 +4648,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         else{
             gameLogger.insert(EventLog(player, LogText.GET_LIFE_DAMAGE, damage.second, card_number))
             sendSimpleCommand(getSocket(player), getSocket(player.opposite()), CommandEnum.GET_DAMAGE_LIFE_YOUR)
-            if(!reconstruct){
-                addMarketPrice(player.opposite())
-                reduceMarketPrice(player)
-            }
+
             if(lifeReplace == null){
                 lifeToSelfFlare(player, damage.second, reconstruct, true, Arrow.NULL, PlayerEnum.PLAYER1, PlayerEnum.PLAYER2, card_number)
             }
@@ -4654,7 +4656,12 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                 moveTokenByInt(player, LocationEnum.LIFE_YOUR.real_number, lifeReplace, damage.second, true, -1, card_number)
             }
 
-            if(!reconstruct) chasmProcess(player)
+            if(!reconstruct){
+                if(damage.second > 0) chasmProcess(player)
+
+                addMarketPrice(player.opposite())
+                reduceMarketPrice(player)
+            }
         }
 
         damageListenerProcess(player)
@@ -5644,30 +5651,49 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
 
         return when(command){
-            CommandEnum.ACTION_GO_FORWARD ->
-                !(nowPlayer.aura + nowPlayer.freezeToken == nowPlayer.maxAura || distanceToken == 0 || getAdjustDistance() <= getAdjustSwellDistance())
-                        && !(getPlayer(player).canNotGoForward)
-            CommandEnum.ACTION_GO_BACKWARD -> {
-                !(nowPlayer.aura == 0 || distanceToken == 10) && basicOperationEnchantmentCheck(player, CommandEnum.ACTION_GO_BACKWARD)
+            CommandEnum.ACTION_GO_FORWARD -> {
+                nowPlayer.aura + nowPlayer.freezeToken < nowPlayer.maxAura &&
+                distanceToken != 0 &&
+                getAdjustDistance() > getAdjustSwellDistance() &&
+                !(getPlayer(player).canNotGoForward)
             }
-            CommandEnum.ACTION_WIND_AROUND -> !(dust == 0 || nowPlayer.aura + nowPlayer.freezeToken == nowPlayer.maxAura ||
-                    checkAdditionalBasicOperation(player, TextEffectTag.CONDITION_ADD_DO_WIND_AROUND))
-            CommandEnum.ACTION_INCUBATE -> (nowPlayer.aura != 0 || nowPlayer.freezeToken != 0) && basicOperationEnchantmentCheck(player, CommandEnum.ACTION_INCUBATE)
+            CommandEnum.ACTION_GO_BACKWARD -> {
+                nowPlayer.aura != 0 &&
+                distanceToken != 10 &&
+                basicOperationEnchantmentCheck(player, CommandEnum.ACTION_GO_BACKWARD)
+            }
+            CommandEnum.ACTION_WIND_AROUND ->{
+                (dust != 0 &&
+                nowPlayer.aura + nowPlayer.freezeToken < nowPlayer.maxAura) ||
+                checkAdditionalBasicOperation(player, TextEffectTag.CONDITION_ADD_DO_WIND_AROUND)
+            }
+            CommandEnum.ACTION_INCUBATE -> {
+                (nowPlayer.aura != 0 ||
+                nowPlayer.freezeToken != 0) &&
+                basicOperationEnchantmentCheck(player, CommandEnum.ACTION_INCUBATE)
+            }
             CommandEnum.ACTION_BREAK_AWAY -> {
-                !(dust == 0 || getAdjustDistance() > getAdjustSwellDistance() || distanceToken == 10) && basicOperationEnchantmentCheck(player, CommandEnum.ACTION_BREAK_AWAY)
+                dust != 0 &&
+                getAdjustDistance() <= getAdjustSwellDistance() &&
+                distanceToken != 10 &&
+                basicOperationEnchantmentCheck(player, CommandEnum.ACTION_BREAK_AWAY)
             }
             CommandEnum.ACTION_YAKSHA -> {
-                getPlayer(player).transformZone[CardName.FORM_YAKSHA] != null || transformBasicOperationCheck(player, CardName.FORM_YAKSHA)
+                getPlayer(player).transformZone[CardName.FORM_YAKSHA] != null ||
+                transformBasicOperationCheck(player, CardName.FORM_YAKSHA)
             }
             CommandEnum.ACTION_NAGA -> {
-                getPlayer(player).transformZone[CardName.FORM_NAGA] != null || transformBasicOperationCheck(player, CardName.FORM_NAGA)
+                getPlayer(player).transformZone[CardName.FORM_NAGA] != null ||
+                transformBasicOperationCheck(player, CardName.FORM_NAGA)
             }
             CommandEnum.ACTION_GARUDA -> {
-                getPlayer(player).transformZone[CardName.FORM_GARUDA] != null || transformBasicOperationCheck(player, CardName.FORM_GARUDA)
+                getPlayer(player).transformZone[CardName.FORM_GARUDA] != null ||
+                transformBasicOperationCheck(player, CardName.FORM_GARUDA)
             }
             CommandEnum.ACTION_ASURA -> {
-                (getPlayer(player).transformZone[CardName.FORM_ASURA] != null || transformBasicOperationCheck(player, CardName.FORM_ASURA))
-                        && !getPlayer(player).asuraUsed
+                (getPlayer(player).transformZone[CardName.FORM_ASURA] != null ||
+                transformBasicOperationCheck(player, CardName.FORM_ASURA)) &&
+                !getPlayer(player).asuraUsed
             }
             else -> false
         }
@@ -5776,14 +5802,11 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     //this 5 function must call after check when select
     private suspend fun doWindAround(player: PlayerEnum, card: Int): Boolean{
         if(canDoBasicOperation(player, CommandEnum.ACTION_WIND_AROUND)){
-            var additionalCheck = 0
             for(usedCard in getPlayer(player).usedSpecialCard.values){
-                additionalCheck += usedCard.effectAllValidEffect(player, this, TextEffectTag.WHEN_DO_WIND_AROUND)
-                if(additionalCheck != 0) {
-                    break
+                if(usedCard.effectAllValidEffect(player, this, TextEffectTag.WHEN_DO_WIND_AROUND) != 0) {
+                    return false
                 }
             }
-            if(additionalCheck != 0) return false
 
             val nowSocket = getSocket(player)
             val otherSocket = getSocket(player.opposite())
@@ -6049,7 +6072,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     return card
                 }
             }
-            LocationEnum.ENCHANTMENT_ZONE -> {
+            LocationEnum.ENCHANTMENT_ZONE, LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD -> {
                 val result = nowPlayer.enchantmentCard[card_number]?: return null
                 sendPopCardZone(nowSocket, otherSocket, result.card_number, public, CommandEnum.POP_ENCHANTMENT_YOUR)
                 nowPlayer.enchantmentCard.remove(card_number)

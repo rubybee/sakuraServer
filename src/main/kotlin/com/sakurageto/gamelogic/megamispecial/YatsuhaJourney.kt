@@ -51,7 +51,7 @@ class YatsuhaJourney(private val startPoint: Int) {
 
     companion object{
         val journeyEffectOne = Text(TextEffectTimingTag.USING, TextEffectTag.CHANGE_CONCENTRATION) {_, player, game_status, _->
-            game_status.setConcentration(player, 1)
+            game_status.addConcentration(player)
             null
         }
 

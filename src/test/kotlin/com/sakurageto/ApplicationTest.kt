@@ -116,7 +116,6 @@ open class ApplicationTest {
         if(card_name != CardName.CARD_UNNAME){
             nowPlayer.putReceiveData(SakuraBaseData(command, card_name.toCardNumber(gameStatus.getPlayer(playerEnum).firstTurn)))
         }
-        nowPlayer.putReceiveData(makeData(CommandEnum.REACT_NO))
         nowPlayer.putReceiveData(makeData(CommandEnum.CHOOSE_AURA))
     }
 

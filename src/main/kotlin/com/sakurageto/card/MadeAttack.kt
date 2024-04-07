@@ -281,13 +281,13 @@ class MadeAttack(
     fun plusMinusRange(number: Int, closable: Boolean){
         if(number > 0){
             if(closable){
-                val min = editedDistance.first()
+                val min = editedDistance.first()?: return
                 for(i in min - number until min){
                     editedDistance.add(i)
                 }
             }
             else{
-                val max = editedDistance.last()
+                val max = editedDistance.last()?: return
                 for(i in max + 1 .. max + number){
                     editedDistance.add(i)
                 }
@@ -295,13 +295,13 @@ class MadeAttack(
         }
         else if(number < 0){
             if(closable){
-                val min = editedDistance.first()
+                val min = editedDistance.first()?: return
                 for(i in min until min - number){
                     editedDistance.remove(i)
                 }
             }
             else{
-                val max = editedDistance.last()
+                val max = editedDistance.last()?: return
                 for(i in max + number + 1 .. max){
                     editedDistance.remove(i)
                 }

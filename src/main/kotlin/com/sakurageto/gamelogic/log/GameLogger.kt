@@ -40,7 +40,7 @@ class GameLogger {
 
     fun checkThisCardUseInSoldier(player: PlayerEnum, card_number: Int): Boolean{
         for (log in eventLogQueue.asReversed()){
-            if(log.player == player && log.number1 == card_number){
+            if(log.player == player && log.number1 == card_number && log.isTextUseCard()){
                 return log.text == LogText.USE_CARD_IN_SOLDIER || log.text == LogText.USE_CARD_IN_SOLDIER_PERJURE
             }
         }

@@ -417,6 +417,12 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
     }
 
+    private fun kanaweSealCheck(player: PlayerEnum, game_status: GameStatus) =
+            game_status.turnPlayer == player &&
+            (game_status.getPlayer(player).canNotUseCardName1?.second == card_data.card_name ||
+            game_status.getPlayer(player).canNotUseCardName2?.second == card_data.card_name)
+                    && card_data.card_name != CardName.RENRI_DECEPTION_FOG
+
     //-2: can't use                    -1: can use                 >= 0: cost
     suspend fun canUse(player: PlayerEnum, gameStatus: GameStatus, react_attack: MadeAttack?, isCost: Boolean, isConsume: Boolean): Int{
         val nowPlayer = gameStatus.getPlayer(player)
@@ -456,13 +462,10 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
 
         if(card_data.card_class == CardClass.SPECIAL){
-            if(gameStatus.turnPlayer == player &&
-                (nowPlayer.canNotUseCardName1?.second == card_data.card_name
-                || nowPlayer.canNotUseCardName2?.second == card_data.card_name)){
-                if(card_data.card_type != CardType.UNDEFINED){
-                    return -2
-                }
+            if(kanaweSealCheck(player, gameStatus)){
+                return -2
             }
+
             if(isCost && isConsume){
                 this.thisCardCostBuff(player, gameStatus, react_attack)
                 gameStatus.addAllCardCostBuff()
@@ -484,18 +487,14 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 cost = 0
             }
         }
-        else{
-            if(card_data.card_class == CardClass.NORMAL){
-                if(gameStatus.getPlayer(player.opposite()).nowAct?.actColor == Act.COLOR_RED){
-                    if(gameStatus.turnPlayer == player &&
-                        (nowPlayer.canNotUseCardName1?.second == card_data.card_name
-                        || nowPlayer.canNotUseCardName2?.second == card_data.card_name)){
-                        if(card_data.card_type != CardType.UNDEFINED){
-                            return -2
-                        }
-                    }
-                }
+        else if(card_data.card_class == CardClass.NORMAL){
+            if(gameStatus.getPlayer(player.opposite()).nowAct?.actColor == Act.COLOR_RED
+                && kanaweSealCheck(player, gameStatus)){
+                return -2
             }
+            cost = -1
+        }
+        else{
             cost = -1
         }
 

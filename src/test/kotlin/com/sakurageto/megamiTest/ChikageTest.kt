@@ -52,11 +52,11 @@ class ChikageTest: ApplicationTest() {
         gameStatus.player1.fullAction = true
 
         addCard(PlayerEnum.PLAYER2, CardName.POISON_HALLUCINOGENIC, LocationEnum.HAND)
-        addReactData(PlayerEnum.PLAYER2, CardName.CARD_UNNAME, LocationEnum.HAND)
+        addReactData(PlayerEnum.PLAYER2)
         player2Connection.putReceiveData(makeData(CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, mutableListOf(
             NUMBER_POISON_RELAXATION + SECOND_PLAYER_START_NUMBER
         )))
-        addReactData(PlayerEnum.PLAYER2, CardName.CARD_UNNAME, LocationEnum.HAND)
+        addReactData(PlayerEnum.PLAYER2)
 
         addCard(PlayerEnum.PLAYER1, CardName.CHIKAGE_HIDDEN_WEAPON, LocationEnum.HAND)
         useCard(PlayerEnum.PLAYER1, CardName.CHIKAGE_HIDDEN_WEAPON, LocationEnum.HAND)

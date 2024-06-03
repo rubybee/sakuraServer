@@ -61,6 +61,7 @@ enum class LocationEnum(var real_number: Int){
     ANVIL_YOUR(47),
     ANVIL_OTHER(48),
     ALL_NORMAL(49),
+    ALL_NORMAL_EXCEPT_ADDITIONAL(61),
     NOT_SELECTED_NORMAL_CARD(50),
 
     MEMORY_YOUR(51),

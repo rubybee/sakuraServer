@@ -1,6 +1,10 @@
 package com.sakurageto.card
 
-import com.sakurageto.gamelogic.MegamiEnum
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.DistanceType
+import com.sakurageto.card.basicenum.SubType
+import com.sakurageto.card.basicenum.MegamiEnum
 import java.util.SortedSet
 
 class CardData(
@@ -27,8 +31,6 @@ class CardData(
 
     //general
     var effect: MutableList<Text>? = null
-    var canCover = true
-    var canDiscard = true
 
     var cannotReactNormal: Boolean = false
     var cannotReactSpecial: Boolean = false
@@ -88,7 +90,7 @@ class CardData(
     }
 
     fun setAttackFold(distance_type: DistanceType, distance_cont: Pair<Int, Int>?, distance_uncont: MutableList<Int>?,
-                  aura_damage: Int, life_damage: Int){
+                      aura_damage: Int, life_damage: Int){
         this.distanceTypeFold = distance_type
         if(distance_type == DistanceType.CONTINUOUS){
             this.distanceContFold = Pair(distance_cont!!.first, distance_cont.second)

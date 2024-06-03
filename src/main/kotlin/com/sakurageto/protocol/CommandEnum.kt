@@ -3,7 +3,7 @@ package com.sakurageto.protocol
 import com.sakurageto.card.INDEX_LACERATION_AURA
 import com.sakurageto.card.INDEX_LACERATION_FLARE
 import com.sakurageto.card.INDEX_LACERATION_LIFE
-import com.sakurageto.card.PlayerEnum
+import com.sakurageto.card.basicenum.PlayerEnum
 import com.sakurageto.plugins.makeBugReportFile
 import java.lang.Exception
 import java.util.*

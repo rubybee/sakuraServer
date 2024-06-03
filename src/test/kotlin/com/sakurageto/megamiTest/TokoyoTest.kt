@@ -2,6 +2,10 @@ package com.sakurageto.megamiTest
 
 import com.sakurageto.ApplicationTest
 import com.sakurageto.card.*
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.PlayerEnum
+import com.sakurageto.card.basicenum.SubType
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import kotlinx.coroutines.test.runTest
@@ -10,8 +14,31 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
 class TokoyoTest: ApplicationTest() {
-    fun setKyoChi(playerEnum: PlayerEnum){
+    private fun setKyoChi(playerEnum: PlayerEnum){
         gameStatus.getPlayer(playerEnum).concentration = 2
+    }
+
+    @Test
+    fun cardTypeTest() = runTest {
+        cardTypeTest(CardName.TOKOYO_BITSUNERIGI, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.TOKOYO_WOOAHHANTAGUCK, CardClass.NORMAL, CardType.ATTACK, SubType.REACTION)
+        cardTypeTest(CardName.TOKOYO_RUNNING_RABBIT, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.TOKOYO_POETDANCE, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.TOKOYO_FLIPFAN, CardClass.NORMAL, CardType.BEHAVIOR, SubType.FULL_POWER)
+        cardTypeTest(CardName.TOKOYO_WINDSTAGE, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.TOKOYO_SUNSTAGE, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.TOKOYO_KUON, CardClass.SPECIAL, CardType.ATTACK, SubType.REACTION)
+        cardTypeTest(CardName.TOKOYO_THOUSANDBIRD, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.TOKOYO_ENDLESSWIND, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.TOKOYO_TOKOYOMOON, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+
+        cardTypeTest(CardName.SAI_TOKO_ENSEMBLE, CardClass.NORMAL, CardType.ATTACK, SubType.REACTION)
+        cardTypeTest(CardName.TOKOYO_FLOWING_PLAY, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.TOKOYO_DUET_CHI_TAN_YANG_MYEONG, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+
+        cardTypeTest(CardName.TOKOYO_PASSING_FEAR, CardClass.NORMAL, CardType.ATTACK, SubType.REACTION)
+        cardTypeTest(CardName.TOKOYO_RELIC_EYE, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.TOKOYO_EIGHT_SAKURA_IN_VAIN, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
     }
 
     @Test
@@ -96,7 +123,8 @@ class TokoyoTest: ApplicationTest() {
         addCard(PlayerEnum.PLAYER1, CardName.TOKOYO_BITSUNERIGI, LocationEnum.DISCARD_YOUR)
         addCard(PlayerEnum.PLAYER1, CardName.TOKOYO_POETDANCE, LocationEnum.COVER_CARD)
 
-        player1Connection.putReceiveData(makeData(PlayerEnum.PLAYER1, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+        player1Connection.putReceiveData(makeData(
+            PlayerEnum.PLAYER1, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
             mutableListOf(CardName.TOKOYO_BITSUNERIGI, CardName.TOKOYO_POETDANCE)))
         useCard(PlayerEnum.PLAYER1, CardName.TOKOYO_FLIPFAN, LocationEnum.HAND)
 
@@ -183,7 +211,8 @@ class TokoyoTest: ApplicationTest() {
 
         addReactData(PlayerEnum.PLAYER2, CardName.CARD_UNNAME, LocationEnum.HAND)
 
-        player2Connection.putReceiveData(makeData(PlayerEnum.PLAYER2, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, mutableListOf(
+        player2Connection.putReceiveData(makeData(
+            PlayerEnum.PLAYER2, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, mutableListOf(
             CardName.TOKOYO_RUNNING_RABBIT)))
         useCard(PlayerEnum.PLAYER1, CardName.TOKOYO_ENDLESSWIND, LocationEnum.SPECIAL_CARD)
 
@@ -252,7 +281,8 @@ class TokoyoTest: ApplicationTest() {
         gameStatus.endPhase(); startPhase()
 
         addReactData(PlayerEnum.PLAYER1, CardName.SAINE_HURUBEGI, LocationEnum.HAND)
-        player1Connection.putReceiveData(makeData(PlayerEnum.PLAYER1, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+        player1Connection.putReceiveData(makeData(
+            PlayerEnum.PLAYER1, CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
             mutableListOf(CardName.TOKOYO_BITSUNERIGI)))
         addReactData(PlayerEnum.PLAYER1, CardName.CARD_UNNAME, LocationEnum.HAND)
         addCard(PlayerEnum.PLAYER2, CardName.TOKOYO_FLOWING_PLAY, LocationEnum.HAND)

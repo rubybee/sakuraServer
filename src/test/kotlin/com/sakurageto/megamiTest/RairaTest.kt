@@ -2,7 +2,11 @@ package com.sakurageto.megamiTest
 
 import com.sakurageto.ApplicationTest
 import com.sakurageto.card.*
-import com.sakurageto.gamelogic.MegamiEnum
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.PlayerEnum
+import com.sakurageto.card.basicenum.SubType
+import com.sakurageto.card.basicenum.MegamiEnum
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import kotlinx.coroutines.test.runTest
@@ -16,6 +20,29 @@ class RairaTest: ApplicationTest() {
         gameStatus.player1.megamiOne = MegamiEnum.RAIRA
         MegamiEnum.RAIRA.settingForOriginal(PlayerEnum.PLAYER1, gameStatus)
     }
+
+    @Test
+    fun cardTypeTest() = runTest {
+        cardTypeTest(CardName.RAIRA_BEAST_NAIL, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.RAIRA_STORM_SURGE_ATTACK, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.RAIRA_REINCARNATION_NAIL, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.RAIRA_WIND_RUN, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.RAIRA_WISDOM_OF_STORM_SURGE, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.RAIRA_HOWLING, CardClass.NORMAL, CardType.BEHAVIOR, SubType.FULL_POWER)
+        cardTypeTest(CardName.RAIRA_WIND_KICK, CardClass.NORMAL, CardType.BEHAVIOR, SubType.FULL_POWER)
+        cardTypeTest(CardName.RAIRA_THUNDER_WIND_PUNCH, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.RAIRA_SUMMON_THUNDER, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.FULL_POWER)
+        cardTypeTest(CardName.RAIRA_WIND_CONSEQUENCE_BALL, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.RAIRA_WIND_ATTACK, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.RAIRA_WIND_ZEN_KAI, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.RAIRA_WIND_CELESTIAL_SPHERE, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.RAIRA_CIRCULAR_CIRCUIT, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.REACTION)
+
+        cardTypeTest(CardName.RAIRA_STORM, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.RAIRA_FURIOUS_STORM, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.FULL_POWER)
+        cardTypeTest(CardName.RAIRA_JIN_PUNG_JE_CHEON_UI, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+    }
+
 
     @Test
     fun stormSurgeTest() = runTest {

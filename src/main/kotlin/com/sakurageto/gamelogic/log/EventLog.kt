@@ -1,6 +1,6 @@
 package com.sakurageto.gamelogic.log
 
-import com.sakurageto.card.PlayerEnum
+import com.sakurageto.card.basicenum.PlayerEnum
 import com.sakurageto.protocol.LocationEnum
 
 //number1, number2 used to express location and card number
@@ -16,11 +16,10 @@ import com.sakurageto.protocol.LocationEnum
  used, constanteffect, in_deployment 같은 형태로 사용될 경우 처리해줘야됨
  */
 class EventLog(val player: PlayerEnum, val text: LogText, val number1: Int, val number2: Int, val resource: LocationEnum = LocationEnum.DUST,
-               val destination: LocationEnum = LocationEnum.DUST, val boolean: Boolean = false) {
+               val destination: LocationEnum = LocationEnum.DUST, val boolean: Boolean = false, var boolean2: Boolean = false) {
 
     fun isTextUseCard() = this.text == LogText.USE_CARD || this.text == LogText.USE_CARD_IN_SOLDIER ||
-            this.text == LogText.USE_CARD_REACT || this.text == LogText.USE_CARD_IN_COVER ||
-            this.text == LogText.USE_CARD_IN_COVER_AND_REACT || this.text == LogText.USE_CARD_PERJURE ||
+            this.text == LogText.USE_CARD_IN_COVER || this.text == LogText.USE_CARD_PERJURE ||
             this.text == LogText.USE_CARD_IN_SOLDIER_PERJURE
 
     fun isAhumBasicOperation(ahumPlayer: PlayerEnum) =

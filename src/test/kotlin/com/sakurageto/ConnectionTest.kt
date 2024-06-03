@@ -1,6 +1,6 @@
 package com.sakurageto
 
-import com.sakurageto.card.PlayerEnum
+import com.sakurageto.card.basicenum.PlayerEnum
 import com.sakurageto.protocol.*
 import io.ktor.server.websocket.*
 import kotlinx.serialization.json.Json
@@ -86,6 +86,7 @@ class ConnectionTest(private val player: PlayerEnum, session: DefaultWebSocketSe
     }
 
     override suspend fun send(data: String){
+        if(this.gameEnd) return
         beforeData = data
         logger.info("(GameRoom${roomNumber}) send message to ${player}: $data")
     }

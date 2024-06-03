@@ -2,6 +2,10 @@ package com.sakurageto.megamiTest
 
 import com.sakurageto.ApplicationTest
 import com.sakurageto.card.*
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.PlayerEnum
+import com.sakurageto.card.basicenum.SubType
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import kotlinx.coroutines.test.runTest
@@ -9,6 +13,36 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 class HonokaTest: ApplicationTest() {
+    @Test
+    fun cardTypeTest() = runTest {
+        cardTypeTest(CardName.HONOKA_SPIRIT_SIK, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.HONOKA_GUARDIAN_SPIRIT_SIK, CardClass.NORMAL, CardType.ATTACK, SubType.REACTION)
+        cardTypeTest(CardName.HONOKA_ASSAULT_SPIRIT_SIK, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.HONOKA_DIVINE_OUKA, CardClass.NORMAL, CardType.ATTACK, SubType.FULL_POWER)
+        cardTypeTest(CardName.HONOKA_SAKURA_BLIZZARD, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.HONOKA_UI_GI_GONG_JIN, CardClass.NORMAL, CardType.ATTACK, SubType.FULL_POWER)
+        cardTypeTest(CardName.HONOKA_SAKURA_WING, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.HONOKA_SAKURA_AMULET, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.HONOKA_HONOKA_SPARKLE, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.HONOKA_COMMAND, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.HONOKA_TAIL_WIND, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.HONOKA_CHEST_WILLINGNESS, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.HONOKA_HAND_FLOWER, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.FULL_POWER)
+        cardTypeTest(CardName.HONOKA_A_NEW_OPENING, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.FULL_POWER)
+        cardTypeTest(CardName.HONOKA_UNDER_THE_NAME_OF_FLAG, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.HONOKA_FOUR_SEASON_BACK, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.HONOKA_FULL_BLOOM_PATH, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.NONE)
+
+        cardTypeTest(CardName.HONOKA_SAKURA_SWORD, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.HONOKA_SHADOW_HAND, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.HONOKA_EYE_OPEN_ALONE, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.HONOKA_FOLLOW_TRACE, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.HONOKA_FACING_SHADOW, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.HONOKA_SAKURA_SHINING_BRIGHTLY, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.HONOKA_HOLD_HANDS, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.HONOKA_WALK_OLD_LOAD, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+    }
+
     @Test
     fun spiritSikTest() = runTest{
         resetValue(0, 0, 10, 10, 8, 0)

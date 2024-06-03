@@ -2,6 +2,10 @@ package com.sakurageto.megamiTest
 
 import com.sakurageto.ApplicationTest
 import com.sakurageto.card.*
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.PlayerEnum
+import com.sakurageto.card.basicenum.SubType
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import kotlinx.coroutines.test.runTest
@@ -10,6 +14,24 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
 class KururuOriginTest: ApplicationTest() {
+    @Test
+    fun cardTypeTest() = runTest {
+        cardTypeTest(CardName.KURURU_ELEKITTEL, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.KURURU_ACCELERATOR, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.KURURU_KURURUOONG, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.KURURU_TORNADO, CardClass.NORMAL, CardType.BEHAVIOR, SubType.FULL_POWER)
+        cardTypeTest(CardName.KURURU_REGAINER, CardClass.NORMAL, CardType.BEHAVIOR, SubType.FULL_POWER)
+        cardTypeTest(CardName.KURURU_MODULE, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.KURURU_REFLECTOR, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.KURURU_DRAIN_DEVIL, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.KURURU_BIG_GOLEM, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.KURURU_INDUSTRIA, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.KURURU_DUPLICATED_GEAR_1, CardClass.NORMAL, CardType.UNDEFINED, SubType.UNDEFINED)
+        cardTypeTest(CardName.KURURU_DUPLICATED_GEAR_2, CardClass.NORMAL, CardType.UNDEFINED, SubType.UNDEFINED)
+        cardTypeTest(CardName.KURURU_DUPLICATED_GEAR_3, CardClass.NORMAL, CardType.UNDEFINED, SubType.UNDEFINED)
+        cardTypeTest(CardName.KURURU_KANSHOUSOUCHI_KURURUSIK, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+    }
+
     @Test
     fun elekittelTest() = runTest {
         resetValue(0, 0, 10, 10, 3, 5)

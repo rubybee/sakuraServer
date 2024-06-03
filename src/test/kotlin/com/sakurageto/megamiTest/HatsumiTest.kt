@@ -2,6 +2,10 @@ package com.sakurageto.megamiTest
 
 import com.sakurageto.ApplicationTest
 import com.sakurageto.card.*
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.PlayerEnum
+import com.sakurageto.card.basicenum.SubType
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import com.sakurageto.protocol.SakuraBaseData
@@ -11,8 +15,26 @@ import kotlin.test.assertEquals
 
 class HatsumiTest: ApplicationTest() {
     @Test
-    fun waterBallTailWindTest() = runTest{
+    fun cardTypeTest() = runTest {
         cardTypeTest(CardName.HATSUMI_WATER_BALL, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.HATSUMI_WATER_CURRENT, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.HATSUMI_STRONG_ACID, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.HATSUMI_TSUNAMI, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.HATSUMI_JUN_BI_MAN_TAN, CardClass.NORMAL, CardType.BEHAVIOR, SubType.FULL_POWER)
+        cardTypeTest(CardName.HATSUMI_COMPASS, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.HATSUMI_CALL_WAVE, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.HATSUMI_ISANA_HAIL, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.HATSUMI_OYOGIBI_FIRE, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.HATSUMI_KIRAHARI_LIGHTHOUSE, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.HATSUMI_MIOBIKI_ROUTE, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+
+        cardTypeTest(CardName.HATSUMI_TORPEDO, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.HATSUMI_SAGIRI_HAIL, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.REACTION)
+        cardTypeTest(CardName.HATSUMI_WADANAKA_ROUTE, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.NONE)
+    }
+
+    @Test
+    fun waterBallTailWindTest() = runTest{
         resetValue(0, 1, 10, 10, 3, 12)
         gameStatus.player1.isThisTurnTailWind = true
 
@@ -38,7 +60,6 @@ class HatsumiTest: ApplicationTest() {
 
     @Test
     fun waterCurrentTest() = runTest {
-        cardTypeTest(CardName.HATSUMI_WATER_CURRENT, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
         resetValue(0, 2, 10, 10, 4, 12)
         gameStatus.player1.isThisTurnTailWind = true
 
@@ -66,7 +87,6 @@ class HatsumiTest: ApplicationTest() {
 
     @Test
     fun strongAcidTest() = runTest {
-        cardTypeTest(CardName.HATSUMI_STRONG_ACID, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
         resetValue(0, 2, 10, 10, 5, 12)
         gameStatus.player1.isThisTurnTailWind = false
 
@@ -80,7 +100,6 @@ class HatsumiTest: ApplicationTest() {
 
     @Test
     fun tsunamiTest() = runTest {
-        cardTypeTest(CardName.HATSUMI_TSUNAMI, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
         resetValue(0, 0, 10, 10, 4, 10)
         gameStatus.player1.isThisTurnTailWind = false
         gameStatus.player2.flare = 1
@@ -95,7 +114,6 @@ class HatsumiTest: ApplicationTest() {
 
     @Test
     fun junBiManTenTest() = runTest {
-        cardTypeTest(CardName.HATSUMI_JUN_BI_MAN_TAN, CardClass.NORMAL, CardType.BEHAVIOR, SubType.FULL_POWER)
         resetValue(0, 0, 10, 10, 4, 10)
         gameStatus.player1.fullAction = true
         gameStatus.player1.isThisTurnTailWind = false
@@ -123,7 +141,6 @@ class HatsumiTest: ApplicationTest() {
 
     @Test
     fun compassTest() = runTest {
-        cardTypeTest(CardName.HATSUMI_COMPASS, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
         resetValue(0, 1, 10, 10, 5, 1)
 
         addCard(PlayerEnum.PLAYER2, CardName.SAINE_HURUBEGI, LocationEnum.HAND)
@@ -147,7 +164,6 @@ class HatsumiTest: ApplicationTest() {
 
     @Test
     fun callWaveTest() = runTest {
-        cardTypeTest(CardName.HATSUMI_CALL_WAVE, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
         resetValue(0, 1, 10, 10, 5, 10)
         gameStatus.player1.isThisTurnTailWind = false
 
@@ -183,7 +199,6 @@ class HatsumiTest: ApplicationTest() {
 
     @Test
     fun isanaHailTailWindTest() = runTest{
-        cardTypeTest(CardName.HATSUMI_ISANA_HAIL, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
         resetValue(0, 2, 10, 10, 3, 12)
         gameStatus.player1.isThisTurnTailWind = true
         gameStatus.player1.flare = 4
@@ -198,7 +213,6 @@ class HatsumiTest: ApplicationTest() {
 
     @Test
     fun isanaHailHeadWindTest() = runTest{
-        cardTypeTest(CardName.HATSUMI_ISANA_HAIL, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
         resetValue(0, 2, 10, 10, 3, 12)
         gameStatus.player1.isThisTurnTailWind = false
         gameStatus.player1.flare = 4
@@ -224,7 +238,6 @@ class HatsumiTest: ApplicationTest() {
             assertEquals(true, haveCard(PlayerEnum.PLAYER1, CardName.HATSUMI_OYOGIBI_FIRE, LocationEnum.SPECIAL_CARD))
         }
 
-        cardTypeTest(CardName.HATSUMI_OYOGIBI_FIRE, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
         resetValue(0, 1, 10, 10, 5, 12)
         gameStatus.player1.flare = 2
 
@@ -239,7 +252,6 @@ class HatsumiTest: ApplicationTest() {
 
     @Test
     fun kirahariLighthouseTest() = runTest {
-        cardTypeTest(CardName.HATSUMI_KIRAHARI_LIGHTHOUSE, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
         resetValue(0, 1, 10, 10, 4, 12)
         gameStatus.player1.flare = 1
         gameStatus.player1.isThisTurnTailWind = true
@@ -262,7 +274,6 @@ class HatsumiTest: ApplicationTest() {
 
     @Test
     fun miobikiRouteTest() = runTest {
-        cardTypeTest(CardName.HATSUMI_MIOBIKI_ROUTE, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
         resetValue(0, 1, 10, 10, 4, 12)
         gameStatus.player1.flare = 2
         gameStatus.player1.isThisTurnTailWind = false
@@ -285,7 +296,6 @@ class HatsumiTest: ApplicationTest() {
 
     @Test
     fun torpedoTest() = runTest {
-        cardTypeTest(CardName.HATSUMI_TORPEDO, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
         resetValue(0, 0, 10, 10, 3, 0)
 
         player1Connection.putReceiveData(makeData(CommandEnum.SELECT_ONE))
@@ -313,7 +323,6 @@ class HatsumiTest: ApplicationTest() {
 
     @Test
     fun sagiriHailTest() = runTest {
-        cardTypeTest(CardName.HATSUMI_SAGIRI_HAIL, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.REACTION)
         resetValue(0, 0, 10, 10, 4, 10)
         gameStatus.player2.flare = 3
 
@@ -331,7 +340,6 @@ class HatsumiTest: ApplicationTest() {
 
     @Test
     fun wadanakaRouteTest() = runTest {
-        cardTypeTest(CardName.HATSUMI_WADANAKA_ROUTE, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.NONE)
         resetValue(0, 0, 10, 10, 4, 10)
         gameStatus.player1.flare = 2; gameStatus.turnPlayer = PlayerEnum.PLAYER2
 

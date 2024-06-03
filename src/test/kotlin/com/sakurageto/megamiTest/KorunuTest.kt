@@ -2,6 +2,10 @@ package com.sakurageto.megamiTest
 
 import com.sakurageto.ApplicationTest
 import com.sakurageto.card.*
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.PlayerEnum
+import com.sakurageto.card.basicenum.SubType
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import kotlinx.coroutines.test.runTest
@@ -10,8 +14,22 @@ import kotlin.test.assertEquals
 
 class KorunuTest: ApplicationTest() {
     @Test
-    fun snowBladeTest() = runTest{
+    fun cardTypeTest() = runTest {
         cardTypeTest(CardName.KORUNU_SNOW_BLADE, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.KORUNU_REVOLVING_BLADE, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.KORUNU_BLADE_DANCE, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.KORUNU_RIDE_SNOW, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.KORUNU_ABSOLUTE_ZERO, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.KORUNU_FROSTBITE, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.KORUNU_FROST_THORN_BUSH, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.KORUNU_CONLU_RUYANPEH, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.KORUNU_LETAR_LERA, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.KORUNU_UPASTUM, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.KORUNU_PORUCHARTO, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.NONE)
+    }
+
+    @Test
+    fun snowBladeTest() = runTest{
         resetValue(0, 0, 10, 10, 4, 12)
 
         addReactData(PlayerEnum.PLAYER2)
@@ -24,7 +42,6 @@ class KorunuTest: ApplicationTest() {
 
     @Test
     fun revolvingBladeTest() = runTest{
-        cardTypeTest(CardName.KORUNU_REVOLVING_BLADE, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
         resetValue(0, 0, 10, 10, 3, 1)
 
         addCard(PlayerEnum.PLAYER2, CardName.YURINA_BEAN_BULLET, LocationEnum.HAND)
@@ -40,7 +57,6 @@ class KorunuTest: ApplicationTest() {
 
     @Test
     fun bladeDanceTest() = runTest {
-        cardTypeTest(CardName.KORUNU_BLADE_DANCE, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
         resetValue(0, 0, 10, 10, 4, 12)
         gameStatus.player2.freezeToken = 5
 
@@ -53,7 +69,6 @@ class KorunuTest: ApplicationTest() {
 
     @Test
     fun rideSnowTest() = runTest {
-        cardTypeTest(CardName.KORUNU_RIDE_SNOW, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
         resetValue(0, 0, 10, 10, 3, 12)
         gameStatus.player2.freezeToken = 5
 
@@ -68,7 +83,6 @@ class KorunuTest: ApplicationTest() {
 
     @Test
     fun absoluteZeroTest() = runTest {
-        cardTypeTest(CardName.KORUNU_ABSOLUTE_ZERO, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
         resetValue(0, 0, 10, 10, 5, 12)
         gameStatus.player1.fullAction = true
 
@@ -82,7 +96,6 @@ class KorunuTest: ApplicationTest() {
 
     @Test
     fun frostBiteTest() = runTest {
-        cardTypeTest(CardName.KORUNU_FROSTBITE, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
         resetValue(0, 0, 10, 10, 5, 12)
 
         addCard(PlayerEnum.PLAYER1, CardName.KORUNU_FROSTBITE, LocationEnum.HAND)
@@ -95,7 +108,6 @@ class KorunuTest: ApplicationTest() {
 
     @Test
     fun frostThornBushTest() = runTest {
-        cardTypeTest(CardName.KORUNU_FROST_THORN_BUSH, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
         resetValue(0, 0, 10, 10, 5, 12)
         gameStatus.player2.freezeToken = 5
 
@@ -114,7 +126,6 @@ class KorunuTest: ApplicationTest() {
 
     @Test
     fun conluRuyanpehTest() = runTest {
-        cardTypeTest(CardName.KORUNU_CONLU_RUYANPEH, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
         resetValue(0, 2, 10, 10, 2, 12)
         gameStatus.player1.flare = 4
 
@@ -128,7 +139,6 @@ class KorunuTest: ApplicationTest() {
 
     @Test
     fun letarLeraNotFullTest() = runTest {
-        cardTypeTest(CardName.KORUNU_LETAR_LERA, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.REACTION)
         resetValue(0, 2, 10, 10, 2, 12)
         gameStatus.player1.flare = 2
 
@@ -163,8 +173,6 @@ class KorunuTest: ApplicationTest() {
 
             assertEquals(true, haveCard(PlayerEnum.PLAYER1, CardName.KORUNU_UPASTUM, LocationEnum.SPECIAL_CARD))
         }
-
-        cardTypeTest(CardName.KORUNU_UPASTUM, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
         resetValue(0, 1, 10, 10, 4, 12)
         gameStatus.player2.freezeToken = 3
 
@@ -186,7 +194,6 @@ class KorunuTest: ApplicationTest() {
                     SECOND_PLAYER_START_NUMBER]?.getNap())
         }
 
-        cardTypeTest(CardName.KORUNU_PORUCHARTO, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.NONE)
         resetValue(0, 0, 10, 10, 5, 12)
         gameStatus.player2.flare = 4
 

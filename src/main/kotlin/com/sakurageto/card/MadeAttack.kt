@@ -1,7 +1,13 @@
 package com.sakurageto.card
 
-import com.sakurageto.gamelogic.GameStatus
-import com.sakurageto.gamelogic.MegamiEnum
+import com.sakurageto.card.basicenum.*
+import com.sakurageto.gamelogic.*
+import com.sakurageto.gamelogic.buff.attack.AttackBuff
+import com.sakurageto.gamelogic.buff.attack.AttackBuffQueue
+import com.sakurageto.gamelogic.buff.other.OtherBuff
+import com.sakurageto.gamelogic.buff.other.OtherBuffQueue
+import com.sakurageto.gamelogic.buff.range.RangeBuff
+import com.sakurageto.gamelogic.buff.range.RangeBuffQueue
 import com.sakurageto.gamelogic.megamispecial.Umbrella
 import java.util.SortedSet
 
@@ -15,6 +21,7 @@ class MadeAttack(
     val damageNotChange: Boolean = false,
     var isLaceration: Boolean = false,
     var isTrace: Boolean = false,
+    var card_player: PlayerEnum? = null,
 ) {
     var bothSideDamage = false
     val effect: MutableList<Text> = mutableListOf()
@@ -81,8 +88,8 @@ class MadeAttack(
         tempAttackBuff.clearBuff()
     }
 
-    fun addAttackBuff(buff: Buff){
-        thisTempAttackBuff.addAttackBuff(buff)
+    fun addAttackBuff(attackBuff: AttackBuff){
+        thisTempAttackBuff.addAttackBuff(attackBuff)
     }
 
     suspend fun getDamage(game_status: GameStatus, player: PlayerEnum, continuousAttackBuff: AttackBuffQueue): Pair<Int, Int>{
@@ -95,7 +102,7 @@ class MadeAttack(
         thisTurnAttackBuff.addAllBuff(continuousAttackBuff)
         continuousAttackBuff.clearBuff()
         for(index in 0 until AttackBuffQueue.buffQueueNumber){
-            val tempQueue: ArrayDeque<Buff> = ArrayDeque()
+            val tempQueue: ArrayDeque<AttackBuff> = ArrayDeque()
             thisTempAttackBuff.applyBuff(index, player, game_status, this, tempQueue)
             thisTurnAttackBuff.applyBuff(index, player, game_status, this, tempQueue, continuousAttackBuff)
             for(buff in tempQueue){
@@ -249,7 +256,7 @@ class MadeAttack(
 
     fun rangeCheckAfterApplyBUff(now_range: Int) = now_range in editedDistance
 
-    suspend fun rangeCheck(now_range: Int, game_status: GameStatus, player: PlayerEnum): Boolean{
+    suspend fun attackRangeCheck(now_range: Int, game_status: GameStatus, player: PlayerEnum): Boolean{
         editedDistance = distance.toSortedSet()
         val continuousRangeBuff = game_status.getPlayerRangeBuff(player)
         thisTurnRangeBuff.addAllBuff(continuousRangeBuff)
@@ -274,8 +281,44 @@ class MadeAttack(
                 tempEditedDistance.clear()
             }
         }
-        return now_range in editedDistance
+
+        return if(this.isTrace){
+            game_status.getPlayer(player).aiming in editedDistance
+        }
+        else{
+            now_range in editedDistance
+        }
     }
+
+    suspend fun rangeCheck(range: Int, game_status: GameStatus, player: PlayerEnum): Boolean{
+        editedDistance = distance.toSortedSet()
+        val continuousRangeBuff = game_status.getPlayerRangeBuff(player)
+        thisTurnRangeBuff.addAllBuff(continuousRangeBuff)
+        continuousRangeBuff.clearBuff()
+        for(index in 0 until RangeBuffQueue.buffQueueNumber) {
+            val tempQueue: ArrayDeque<RangeBuff> = ArrayDeque()
+            thisTempRangeBuff.applyBuff(index, player, game_status, this, tempQueue)
+            thisTurnRangeBuff.applyBuff(index, player, game_status, this, tempQueue, continuousRangeBuff)
+            for (buff in tempQueue) {
+                buff.effect(player, game_status, this)
+            }
+            if(index == RangeBuffQueue.INDEX_ADD){
+                for(i in tempEditedDistance){
+                    editedDistance.add(i)
+                }
+                tempEditedDistance.clear()
+            }
+            else if(index == RangeBuffQueue.INDEX_DELETE){
+                for(i in tempEditedDistance){
+                    editedDistance.remove(i)
+                }
+                tempEditedDistance.clear()
+            }
+        }
+
+        return range in editedDistance
+    }
+
 
     //closable true -> increment range from left
     fun plusMinusRange(number: Int, closable: Boolean){

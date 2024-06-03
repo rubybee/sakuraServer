@@ -2,8 +2,12 @@ package com.sakurageto.megamiTest
 
 import com.sakurageto.ApplicationTest
 import com.sakurageto.card.*
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.PlayerEnum
+import com.sakurageto.card.basicenum.SubType
 import com.sakurageto.gamelogic.GameVersion
-import com.sakurageto.gamelogic.MegamiEnum
+import com.sakurageto.card.basicenum.MegamiEnum
 import com.sakurageto.gamelogic.megamispecial.storyboard.StoryBoard
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
@@ -33,8 +37,22 @@ class KanaweTest: ApplicationTest() {
     }
 
     @Test
-    fun imageTest() = runTest {
+    fun cardTypeTest() = runTest {
         cardTypeTest(CardName.KANAWE_IMAGE, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.KANAWE_SCREENPLAY, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.KANAWE_PRODUCTION, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.KANAWE_PUBLISH, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.KANAWE_AFTERGLOW, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.KANAWE_IMPROMPTU, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.KANAWE_SEAL, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.KANAWE_VAGUE_STORY, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.KANAWE_INFINITE_STARLIGHT, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.KANAWE_BEND_OVER_THIS_NIGHT, CardClass.SPECIAL, CardType.ATTACK, SubType.REACTION)
+        cardTypeTest(CardName.KANAWE_DISTANT_SKY, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+    }
+
+    @Test
+    fun imageTest() = runTest {
         resetValue(0, 2, 10, 10, 4, 1)
         gameStatus.player1.nowAct = StoryBoard.getActByNumber(7)
 
@@ -58,7 +76,6 @@ class KanaweTest: ApplicationTest() {
             assertEquals(true, haveCard(PlayerEnum.PLAYER1, CardName.KANAWE_SCREENPLAY, LocationEnum.DECK))
         }
 
-        cardTypeTest(CardName.KANAWE_SCREENPLAY, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
         resetValue(0, 0, 10, 10, 8, 1)
 
         player1Connection.putReceiveData(makeData(CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, mutableListOf(
@@ -78,7 +95,6 @@ class KanaweTest: ApplicationTest() {
 
     @Test
     fun productionTest() = runTest {
-        cardTypeTest(CardName.KANAWE_PRODUCTION, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
         resetValue(0, 1, 10, 10, 2, 1)
         gameStatus.player1.nowAct = StoryBoard.getActByNumber(9)
 
@@ -91,7 +107,6 @@ class KanaweTest: ApplicationTest() {
 
     @Test
     fun publishTest() = runTest {
-        cardTypeTest(CardName.KANAWE_PUBLISH, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
         resetValue(0, 0, 10, 10, 3, 2)
         gameStatus.player1.fullAction = true
 
@@ -113,7 +128,6 @@ class KanaweTest: ApplicationTest() {
 
     @Test
     fun afterGlowTest() = runTest {
-        cardTypeTest(CardName.KANAWE_AFTERGLOW, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
         resetValue(0, 2, 10, 10, 4, 1)
         gameStatus.player1.nowAct = StoryBoard.getActByNumber(2)
 
@@ -128,7 +142,6 @@ class KanaweTest: ApplicationTest() {
 
     @Test
     fun impromptuTest() = runTest {
-        cardTypeTest(CardName.KANAWE_IMPROMPTU, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
         resetValue(0, 1, 10, 10, 6, 1)
         gameStatus.player1.nowAct = StoryBoard.getActByNumber(2)
 
@@ -146,7 +159,6 @@ class KanaweTest: ApplicationTest() {
 
     @Test
     fun sealTest() = runTest {
-        cardTypeTest(CardName.KANAWE_SEAL, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
         resetValue(0, 1, 10, 10, 4, 3)
         gameStatus.player2.megamiOne = MegamiEnum.YURINA; gameStatus.player2.megamiTwo = MegamiEnum.SAINE
         gameStatus.turnPlayer = PlayerEnum.PLAYER2
@@ -177,8 +189,6 @@ class KanaweTest: ApplicationTest() {
             assertEquals(2, gameStatus.player2.concentration)
             assertEquals(true, haveCard(PlayerEnum.PLAYER1, CardName.KANAWE_VAGUE_STORY, LocationEnum.SPECIAL_CARD))
         }
-
-        cardTypeTest(CardName.KANAWE_VAGUE_STORY, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
         resetValue(0, 0, 10, 10, 4, 3)
         gameStatus.player1.flare = 1
 
@@ -199,7 +209,6 @@ class KanaweTest: ApplicationTest() {
 
     @Test
     fun infiniteStarLightTest() = runTest {
-        cardTypeTest(CardName.KANAWE_INFINITE_STARLIGHT, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
         resetValue(0, 0, 10, 10, 0, 0)
         gameStatus.player1.flare = 2
         gameStatus.player1.nowAct = StoryBoard.getActByNumber(3)
@@ -241,7 +250,6 @@ class KanaweTest: ApplicationTest() {
 
     @Test
     fun bendOverThisNightTest() = runTest {
-        cardTypeTest(CardName.KANAWE_BEND_OVER_THIS_NIGHT, CardClass.SPECIAL, CardType.ATTACK, SubType.REACTION)
         resetValue(0, 0, 10, 10, 3, 0)
         gameStatus.player1.flare = 4
 
@@ -257,7 +265,6 @@ class KanaweTest: ApplicationTest() {
 
     @Test
     fun distantSkyTest() = runTest {
-        cardTypeTest(CardName.KANAWE_DISTANT_SKY, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
         gameStatus.player1.unselectedCard.add(CardName.KANAWE_IMAGE)
         gameStatus.player1.unselectedSpecialCard.add(CardName.KANAWE_BEND_OVER_THIS_NIGHT)
         gameStatus.player1.flare = 2

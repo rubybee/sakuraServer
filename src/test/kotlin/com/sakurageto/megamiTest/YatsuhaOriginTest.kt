@@ -2,6 +2,10 @@ package com.sakurageto.megamiTest
 
 import com.sakurageto.ApplicationTest
 import com.sakurageto.card.*
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.PlayerEnum
+import com.sakurageto.card.basicenum.SubType
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import kotlinx.coroutines.test.runTest
@@ -10,8 +14,22 @@ import kotlin.test.assertEquals
 
 class YatsuhaOriginTest: ApplicationTest() {
     @Test
-    fun starNailTest() = runTest{
+    fun cardTypeTest() = runTest {
         cardTypeTest(CardName.YATSUHA_STAR_NAIL, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.YATSUHA_DARKNESS_GILL, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.YATSUHA_MIRROR_DEVIL, CardClass.NORMAL, CardType.ATTACK, SubType.FULL_POWER)
+        cardTypeTest(CardName.YATSUHA_GHOST_STEP, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.YATSUHA_WILLING, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.YATSUHA_CONTRACT, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.YATSUHA_CLINGY_FLOWER, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.YATSUHA_TWO_LEAP_MIRROR_DIVINE, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.YATSUHA_FOUR_LEAP_SONG, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.YATSUHA_SIX_STAR_SEA, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.YATSUHA_EIGHT_MIRROR_OTHER_SIDE, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.NONE)
+    }
+
+    @Test
+    fun starNailTest() = runTest{
         resetValue(1, 2, 10, 10, 4, 12)
 
         addReactData(PlayerEnum.PLAYER2)
@@ -25,7 +43,6 @@ class YatsuhaOriginTest: ApplicationTest() {
 
     @Test
     fun darknessGillTest() = runTest{
-        cardTypeTest(CardName.YATSUHA_DARKNESS_GILL, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
         resetValue(2, 2, 10, 10, 4, 12)
 
         addReactData(PlayerEnum.PLAYER2)
@@ -38,7 +55,6 @@ class YatsuhaOriginTest: ApplicationTest() {
 
     @Test
     fun mirrorDevilTest() = runTest {
-        cardTypeTest(CardName.YATSUHA_MIRROR_DEVIL, CardClass.NORMAL, CardType.ATTACK, SubType.FULL_POWER)
         resetValue(0, 4, 10, 10, 3, 12)
         gameStatus.player1.fullAction = true
 
@@ -52,7 +68,6 @@ class YatsuhaOriginTest: ApplicationTest() {
 
     @Test
     fun ghostStepTest() = runTest {
-        cardTypeTest(CardName.YATSUHA_GHOST_STEP, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
         resetValue(0, 4, 10, 10, 3, 12)
 
         addCard(PlayerEnum.PLAYER1, CardName.YATSUHA_GHOST_STEP, LocationEnum.HAND)
@@ -65,7 +80,6 @@ class YatsuhaOriginTest: ApplicationTest() {
 
     @Test
     fun willingTest() = runTest {
-        cardTypeTest(CardName.YATSUHA_WILLING, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
         resetValue(1, 1, 10, 10, 3, 12)
 
         player1Connection.putReceiveData(makeData(CommandEnum.SELECT_THREE))
@@ -81,7 +95,6 @@ class YatsuhaOriginTest: ApplicationTest() {
 
     @Test
     fun contractTest() = runTest {
-        cardTypeTest(CardName.YATSUHA_CONTRACT, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
         resetValue(0, 0, 10, 10, 3, 12)
         gameStatus.player2.flare = 1
 
@@ -99,7 +112,6 @@ class YatsuhaOriginTest: ApplicationTest() {
 
     @Test
     fun clingyFlowerTest() = runTest {
-        cardTypeTest(CardName.YATSUHA_CLINGY_FLOWER, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
         resetValue(2, 2, 10, 10, 1, 12)
 
         addReactData(PlayerEnum.PLAYER2)
@@ -112,7 +124,6 @@ class YatsuhaOriginTest: ApplicationTest() {
 
     @Test
     fun twoLeafMirrorDivineTest() = runTest {
-        cardTypeTest(CardName.YATSUHA_TWO_LEAP_MIRROR_DIVINE, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.REACTION)
         resetValue(0, 0, 7, 6, 4, 12)
         gameStatus.player2.flare = 4
 
@@ -131,7 +142,6 @@ class YatsuhaOriginTest: ApplicationTest() {
 
     @Test
     fun fourLeafSongTest() = runTest {
-        cardTypeTest(CardName.YATSUHA_FOUR_LEAP_SONG, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
         resetValue(4, 0, 10, 10, 3, 12)
         gameStatus.player1.flare = 2
         addCard(PlayerEnum.PLAYER2, CardName.YATSUHA_CLINGY_FLOWER, LocationEnum.ENCHANTMENT_ZONE)
@@ -148,8 +158,7 @@ class YatsuhaOriginTest: ApplicationTest() {
 
     @Test
     fun sixStarSeaTest() = runTest {
-        cardTypeTest(CardName.YATSUHA_SIX_STAR_SEA, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
-        resetValue(5, 5, 10, 10, 4, 12)
+       resetValue(5, 5, 10, 10, 4, 12)
         gameStatus.player1.flare = 5
 
         addReactData(PlayerEnum.PLAYER2)
@@ -162,7 +171,6 @@ class YatsuhaOriginTest: ApplicationTest() {
 
     @Test
     fun eightMirrorOtherSideTest() = runTest {
-        cardTypeTest(CardName.YATSUHA_EIGHT_MIRROR_OTHER_SIDE, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.NONE)
         resetValue(0, 0, 9, 10, 3, 12)
         gameStatus.player1.flare = 2
 

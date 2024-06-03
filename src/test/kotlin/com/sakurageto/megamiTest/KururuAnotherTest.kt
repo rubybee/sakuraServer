@@ -2,7 +2,11 @@ package com.sakurageto.megamiTest
 
 import com.sakurageto.ApplicationTest
 import com.sakurageto.card.*
-import com.sakurageto.gamelogic.MegamiEnum
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.PlayerEnum
+import com.sakurageto.card.basicenum.SubType
+import com.sakurageto.card.basicenum.MegamiEnum
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import kotlinx.coroutines.test.runTest
@@ -11,6 +15,18 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
 class KururuAnotherTest: ApplicationTest() {
+    @Test
+    fun cardTypeTest() = runTest {
+        cardTypeTest(CardName.KURURU_ANALYZE, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.KURURU_DAUZING, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.KURURU_LAST_RESEARCH, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.KURURU_GRAND_GULLIVER, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+
+        cardTypeTest(CardName.KURURU_BLASTER, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.KURURU_RAILGUN, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.KURURU_CONNECT_DIVE, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+    }
+
     @Test
     fun analyzeAttackTest() = runTest {
         resetValue(0, 0, 10, 10, 3, 3)

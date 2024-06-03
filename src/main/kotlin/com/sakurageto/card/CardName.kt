@@ -1,58 +1,9 @@
 package com.sakurageto.card
 
 import com.sakurageto.gamelogic.GameVersion
-import com.sakurageto.gamelogic.MegamiEnum
-import com.sakurageto.gamelogic.MegamiEnum.*
+import com.sakurageto.card.basicenum.MegamiEnum
+import com.sakurageto.card.basicenum.MegamiEnum.*
 import java.util.EnumMap
-
-enum class PlayerEnum {
-    PLAYER1,
-    PLAYER2;
-
-    fun opposite(): PlayerEnum{
-        return if(this == PLAYER1){
-            PLAYER2
-        } else{
-            PLAYER1
-        }
-    }
-}
-
-enum class SpecialCardEnum {
-    UNUSED,
-    PLAYING,
-    PLAYED
-}
-
-enum class CardClass {
-    SPECIAL,
-    NORMAL,
-    SOLDIER,
-    IDEA,
-    POISON,
-    MAIN_PARTS,
-    CUSTOM_PARTS,
-    NULL
-}
-
-enum class CardType {
-    ATTACK,
-    BEHAVIOR,
-    ENCHANTMENT,
-    UNDEFINED
-}
-
-enum class SubType {
-    FULL_POWER,
-    REACTION,
-    NONE,
-    UNDEFINED,
-}
-
-enum class DistanceType {
-    DISCONTINUOUS,
-    CONTINUOUS
-}
 
 enum class CardName {
     POISON_ANYTHING,
@@ -2332,32 +2283,3 @@ enum class CardName {
     }
 }
 
-enum class DamageSelect {
-    NULL,
-    AURA,
-    LIFE,
-    BOTH
-}
-
-enum class Arrow {
-    ONE_DIRECTION,
-    BOTH_DIRECTION,
-    NULL;
-}
-
-enum class CardEffectLocation {
-    EFFECT_LACERATION,
-    ARTIFICIAL_TOKEN,
-    ENCHANTMENT_OTHER,
-    ENCHANTMENT_YOUR,
-    DISCARD_YOUR,
-    RETURN_YOUR,
-    USED_YOUR,
-    USED_OTHER,
-    MEGAMI_YOUR,
-    DIVING,
-    TEMP_PLAYER1,
-    TEMP_PLAYER2,
-    IDEA_PLAYER1,
-    IDEA_PLAYER2;
-}

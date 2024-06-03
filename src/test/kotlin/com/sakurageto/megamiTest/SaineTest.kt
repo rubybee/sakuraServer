@@ -1,8 +1,11 @@
 package com.sakurageto.megamiTest
 
 import com.sakurageto.ApplicationTest
-import com.sakurageto.card.CardName
-import com.sakurageto.card.PlayerEnum
+import com.sakurageto.card.*
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.PlayerEnum
+import com.sakurageto.card.basicenum.SubType
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import kotlinx.coroutines.test.runTest
@@ -11,6 +14,29 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
 class SaineTest: ApplicationTest() {
+    @Test
+    fun cardTypeTest() = runTest {
+        cardTypeTest(CardName.SAINE_DOUBLEBEGI, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.SAINE_HURUBEGI, CardClass.NORMAL, CardType.ATTACK, SubType.REACTION)
+        cardTypeTest(CardName.SAINE_MOOGECHOO, CardClass.NORMAL, CardType.ATTACK, SubType.REACTION)
+        cardTypeTest(CardName.SAINE_GANPA, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.SAINE_GWONYUCK, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.SAINE_CHOONGEMJUNG, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.REACTION)
+        cardTypeTest(CardName.SAINE_MOOEMBUCK, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.FULL_POWER)
+        cardTypeTest(CardName.SAINE_YULDONGHOGEK, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.SAINE_HANGMUNGGONGJIN, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.SAINE_EMMOOSHOEBING, CardClass.SPECIAL, CardType.ATTACK, SubType.REACTION)
+        cardTypeTest(CardName.SAINE_JONGGEK, CardClass.SPECIAL, CardType.ATTACK, SubType.REACTION)
+
+        cardTypeTest(CardName.SAI_TOKO_ENSEMBLE, CardClass.NORMAL, CardType.ATTACK, SubType.REACTION)
+        cardTypeTest(CardName.SAINE_ACCOMPANIMENT, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.SAINE_DUET_TAN_JU_BING_MYEONG, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+
+        cardTypeTest(CardName.SAINE_BETRAYAL, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.SAINE_FLOWING_WALL, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.SAINE_JEOL_CHANG_JEOL_HWA, CardClass.SPECIAL, CardType.ATTACK, SubType.REACTION)
+    }
+
     @Test
     fun moogechooTest() = runTest {
         resetValue(1, 1, 10, 10, 3, 10)
@@ -138,10 +164,24 @@ class SaineTest: ApplicationTest() {
     @Test
     fun soundOfIceTest() = runTest {
         resetValue(0, 1, 10, 10, 3, 10)
+
         addCard(PlayerEnum.PLAYER1, CardName.SAINE_SOUND_OF_ICE, LocationEnum.HAND)
         useCard(PlayerEnum.PLAYER1, CardName.SAINE_SOUND_OF_ICE, LocationEnum.HAND)
+
         assertEquals(0, gameStatus.player2.aura)
         assertEquals(11, gameStatus.dust)
+    }
+
+    @Test
+    fun soundOfIceReactTest() = runTest {
+        resetValue(2, 1, 10, 10, 3, 10)
+
+        addCard(PlayerEnum.PLAYER2, CardName.SAINE_SOUND_OF_ICE, LocationEnum.HAND)
+        addReactData(PlayerEnum.PLAYER2, CardName.SAINE_SOUND_OF_ICE, LocationEnum.HAND)
+        addCard(PlayerEnum.PLAYER1, CardName.YURINA_CHAM, LocationEnum.HAND)
+        useCard(PlayerEnum.PLAYER1, CardName.YURINA_CHAM, LocationEnum.HAND)
+
+        assertEquals(0, gameStatus.player1.aura)
     }
 
     @Test

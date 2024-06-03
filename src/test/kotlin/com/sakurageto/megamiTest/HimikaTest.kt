@@ -1,8 +1,11 @@
 package com.sakurageto.megamiTest
 
 import com.sakurageto.ApplicationTest
-import com.sakurageto.card.CardName
-import com.sakurageto.card.PlayerEnum
+import com.sakurageto.card.*
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.PlayerEnum
+import com.sakurageto.card.basicenum.SubType
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import kotlinx.coroutines.test.runTest
@@ -17,6 +20,25 @@ class HimikaTest: ApplicationTest() {
         useCard(PlayerEnum.PLAYER1, CardName.SAINE_GANPA, LocationEnum.HAND)
         addCard(PlayerEnum.PLAYER1, CardName.YURINA_GIBACK, LocationEnum.HAND)
         useCard(PlayerEnum.PLAYER1, CardName.YURINA_GIBACK, LocationEnum.HAND)
+    }
+
+    @Test
+    fun cardTypeTest() = runTest {
+        cardTypeTest(CardName.HIMIKA_SHOOT, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.HIMIKA_RAPIDFIRE, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.HIMIKA_MAGNUMCANON, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.HIMIKA_FULLBURST, CardClass.NORMAL, CardType.ATTACK, SubType.FULL_POWER)
+        cardTypeTest(CardName.HIMIKA_BACKSTEP, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.HIMIKA_BACKDRAFT, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.HIMIKA_SMOKE, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.HIMIKA_REDBULLET, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.HIMIKA_CRIMSONZERO, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.HIMIKA_SCARLETIMAGINE, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.HIMIKA_BURMILIONFIELD, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+
+        cardTypeTest(CardName.HIMIKA_FIRE_WAVE, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.HIMIKA_SAT_SUI, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.HIMIKA_EN_TEN_HIMIKA, CardClass.SPECIAL, CardType.ATTACK, SubType.FULL_POWER)
     }
 
     @Test

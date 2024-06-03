@@ -2,7 +2,11 @@ package com.sakurageto.megamiTest
 
 import com.sakurageto.ApplicationTest
 import com.sakurageto.card.*
-import com.sakurageto.gamelogic.MegamiEnum
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.PlayerEnum
+import com.sakurageto.card.basicenum.SubType
+import com.sakurageto.card.basicenum.MegamiEnum
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import kotlinx.coroutines.test.runTest
@@ -15,6 +19,27 @@ class MizukiTest: ApplicationTest() {
     fun setting(){
         gameStatus.player1.megamiOne = MegamiEnum.MIZUKI
         MegamiEnum.MIZUKI.settingForOriginal(PlayerEnum.PLAYER1, gameStatus)
+    }
+
+    @Test
+    fun cardTypeTest() = runTest {
+        cardTypeTest(CardName.MIZUKI_JIN_DU, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.MIZUKI_BAN_GONG, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.MIZUKI_SHOOTING_DOWN, CardClass.NORMAL, CardType.ATTACK, SubType.REACTION)
+        cardTypeTest(CardName.MIZUKI_HO_LYEONG, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.MIZUKI_BANG_BYEOG, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.MIZUKI_OVERPOWERING_GO_FORWARD, CardClass.NORMAL, CardType.BEHAVIOR, SubType.FULL_POWER)
+        cardTypeTest(CardName.MIZUKI_JEON_JANG, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.MIZUKI_HACHIRYU_CHEONJUGAK, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.REACTION)
+        cardTypeTest(CardName.MIZUKI_HIJAMARU_TRIPLET, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.MIZUKI_TARTENASHI_DAESUMUN, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.MIZUKI_MIZUKI_BATTLE_CRY, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.FULL_POWER)
+
+        cardTypeTest(CardName.KODAMA_TU_SIN, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.SOLDIER_SPEAR_1, CardClass.SOLDIER, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.SOLDIER_SPEAR_2, CardClass.SOLDIER, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.SOLDIER_SHIELD, CardClass.SOLDIER, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.SOLDIER_HORSE, CardClass.SOLDIER, CardType.ENCHANTMENT, SubType.NONE)
     }
 
     @Test
@@ -32,7 +57,6 @@ class MizukiTest: ApplicationTest() {
 
     @Test
     fun jinDuTest() = runTest{
-        cardTypeTest(CardName.MIZUKI_JIN_DU, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
         resetValue(0, 0, 10, 10, 2, 0)
 
         player1Connection.putReceiveData(makeData(CommandEnum.SELECT_CARD_REASON_CARD_EFFECT, mutableListOf(
@@ -49,7 +73,6 @@ class MizukiTest: ApplicationTest() {
 
     @Test
     fun banGongTest() = runTest {
-        cardTypeTest(CardName.MIZUKI_BAN_GONG, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
         resetValue(0, 3, 10, 10, 2, 0)
         gameStatus.player1.fullAction = true; gameStatus.player1.lastTurnReact = true
 
@@ -61,7 +84,6 @@ class MizukiTest: ApplicationTest() {
 
     @Test
     fun shootingDownTest() = runTest {
-        cardTypeTest(CardName.MIZUKI_SHOOTING_DOWN, CardClass.NORMAL, CardType.ATTACK, SubType.REACTION)
         resetValue(2, 3, 10, 10, 3, 0)
 
         startPhase()
@@ -76,7 +98,6 @@ class MizukiTest: ApplicationTest() {
 
     @Test
     fun hoLyeongTest() = runTest {
-        cardTypeTest(CardName.MIZUKI_HO_LYEONG, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
         resetValue(0, 3, 10, 10, 2, 0)
         gameStatus.player1.lastTurnReact = true
 
@@ -93,7 +114,6 @@ class MizukiTest: ApplicationTest() {
 
     @Test
     fun bangByeogTest() = runTest {
-        cardTypeTest(CardName.MIZUKI_BANG_BYEOG, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
         resetValue(0, 1, 10, 10, 3, 0)
 
         addCard(PlayerEnum.PLAYER2, CardName.MIZUKI_BANG_BYEOG, LocationEnum.HAND)
@@ -113,7 +133,6 @@ class MizukiTest: ApplicationTest() {
 
     @Test
     fun overPoweringGoForwardTest() = runTest {
-        cardTypeTest(CardName.MIZUKI_OVERPOWERING_GO_FORWARD, CardClass.NORMAL, CardType.BEHAVIOR, SubType.FULL_POWER)
         resetValue(0, 1, 10, 10, 5, 5)
         gameStatus.player1.fullAction = true
 
@@ -134,7 +153,6 @@ class MizukiTest: ApplicationTest() {
 
     @Test
     fun jeonJangTest() = runTest {
-        cardTypeTest(CardName.MIZUKI_JEON_JANG, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
         resetValue(0, 1, 10, 10, 6, 5)
 
         addCard(PlayerEnum.PLAYER1, CardName.MIZUKI_JEON_JANG, LocationEnum.HAND)
@@ -151,7 +169,6 @@ class MizukiTest: ApplicationTest() {
 
     @Test
     fun hachiryuCheonJuGakTest() = runTest {
-        cardTypeTest(CardName.MIZUKI_HACHIRYU_CHEONJUGAK, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.REACTION)
         resetValue(0, 1, 10, 10, 4, 5)
         gameStatus.player2.flare = 5
 
@@ -179,8 +196,6 @@ class MizukiTest: ApplicationTest() {
 
             assertEquals(true, haveCard(PlayerEnum.PLAYER1, CardName.MIZUKI_HIJAMARU_TRIPLET, LocationEnum.SPECIAL_CARD))
         }
-
-        cardTypeTest(CardName.MIZUKI_HIJAMARU_TRIPLET, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
         resetValue(0, 2, 10, 10, 4, 5)
         gameStatus.player1.flare = 2
 
@@ -195,7 +210,6 @@ class MizukiTest: ApplicationTest() {
 
     @Test
     fun tartenashiDaesumunTest() = runTest {
-        cardTypeTest(CardName.MIZUKI_TARTENASHI_DAESUMUN, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
         resetValue(0, 2, 10, 10, 4, 5)
         gameStatus.player1.flare = 3
 
@@ -226,7 +240,6 @@ class MizukiTest: ApplicationTest() {
 
     @Test
     fun mizukiBattleCryTest() = runTest {
-        cardTypeTest(CardName.MIZUKI_MIZUKI_BATTLE_CRY, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.FULL_POWER)
         resetValue(0, 3, 10, 10, 4, 5)
         gameStatus.player1.flare = 5; gameStatus.player1.fullAction = true
 
@@ -249,7 +262,6 @@ class MizukiTest: ApplicationTest() {
 
     @Test
     fun tusinTest() = runTest {
-        cardTypeTest(CardName.KODAMA_TU_SIN, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
         resetValue(0, 1, 10, 10, 1, 5)
         startPhase()
 
@@ -263,8 +275,6 @@ class MizukiTest: ApplicationTest() {
 
     @Test
     fun spearSoldierTest() = runTest {
-        cardTypeTest(CardName.SOLDIER_SPEAR_1, CardClass.SOLDIER, CardType.ATTACK, SubType.NONE)
-        cardTypeTest(CardName.SOLDIER_SPEAR_2, CardClass.SOLDIER, CardType.ATTACK, SubType.NONE)
         resetValue(0, 1, 10, 10, 3, 5)
         gameStatus.player1.lastTurnReact = true
 
@@ -278,7 +288,6 @@ class MizukiTest: ApplicationTest() {
 
     @Test
     fun shieldSoldierTest() = runTest {
-        cardTypeTest(CardName.SOLDIER_SHIELD, CardClass.SOLDIER, CardType.BEHAVIOR, SubType.REACTION)
         resetValue(1, 1, 10, 10, 2, 5)
 
         addCard(PlayerEnum.PLAYER1, CardName.SOLDIER_SHIELD, LocationEnum.READY_SOLDIER_ZONE)
@@ -292,7 +301,6 @@ class MizukiTest: ApplicationTest() {
 
     @Test
     fun horseSoldierTest() = runTest {
-        cardTypeTest(CardName.SOLDIER_HORSE, CardClass.SOLDIER, CardType.ENCHANTMENT, SubType.NONE)
         resetValue(2, 2, 10, 10, 4, 5)
 
         addCard(PlayerEnum.PLAYER1, CardName.SOLDIER_HORSE, LocationEnum.READY_SOLDIER_ZONE)

@@ -1,6 +1,7 @@
 package com.sakurageto.gamelogic.megamispecial
 
 import com.sakurageto.card.*
+import com.sakurageto.card.basicenum.PlayerEnum
 import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.log.EventLog
 import com.sakurageto.gamelogic.log.LogText

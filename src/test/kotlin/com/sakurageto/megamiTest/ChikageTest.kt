@@ -2,7 +2,11 @@ package com.sakurageto.megamiTest
 
 import com.sakurageto.ApplicationTest
 import com.sakurageto.card.*
-import com.sakurageto.gamelogic.MegamiEnum
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.PlayerEnum
+import com.sakurageto.card.basicenum.SubType
+import com.sakurageto.card.basicenum.MegamiEnum
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import kotlinx.coroutines.test.runTest
@@ -15,6 +19,31 @@ class ChikageTest: ApplicationTest() {
     fun setting(){
         gameStatus.player1.megamiOne = MegamiEnum.CHIKAGE
         MegamiEnum.CHIKAGE.settingForOriginal(PlayerEnum.PLAYER1, gameStatus)
+    }
+
+    @Test
+    fun cardTypeTest() = runTest {
+        cardTypeTest(CardName.CHIKAGE_THROW_KUNAI, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.CHIKAGE_POISON_NEEDLE, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.CHIKAGE_TO_ZU_CHU, CardClass.NORMAL, CardType.ATTACK, SubType.REACTION)
+        cardTypeTest(CardName.CHIKAGE_HIDDEN_WEAPON, CardClass.NORMAL, CardType.ATTACK, SubType.REACTION)
+        cardTypeTest(CardName.CHIKAGE_POISON_SMOKE, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.CHIKAGE_TIP_TOEING, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.CHIKAGE_MUDDLE, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.CHIKAGE_DEADLY_POISON, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.CHIKAGE_HAN_KI_POISON, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.REACTION)
+        cardTypeTest(CardName.CHIKAGE_REINCARNATION_POISON, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.CHIKAGE_YAMIKURA_CHIKAGE_WAY_OF_LIVE, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.FULL_POWER)
+
+        cardTypeTest(CardName.POISON_PARALYTIC, CardClass.POISON, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.POISON_HALLUCINOGENIC, CardClass.POISON, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.POISON_RELAXATION, CardClass.POISON, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.POISON_DEADLY_1, CardClass.POISON, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.POISON_DEADLY_2, CardClass.POISON, CardType.BEHAVIOR, SubType.NONE)
+
+        cardTypeTest(CardName.CHIKAGE_TRICK_UMBRELLA, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.CHIKAGE_STRUGGLE, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.CHIKAGE_ZAN_ZE_NO_CONNECTION_POISON, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
     }
 
     @Test

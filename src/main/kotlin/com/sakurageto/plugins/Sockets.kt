@@ -7,7 +7,7 @@ import io.ktor.websocket.*
 import java.time.Duration
 import io.ktor.server.application.*
 import com.sakurageto.protocol.RoomInformation
-import com.sakurageto.card.PlayerEnum
+import com.sakurageto.card.basicenum.PlayerEnum
 import com.sakurageto.gamelogic.GameFactory
 import kotlinx.coroutines.delay
 import java.lang.NumberFormatException

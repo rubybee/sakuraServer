@@ -1,9 +1,9 @@
-package com.sakurageto.gamelogic
+package com.sakurageto.card.basicenum
 
 import com.sakurageto.card.Card
 import com.sakurageto.card.CardName
-import com.sakurageto.card.PlayerEnum
-import com.sakurageto.card.SpecialCardEnum
+import com.sakurageto.gamelogic.GameStatus
+import com.sakurageto.gamelogic.GameVersion
 import com.sakurageto.gamelogic.megamispecial.Stratagem
 import com.sakurageto.gamelogic.megamispecial.Umbrella
 import com.sakurageto.gamelogic.megamispecial.storyboard.StoryBoard
@@ -83,7 +83,7 @@ enum class MegamiEnum(var real_number: Int) {
         return this == megami
     }
 
-    fun changeNormalMegami(): MegamiEnum{
+    fun changeNormalMegami(): MegamiEnum {
         val anotherNumber = this.real_number % 10
         return if(anotherNumber == 0){
             this

@@ -2,7 +2,11 @@ package com.sakurageto.megamiTest
 
 import com.sakurageto.ApplicationTest
 import com.sakurageto.card.*
-import com.sakurageto.gamelogic.MegamiEnum
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.PlayerEnum
+import com.sakurageto.card.basicenum.SubType
+import com.sakurageto.card.basicenum.MegamiEnum
 import com.sakurageto.gamelogic.megamispecial.Stratagem
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
@@ -16,6 +20,25 @@ class ShinraTest: ApplicationTest() {
     fun setting(){
         gameStatus.player1.megamiOne = MegamiEnum.SHINRA
         MegamiEnum.SHINRA.settingForOriginal(PlayerEnum.PLAYER1, gameStatus)
+    }
+
+    @Test
+    fun cardTypeTest() = runTest {
+        cardTypeTest(CardName.SHINRA_IBLON, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.SHINRA_BANLON, CardClass.NORMAL, CardType.ATTACK, SubType.REACTION)
+        cardTypeTest(CardName.SHINRA_KIBEN, CardClass.NORMAL, CardType.ATTACK, SubType.FULL_POWER)
+        cardTypeTest(CardName.SHINRA_INYONG, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.SHINRA_SEONDONG, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.SHINRA_JANGDAM, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.SHINRA_NONPA, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.SHINRA_WANJEON_NONPA, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.SHINRA_DASIG_IHAE, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.SHINRA_CHEONJI_BANBAG, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.FULL_POWER)
+        cardTypeTest(CardName.SHINRA_SAMRA_BAN_SHO, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.NONE)
+
+        cardTypeTest(CardName.SHINRA_ZHEN_YEN, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.SHINRA_SA_DO, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.FULL_POWER)
+        cardTypeTest(CardName.SHINRA_ZEN_CHI_KYO_TEN, CardClass.SPECIAL, CardType.ATTACK, SubType.FULL_POWER)
     }
 
     @Test

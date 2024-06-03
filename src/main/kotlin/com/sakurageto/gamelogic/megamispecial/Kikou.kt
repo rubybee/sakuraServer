@@ -1,8 +1,8 @@
 package com.sakurageto.gamelogic.megamispecial
 
 import com.sakurageto.card.Card
-import com.sakurageto.card.CardType
-import com.sakurageto.card.SubType
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.SubType
 
 data class Kikou(var attack: Int = 0, var behavior: Int = 0, var enchantment: Int = 0, var reaction: Int = 0, var fullPower: Int = 0){
     fun add(card: Card){

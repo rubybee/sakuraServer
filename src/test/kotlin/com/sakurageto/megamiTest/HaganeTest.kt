@@ -2,7 +2,11 @@ package com.sakurageto.megamiTest
 
 import com.sakurageto.ApplicationTest
 import com.sakurageto.card.*
-import com.sakurageto.gamelogic.MegamiEnum
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.PlayerEnum
+import com.sakurageto.card.basicenum.SubType
+import com.sakurageto.card.basicenum.MegamiEnum
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import kotlinx.coroutines.test.runTest
@@ -10,9 +14,29 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 class HaganeTest: ApplicationTest() {
-    fun makeCentrifugal(){
+    private fun makeCentrifugal(){
         gameStatus.startTurnDistance = gameStatus.distanceToken
         gameStatus.distanceToken += 2
+    }
+
+    @Test
+    fun cardTypeTest() = runTest {
+        cardTypeTest(CardName.HAGANE_CENTRIFUGAL_ATTACK, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.HAGANE_FOUR_WINDED_EARTHQUAKE, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.HAGANE_GROUND_BREAKING, CardClass.NORMAL, CardType.ATTACK, SubType.FULL_POWER)
+        cardTypeTest(CardName.HAGANE_HYPER_RECOIL, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.HAGANE_WON_MU_RUYN, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.HAGANE_RING_A_BELL, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.HAGANE_GRAVITATION_FIELD, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.HAGANE_GRAND_SKY_HOLE_CRASH, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.HAGANE_GRAND_BELL_MEGALOBEL, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.HAGANE_GRAND_GRAVITATION_ATTRACT, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.HAGANE_GRAND_MOUNTAIN_RESPECT, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+
+        cardTypeTest(CardName.HAGANE_BONFIRE, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.HAGANE_WHEEL_SKILL, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.HAGANE_GRAND_SOFT_MATERIAL, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.HAGANE_SOFT_ATTACK, CardClass.NORMAL, CardType.UNDEFINED, SubType.UNDEFINED)
     }
 
     @Test

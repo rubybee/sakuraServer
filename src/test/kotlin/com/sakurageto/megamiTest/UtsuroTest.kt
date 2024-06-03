@@ -2,6 +2,10 @@ package com.sakurageto.megamiTest
 
 import com.sakurageto.ApplicationTest
 import com.sakurageto.card.*
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.PlayerEnum
+import com.sakurageto.card.basicenum.SubType
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import kotlinx.coroutines.test.runTest
@@ -9,6 +13,28 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 class UtsuroTest: ApplicationTest() {
+    @Test
+    fun cardTypeTest() = runTest {
+        cardTypeTest(CardName.UTSURO_WON_WOL, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.UTSURO_BLACK_WAVE, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.UTSURO_HARVEST, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.UTSURO_PRESSURE, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.UTSURO_SHADOW_WING, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.UTSURO_SHADOW_WALL, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.UTSURO_YUE_HOE_JU, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.FULL_POWER)
+        cardTypeTest(CardName.UTSURO_HOE_MYEOL, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.UTSURO_HEO_WI, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.REACTION)
+        cardTypeTest(CardName.UTSURO_JONG_MAL, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.UTSURO_MA_SIG, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+
+        cardTypeTest(CardName.UTSURO_BITE_DUST, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.UTSURO_REVERBERATE_DEVICE_KURURUSIK, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.UTSURO_MANG_A, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.UTSURO_ANNIHILATION_SHADOW, CardClass.NORMAL, CardType.ATTACK, SubType.FULL_POWER)
+        cardTypeTest(CardName.UTSURO_SILENT_WALK, CardClass.NORMAL, CardType.BEHAVIOR, SubType.FULL_POWER)
+        cardTypeTest(CardName.UTSURO_DE_MISE, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+    }
+
     @Test
     fun wonwolTest() = runTest{
         resetValue(0, 5, 10, 10, 4, 12)

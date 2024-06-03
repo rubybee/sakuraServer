@@ -1,7 +1,7 @@
 package com.sakurageto
 
 import com.sakurageto.card.CardName
-import com.sakurageto.card.PlayerEnum
+import com.sakurageto.card.basicenum.PlayerEnum
 import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
@@ -11,7 +11,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class BasicTest: ApplicationTest() {
+class BasicOperationTest: ApplicationTest() {
     @Test
     fun chasmTest() = runTest {
         gameStatus.distanceToken = 3; gameStatus.dust = 10

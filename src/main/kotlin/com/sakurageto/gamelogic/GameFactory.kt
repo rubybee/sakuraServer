@@ -3,6 +3,7 @@ package com.sakurageto.gamelogic
 import com.sakurageto.protocol.Connection
 import com.sakurageto.protocol.RoomInformation
 import com.sakurageto.card.*
+import com.sakurageto.card.basicenum.PlayerEnum
 import com.sakurageto.protocol.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -10,7 +11,7 @@ import kotlin.random.Random
 
 
 class GameFactory(private val roomNumber: Int, val player1: Connection, val player2: Connection) {
-    private var gameMode: GameMode //0 = no ban 1 = pick ban
+    private var gameMode: GameMode
     private var gameStatus: GameStatus
 
     init {
@@ -59,7 +60,7 @@ class GameFactory(private val roomNumber: Int, val player1: Connection, val play
 
     private suspend fun selectEnd(){
         val data = SakuraArrayData(CommandEnum.END_OF_SELECT_MODE, mutableListOf(gameMode.real_number))
-        val sendData = Json.encodeToString(data)
+        val sendData = data.toString()
         player1.send(sendData)
         player2.send(sendData)
     }

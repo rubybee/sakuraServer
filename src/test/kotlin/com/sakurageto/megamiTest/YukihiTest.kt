@@ -1,11 +1,12 @@
 package com.sakurageto.megamiTest
 
 import com.sakurageto.ApplicationTest
-import com.sakurageto.card.CardName
-import com.sakurageto.card.NUMBER_OBORO_WIRE
-import com.sakurageto.card.NUMBER_YUKIHI_FLUTTERING_COLLAR
-import com.sakurageto.card.PlayerEnum
-import com.sakurageto.gamelogic.MegamiEnum
+import com.sakurageto.card.*
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.PlayerEnum
+import com.sakurageto.card.basicenum.SubType
+import com.sakurageto.card.basicenum.MegamiEnum
 import com.sakurageto.gamelogic.megamispecial.Umbrella
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
@@ -19,6 +20,25 @@ class YukihiTest: ApplicationTest() {
     fun setting(){
         gameStatus.player1.megamiOne = MegamiEnum.YUKIHI
         MegamiEnum.YUKIHI.settingForOriginal(PlayerEnum.PLAYER1, gameStatus)
+    }
+
+    @Test
+    fun cardTypeTest() = runTest {
+        cardTypeTest(CardName.YUKIHI_HIDDEN_NEEDLE_SLASH_HOLD_NEEDLE, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.YUKIHI_HIDDEN_FIRE_SLASH_CLAP_HANDS, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.YUKIHI_PUSH_OUT_SLASH_PULL, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.YUKIHI_SWING_SLASH_STAB, CardClass.NORMAL, CardType.ATTACK, SubType.FULL_POWER)
+        cardTypeTest(CardName.YUKIHI_TURN_UMBRELLA, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.YUKIHI_BACK_WARD_STEP_SLASH_DIG_IN, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.YUKIHI_MAKE_CONNECTION, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.YUKIHI_FLUTTERING_SNOWFLAKE, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.YUKIHI_SWAYING_LAMPLIGHT, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.YUKIHI_CLINGY_MIND, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.FULL_POWER)
+        cardTypeTest(CardName.YUKIHI_SWIRLING_GESTURE, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.REACTION)
+
+        cardTypeTest(CardName.YUKIHI_HELP_SLASH_THREAT, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.YUKIHI_THREAD_SLASH_RAW_THREAD, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.YUKIHI_FLUTTERING_COLLAR, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.NONE)
     }
 
     @Test

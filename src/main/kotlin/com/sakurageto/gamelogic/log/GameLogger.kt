@@ -1,6 +1,6 @@
 package com.sakurageto.gamelogic.log
 
-import com.sakurageto.card.PlayerEnum
+import com.sakurageto.card.basicenum.PlayerEnum
 import com.sakurageto.protocol.LocationEnum
 
 class GameLogger {
@@ -148,7 +148,7 @@ class GameLogger {
         var count = 0
         for(log in eventLogQueue){
             if(log.text == LogText.ATTACK) count += 1
-            else if(log.text == LogText.USE_CARD_REACT) count += 1
+            else if(log.isTextUseCard() && log.boolean2) count += 1
         }
 
         return if(flipped){

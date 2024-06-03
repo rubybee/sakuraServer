@@ -1,7 +1,8 @@
 package com.sakurageto
 
 import com.sakurageto.card.*
-import com.sakurageto.card.PlayerEnum.*
+import com.sakurageto.card.basicenum.*
+import com.sakurageto.card.basicenum.PlayerEnum.*
 import com.sakurageto.gamelogic.GameStatus
 import com.sakurageto.gamelogic.GameVersion
 import com.sakurageto.gamelogic.PlayerStatus

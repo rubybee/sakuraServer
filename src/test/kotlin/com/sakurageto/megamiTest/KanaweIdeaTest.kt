@@ -2,8 +2,12 @@ package com.sakurageto.megamiTest
 
 import com.sakurageto.ApplicationTest
 import com.sakurageto.card.*
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.PlayerEnum
+import com.sakurageto.card.basicenum.SubType
 import com.sakurageto.gamelogic.GameVersion
-import com.sakurageto.gamelogic.MegamiEnum
+import com.sakurageto.card.basicenum.MegamiEnum
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import kotlinx.coroutines.test.runTest
@@ -31,7 +35,17 @@ class KanaweIdeaTest: ApplicationTest() {
             Card.cardMakerByName(true, CardName.IDEA_POSITIONING, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9)
     }
 
-    suspend fun readyIdea(cardName: CardName, flipped: Boolean) {
+    @Test
+    fun cardTypeTest() = runTest {
+        cardTypeTest(CardName.IDEA_SAL_JIN, CardClass.IDEA, CardType.UNDEFINED, SubType.NONE)
+        cardTypeTest(CardName.IDEA_SAKURA_WAVE, CardClass.IDEA, CardType.UNDEFINED, SubType.NONE)
+        cardTypeTest(CardName.IDEA_WHISTLE, CardClass.IDEA, CardType.UNDEFINED, SubType.NONE)
+        cardTypeTest(CardName.IDEA_MYEONG_JEON, CardClass.IDEA, CardType.UNDEFINED, SubType.NONE)
+        cardTypeTest(CardName.IDEA_EMPHASIZING, CardClass.IDEA, CardType.UNDEFINED, SubType.NONE)
+        cardTypeTest(CardName.IDEA_POSITIONING, CardClass.IDEA, CardType.UNDEFINED, SubType.NONE)
+    }
+
+    private suspend fun readyIdea(cardName: CardName, flipped: Boolean) {
         resetValue(0, 0, 10, 10, 3, 2)
         gameStatus.player1.fullAction = true
 

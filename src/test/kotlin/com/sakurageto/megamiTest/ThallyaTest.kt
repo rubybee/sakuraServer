@@ -2,8 +2,12 @@ package com.sakurageto.megamiTest
 
 import com.sakurageto.ApplicationTest
 import com.sakurageto.card.*
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.PlayerEnum
+import com.sakurageto.card.basicenum.SubType
 import com.sakurageto.gamelogic.GameVersion
-import com.sakurageto.gamelogic.MegamiEnum
+import com.sakurageto.card.basicenum.MegamiEnum
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import kotlinx.coroutines.test.runTest
@@ -29,6 +33,25 @@ class ThallyaTest: ApplicationTest() {
             Card.cardMakerByName(true, CardName.FORM_DEVA, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9)
         gameStatus.player1.additionalHand[CardName.FORM_ASURA] =
             Card.cardMakerByName(true, CardName.FORM_ASURA, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9)
+    }
+
+    @Test
+    fun cardTypeTest() = runTest {
+        cardTypeTest(CardName.THALLYA_BURNING_STEAM, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.THALLYA_WAVING_EDGE, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.THALLYA_SHIELD_CHARGE, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.THALLYA_STEAM_CANNON, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.THALLYA_STUNT, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.THALLYA_ROARING, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.THALLYA_TURBO_SWITCH, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.THALLYA_ALPHA_EDGE, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.THALLYA_OMEGA_BURST, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.THALLYA_THALLYA_MASTERPIECE, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.THALLYA_JULIA_BLACKBOX, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.FULL_POWER)
+
+        cardTypeTest(CardName.THALLYA_QUICK_CHANGE, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.THALLYA_BLACKBOX_NEO, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.THALLYA_OMNIS_BLASTER, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
     }
 
     @Test

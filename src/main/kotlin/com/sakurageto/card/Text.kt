@@ -1,5 +1,6 @@
 package com.sakurageto.card
 
+import com.sakurageto.card.basicenum.PlayerEnum
 import com.sakurageto.gamelogic.GameStatus
 
 class Text(
@@ -84,7 +85,7 @@ enum class TextEffectTag {
     WHEN_CHOOSE_AURA_DAMAGE,
     WHEN_TRANSFORM,
     WHEN_DEPLOYMENT_OTHER,
-    WHEN_ENCHANTMENT_DESTRUCTION_YOUR,
+    WHEN_YOUR_ENCHANTMENT_CARD_DESTRUCTION,
     WHEN_GET_DAMAGE_BY_ATTACK,
     WHEN_USE_REACT_CARD_YOUR_END,
     WHEN_DO_WIND_AROUND,
@@ -143,7 +144,7 @@ enum class TextEffectTag {
     WHEN_END_PHASE_ADDITIONAL_CHECK,
     USING_CONDITION,
     CAN_USE_REACT,
-    CAN_USE_COVER,
+    CAN_USE_AT_COVER,
     COST_CHECK,
     COST,
     FORBID_GO_BACKWARD_OTHER,

@@ -1,9 +1,9 @@
 package com.sakurageto.card
 
 import com.sakurageto.card.CardSet.toCardData
-import com.sakurageto.gamelogic.GameStatus
-import com.sakurageto.gamelogic.GameVersion
-import com.sakurageto.gamelogic.MegamiEnum
+import com.sakurageto.card.basicenum.*
+import com.sakurageto.gamelogic.*
+import com.sakurageto.gamelogic.buff.other.OtherBuffQueue
 import com.sakurageto.gamelogic.megamispecial.Umbrella
 import com.sakurageto.gamelogic.log.EventLog
 import com.sakurageto.gamelogic.log.LogText
@@ -29,6 +29,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
      */
     var isSoftAttack = false
     var numberForX = 0
+    var flipped = false
 
     fun getNap() = nap
     fun getSeedToken() = seedToken
@@ -53,6 +54,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     }
 
     fun addNap(number: Int, seed: Boolean = false) {
+        if(number == 0) return
+
         nap = nap?.let {
             it + number
         }?: number
@@ -86,7 +89,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
 
         fun cardInitInsert(start_turn: Boolean, dest: ArrayDeque<Card>, src: MutableList<CardName>, player: PlayerEnum,
-            version: GameVersion){
+                           version: GameVersion){
             src.shuffle()
             for(card_name in src){
                 dest.add(cardMakerByName(start_turn, card_name, player, LocationEnum.DECK, version))
@@ -94,7 +97,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
 
         fun cardInitInsert(start_turn: Boolean, dest: HashMap<Int, Card>, src: MutableList<CardName>, player: PlayerEnum,
-            version: GameVersion){
+                           version: GameVersion){
             for(card_name in src){
                 if(start_turn){
                     dest[card_name.toCardNumber(true)] = cardMakerByName(true, card_name, player,
@@ -122,9 +125,9 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
     }
 
-    fun enchantmentUsable(text: Text): Boolean =
+    private fun enchantmentUsable(text: Text): Boolean =
         location == LocationEnum.ENCHANTMENT_ZONE && text.timing_tag == TextEffectTimingTag.IN_DEPLOYMENT && (nap?: 0) > 0
-    fun usedEffectUsable(text: Text): Boolean =
+    private fun usedEffectUsable(text: Text): Boolean =
         text.timing_tag == TextEffectTimingTag.USED && this.special_card_state == SpecialCardEnum.PLAYED
 
     suspend fun destructionEnchantmentNormal(player: PlayerEnum, game_status: GameStatus){
@@ -217,7 +220,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
     }
 
-    suspend fun getBaseCost(player: PlayerEnum, gameStatus: GameStatus): Pair<Boolean, Int>{
+    private suspend fun getBaseCost(player: PlayerEnum, gameStatus: GameStatus): Pair<Boolean, Int>{
         var x = 10000
         x = this.card_data.cost?: card_data.effect?.let {
             for(text in it){
@@ -239,7 +242,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     }
 
     //true mean can use
-    suspend fun textUseCheck(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?): Boolean{
+    private suspend fun textUseCheck(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?): Boolean{
         card_data.effect?.let {
             for(text in it){
                 if(text.tag == TextEffectTag.USING_CONDITION){
@@ -253,7 +256,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         return true
     }
 
-    suspend fun textCostCheck(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?): Boolean {
+    private suspend fun textCostCheck(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?): Boolean {
         card_data.effect?.let {
             for (text in it) {
                 if (text.tag == TextEffectTag.COST_CHECK) {
@@ -348,6 +351,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         }
                     }
                     return MadeAttack(
+                        card_player = this.player,
                         card_name =  this.card_data.card_name,
                         card_number = this.card_number,
                         card_class = this.card_data.card_class,
@@ -374,6 +378,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         }
                     }
                     return MadeAttack(
+                        card_player = this.player,
                         card_name =  this.card_data.card_name,
                         card_number = this.card_number,
                         card_class = this.card_data.card_class,
@@ -398,6 +403,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
         else{
             return MadeAttack(
+                card_player = this.player,
                 card_name =  this.card_data.card_name,
                 card_number = this.card_number,
                 card_class = this.card_data.card_class,
@@ -423,7 +429,15 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             game_status.getPlayer(player).canNotUseCardName2?.second == card_data.card_name)
                     && card_data.card_name != CardName.RENRI_DECEPTION_FOG
 
-    //-2: can't use                    -1: can use                 >= 0: cost
+    /**
+     * @return (-2) means can't use
+     *
+     * (-1) means can use(when not special card)
+     *
+     * (>=0) flare cost
+     *
+     * (<=-4) laceration flare cost
+     */
     suspend fun canUse(player: PlayerEnum, gameStatus: GameStatus, react_attack: MadeAttack?, isCost: Boolean, isConsume: Boolean): Int{
         val nowPlayer = gameStatus.getPlayer(player)
         var cost: Int
@@ -452,7 +466,8 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
 
             if(cardMustPay != 0){
                 val cardCanUseCost = nowPlayer.hand.values.filter {
-                    it.card_data.megami == nowPlayer.nextCostAddMegami
+                    it.card_data.megami == this.card_data.megami
+                            && it.card_number != this.card_number
                 }.size
 
                 if(cardCanUseCost < cardMustPay){
@@ -508,6 +523,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                         this.makeAttack(player, gameStatus, react_attack, this.card_data.sub_type)?.
                         addTextAndReturn(gameStatus.getUmbrella(this.player), this.card_data)?:
                             MadeAttack(
+                                card_player = this.player,
                                 card_name =  this.card_data.card_name,
                                 card_number = this.card_number,
                                 card_class = this.card_data.card_class,
@@ -550,7 +566,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
 
     suspend fun behaviorUseNormal(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?){
         for(card in game_status.getPlayer(player).enchantmentCard.values){
-            card.addValidEffect(TextEffectTag.WHEN_USE_BEHAVIOR_END, cardUseEndEffect)
+            card.addOneValidEffect(TextEffectTag.WHEN_USE_BEHAVIOR_END, cardUseEndEffect)
         }
 
         if(this.card_data.umbrellaMark) {
@@ -640,7 +656,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 game_status.gameLogger.insert(EventLog(player, LogText.END_EFFECT, EventLog.NORMAL_NAP_COST, -1))
             }
             game_status.dust == 0 -> {
-                game_status.auraToCard(player, game_status.getPlayerAura(player), this, EventLog.NORMAL_NAP_COST)
+                game_status.auraToCard(player, nowNeedNap, this, EventLog.NORMAL_NAP_COST)
                 game_status.gameLogger.insert(EventLog(player, LogText.END_EFFECT, EventLog.NORMAL_NAP_COST, -1))
             }
             else -> {
@@ -715,13 +731,13 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
 
         if(card_data.sub_type == SubType.FULL_POWER){
             for(card in game_status.getPlayer(player).usedSpecialCard.values){
-                card.addValidEffect(TextEffectTag.WHEN_USE_FULL_POWER_YOUR_END, cardUseEndEffect)
+                card.addOneValidEffect(TextEffectTag.WHEN_USE_FULL_POWER_YOUR_END, cardUseEndEffect)
                 card.effectAllValidEffect(player, game_status, TextEffectTag.WHEN_USE_FULL_POWER_YOUR)
             }
         }
         else if(card_data.sub_type == SubType.REACTION){
             for(card in game_status.getPlayer(player).enchantmentCard.values){
-                card.addValidEffect(TextEffectTag.WHEN_USE_REACT_CARD_YOUR_END, cardUseEndEffect)
+                card.addOneValidEffect(TextEffectTag.WHEN_USE_REACT_CARD_YOUR_END, cardUseEndEffect)
             }
         }
 
@@ -867,8 +883,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
     }
 
-    // It is assumed that only one effect added so, if want to add more then one effect make new mechanism
-    private fun addValidEffect(effectTag: TextEffectTag, queue: HashMap<Int, Text>){
+    private fun addOneValidEffect(effectTag: TextEffectTag, queue: HashMap<Int, Text>){
         card_data.effect?.let {
             for(text in it){
                 if(usedEffectUsable(text) || enchantmentUsable(text)){
@@ -881,8 +896,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         }
     }
 
-    // It is assumed that only one effect added so, if want to add more then one effect make new mechanism
-    fun addEffect(effectTag: TextEffectTag, queue: HashMap<Int, Text>){
+    fun addOneEffect(effectTag: TextEffectTag, queue: HashMap<Int, Text>){
         card_data.effect?.let {
             for(text in it){
                 if(text.tag == effectTag) {
@@ -894,7 +908,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     }
 
     suspend fun effectAllValidEffect(card_number: Int, player: PlayerEnum, game_status: GameStatus, effectTag: TextEffectTag,
-        react_attack: MadeAttack? = null): Int{
+                                     react_attack: MadeAttack? = null): Int{
         var now = 0
         if(this.card_data.umbrellaMark) {
             when (game_status.getUmbrella(this.player)) {
@@ -987,7 +1001,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     fun canUseAtCover(): Boolean{
         card_data.effect?.let {
             for(text in it){
-                if(text.tag == TextEffectTag.CAN_USE_COVER) return true
+                if(text.tag == TextEffectTag.CAN_USE_AT_COVER) return true
             }
         }
         return false
@@ -1082,5 +1096,9 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             }
         }
         return false
+    }
+
+    fun canCover(): Boolean{
+        return card_data.card_class != CardClass.POISON
     }
 }

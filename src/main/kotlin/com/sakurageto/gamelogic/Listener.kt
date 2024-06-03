@@ -1,6 +1,6 @@
 package com.sakurageto.gamelogic
 
-import com.sakurageto.card.PlayerEnum
+import com.sakurageto.card.basicenum.PlayerEnum
 
 class Listener(
     var player: PlayerEnum,

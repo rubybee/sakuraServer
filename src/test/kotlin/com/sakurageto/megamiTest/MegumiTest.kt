@@ -2,7 +2,11 @@ package com.sakurageto.megamiTest
 
 import com.sakurageto.ApplicationTest
 import com.sakurageto.card.*
-import com.sakurageto.gamelogic.MegamiEnum
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.PlayerEnum
+import com.sakurageto.card.basicenum.SubType
+import com.sakurageto.card.basicenum.MegamiEnum
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import kotlinx.coroutines.test.runTest
@@ -11,6 +15,15 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 class MegumiTest: ApplicationTest() {
+    private suspend fun useReed(){
+        player1Connection.putReceiveData(makeData(CommandEnum.SELECT_SPROUT, mutableListOf(0, 0)))
+        player1Connection.putReceiveData(makeData(CommandEnum.SELECT_NAP, mutableListOf(0, 1)))
+        player1Connection.putReceiveData(makeData(CommandEnum.SELECT_GROWING, mutableListOf(1, 0)))
+
+        addCard(PlayerEnum.PLAYER1, CardName.MEGUMI_REED, LocationEnum.HAND)
+        useCard(PlayerEnum.PLAYER1, CardName.MEGUMI_REED, LocationEnum.HAND)
+    }
+
     @Before
     fun setting(){
         gameStatus.player1.megamiOne = MegamiEnum.MEGUMI
@@ -18,8 +31,23 @@ class MegumiTest: ApplicationTest() {
     }
 
     @Test
-    fun gongSumTest() = runTest {
+    fun cardTypeTest() {
         cardTypeTest(CardName.MEGUMI_GONG_SUM, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.MEGUMI_TA_CHEOG, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.MEGUMI_SHELL_ATTACK, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.MEGUMI_POLE_THRUST, CardClass.NORMAL, CardType.ATTACK, SubType.REACTION)
+        cardTypeTest(CardName.MEGUMI_REED, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.MEGUMI_BALSAM, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.MEGUMI_WILD_ROSE, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.FULL_POWER)
+
+        cardTypeTest(CardName.MEGUMI_ROOT_OF_CAUSALITY, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.MEGUMI_BRANCH_OF_POSSIBILITY, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.REACTION)
+        cardTypeTest(CardName.MEGUMI_FRUIT_OF_END, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.MEGUMI_MEGUMI_PALM, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.NONE)
+    }
+
+    @Test
+    fun gongSumTest() = runTest {
         resetValue(0, 2, 10, 10, 4, 0)
         gameStatus.player1.notReadySeed = null
 
@@ -32,7 +60,6 @@ class MegumiTest: ApplicationTest() {
 
     @Test
     fun taCheogTest() = runTest {
-        cardTypeTest(CardName.MEGUMI_TA_CHEOG, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
         useReed()
         resetValue(0, 2, 10, 10, 3, 0)
 
@@ -45,7 +72,6 @@ class MegumiTest: ApplicationTest() {
 
     @Test
     fun shellAttackTest() = runTest {
-        cardTypeTest(CardName.MEGUMI_TA_CHEOG, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
         resetValue(0, 1, 10, 10, 3, 10)
 
         addReactData(PlayerEnum.PLAYER2)
@@ -64,7 +90,6 @@ class MegumiTest: ApplicationTest() {
 
     @Test
     fun poleThrust() = runTest {
-        cardTypeTest(CardName.MEGUMI_POLE_THRUST, CardClass.NORMAL, CardType.ATTACK, SubType.REACTION)
         resetValue(0, 0, 10, 10, 3, 10)
 
         addCard(PlayerEnum.PLAYER1, CardName.MEGUMI_REED, LocationEnum.ENCHANTMENT_ZONE)
@@ -81,18 +106,8 @@ class MegumiTest: ApplicationTest() {
         assertEquals(4, gameStatus.distanceToken)
     }
 
-    private suspend fun useReed(){
-        player1Connection.putReceiveData(makeData(CommandEnum.SELECT_SPROUT, mutableListOf(0, 0)))
-        player1Connection.putReceiveData(makeData(CommandEnum.SELECT_NAP, mutableListOf(0, 1)))
-        player1Connection.putReceiveData(makeData(CommandEnum.SELECT_GROWING, mutableListOf(1, 0)))
-
-        addCard(PlayerEnum.PLAYER1, CardName.MEGUMI_REED, LocationEnum.HAND)
-        useCard(PlayerEnum.PLAYER1, CardName.MEGUMI_REED, LocationEnum.HAND)
-    }
-
     @Test
     fun reedTest() = runTest {
-        cardTypeTest(CardName.MEGUMI_REED, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
         resetValue(0, 2, 10, 10, 4, 10)
 
         useReed()
@@ -103,7 +118,6 @@ class MegumiTest: ApplicationTest() {
 
     @Test
     fun balsamTest() = runTest {
-        cardTypeTest(CardName.MEGUMI_BALSAM, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
         resetValue(0, 1, 10, 10, 3, 10)
 
         player1Connection.putReceiveData(makeData(CommandEnum.SELECT_SPROUT, mutableListOf(0, 0)))
@@ -133,7 +147,6 @@ class MegumiTest: ApplicationTest() {
 
     @Test
     fun wildRoseTest() = runTest {
-        cardTypeTest(CardName.MEGUMI_WILD_ROSE, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.FULL_POWER)
         resetValue(0, 1, 10, 10, 4, 10)
         gameStatus.player1.fullAction = true
 
@@ -170,7 +183,6 @@ class MegumiTest: ApplicationTest() {
             assertEquals(true, haveCard(PlayerEnum.PLAYER1, CardName.MEGUMI_ROOT_OF_CAUSALITY, LocationEnum.SPECIAL_CARD))
         }
 
-        cardTypeTest(CardName.MEGUMI_ROOT_OF_CAUSALITY, CardClass.SPECIAL, CardType.ATTACK, SubType.NONE)
         resetValue(0, 0, 10, 10, 3, 10)
         gameStatus.player1.flare = 1
 
@@ -186,7 +198,6 @@ class MegumiTest: ApplicationTest() {
 
     @Test
     fun branchPossibilityTest() = runTest {
-        cardTypeTest(CardName.MEGUMI_BRANCH_OF_POSSIBILITY, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.REACTION)
         resetValue(2, 3, 10, 10, 2, 10)
         gameStatus.player1.flare = 3; gameStatus.player2.flare = 10
 
@@ -211,7 +222,6 @@ class MegumiTest: ApplicationTest() {
 
     @Test
     fun fruitEndTest() = runTest {
-        cardTypeTest(CardName.MEGUMI_FRUIT_OF_END, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.NONE)
         resetValue(0, 5, 10, 10, 4, 10)
         gameStatus.player1.flare = 4
 
@@ -255,7 +265,6 @@ class MegumiTest: ApplicationTest() {
 
     @Test
     fun megumiPalmTest() = runTest {
-        cardTypeTest(CardName.MEGUMI_MEGUMI_PALM, CardClass.SPECIAL, CardType.ENCHANTMENT, SubType.NONE)
         resetValue(5, 5, 10, 10, 4, 10)
         gameStatus.player1.flare = 3
 

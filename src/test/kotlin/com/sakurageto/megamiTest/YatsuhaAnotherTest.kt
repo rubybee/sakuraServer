@@ -2,7 +2,11 @@ package com.sakurageto.megamiTest
 
 import com.sakurageto.ApplicationTest
 import com.sakurageto.card.*
-import com.sakurageto.gamelogic.MegamiEnum
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.CardType
+import com.sakurageto.card.basicenum.PlayerEnum
+import com.sakurageto.card.basicenum.SubType
+import com.sakurageto.card.basicenum.MegamiEnum
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 import kotlinx.coroutines.test.runTest
@@ -11,8 +15,24 @@ import kotlin.test.assertEquals
 
 class YatsuhaAnotherTest: ApplicationTest() {
     @Test
-    fun holyRakeHandTest() = runTest{
+    fun cardTypeTest() = runTest {
         cardTypeTest(CardName.YATSUHA_HOLY_RAKE_HANDS, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.YATSUHA_ENTRANCE_OF_ABYSS, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
+        cardTypeTest(CardName.YATSUHA_TRUE_MONSTER, CardClass.NORMAL, CardType.ATTACK, SubType.FULL_POWER)
+        cardTypeTest(CardName.YATSUHA_GHOST_LINK, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.YATSUHA_RESOLUTION, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.YATSUHA_PLEDGE, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
+        cardTypeTest(CardName.YATSUHA_VAIN_FLOWER, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.YATSUHA_EIGHT_MIRROR_VAIN_SAKURA, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+
+        cardTypeTest(CardName.YATSUHA_UNFAMILIAR_WORLD, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
+        cardTypeTest(CardName.YATSUHA_COLORED_WORLD, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.YATSUHA_SHES_CHERRY_BLOSSOM_WORLD, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+        cardTypeTest(CardName.YATSUHA_SHES_EGO_AND_DETERMINATION, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
+    }
+
+    @Test
+    fun holyRakeHandTest() = runTest{
         resetValue(0, 1, 10, 10, 4, 12)
 
         addReactData(PlayerEnum.PLAYER2)
@@ -26,7 +46,6 @@ class YatsuhaAnotherTest: ApplicationTest() {
 
     @Test
     fun entranceOfAbyssTest() = runTest {
-        cardTypeTest(CardName.YATSUHA_ENTRANCE_OF_ABYSS, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)
         resetValue(4, 4, 10, 10, 4, 12)
 
         addReactData(PlayerEnum.PLAYER2)
@@ -38,7 +57,6 @@ class YatsuhaAnotherTest: ApplicationTest() {
 
     @Test
     fun trueMonsterTest() = runTest {
-        cardTypeTest(CardName.YATSUHA_TRUE_MONSTER, CardClass.NORMAL, CardType.ATTACK, SubType.FULL_POWER)
         resetValue(3, 3, 9, 9, 3, 12)
         gameStatus.player1.fullAction = true
 
@@ -52,7 +70,6 @@ class YatsuhaAnotherTest: ApplicationTest() {
 
     @Test
     fun ghostLinkTest() = runTest {
-        cardTypeTest(CardName.YATSUHA_GHOST_LINK, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)
         resetValue(0, 1, 10, 10, 3, 12)
 
         player1Connection.putReceiveData(makeData(CommandEnum.SELECT_ONE))
@@ -68,7 +85,6 @@ class YatsuhaAnotherTest: ApplicationTest() {
 
     @Test
     fun resolutionTest() = runTest {
-        cardTypeTest(CardName.YATSUHA_RESOLUTION, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
         resetValue(1, 0, 9, 10, 4, 12)
 
         addCard(PlayerEnum.PLAYER2, CardName.YATSUHA_RESOLUTION, LocationEnum.HAND)
@@ -83,7 +99,6 @@ class YatsuhaAnotherTest: ApplicationTest() {
 
     @Test
     fun pledgeTest() = runTest {
-        cardTypeTest(CardName.YATSUHA_PLEDGE, CardClass.NORMAL, CardType.BEHAVIOR, SubType.REACTION)
         resetValue(0, 1, 9, 10, 4, 12)
 
         player1Connection.putReceiveData(makeData(CommandEnum.SELECT_ONE))
@@ -113,7 +128,6 @@ class YatsuhaAnotherTest: ApplicationTest() {
 
     @Test
     fun vainFlowerTest() = runTest {
-        cardTypeTest(CardName.YATSUHA_VAIN_FLOWER, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
         resetValue(0, 0, 9, 10, 4, 0)
 
         addCard(PlayerEnum.PLAYER1, CardName.YATSUHA_STAR_NAIL, LocationEnum.HAND)
@@ -149,7 +163,6 @@ class YatsuhaAnotherTest: ApplicationTest() {
 
     @Test
     fun eightMirrorVainSakuraTest() = runTest {
-        cardTypeTest(CardName.YATSUHA_EIGHT_MIRROR_VAIN_SAKURA, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
         resetValue(0, 0, 9, 10, 4, 0)
         gameStatus.player1.flare = 1
 
@@ -177,7 +190,6 @@ class YatsuhaAnotherTest: ApplicationTest() {
 
     @Test
     fun unfamiliarWorldTest() = runTest {
-        cardTypeTest(CardName.YATSUHA_UNFAMILIAR_WORLD, CardClass.NORMAL, CardType.ENCHANTMENT, SubType.NONE)
         resetValue(0, 0, 10, 10, 4, 0)
 
         player1Connection.putReceiveData(makeData(CommandEnum.SELECT_NOT))
@@ -192,7 +204,6 @@ class YatsuhaAnotherTest: ApplicationTest() {
 
     @Test
     fun coloredWorldTest() = runTest {
-        cardTypeTest(CardName.YATSUHA_COLORED_WORLD, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
         resetValue(5, 3, 10, 10, 4, 0)
         MegamiEnum.YATSUHA_AA1.settingForAnother(PlayerEnum.PLAYER1, gameStatus)
         gameStatus.player1.flare = 2; gameStatus.player1.megamiOne = MegamiEnum.YATSUHA_AA1
@@ -237,7 +248,6 @@ class YatsuhaAnotherTest: ApplicationTest() {
 
     @Test
     fun shesCherryBlossomWorldTest() = runTest {
-        cardTypeTest(CardName.YATSUHA_SHES_CHERRY_BLOSSOM_WORLD, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
         resetValue(5, 3, 10, 10, 4, 0)
         MegamiEnum.YATSUHA_AA1.settingForAnother(PlayerEnum.PLAYER1, gameStatus)
         gameStatus.player1.megamiOne = MegamiEnum.YATSUHA_AA1
@@ -294,7 +304,6 @@ class YatsuhaAnotherTest: ApplicationTest() {
             assertEquals(4, gameStatus.player1.life)
         }
 
-        cardTypeTest(CardName.YATSUHA_SHES_EGO_AND_DETERMINATION, CardClass.SPECIAL, CardType.BEHAVIOR, SubType.NONE)
         resetValue(5, 3, 10, 10, 4, 0)
         gameStatus.player1.flare = 4
 

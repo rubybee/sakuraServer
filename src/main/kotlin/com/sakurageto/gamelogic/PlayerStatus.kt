@@ -3,6 +3,14 @@ package com.sakurageto.gamelogic
 import com.sakurageto.card.*
 import com.sakurageto.card.CardSet.toCardData
 import com.sakurageto.card.CardSet.toCardName
+import com.sakurageto.card.basicenum.CardClass
+import com.sakurageto.card.basicenum.MegamiEnum
+import com.sakurageto.card.basicenum.PlayerEnum
+import com.sakurageto.gamelogic.buff.attack.AttackBuffQueue
+import com.sakurageto.gamelogic.buff.CostBuff
+import com.sakurageto.gamelogic.buff.other.OtherBuffQueue
+import com.sakurageto.gamelogic.buff.range.RangeBuffQueue
+import com.sakurageto.gamelogic.buff.attack.AttackBuffTag
 import com.sakurageto.gamelogic.megamispecial.Stratagem
 import com.sakurageto.gamelogic.megamispecial.Umbrella
 import com.sakurageto.gamelogic.megamispecial.YatsuhaJourney
@@ -49,7 +57,6 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     var additionalHand: EnumMap<CardName, Card> = EnumMap(CardName::class.java)
     var sealZone = HashMap<Int, Card>()
     var sealInformation = HashMap<Int, MutableList<Int>>()
-    var outOfGame = HashMap<Int, Card>()
 
     var preAttackCard: MadeAttack? = null
     var usingCard = ArrayDeque<Card>()
@@ -451,6 +458,10 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
                 {it.toCardData(version).card_class == CardClass.NORMAL}.map
                 {it.toCardNumber(true)})
             }
+            LocationEnum.ALL_NORMAL_EXCEPT_ADDITIONAL -> {
+                destList.addAll(megamiOne.getAllNormalCardName(version).map { it.toCardNumber(true) })
+                destList.addAll(megamiTwo.getAllNormalCardName(version).map { it.toCardNumber(true) })
+            }
             LocationEnum.ALL -> {
                 if(megamiTwo == MegamiEnum.RENRI){
                     destList.add(NUMBER_TOKOYO_KUON)
@@ -462,10 +473,13 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
                     destList.add(NUMBER_SHINRA_WANJEON_NONPA)
                     destList.add(NUMBER_UTSURO_MANG_A)
                 }
+
                 destList.addAll(megamiOne.getAllNormalCardName(version).map { it.toCardNumber(true) })
                 destList.addAll(megamiTwo.getAllNormalCardName(version).map { it.toCardNumber(true) })
+
                 destList.addAll(megamiOne.getAllSpecialCardName(version).map { it.toCardNumber(true) })
                 destList.addAll(megamiTwo.getAllSpecialCardName(version).map { it.toCardNumber(true) })
+
                 destList.addAll(megamiOne.getAllAdditionalCardName().map {it.toCardNumber(true)})
                 destList.addAll(megamiTwo.getAllAdditionalCardName().map {it.toCardNumber(true)})
             }
@@ -641,16 +655,16 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
 
     fun addCostBuff(buf: CostBuff){
         when(buf.tag){
-            BufTag.INSERT -> costBuff[1].add(buf)
-            BufTag.CHANGE_EACH -> costBuff[3].add(buf)
-            BufTag.MULTIPLE -> costBuff[5].add(buf)
-            BufTag.DIVIDE -> costBuff[7].add(buf)
-            BufTag.PLUS_MINUS -> costBuff[9].add(buf)
-            BufTag.INSERT_IMMEDIATE -> costBuff[0].add(buf)
-            BufTag.CHANGE_EACH_IMMEDIATE -> costBuff[2].add(buf)
-            BufTag.MULTIPLE_IMMEDIATE -> costBuff[4].add(buf)
-            BufTag.DIVIDE_IMMEDIATE -> costBuff[6].add(buf)
-            BufTag.PLUS_MINUS_IMMEDIATE -> costBuff[8].add(buf)
+            AttackBuffTag.INSERT -> costBuff[1].add(buf)
+            AttackBuffTag.CHANGE_EACH -> costBuff[3].add(buf)
+            AttackBuffTag.MULTIPLE -> costBuff[5].add(buf)
+            AttackBuffTag.DIVIDE -> costBuff[7].add(buf)
+            AttackBuffTag.PLUS_MINUS -> costBuff[9].add(buf)
+            AttackBuffTag.INSERT_IMMEDIATE -> costBuff[0].add(buf)
+            AttackBuffTag.CHANGE_EACH_IMMEDIATE -> costBuff[2].add(buf)
+            AttackBuffTag.MULTIPLE_IMMEDIATE -> costBuff[4].add(buf)
+            AttackBuffTag.DIVIDE_IMMEDIATE -> costBuff[6].add(buf)
+            AttackBuffTag.PLUS_MINUS_IMMEDIATE -> costBuff[8].add(buf)
             else -> costBuff[11].add(buf)
         }
     }
@@ -663,7 +677,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
         it.card_number == card_number
     }
 
-    fun isDeckHave(find_name: CardName) = normalCardDeck.any {
+    fun isHandHave(find_name: CardName) = hand.values.any {
         it.card_data.card_name == find_name
     }
 

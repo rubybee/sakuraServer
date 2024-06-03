@@ -21,7 +21,7 @@ suspend fun makeBugReportFile(content: String){
     val currentDirectory = System.getProperty("user.dir")
     val directory = File("$currentDirectory/bugreport/")
     if (!directory.exists()) {
-        directory.mkdirs() // 디렉터리 생성
+        directory.mkdirs()
     }
 
     val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(currentTime)
@@ -30,7 +30,7 @@ suspend fun makeBugReportFile(content: String){
     var fileNumber = 1
 
     while (File(filePath).exists()) {
-        filePath = "file_${timestamp}_$fileNumber.txt"
+        filePath = "$currentDirectory/bugreport/file_${timestamp}_$fileNumber.txt"
         fileNumber++
     }
 

@@ -11,8 +11,13 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "1.7.20"
 }
 
+tasks {
+    create("stage").dependsOn("installDist")
+}
+
 group = "com.sakurageto"
 version = "0.0.1"
+
 application {
     mainClass.set("com.sakurageto.ApplicationKt")
 

@@ -1,1 +1,1 @@
-web: ./build/install/SakuraServer/bin/SakuraServer
+web: ./build/install/com.sakurageto.sakuraserver/bin/com.sakurageto.sakuraserver

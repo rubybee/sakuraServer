@@ -15,15 +15,15 @@ import com.sakurageto.protocol.LocationEnum
  텍스트 내에 processdamage가 존재할경우 처리해줘야됨
  used, constanteffect, in_deployment 같은 형태로 사용될 경우 처리해줘야됨
  */
-class EventLog(val player: PlayerEnum, val text: LogText, val number1: Int, val number2: Int, val resource: LocationEnum = LocationEnum.DUST,
-               val destination: LocationEnum = LocationEnum.DUST, val boolean: Boolean = false, var boolean2: Boolean = false) {
+class GameLog(val player: PlayerEnum, val text: LogEnum, val number1: Int, val number2: Int, val resource: LocationEnum = LocationEnum.DUST,
+              val destination: LocationEnum = LocationEnum.DUST, val boolean: Boolean = false, var boolean2: Boolean = false) {
 
-    fun isTextUseCard() = this.text == LogText.USE_CARD || this.text == LogText.USE_CARD_IN_SOLDIER ||
-            this.text == LogText.USE_CARD_IN_COVER || this.text == LogText.USE_CARD_PERJURE ||
-            this.text == LogText.USE_CARD_IN_SOLDIER_PERJURE
+    fun isTextUseCard() = this.text == LogEnum.USE_CARD || this.text == LogEnum.USE_CARD_IN_SOLDIER ||
+            this.text == LogEnum.USE_CARD_IN_COVER || this.text == LogEnum.USE_CARD_PERJURE ||
+            this.text == LogEnum.USE_CARD_IN_SOLDIER_PERJURE
 
     fun isAhumBasicOperation(ahumPlayer: PlayerEnum) =
-        text == LogText.MOVE_TOKEN && number1 == BASIC_OPERATION && player == ahumPlayer.opposite() &&
+        text == LogEnum.MOVE_TOKEN && number1 == BASIC_OPERATION && player == ahumPlayer.opposite() &&
                 isMoveAura()
 
     fun isMoveAura() =
@@ -34,8 +34,8 @@ class EventLog(val player: PlayerEnum, val text: LogText, val number1: Int, val 
                 destination == LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD || resource == LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD)
                 && number2 >= 1
 
-    fun isGetDamageLog() = this.text == LogText.GET_LIFE_DAMAGE || this.text == LogText.GET_AURA_DAMAGE
-            || this.text == LogText.GET_FLARE_DAMAGE
+    fun isGetDamageLog() = this.text == LogEnum.GET_LIFE_DAMAGE || this.text == LogEnum.GET_AURA_DAMAGE
+            || this.text == LogEnum.GET_FLARE_DAMAGE
 
     companion object{
         const val SPECIAL_COST = 0

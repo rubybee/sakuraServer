@@ -23,17 +23,17 @@ class KanaweTest: ApplicationTest() {
         MegamiEnum.KANAWE.settingForOriginal(PlayerEnum.PLAYER1, gameStatus)
 
         gameStatus.player1.additionalHand[CardName.IDEA_SAL_JIN] =
-            Card.cardMakerByName(true, CardName.IDEA_SAL_JIN, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9)
+            Card.cardMakerByName(true, CardName.IDEA_SAL_JIN, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9_1)
         gameStatus.player1.additionalHand[CardName.IDEA_SAKURA_WAVE] =
-            Card.cardMakerByName(true, CardName.IDEA_SAKURA_WAVE, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9)
+            Card.cardMakerByName(true, CardName.IDEA_SAKURA_WAVE, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9_1)
         gameStatus.player1.additionalHand[CardName.IDEA_WHISTLE] =
-            Card.cardMakerByName(true, CardName.IDEA_WHISTLE, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9)
+            Card.cardMakerByName(true, CardName.IDEA_WHISTLE, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9_1)
         gameStatus.player1.additionalHand[CardName.IDEA_MYEONG_JEON] =
-            Card.cardMakerByName(true, CardName.IDEA_MYEONG_JEON, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9)
+            Card.cardMakerByName(true, CardName.IDEA_MYEONG_JEON, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9_1)
         gameStatus.player1.additionalHand[CardName.IDEA_EMPHASIZING] =
-            Card.cardMakerByName(true, CardName.IDEA_EMPHASIZING, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9)
+            Card.cardMakerByName(true, CardName.IDEA_EMPHASIZING, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9_1)
         gameStatus.player1.additionalHand[CardName.IDEA_POSITIONING] =
-            Card.cardMakerByName(true, CardName.IDEA_POSITIONING, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9)
+            Card.cardMakerByName(true, CardName.IDEA_POSITIONING, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9_1)
     }
 
     @Test

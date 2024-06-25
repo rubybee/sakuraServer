@@ -3,8 +3,8 @@ package com.sakurageto.gamelogic.megamispecial
 import com.sakurageto.card.*
 import com.sakurageto.card.basicenum.PlayerEnum
 import com.sakurageto.gamelogic.GameStatus
-import com.sakurageto.gamelogic.log.EventLog
-import com.sakurageto.gamelogic.log.LogText
+import com.sakurageto.gamelogic.log.GameLog
+import com.sakurageto.gamelogic.log.LogEnum
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
 
@@ -81,7 +81,7 @@ class YatsuhaJourney(private val startPoint: Int) {
                         else -> {}
                     }
                 }
-                game_status.gameLogger.insert(EventLog(player, LogText.END_EFFECT, NUMBER_JOURNEY_SECOND_EFFECT, -1))
+                game_status.gameLogger.insert(GameLog(player, LogEnum.END_EFFECT, NUMBER_JOURNEY_SECOND_EFFECT, -1))
             }
             null
         }

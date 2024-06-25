@@ -1,6 +1,6 @@
 package com.sakurageto.gamelogic.log
 
-enum class LogText{
+enum class LogEnum{
     MOVE_TOKEN,
     END_EFFECT,
     IDEA,
@@ -13,12 +13,18 @@ enum class LogText{
     USE_CARD_IN_SOLDIER_PERJURE,
     USE_CARD,
     USE_CARD_PERJURE,
-    USE_CARD_REACT,
     USE_CENTRIFUGAL,
     GET_LIFE_DAMAGE,
     GET_AURA_DAMAGE,
     DAMAGE_PROCESS_START,
     START_PROCESS_ATTACK_DAMAGE,
     FAIL_DISPROVE,
-    GET_FLARE_DAMAGE;
+    GET_FLARE_DAMAGE,
+    START_PHASE,
+    MAIN_PHASE,
+    END_PHASE;
+
+    fun isPhaseLog(): Boolean{
+        return this == START_PHASE || this == MAIN_PHASE || this == END_PHASE
+    }
 }

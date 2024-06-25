@@ -22,17 +22,17 @@ class ThallyaTest: ApplicationTest() {
         MegamiEnum.THALLYA.settingForOriginal(PlayerEnum.PLAYER1, gameStatus)
 
         gameStatus.player1.additionalHand[CardName.FORM_YAKSHA] =
-            Card.cardMakerByName(true, CardName.FORM_YAKSHA, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9)
+            Card.cardMakerByName(true, CardName.FORM_YAKSHA, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9_1)
         gameStatus.player1.additionalHand[CardName.FORM_NAGA] =
-            Card.cardMakerByName(true, CardName.FORM_NAGA, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9)
+            Card.cardMakerByName(true, CardName.FORM_NAGA, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9_1)
         gameStatus.player1.additionalHand[CardName.FORM_GARUDA] =
-            Card.cardMakerByName(true, CardName.FORM_GARUDA, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9)
+            Card.cardMakerByName(true, CardName.FORM_GARUDA, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9_1)
         gameStatus.player1.additionalHand[CardName.FORM_KINNARI] =
-            Card.cardMakerByName(true, CardName.FORM_KINNARI, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9)
+            Card.cardMakerByName(true, CardName.FORM_KINNARI, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9_1)
         gameStatus.player1.additionalHand[CardName.FORM_DEVA] =
-            Card.cardMakerByName(true, CardName.FORM_DEVA, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9)
+            Card.cardMakerByName(true, CardName.FORM_DEVA, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9_1)
         gameStatus.player1.additionalHand[CardName.FORM_ASURA] =
-            Card.cardMakerByName(true, CardName.FORM_ASURA, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9)
+            Card.cardMakerByName(true, CardName.FORM_ASURA, PlayerEnum.PLAYER1, LocationEnum.ADDITIONAL_CARD, GameVersion.VERSION_9_1)
     }
 
     @Test

@@ -15,7 +15,7 @@ import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class YukihiTest: ApplicationTest() {
+class N6YukihiTest: ApplicationTest() {
     @Before
     fun setting(){
         gameStatus.player1.megamiOne = MegamiEnum.YUKIHI

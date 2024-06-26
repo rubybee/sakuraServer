@@ -13,7 +13,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
-class KururuOriginTest: ApplicationTest() {
+class N10KururuOriginTest: ApplicationTest() {
     @Test
     fun cardTypeTest() = runTest {
         cardTypeTest(CardName.KURURU_ELEKITTEL, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)

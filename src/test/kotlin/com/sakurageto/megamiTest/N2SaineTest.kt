@@ -13,7 +13,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
-class SaineTest: ApplicationTest() {
+class N2SaineTest: ApplicationTest() {
     @Test
     fun cardTypeTest() = runTest {
         cardTypeTest(CardName.SAINE_DOUBLEBEGI, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)

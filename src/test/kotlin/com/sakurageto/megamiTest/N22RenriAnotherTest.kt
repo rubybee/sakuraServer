@@ -14,7 +14,7 @@ import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class RenriAnotherTest: ApplicationTest() {
+class N22RenriAnotherTest: ApplicationTest() {
     private suspend fun useCardPerjury(playerEnum: PlayerEnum, card_name: CardName, original_card: Int, location: LocationEnum){
         when(location){
             LocationEnum.HAND -> {

@@ -14,7 +14,7 @@ import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class MegumiTest: ApplicationTest() {
+class N19MegumiTest: ApplicationTest() {
     private suspend fun useReed(){
         player1Connection.putReceiveData(makeData(CommandEnum.SELECT_SPROUT, mutableListOf(0, 0)))
         player1Connection.putReceiveData(makeData(CommandEnum.SELECT_NAP, mutableListOf(0, 1)))

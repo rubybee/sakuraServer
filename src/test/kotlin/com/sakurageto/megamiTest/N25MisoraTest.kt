@@ -14,7 +14,7 @@ import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class MisoraTest: ApplicationTest() {
+class N25MisoraTest: ApplicationTest() {
     private suspend fun useCardPerjury(playerEnum: PlayerEnum, card_name: CardName, original_card: Int, location: LocationEnum){
         when(location){
             LocationEnum.HAND -> {

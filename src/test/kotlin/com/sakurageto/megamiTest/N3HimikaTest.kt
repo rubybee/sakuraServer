@@ -13,7 +13,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
-class HimikaTest: ApplicationTest() {
+class N3HimikaTest: ApplicationTest() {
     private suspend fun useTwoCard(){
         player1Connection.putReceiveData(makeData(CommandEnum.SELECT_TWO))
         addCard(PlayerEnum.PLAYER1, CardName.SAINE_GANPA, LocationEnum.HAND)

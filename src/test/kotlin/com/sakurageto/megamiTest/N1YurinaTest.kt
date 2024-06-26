@@ -14,7 +14,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class YurinaTest: ApplicationTest() {
+class N1YurinaTest: ApplicationTest() {
     @Test
     fun cardTypeTest() = runTest {
         cardTypeTest(CardName.YURINA_CHAM, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)

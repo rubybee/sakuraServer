@@ -15,7 +15,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class OboroTest: ApplicationTest() {
+class N5OboroTest: ApplicationTest() {
     private fun addInstallationData(playerEnum: PlayerEnum, cardName: CardName){
         when(playerEnum){
             PlayerEnum.PLAYER1 -> {

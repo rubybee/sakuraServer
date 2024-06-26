@@ -13,7 +13,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
-class TokoyoTest: ApplicationTest() {
+class N4TokoyoTest: ApplicationTest() {
     private fun setKyoChi(playerEnum: PlayerEnum){
         gameStatus.getPlayer(playerEnum).concentration = 2
     }

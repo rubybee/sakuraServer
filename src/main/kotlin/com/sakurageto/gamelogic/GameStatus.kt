@@ -375,6 +375,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.YOUR_ARTIFICIAL_SAKURA_TOKEN,
                         LocationEnum.MACHINE_BURN_YOUR, LocationEnum.MACHINE_YOUR, number, -1)
                 }
+                return
             }
         }
 

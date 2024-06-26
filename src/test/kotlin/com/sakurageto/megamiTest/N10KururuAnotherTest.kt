@@ -14,7 +14,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
-class KururuAnotherTest: ApplicationTest() {
+class N10KururuAnotherTest: ApplicationTest() {
     @Test
     fun cardTypeTest() = runTest {
         cardTypeTest(CardName.KURURU_ANALYZE, CardClass.NORMAL, CardType.BEHAVIOR, SubType.NONE)

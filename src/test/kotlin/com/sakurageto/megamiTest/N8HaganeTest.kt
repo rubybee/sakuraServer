@@ -13,7 +13,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class HaganeTest: ApplicationTest() {
+class N8HaganeTest: ApplicationTest() {
     private fun makeCentrifugal(){
         gameStatus.startTurnDistance = gameStatus.distanceToken
         gameStatus.distanceToken += 2

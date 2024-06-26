@@ -16,7 +16,7 @@ import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class KanaweTest: ApplicationTest() {
+class N20KanaweTest: ApplicationTest() {
     @Before
     fun setting(){
         gameStatus.player1.megamiOne = MegamiEnum.KANAWE

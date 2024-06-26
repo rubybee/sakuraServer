@@ -12,7 +12,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class KorunuTest: ApplicationTest() {
+class N15KorunuTest: ApplicationTest() {
     @Test
     fun cardTypeTest() = runTest {
         cardTypeTest(CardName.KORUNU_SNOW_BLADE, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)

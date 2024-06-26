@@ -1540,6 +1540,16 @@ object CardSet {
         cardDataHashmapV9[CardName.SHISUI_IRON_POWDER_WIND_AROUND] = ironPowderWindAroundV9
         cardDataHashmapV9[CardName.SHISUI_PADMA_CUT_DOWN] = padmaCutDown
         cardDataHashmapV9[CardName.SHISUI_UPALA_TEAR] = upalaTearV9
+
+        cardDataHashmapV9_2[CardName.YURINA_GIBACK] = gibackV9_2
+        cardDataHashmapV9_2[CardName.YUKIHI_TURN_UMBRELLA] = turnUmbrellaV9_2
+        cardDataHashmapV9_2[CardName.HAGANE_GRAND_MOUNTAIN_RESPECT] = grandMountainRespectV9_2
+        cardDataHashmapV9_2[CardName.THALLYA_WAVING_EDGE] = wavingEdgeV9_2
+        cardDataHashmapV9_2[CardName.THALLYA_THALLYA_MASTERPIECE] =  masterPieceV9_2
+        cardDataHashmapV9_2[CardName.RAIRA_HOWLING] = howlingV9_2
+        cardDataHashmapV9_2[CardName.HONOKA_ASSAULT_SPIRIT_SIK] = assaultSikV9_2
+        cardDataHashmapV9_2[CardName.RENRI_SIN_SOO] = sinSooV9_2
+        cardDataHashmapV9_2[CardName.AKINA_THREAT] = threatV9_2
     }
 
     private suspend fun selectDustToDistance(nowCommand: CommandEnum, game_status: GameStatus,
@@ -15500,10 +15510,7 @@ object CardSet {
     fun v9hypen2CardInit(){
         gibackV9_2.addText(Text(TextEffectTimingTag.USING, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { card_number, player, game_status, _->
             game_status.addThisTurnRangeBuff(player, RangeBuff(card_number,1, RangeBuffTag.PLUS, { _, _, _ -> true},
-                { _, _, attack -> attack.plusMinusRange(1, true) }
-            ))
-            game_status.addThisTurnOtherBuff(player, OtherBuff(card_number, OtherBuffTag.GET, { _, _, _ -> true},
-                { _, _, attack -> attack.canNotReactNormal()}
+                { _, _, attack -> attack.plusMinusRange(1, false) }
             ))
             null
         })
@@ -15605,7 +15612,7 @@ object CardSet {
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         wavingEdgeV9_2.addText(combustCheckText)
         wavingEdgeV9_2.addText(combustText)
-        wavingEdgeV9_2.addText(Text(TextEffectTimingTag.USING, TextEffectTag.MOVE_TOKEN){ _, player, game_status, _ ->
+        wavingEdgeV9_2.addText(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_TOKEN){ _, player, game_status, _ ->
             game_status.requestAndDoBasicOperation(player, NUMBER_THALLYA_WAVING_EDGE)
             null
         })

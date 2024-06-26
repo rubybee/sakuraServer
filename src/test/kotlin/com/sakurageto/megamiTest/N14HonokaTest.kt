@@ -12,7 +12,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class HonokaTest: ApplicationTest() {
+class N14HonokaTest: ApplicationTest() {
     @Test
     fun cardTypeTest() = runTest {
         cardTypeTest(CardName.HONOKA_SPIRIT_SIK, CardClass.NORMAL, CardType.ATTACK, SubType.NONE)

@@ -14,7 +14,7 @@ import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class RairaTest: ApplicationTest() {
+class N12RairaTest: ApplicationTest() {
     @Before
     fun setting(){
         gameStatus.player1.megamiOne = MegamiEnum.RAIRA
@@ -111,6 +111,7 @@ class RairaTest: ApplicationTest() {
         addCard(PlayerEnum.PLAYER1, CardName.RAIRA_HOWLING, LocationEnum.HAND)
         useCard(PlayerEnum.PLAYER1, CardName.RAIRA_HOWLING, LocationEnum.HAND)
 
+        assertEquals(true, gameStatus.player2.shrink)
         assertEquals(20, gameStatus.player1.thunderGauge)
         assertEquals(0, gameStatus.player1.hand.size)
         assertEquals(1, gameStatus.player1.coverCard.size)

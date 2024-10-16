@@ -17,8 +17,16 @@ open class Connection(open var session: DefaultWebSocketServerSession) {
     var disconnectTime: Long = -1
 
     private suspend fun sendData(data: String){
+        while (true){
+            try{
+                session.send(data)
+                session.incoming.receiveCatching().getOrNull() ?: continue
+                break
+            }catch (e: Exception){
+                waitReconnect()
+            }
+        }
         logger.info("(GameRoom${roomNumber}) send message to ${socketPlayer}: $data")
-        session.send(data)
     }
 
     open suspend fun waitReconnect(){
@@ -26,6 +34,7 @@ open class Connection(open var session: DefaultWebSocketServerSession) {
         while (true){
             delay(1000)
             if(disconnectTime == -1L){
+                delay(2000)
                 break
             }
         }
@@ -47,7 +56,6 @@ open class Connection(open var session: DefaultWebSocketServerSession) {
 
     open suspend fun send(data: String){
         sendData(data)
-        receive()
     }
     
     companion object{

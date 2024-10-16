@@ -4788,22 +4788,6 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    //first means upperside of deck, last means belowside of deck
-    suspend fun insertHandToDeck(public: Boolean, Below: Boolean, player: PlayerEnum, card_number: Int): Boolean{
-        val nowPlayer = getPlayer(player)
-
-        val nowSocket = getSocket(player)
-        val otherSocket = getSocket(player.opposite())
-
-        return nowPlayer.hand[card_number]?.let {
-            if(Below) nowPlayer.normalCardDeck.addLast(it)
-            else nowPlayer.normalCardDeck.addFirst(it)
-            nowPlayer.hand.remove(card_number)
-            sendHandToDeck(nowSocket, otherSocket, card_number, public, Below)
-            true
-        }?: false
-    }
-
     private suspend fun removeArtificialToken(){
         when(turnPlayer){
             PlayerEnum.PLAYER1 -> {

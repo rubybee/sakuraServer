@@ -22,22 +22,32 @@ fun Application.configureSockets() {
 
     routing {
         webSocket("/waitroom/{roomnumber}") {
-            try {
-                call.parameters["roomnumber"]?.toInt()?.let {
-                    RoomInformation.roomHashMap[it]?.let { room ->
-                        while (true){
-                            if(!room.waitStatus){
-                                this.send("player match success")
-                                close(CloseReason(CloseReason.Codes.NORMAL, "player match success"))
-                                break
-                            }
-                            delay(1000)
-                        }
-                    }?: close(CloseReason(CloseReason.Codes.PROTOCOL_ERROR, "invalid room number"))
-                }
-            }catch (_: NumberFormatException){
+            val roomNumber = call.parameters["roomnumber"]?.toIntOrNull()
+            var matchSuccess = false
+
+            if (roomNumber == null) {
                 close(CloseReason(CloseReason.Codes.PROTOCOL_ERROR, "invalid room number"))
+                return@webSocket
             }
+
+            RoomInformation.roomHashMap[roomNumber]?.let { room ->
+                try {
+                    while (true) {
+                        if (!room.waitStatus) {
+                            this.send("player match success")
+                            matchSuccess = true
+                            close(CloseReason(CloseReason.Codes.NORMAL, "player match success"))
+                            break
+                        }
+                        delay(1000)
+                    }
+                } finally {
+                    if (!matchSuccess) {
+                        RoomInformation.roomHashMap.remove(roomNumber)
+                        close(CloseReason(CloseReason.Codes.PROTOCOL_ERROR, "time out"))
+                    }
+                }
+            } ?: close(CloseReason(CloseReason.Codes.PROTOCOL_ERROR, "invalid room number"))
         }
 
         webSocket("/play/{roomNumber}") {
@@ -87,17 +97,23 @@ fun Application.configureSockets() {
                                 room.firstUserConnection?.session?.incoming?.cancel()
                                 room.firstUserConnection?.session?.close()
                                 while(room.firstUserConnection?.disconnectTime == -1L){
+                                    if(room.firstUserConnection?.gameEnd == true){
+                                        break
+                                    }
                                     delay(500)
                                 }
                                 val logger = LoggerFactory.getLogger("WebSocketLogger")
                                 logger.info("GameRoom Num$roomNumber: reconnect Player1")
                                 room.firstUserConnection?.session = this
                                 room.firstUserConnection?.disconnectTime = -1L
+
+                                val nowSession = room.firstUserConnection?.session
                                 while(true){
-                                    if(room.firstUserConnection?.gameEnd == true){
+                                    if(nowSession != room.firstUserConnection?.session
+                                        || room.firstUserConnection?.gameEnd == true) {
                                         break
                                     }
-                                    delay(1000)
+                                    delay(5000)
                                 }
                             }
                             else if(room.secondUserCode == userCode){
@@ -113,8 +129,12 @@ fun Application.configureSockets() {
                                 logger.info("GameRoom Num$roomNumber: reconnect Player2")
                                 room.secondUserConnection?.session = this
                                 room.secondUserConnection?.disconnectTime = -1L
+
+                                val nowSession = room.secondUserConnection?.session
                                 while(true){
-                                    delay(1000)
+                                    if(nowSession != room.secondUserConnection?.session
+                                        || room.secondUserConnection?.gameEnd == true) break
+                                    delay(5000)
                                 }
                             }
                             else{

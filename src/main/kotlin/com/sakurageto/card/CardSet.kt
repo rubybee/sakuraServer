@@ -15543,8 +15543,11 @@ object CardSet {
             }
             null
         })
-        turnUmbrellaV9_2.addText(Text(TextEffectTimingTag.USING, TextEffectTag.CHANGE_UMBRELLA) { _, player, game_status, _ ->
+        turnUmbrellaV9_2.addText(Text(TextEffectTimingTag.USING, TextEffectTag.CHANGE_UMBRELLA) { card_number, player, game_status, _ ->
             game_status.changeUmbrella(player)
+            game_status.dustToAura(player, 1, Arrow.ONE_DIRECTION, player,
+                game_status.getCardOwner(card_number), card_number)
+            game_status.gameLogger.insert(GameLog(player, LogEnum.END_EFFECT, card_number, -1))
             null
         })
 

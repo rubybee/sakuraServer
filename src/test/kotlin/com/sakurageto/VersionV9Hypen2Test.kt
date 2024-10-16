@@ -64,6 +64,7 @@ class VersionV9Hypen2Test: ApplicationTest() {
 
         assertEquals(1, gameStatus.player1.aura)
         useCard(PlayerEnum.PLAYER1, CardName.YUKIHI_TURN_UMBRELLA, LocationEnum.HAND)
+        assertEquals(2, gameStatus.player1.aura)
         assertEquals(Umbrella.FOLD, gameStatus.player1.umbrella)
     }
 

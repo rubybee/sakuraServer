@@ -94,7 +94,7 @@ suspend fun sendMoveToken(mine: Connection, other: Connection, what: TokenEnum, 
     mine.send(Json.encodeToString(preData))
     other.send(Json.encodeToString(preData))
     val dataYour = SakuraArrayData(MOVE_TOKEN, mutableListOf(what.real_number, from.real_number, to.real_number, number, card_number, card_number2))
-    val dataOther = SakuraArrayData(MOVE_TOKEN, mutableListOf(what.opposite().real_number, from.oppositeLocation().real_number, to.oppositeLocation().real_number, number, card_number, card_number2))
+    val dataOther = SakuraArrayData(MOVE_TOKEN, mutableListOf(what.opposite().real_number, from.opposite().real_number, to.opposite().real_number, number, card_number, card_number2))
     mine.send(Json.encodeToString(dataYour))
     other.send(Json.encodeToString(dataOther))
 }
@@ -139,14 +139,6 @@ suspend fun sendSetShrink(mine: Connection, other: Connection){
 suspend fun sendRemoveShrink(mine: Connection, other: Connection){
     val dataYour = SakuraBaseData(REMOVE_SHRINK_YOUR, -1)
     val dataOther = SakuraBaseData(REMOVE_SHRINK_OTHER, -1)
-    mine.send(Json.encodeToString(dataYour))
-    other.send(Json.encodeToString(dataOther))
-}
-
-suspend fun sendHandToDeck(mine: Connection, other: Connection, card_number: Int, public: Boolean, below: Boolean){
-    val dataYour = SakuraBaseData(if (below) CARD_HAND_TO_DECK_BELOW_YOUR else CARD_HAND_TO_DECK_UPPER_YOUR, card_number)
-    val dataOther = if(public) SakuraBaseData(if (below) CARD_HAND_TO_DECK_BELOW_OTHER else CARD_HAND_TO_DECK_UPPER_OTHER, card_number)
-    else SakuraBaseData(if (below) CARD_HAND_TO_DECK_BELOW_OTHER else CARD_HAND_TO_DECK_UPPER_OTHER, card_number.toPrivate())
     mine.send(Json.encodeToString(dataYour))
     other.send(Json.encodeToString(dataOther))
 }

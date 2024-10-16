@@ -5,8 +5,8 @@ import com.sakurageto.card.basicenum.*
 import com.sakurageto.gamelogic.*
 import com.sakurageto.gamelogic.buff.other.OtherBuffQueue
 import com.sakurageto.gamelogic.megamispecial.Umbrella
-import com.sakurageto.gamelogic.log.EventLog
-import com.sakurageto.gamelogic.log.LogText
+import com.sakurageto.gamelogic.log.GameLog
+import com.sakurageto.gamelogic.log.LogEnum
 import com.sakurageto.gamelogic.megamispecial.storyboard.Act
 import com.sakurageto.protocol.CommandEnum
 import com.sakurageto.protocol.LocationEnum
@@ -85,7 +85,6 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                 }
 
             }
-
         }
 
         fun cardInitInsert(start_turn: Boolean, dest: ArrayDeque<Card>, src: MutableList<CardName>, player: PlayerEnum,
@@ -647,17 +646,17 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
         when {
             nowNeedNap == 0 -> {}
             (nowNeedNap > game_status.getPlayerAura(player) + game_status.dust) -> {
-                game_status.dustToCard(player, game_status.dust, this, EventLog.NORMAL_NAP_COST)
-                game_status.auraToCard(player, game_status.getPlayerAura(player), this, EventLog.NORMAL_NAP_COST)
-                game_status.gameLogger.insert(EventLog(player, LogText.END_EFFECT, EventLog.NORMAL_NAP_COST, -1))
+                game_status.dustToCard(player, game_status.dust, this, GameLog.NORMAL_NAP_COST)
+                game_status.auraToCard(player, game_status.getPlayerAura(player), this, GameLog.NORMAL_NAP_COST)
+                game_status.gameLogger.insert(GameLog(player, LogEnum.END_EFFECT, GameLog.NORMAL_NAP_COST, -1))
             }
             game_status.getPlayerAura(player) == 0 -> {
-                game_status.dustToCard(player, nowNeedNap, this, EventLog.NORMAL_NAP_COST)
-                game_status.gameLogger.insert(EventLog(player, LogText.END_EFFECT, EventLog.NORMAL_NAP_COST, -1))
+                game_status.dustToCard(player, nowNeedNap, this, GameLog.NORMAL_NAP_COST)
+                game_status.gameLogger.insert(GameLog(player, LogEnum.END_EFFECT, GameLog.NORMAL_NAP_COST, -1))
             }
             game_status.dust == 0 -> {
-                game_status.auraToCard(player, nowNeedNap, this, EventLog.NORMAL_NAP_COST)
-                game_status.gameLogger.insert(EventLog(player, LogText.END_EFFECT, EventLog.NORMAL_NAP_COST, -1))
+                game_status.auraToCard(player, nowNeedNap, this, GameLog.NORMAL_NAP_COST)
+                game_status.gameLogger.insert(GameLog(player, LogEnum.END_EFFECT, GameLog.NORMAL_NAP_COST, -1))
             }
             else -> {
                 while (true) {
@@ -666,9 +665,9 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
                     if (aura < 0 || dust < 0 || aura + dust != nowNeedNap || game_status.getPlayerAura(player) < aura || game_status.dust < dust) {
                         continue
                     }
-                    game_status.auraToCard(player, aura, this, EventLog.NORMAL_NAP_COST)
-                    game_status.dustToCard(player, dust, this, EventLog.NORMAL_NAP_COST)
-                    game_status.gameLogger.insert(EventLog(player, LogText.END_EFFECT, EventLog.NORMAL_NAP_COST, -1))
+                    game_status.auraToCard(player, aura, this, GameLog.NORMAL_NAP_COST)
+                    game_status.dustToCard(player, dust, this, GameLog.NORMAL_NAP_COST)
+                    game_status.gameLogger.insert(GameLog(player, LogEnum.END_EFFECT, GameLog.NORMAL_NAP_COST, -1))
                     break
                 }
             }

@@ -268,11 +268,14 @@ class GameFactory(private val roomNumber: Int, val player1: Connection, val play
         val player1Data = receiveSakuraCardSet(player1, CommandEnum.MULIGUN)
         val player2Data = receiveSakuraCardSet(player2, CommandEnum.MULIGUN)
         var count = 0
+
         player1Data.normal_card?.let {
             for(card_name in it){
-                if(gameStatus.insertHandToDeck(public = false, Below = true, player = PlayerEnum.PLAYER1,
-                        card_number = gameStatus.getCardNumber(PlayerEnum.PLAYER1, card_name)
-                    )){
+                val card = gameStatus.popCardFrom(PlayerEnum.PLAYER1,
+                    gameStatus.getCardNumber(PlayerEnum.PLAYER1, card_name), LocationEnum.HAND, false)
+                if(card != null){
+                    gameStatus.insertCardTo(PlayerEnum.PLAYER1, card, LocationEnum.YOUR_DECK_BELOW,
+                        publicForOther = false, publicForYour = true, discardCheck = false)
                     count += 1
                 }
             }
@@ -282,9 +285,11 @@ class GameFactory(private val roomNumber: Int, val player1: Connection, val play
         count = 0
         player2Data.normal_card?.let {
             for(card_name in it){
-                if(gameStatus.insertHandToDeck(public = false, Below = true, player = PlayerEnum.PLAYER2,
-                        card_number = gameStatus.getCardNumber(PlayerEnum.PLAYER2, card_name)
-                    )){
+                val card = gameStatus.popCardFrom(PlayerEnum.PLAYER2,
+                    gameStatus.getCardNumber(PlayerEnum.PLAYER2, card_name), LocationEnum.HAND, false)
+                if(card != null){
+                    gameStatus.insertCardTo(PlayerEnum.PLAYER2, card, LocationEnum.YOUR_DECK_BELOW,
+                        publicForOther = false, publicForYour = true, discardCheck = false)
                     count += 1
                 }
             }

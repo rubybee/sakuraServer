@@ -138,7 +138,7 @@ open class ApplicationTest {
         player2Connection = ConnectionTest(PLAYER2, mockk())
         gameStatus = GameStatus(PlayerStatus(PLAYER1),
             PlayerStatus(PLAYER2), player1Connection, player2Connection)
-        gameStatus.version = GameVersion.VERSION_9
+        gameStatus.version = GameVersion.VERSION_9_1
         gameStatus.nowPhase = GameStatus.MAIN_PHASE; gameStatus.turnPlayer = PLAYER1
         gameStatus.turnNumber = 3
         gameStatus.firstTurnPlayer = PLAYER1; gameStatus.player1.firstTurn = true; gameStatus.player2.firstTurn = false

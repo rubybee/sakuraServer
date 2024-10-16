@@ -1,11 +1,6 @@
 package com.sakurageto.protocol
 
-import com.sakurageto.card.INDEX_LACERATION_AURA
-import com.sakurageto.card.INDEX_LACERATION_FLARE
-import com.sakurageto.card.INDEX_LACERATION_LIFE
-import com.sakurageto.card.basicenum.PlayerEnum
 import com.sakurageto.plugins.makeBugReportFile
-import java.lang.Exception
 import java.util.*
 
 enum class CommandEnum {
@@ -152,10 +147,6 @@ enum class CommandEnum {
     USE_CARD_OTHER,
     USE_CARD_YOUR_REACTION,
     USE_CARD_OTHER_REACTION,
-    CARD_HAND_TO_DECK_BELOW_YOUR,
-    CARD_HAND_TO_DECK_BELOW_OTHER,
-    CARD_HAND_TO_DECK_UPPER_YOUR,
-    CARD_HAND_TO_DECK_UPPER_OTHER,
     DRAW_CARD_YOUR,
     DRAW_CARD_OTHER,
     SELECT_NAP,
@@ -388,10 +379,6 @@ enum class CommandEnum {
             USE_CARD_OTHER to USE_CARD_YOUR,
             USE_CARD_YOUR_REACTION to USE_CARD_OTHER_REACTION,
             USE_CARD_OTHER_REACTION to USE_CARD_YOUR_REACTION,
-            CARD_HAND_TO_DECK_BELOW_YOUR to CARD_HAND_TO_DECK_BELOW_OTHER,
-            CARD_HAND_TO_DECK_BELOW_OTHER to CARD_HAND_TO_DECK_BELOW_YOUR,
-            CARD_HAND_TO_DECK_UPPER_YOUR to CARD_HAND_TO_DECK_UPPER_OTHER,
-            CARD_HAND_TO_DECK_UPPER_OTHER to CARD_HAND_TO_DECK_UPPER_YOUR,
             ACTION_GO_FORWARD_YOUR to ACTION_GO_FORWARD_OTHER,
             ACTION_GO_BACKWARD_YOUR to ACTION_GO_BACKWARD_OTHER,
             ACTION_WIND_AROUND_YOUR to ACTION_WIND_AROUND_OTHER,
@@ -542,51 +529,7 @@ enum class CommandEnum {
     }
 }
 
-enum class TokenEnum(var real_number: Int){
-    SAKURA_TOKEN(0),
-    YOUR_ARTIFICIAL_SAKURA_TOKEN(1),
-    YOUR_ARTIFICIAL_SAKURA_TOKEN_ON_TOKEN(2),
-    YOUR_ARTIFICIAL_SAKURA_TOKEN_OUT_TOKEN(3),
-    OTHER_ARTIFICIAL_SAKURA_TOKEN(4),
-    OTHER_ARTIFICIAL_SAKURA_TOKEN_ON_TOKEN(5),
-    OTHER_ARTIFICIAL_SAKURA_TOKEN_OUT_TOKEN(6),
-    FREEZE_TOKEN(7),
-    SEED_TOKEN(8),
-    LACERATION_YOUR(9),
-    LACERATION_OTHER(10);
-
-    fun opposite(): TokenEnum{
-        return when(this){
-            SAKURA_TOKEN -> SAKURA_TOKEN
-            YOUR_ARTIFICIAL_SAKURA_TOKEN -> OTHER_ARTIFICIAL_SAKURA_TOKEN
-            YOUR_ARTIFICIAL_SAKURA_TOKEN_ON_TOKEN -> OTHER_ARTIFICIAL_SAKURA_TOKEN_ON_TOKEN
-            YOUR_ARTIFICIAL_SAKURA_TOKEN_OUT_TOKEN -> OTHER_ARTIFICIAL_SAKURA_TOKEN_OUT_TOKEN
-            OTHER_ARTIFICIAL_SAKURA_TOKEN -> YOUR_ARTIFICIAL_SAKURA_TOKEN
-            OTHER_ARTIFICIAL_SAKURA_TOKEN_ON_TOKEN -> YOUR_ARTIFICIAL_SAKURA_TOKEN_ON_TOKEN
-            OTHER_ARTIFICIAL_SAKURA_TOKEN_OUT_TOKEN -> YOUR_ARTIFICIAL_SAKURA_TOKEN_OUT_TOKEN
-            FREEZE_TOKEN -> FREEZE_TOKEN
-            SEED_TOKEN -> SEED_TOKEN
-            LACERATION_YOUR -> LACERATION_OTHER
-            LACERATION_OTHER -> LACERATION_YOUR
-        }
-    }
-
-    companion object {
-        fun fromInt(value: Int) = TokenEnum.values().first { it.real_number == value }
-
-        fun getLaceration(getDamage: PlayerEnum, giveDamage: PlayerEnum) = if(getDamage == giveDamage) LACERATION_YOUR
-        else LACERATION_OTHER
-
-        fun Int.toLacerationLocation() = when(this){
-            INDEX_LACERATION_AURA -> LocationEnum.AURA_YOUR
-            INDEX_LACERATION_FLARE -> LocationEnum.FLARE_YOUR
-            INDEX_LACERATION_LIFE -> LocationEnum.LIFE_YOUR
-            else -> throw Exception("invalid int value to laceration index: $this")
-        }
-    }
-}
-
-    //SELECT_ONE MEANS I SELECT AURA TO OUT
+//SELECT_ONE MEANS I SELECT AURA TO OUT
 enum class LocToLoc(var real_number: Int){
     AURA_YOUR_TO_OUT(0),
     FLARE_YOUR_TO_OUT(1),

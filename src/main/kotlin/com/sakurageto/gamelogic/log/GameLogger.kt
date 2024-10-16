@@ -4,29 +4,29 @@ import com.sakurageto.card.basicenum.PlayerEnum
 import com.sakurageto.protocol.LocationEnum
 
 class GameLogger {
-    private val eventLogQueue = ArrayDeque<EventLog>()
+    private val gameLogQueue = ArrayDeque<GameLog>()
 
-    fun insert(eventLog: EventLog){
-        eventLogQueue.addLast(eventLog)
+    fun insert(gameLog: GameLog){
+        gameLogQueue.addLast(gameLog)
     }
 
     fun reset(){
-        eventLogQueue.clear()
+        gameLogQueue.clear()
     }
 
     fun playerUseCardNumber(player: PlayerEnum): Int{
         var result = 0
-        for(log in eventLogQueue){
+        for(log in gameLogQueue){
             if(log.player == player && log.isTextUseCard()) result +=1
         }
         return result
     }
 
     fun checkThisCardUseInCover(player: PlayerEnum, card_number: Int): Boolean{
-        for (log in eventLogQueue.asReversed()){
+        for (log in gameLogQueue.asReversed()){
             if(log.player == player){
                 if(card_number == log.number1){
-                    if(log.text == LogText.USE_CARD_IN_COVER || log.text == LogText.USE_CARD_IN_COVER_AND_REACT){
+                    if(log.text == LogEnum.USE_CARD_IN_COVER || log.text == LogEnum.USE_CARD_IN_COVER_AND_REACT){
                         return true
                     }
                     else if(log.isTextUseCard()){
@@ -39,37 +39,45 @@ class GameLogger {
     }
 
     fun checkThisCardUseInSoldier(player: PlayerEnum, card_number: Int): Boolean{
-        for (log in eventLogQueue.asReversed()){
+        for (log in gameLogQueue.asReversed()){
             if(log.player == player && log.number1 == card_number && log.isTextUseCard()){
-                return log.text == LogText.USE_CARD_IN_SOLDIER || log.text == LogText.USE_CARD_IN_SOLDIER_PERJURE
+                return log.text == LogEnum.USE_CARD_IN_SOLDIER || log.text == LogEnum.USE_CARD_IN_SOLDIER_PERJURE
             }
         }
         return false
     }
 
     fun checkThisTurnGetAuraDamage(player: PlayerEnum): Boolean{
-        for (log in eventLogQueue){
-            if(log.player == player && log.text == LogText.GET_AURA_DAMAGE) return true
+        for (log in gameLogQueue){
+            if(log.player == player && log.text == LogEnum.GET_AURA_DAMAGE) return true
         }
         return false
     }
 
     fun checkThisTurnDoAttack(player: PlayerEnum): Boolean{
-        for(log in eventLogQueue){
-            if(log.player == player && log.text == LogText.ATTACK) return true
+        for(log in gameLogQueue){
+            if(log.player == player && log.text == LogEnum.ATTACK) return true
+        }
+        return false
+    }
+
+    fun checkThisPhaseDoAttack(player: PlayerEnum): Boolean{
+        for(log in gameLogQueue.asReversed()){
+            if(log.text.isPhaseLog()) break
+            if(log.player == player && log.text == LogEnum.ATTACK) return true
         }
         return false
     }
 
     fun checkThisTurnDoAttackNotSpecial(player: PlayerEnum): Boolean{
-        for(log in eventLogQueue){
-            if(log.player == player && log.text == LogText.ATTACK && log.number2 != EventLog.ATTACK_NUMBER_SPECIAL) return true
+        for(log in gameLogQueue){
+            if(log.player == player && log.text == LogEnum.ATTACK && log.number2 != GameLog.ATTACK_NUMBER_SPECIAL) return true
         }
         return false
     }
 
     fun checkThisTurnUseCardCondition(player: PlayerEnum, filter: (Int, Int) -> Int): Boolean{
-        for(log in eventLogQueue){
+        for(log in gameLogQueue){
             if(log.player == player && log.isTextUseCard()){
                 when(filter(log.number1, log.number2)){
                     0 -> return false
@@ -83,7 +91,7 @@ class GameLogger {
     }
 
     fun checkThisTurnUseCard(player: PlayerEnum, filter: (Int) -> Boolean): Boolean{
-        for(log in eventLogQueue){
+        for(log in gameLogQueue){
             if(log.player == player && log.isTextUseCard() && filter(log.number1)){
                 return true
             }
@@ -93,7 +101,7 @@ class GameLogger {
 
     fun countCardUseCount(player: PlayerEnum, card_number: Int): Int{
         var count = 0
-        for(log in eventLogQueue){
+        for(log in gameLogQueue){
             if(log.player == player && log.isTextUseCard() && log.number1 == card_number){
                 count += 1
             }
@@ -102,38 +110,38 @@ class GameLogger {
     }
 
     fun checkThisCardUsed(player: PlayerEnum, card_number: Int): Boolean{
-        for(log in eventLogQueue.asReversed()){
+        for(log in gameLogQueue.asReversed()){
             if(log.player == player && log.isTextUseCard() && log.number1 == card_number) return true
         }
         return false
     }
 
     fun checkUseCentrifugal(player: PlayerEnum): Boolean{
-        for(log in eventLogQueue.asReversed()){
-            if(log.player == player && log.text == LogText.USE_CENTRIFUGAL) return true
+        for(log in gameLogQueue.asReversed()){
+            if(log.player == player && log.text == LogEnum.USE_CENTRIFUGAL) return true
         }
         return false
     }
 
     fun checkThisTurnAttackNumber(player: PlayerEnum): Int{
         var number = 0
-        for(log in eventLogQueue){
-            if(log.player == player && log.text == LogText.ATTACK) number += 1
+        for(log in gameLogQueue){
+            if(log.player == player && log.text == LogEnum.ATTACK) number += 1
         }
         return number
     }
 
     fun checkThisTurnTransform(player: PlayerEnum): Boolean{
-        for(log in eventLogQueue){
-            if(log.player == player && log.text == LogText.TRANSFORM) return true
+        for(log in gameLogQueue){
+            if(log.player == player && log.text == LogEnum.TRANSFORM) return true
         }
         return false
     }
 
     fun isThisAttackFirst(player: PlayerEnum, card_number: Int): Boolean{
         var check = true
-        for(log in eventLogQueue){
-            if(log.player == player && log.text == LogText.ATTACK){
+        for(log in gameLogQueue){
+            if(log.player == player && log.text == LogEnum.ATTACK){
                 if(log.number1 != card_number) return false
                 else{
                     if(check) check = false
@@ -146,8 +154,8 @@ class GameLogger {
 
     fun checkSaljin(flipped: Boolean): Boolean{
         var count = 0
-        for(log in eventLogQueue){
-            if(log.text == LogText.ATTACK) count += 1
+        for(log in gameLogQueue){
+            if(log.text == LogEnum.ATTACK) count += 1
             else if(log.isTextUseCard() && log.boolean2) count += 1
         }
 
@@ -160,11 +168,11 @@ class GameLogger {
 
     fun checkSakuraWave(): Boolean{
         val store = HashMap<Int, Int>()
-        for(log in eventLogQueue){
-            if(log.text == LogText.MOVE_TOKEN){
+        for(log in gameLogQueue){
+            if(log.text == LogEnum.MOVE_TOKEN){
                 when(log.number1){
-                    EventLog.IGNORE -> {}
-                    EventLog.BASIC_OPERATION -> {
+                    GameLog.IGNORE -> {}
+                    GameLog.BASIC_OPERATION -> {
                         if(log.number2 >= 3){
                             return true
                         }
@@ -180,7 +188,7 @@ class GameLogger {
                     }
                 }
             }
-            else if(log.text == LogText.END_EFFECT){
+            else if(log.text == LogEnum.END_EFFECT){
                 if((store[log.number1]?: 0) >= 3){
                     return true
                 }
@@ -192,11 +200,11 @@ class GameLogger {
 
     fun checkSakuraWaveFlipped(): Boolean{
         val store = HashMap<Int, Int>()
-        for(log in eventLogQueue){
-            if(log.text == LogText.MOVE_TOKEN){
+        for(log in gameLogQueue){
+            if(log.text == LogEnum.MOVE_TOKEN){
                 when(log.number1){
-                    EventLog.IGNORE -> {}
-                    EventLog.BASIC_OPERATION -> {
+                    GameLog.IGNORE -> {}
+                    GameLog.BASIC_OPERATION -> {
                         if(log.number2 >= 5){
                             return true
                         }
@@ -210,7 +218,7 @@ class GameLogger {
                     }
                 }
             }
-            else if(log.text == LogText.END_EFFECT){
+            else if(log.text == LogEnum.END_EFFECT){
                 if((store[log.number1]?: 0) >= 5){
                     return true
                 }
@@ -224,10 +232,10 @@ class GameLogger {
         val value = if(flipped) 2 else 1
         val storeFrom = HashMap<Int, Int>()
         val storeTo = HashMap<Int, Int>()
-        for(log in eventLogQueue){
-            if(log.text == LogText.MOVE_TOKEN){
+        for(log in gameLogQueue){
+            if(log.text == LogEnum.MOVE_TOKEN){
                 when(log.number1){
-                    EventLog.IGNORE, EventLog.BASIC_OPERATION -> {}
+                    GameLog.IGNORE, GameLog.BASIC_OPERATION -> {}
                     else -> {
                         if(log.resource == LocationEnum.LIFE_YOUR){
                             storeFrom[log.number1] = storeFrom[log.number1]?.let{
@@ -246,7 +254,7 @@ class GameLogger {
                     }
                 }
             }
-            else if(log.text == LogText.END_EFFECT){
+            else if(log.text == LogEnum.END_EFFECT){
                 if((storeFrom[log.number1]?: 0) >= value){
                     return true
                 }
@@ -264,8 +272,8 @@ class GameLogger {
     fun checkMyeongJeon(flipped: Boolean): Boolean{
         val value = if(flipped) 2 else 1
         var count = 0
-        for(log in eventLogQueue){
-            if(log.text == LogText.MOVE_TOKEN){
+        for(log in gameLogQueue){
+            if(log.text == LogEnum.MOVE_TOKEN){
                 if(log.boolean){
                     count += 1
                     if(count >= value){
@@ -279,30 +287,30 @@ class GameLogger {
 
 
     fun checkThisTurnUseFullPower(): Boolean{
-        for(log in eventLogQueue){
+        for(log in gameLogQueue){
             if(log.isTextUseCard() && log.boolean) return true
         }
         return false
     }
 
     fun checkThisTurnIdea(player: PlayerEnum): Boolean{
-        for(log in eventLogQueue){
-            if(log.player == player && log.text == LogText.IDEA) return true
+        for(log in gameLogQueue){
+            if(log.player == player && log.text == LogEnum.IDEA) return true
         }
         return false
     }
 
     fun findGetDamageByThisAttack(attack_number: Int): Pair<Int, Int>{
-        for(log in eventLogQueue.asReversed()){
+        for(log in gameLogQueue.asReversed()){
             if(log.number2 == attack_number){
                 when (log.text) {
-                    LogText.GET_AURA_DAMAGE -> {
+                    LogEnum.GET_AURA_DAMAGE -> {
                         return Pair(log.number1, 0)
                     }
-                    LogText.GET_LIFE_DAMAGE -> {
+                    LogEnum.GET_LIFE_DAMAGE -> {
                         return Pair(0, log.number1)
                     }
-                    LogText.DAMAGE_PROCESS_START -> {
+                    LogEnum.DAMAGE_PROCESS_START -> {
                         return Pair(0, 0)
                     }
                     else -> {}
@@ -313,8 +321,8 @@ class GameLogger {
     }
 
     fun checkThisTurnMoveDustToken(): Boolean{
-        for(log in eventLogQueue){
-            if(log.text == LogText.MOVE_TOKEN && log.resource == LocationEnum.DUST && log.number2 >= 1){
+        for(log in gameLogQueue){
+            if(log.text == LogEnum.MOVE_TOKEN && log.resource == LocationEnum.DUST && log.number2 >= 1){
                 return true
             }
         }
@@ -322,8 +330,8 @@ class GameLogger {
     }
 
     fun checkThisTurnFailDisprove(player: PlayerEnum): Boolean{
-        for(log in eventLogQueue){
-            if(log.player == player && log.text == LogText.FAIL_DISPROVE){
+        for(log in gameLogQueue){
+            if(log.player == player && log.text == LogEnum.FAIL_DISPROVE){
                 return true
             }
         }
@@ -332,15 +340,15 @@ class GameLogger {
 
     fun checkAhumAttack(playerUseAhum: PlayerEnum, attack_number: Int): Boolean{
         var index = 0
-        while (index < eventLogQueue.size){
-            val log = eventLogQueue[index]
+        while (index < gameLogQueue.size){
+            val log = gameLogQueue[index]
             if(log.isAhumBasicOperation(playerUseAhum)){
                 return false
             }
-            else if(log.text == LogText.START_PROCESS_ATTACK_DAMAGE && playerUseAhum == log.player){
+            else if(log.text == LogEnum.START_PROCESS_ATTACK_DAMAGE && playerUseAhum == log.player){
                 val (endIndex, isMove) = isAttackMoveAura(playerUseAhum, index + 1)
                 index = endIndex
-                while(eventLogQueue[index].text != LogText.END_EFFECT){
+                while(gameLogQueue[index].text != LogEnum.END_EFFECT){
                     index += 1
                 }
                 if(isMove){
@@ -358,9 +366,9 @@ class GameLogger {
 
     private fun isAttackMoveAura(playerUseAhum: PlayerEnum, startIndex: Int): Pair<Int, Boolean>{
         var index = startIndex
-        while (index < eventLogQueue.size){
-            val log = eventLogQueue[index]
-            if(log.text == LogText.END_EFFECT){
+        while (index < gameLogQueue.size){
+            val log = gameLogQueue[index]
+            if(log.text == LogEnum.END_EFFECT){
                 return Pair(index, false)
             }
             else if(log.isMoveAuraForAttack(playerUseAhum.opposite())){
@@ -373,9 +381,9 @@ class GameLogger {
 
     private fun isAhumAttackTwice(playerUseAhum: PlayerEnum, attack_number: Int, startIndex: Int): Boolean{
         var index = startIndex
-        while (index < eventLogQueue.size){
-            val log = eventLogQueue[index]
-            if(log.player == playerUseAhum && log.text == LogText.ATTACK && log.number1 == attack_number){
+        while (index < gameLogQueue.size){
+            val log = gameLogQueue[index]
+            if(log.player == playerUseAhum && log.text == LogEnum.ATTACK && log.number1 == attack_number){
                 return true
             }
             index += 1
@@ -385,15 +393,15 @@ class GameLogger {
 
     fun checkAhumBasicOperation(ahumPlayer: PlayerEnum): Boolean{
         var index = 0
-        while (index < eventLogQueue.size){
-            val log = eventLogQueue[index]
+        while (index < gameLogQueue.size){
+            val log = gameLogQueue[index]
             if(log.isAhumBasicOperation(ahumPlayer)){
                 return !isAhumBasicOperationTwice(ahumPlayer, index + 1)
             }
-            else if(log.text == LogText.START_PROCESS_ATTACK_DAMAGE && ahumPlayer == log.player){
+            else if(log.text == LogEnum.START_PROCESS_ATTACK_DAMAGE && ahumPlayer == log.player){
                 val (endIndex, isMove) = isAttackMoveAura(ahumPlayer, index + 1)
                 index = endIndex
-                while(eventLogQueue[index].text != LogText.END_EFFECT){
+                while(gameLogQueue[index].text != LogEnum.END_EFFECT){
                     index += 1
                 }
                 if(isMove){
@@ -407,8 +415,8 @@ class GameLogger {
 
     private fun isAhumBasicOperationTwice(playerUseAhum: PlayerEnum, startIndex: Int): Boolean{
         var index = startIndex
-        while (index < eventLogQueue.size){
-            val log = eventLogQueue[index]
+        while (index < gameLogQueue.size){
+            val log = gameLogQueue[index]
             if(log.isAhumBasicOperation(playerUseAhum)){
                 return true
             }
@@ -419,7 +427,7 @@ class GameLogger {
 
     fun countGetDamage(player: PlayerEnum): Int{
         var count = 0
-        for(log in eventLogQueue){
+        for(log in gameLogQueue){
             if(log.player == player && log.isGetDamageLog()){
                 count += 1
             }
@@ -429,7 +437,7 @@ class GameLogger {
 
     fun cardUseCounter(player: PlayerEnum, card_number: Int): Int{
         var result = 0
-        for (log in eventLogQueue){
+        for (log in gameLogQueue){
             if(log.player == player && log.isTextUseCard()){
                 if(log.number1 == card_number){
                     result += 1
@@ -442,7 +450,7 @@ class GameLogger {
     fun checkThisCardUseWhen(player: PlayerEnum, card_number: Int): Int{
         var useNumber = cardUseCounter(player, card_number)
         var cardUseCounter = 0
-        for (log in eventLogQueue){
+        for (log in gameLogQueue){
             if(log.player == player && log.isTextUseCard()){
                 cardUseCounter += 1
                 if(log.number1 == card_number){
@@ -457,8 +465,8 @@ class GameLogger {
     }
 
     fun isPlayerMakeOverAuraDamageOver3(player: PlayerEnum): Boolean{
-        for (log in eventLogQueue){
-            if(log.player == player && log.text == LogText.ATTACK_DAMAGE){
+        for (log in gameLogQueue){
+            if(log.player == player && log.text == LogEnum.ATTACK_DAMAGE){
                 if(log.number1 > 3){
                     return true
                 }

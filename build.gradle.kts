@@ -30,6 +30,7 @@ repositories {
 }
 
 dependencies {
+    implementation("io.ktor:ktor-server-cors:$ktorVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("org.slf4j:slf4j-api:1.7.30")
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")

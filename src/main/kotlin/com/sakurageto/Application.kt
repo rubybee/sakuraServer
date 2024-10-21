@@ -17,7 +17,6 @@ fun main() {
 
 fun Application.module() {
     configureSockets()
-    configureSerialization()
     configureMonitoring()
     configureRouting()
     configurationCORS()

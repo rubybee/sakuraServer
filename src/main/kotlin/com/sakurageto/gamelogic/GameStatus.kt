@@ -1,7 +1,6 @@
 package com.sakurageto.gamelogic
 
 import com.sakurageto.protocol.Connection
-import com.sakurageto.protocol.RoomInformation
 import com.sakurageto.card.*
 import com.sakurageto.card.CardSet.toCardName
 import com.sakurageto.card.basicenum.*
@@ -25,7 +24,6 @@ import com.sakurageto.plugins.makeBugReportFile
 import com.sakurageto.protocol.*
 import com.sakurageto.protocol.CommandEnum.Companion.BASIC_OPERATION_CAUSE_BY_CARD
 import com.sakurageto.protocol.TokenEnum.Companion.toLacerationLocation
-import io.ktor.websocket.*
 
 class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private val player1_socket: Connection, private val player2_socket: Connection) {
     var perjuryCheck =
@@ -4524,14 +4522,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
 
         sendGameEnd(winnerSocket, loserSocket)
-
-        player1_socket.session.close()
-        player2_socket.session.close()
-        RoomInformation.roomHashMap.remove(winnerSocket.roomNumber)
-        endCurrentPhase = true
-        winnerSocket.gameEnd = true
-        loserSocket.gameEnd = true
-        gameEnd = true
+        endCurrentPhase = true; gameEnd = true
     }
 
     suspend fun auraDamageProcess(player: PlayerEnum, data: MutableList<Int>, replace: Int?, card_number: Int){

@@ -54,27 +54,32 @@ fun Application.configureRouting() {
         }
 
         get("/makeroom") {
-            var nowRoomNumber = roomNumberRange.random()
-            while (RoomInformation.roomHashMap.containsKey(nowRoomNumber)){
-                val nowRoom = RoomInformation.roomHashMap[nowRoomNumber]
-                if(nowRoom == null){
-                    break
-                }
-                else if(nowRoom.waitStatus){
-                    if(nowRoom.isItExpirationWhenWait(System.currentTimeMillis())){
-                        nowRoom.firstUserConnection?.session?.close()
-                        nowRoom.secondUserConnection?.session?.close()
+            while (true){
+                val nowRoomNumber = roomNumberRange.random()
+                if(RoomInformation.roomHashMap.containsKey(nowRoomNumber)){
+                    val nowRoom = RoomInformation.roomHashMap[nowRoomNumber]
+                    if(nowRoom == null){
+                        break
+                    }
+                    else if(nowRoom.waitStatus){
+                        if(nowRoom.isItExpirationWhenWait(System.currentTimeMillis())){
+                            nowRoom.firstUserConnection?.session?.close()
+                            nowRoom.secondUserConnection?.session?.close()
+                        }
+                    }
+                    else{
+                        if(nowRoom.isItExpirationWhenGameDoing(System.currentTimeMillis())){
+                            //TODO(expiration when game is running)
+                        }
                     }
                 }
                 else{
-                    if(nowRoom.isItExpirationWhenGameDoing(System.currentTimeMillis())){
-                        //TODO(expiration when game is running)
+                    if(RoomInformation.roomHashMap.putIfAbsent(nowRoomNumber, Room(System.currentTimeMillis())) == null){
+                        call.respondText(nowRoomNumber.toString(), status = HttpStatusCode.OK)
+                        break
                     }
                 }
-                nowRoomNumber  = roomNumberRange.random()
             }
-            RoomInformation.roomHashMap[nowRoomNumber] = Room(System.currentTimeMillis())
-            call.respondText(nowRoomNumber.toString(), status = HttpStatusCode.OK)
         }
 
         get("/enterroom/{roomnumber}"){

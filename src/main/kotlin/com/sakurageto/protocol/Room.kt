@@ -1,6 +1,7 @@
 package com.sakurageto.protocol
 
 import com.sakurageto.gamelogic.GameStatus
+import io.ktor.websocket.*
 
 class Room(private val madeTime: Long){
     var waitStatus: Boolean = true
@@ -25,5 +26,10 @@ class Room(private val madeTime: Long){
             return true
         }
         return false
+    }
+
+    suspend fun end(){
+        firstUserConnection?.session?.close(); secondUserConnection?.session?.close()
+        firstUserConnection?.gameEnd = true; secondUserConnection?.gameEnd = true
     }
 }

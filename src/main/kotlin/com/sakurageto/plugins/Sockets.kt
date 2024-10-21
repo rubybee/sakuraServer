@@ -4,7 +4,6 @@ import com.sakurageto.protocol.Connection
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
-import java.time.Duration
 import io.ktor.server.application.*
 import com.sakurageto.protocol.RoomInformation
 import com.sakurageto.card.basicenum.PlayerEnum
@@ -12,10 +11,11 @@ import com.sakurageto.gamelogic.GameFactory
 import kotlinx.coroutines.delay
 import java.lang.NumberFormatException
 import org.slf4j.LoggerFactory
+import kotlin.time.Duration.Companion.seconds
 
 fun Application.configureSockets() {
     install(WebSockets) {
-        timeout = Duration.ofSeconds(40)
+        timeout = 40.seconds
         maxFrameSize = Long.MAX_VALUE
         masking = false
     }
@@ -79,6 +79,7 @@ fun Application.configureSockets() {
                                 val game = GameFactory(it, now1, now2).makeGame()
                                 logger.info("GameRoom Num$it: start game")
                                 game.start()
+                                RoomInformation.endRoom(it)
                             }
                         }
                     }?: close(CloseReason(CloseReason.Codes.PROTOCOL_ERROR, "invalid room number"))

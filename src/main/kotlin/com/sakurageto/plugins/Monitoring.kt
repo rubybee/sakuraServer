@@ -1,6 +1,6 @@
 package com.sakurageto.plugins
 
-import io.ktor.server.plugins.callloging.*
+import io.ktor.server.plugins.calllogging.CallLogging
 import org.slf4j.event.*
 import io.ktor.server.request.*
 import io.ktor.server.application.*

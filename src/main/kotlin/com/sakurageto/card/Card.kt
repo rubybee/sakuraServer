@@ -713,7 +713,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
     }
 
     suspend fun use(player: PlayerEnum, game_status: GameStatus, react_attack: MadeAttack?, isTermination: Boolean,
-                    nap_change: Int = -1, cardMoveCancel: Boolean, isDisprove: Boolean = false, ){
+                    nap_change: Int = -1, cardMoveCancel: Boolean, isDisprove: Boolean = false, afterPlace: LocationEnum? = null){
         this.card_data.effect?.let {
             for(text in it){
                 if(text.timing_tag == TextEffectTimingTag.CONSTANT_EFFECT){
@@ -764,7 +764,7 @@ class Card(val card_number: Int, var card_data: CardData, val player: PlayerEnum
             game_status.getPlayer(player).afterCardUseTermination = false
         }
 
-        game_status.afterCardUsed(this.card_number, player, this, cardMoveCancel)
+        game_status.afterCardUsed(this.card_number, player, this, cardMoveCancel, afterPlace)
         if(this.card_data.card_type == CardType.ENCHANTMENT && !cardMoveCancel){
             this.effectText(player, game_status, react_attack, TextEffectTag.AFTER_DEPLOYMENT)
         }

@@ -170,20 +170,27 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
 
     //game init function
     fun megamiOneNormalForm() = megamiOne.changeNormalMegami()
-    fun setMegamiSsangjang(data: SakuraArrayData){
+    fun setMegamiSsangjang(data: SakuraArrayData, version: GameVersion){
         megamiOne = try{
             MegamiEnum.fromInt(data.data?.get(0)?: 10)
         }catch (e: NoSuchElementException){
-            println("Error: Invalid MegamiNumber: ${data.data?.get(0)?: 10}")
+            println("Error: Invalid MegamiNumber: ${data.data?.getOrNull(0)?: 10}")
             MegamiEnum.fromInt(10)
+        }
+        if(!megamiOne.isValidAtVersion(version)){
+            megamiOne = MegamiEnum.YURINA
         }
 
         megamiTwo = try{
-            MegamiEnum.fromInt(data.data?.get(1)?: 20)
+            MegamiEnum.fromInt(data.data?.getOrNull(1)?: 20)
         }catch (e: NoSuchElementException){
             println("Error: Invalid MegamiNumber: ${data.data?.get(1)?: 20}")
             MegamiEnum.fromInt(20)
         }
+        if(!megamiTwo.isValidAtVersion(version)){
+            megamiTwo = MegamiEnum.YURINA
+        }
+
 
         if(megamiOne == megamiTwo){
             megamiOne = MegamiEnum.YURINA
@@ -191,26 +198,35 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
         }
     }
 
-    fun setMegamiSamSep(data: SakuraArrayData){
+    fun setMegamiSamSep(data: SakuraArrayData, version: GameVersion){
         megamiOne = try{
             MegamiEnum.fromInt(data.data?.get(0)?: 10)
         }catch (e: NoSuchElementException){
-            println("Error: Invalid MegamiNumber: ${data.data?.get(0)?: 10}")
+            println("Error: Invalid MegamiNumber: ${data.data?.getOrNull(0)?: 10}")
             MegamiEnum.fromInt(10)
+        }
+        if(!megamiOne.isValidAtVersion(version)){
+            megamiOne = MegamiEnum.YURINA
         }
 
         megamiTwo = try{
             MegamiEnum.fromInt(data.data?.get(1)?: 20)
         }catch (e: NoSuchElementException){
-            println("Error: Invalid MegamiNumber: ${data.data?.get(1)?: 20}")
+            println("Error: Invalid MegamiNumber: ${data.data?.getOrNull(1)?: 20}")
             MegamiEnum.fromInt(20)
+        }
+        if(!megamiTwo.isValidAtVersion(version)){
+            megamiTwo = MegamiEnum.YURINA
         }
 
         megamiBanned = try{
             MegamiEnum.fromInt(data.data?.get(2)?: 30)
         }catch (e: NoSuchElementException){
-            println("Error: Invalid MegamiNumber: ${data.data?.get(2)?: 30}")
+            println("Error: Invalid MegamiNumber: ${data.data?.getOrNull(2)?: 30}")
             MegamiEnum.fromInt(30)
+        }
+        if(!megamiBanned.isValidAtVersion(version)){
+            megamiBanned = MegamiEnum.YURINA
         }
 
         if(megamiTwo == megamiOne){
@@ -235,7 +251,7 @@ class PlayerStatus(private val player_enum: PlayerEnum) {
     }
 
     fun banMegami(data: SakuraArrayData){
-        val benMegami = data.data?.get(0)?: megamiOne
+        val benMegami = data.data?.getOrNull(0)?: megamiOne
         if (benMegami != megamiBanned.real_number){
             if(benMegami == megamiOne.real_number){
                 megamiOne = megamiBanned

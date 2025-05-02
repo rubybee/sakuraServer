@@ -83,6 +83,34 @@ enum class MegamiEnum(var real_number: Int) {
         return this == megami
     }
 
+    fun isValidAtVersion(version: GameVersion): Boolean {
+        when (version) {
+            GameVersion.VERSION_7_2 -> {
+                return when (this) {
+                    SHISUI -> false
+                    AKINA -> false
+                    else -> this.isValidAtVersion(GameVersion.VERSION_8_1)
+                }
+            }
+            GameVersion.VERSION_8_1 -> {
+                return when (this) {
+                    RENRI_A1 -> false
+                    else -> this.isValidAtVersion(GameVersion.VERSION_8_2)
+                }
+            }
+            GameVersion.VERSION_8_2 -> {
+                return when (this) {
+                    MISORA -> false
+                    OBORO_A2 -> false
+                    else -> this.isValidAtVersion(GameVersion.VERSION_9_1)
+                }
+            }
+            GameVersion.VERSION_9_1, GameVersion.VERSION_9_2, GameVersion.VERSION_10 -> {
+                return true
+            }
+        }
+    }
+
     fun changeNormalMegami(): MegamiEnum {
         val anotherNumber = this.real_number % 10
         return if(anotherNumber == 0){
@@ -297,6 +325,6 @@ enum class MegamiEnum(var real_number: Int) {
     companion object {
         const val NUMBER_RENRI_ORIGIN_NUMBER = 22
 
-        fun fromInt(value: Int) = MegamiEnum.values().first { it.real_number == value }
+        fun fromInt(value: Int) = entries.first { it.real_number == value }
     }
 }

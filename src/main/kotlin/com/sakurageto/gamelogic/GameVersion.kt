@@ -5,13 +5,14 @@ enum class GameVersion(val real_number: Int) {
     VERSION_8_1(1),
     VERSION_8_2(2),
     VERSION_9_1(3),
-    VERSION_9_2(4);
+    VERSION_9_2(4),
+    VERSION_10(5);
 
     fun isHigherThen(version: GameVersion): Boolean{
         return this.real_number > version.real_number
     }
 
     companion object {
-        fun fromInt(value: Int) = GameVersion.values().first { it.real_number == value }
+        fun fromInt(value: Int) = entries.first { it.real_number == value }
     }
 }

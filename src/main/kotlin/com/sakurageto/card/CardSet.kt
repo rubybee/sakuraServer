@@ -19,7 +19,6 @@ import com.sakurageto.gamelogic.megamispecial.Umbrella
 import com.sakurageto.gamelogic.megamispecial.YatsuhaJourney
 import com.sakurageto.gamelogic.megamispecial.storyboard.Act
 import com.sakurageto.protocol.*
-import io.ktor.network.sockets.*
 import kotlinx.coroutines.delay
 import java.lang.Integer.min
 import java.util.EnumMap
@@ -34,6 +33,7 @@ object CardSet {
     private val cardDataHashmapV8_2 = EnumMap<CardName, CardData>(CardName::class.java)
     private val cardDataHashmapV9 = EnumMap<CardName, CardData>(CardName::class.java)
     private val cardDataHashmapV9_2 = EnumMap<CardName, CardData>(CardName::class.java)
+    private val cardDataHashmapV10 = EnumMap<CardName, CardData>(CardName::class.java)
 
     fun Pair<Int, Int>?.adjustRange(parameter: Int): Pair<Int, Int>{
         return if (this == null) Pair(0, 0)
@@ -78,8 +78,20 @@ object CardSet {
                     this.toCardData(GameVersion.VERSION_9_1)
                 }
             }
+            GameVersion.VERSION_10 -> {
+                if(this in cardDataHashmapV10) {
+                    cardDataHashmapV10[this]!!
+                }
+                else{
+                    this.toCardData(GameVersion.VERSION_9_2)
+                }
+            }
         }
     }
+
+    /**
+     * for yatsuha's twoLeapMirrorDivine(this card means attack that has same name with card)
+     */
 
     fun thisCardMoveTextCheck(cardName: CardName, originalCardName: CardName)
             = cardName == originalCardName || dupligearCheck(cardName) || cardName == CardName.HAGANE_SOFT_ATTACK
@@ -1550,6 +1562,15 @@ object CardSet {
         cardDataHashmapV9_2[CardName.HONOKA_ASSAULT_SPIRIT_SIK] = assaultSikV9_2
         cardDataHashmapV9_2[CardName.RENRI_SIN_SOO] = sinSooV9_2
         cardDataHashmapV9_2[CardName.AKINA_THREAT] = threatV9_2
+
+        cardDataHashmapV10[CardName.SHINRA_BANLON] = banlonV10
+        cardDataHashmapV10[CardName.HAGANE_GRAND_MOUNTAIN_RESPECT] = grandMountainRespectV10
+        cardDataHashmapV10[CardName.RAIRA_HOWLING] = howlingV10
+        cardDataHashmapV10[CardName.AKINA_THREAT] = threatV10
+        cardDataHashmapV10[CardName.AKINA_CALC] = calcV10
+        cardDataHashmapV10[CardName.AKINA_TURN_OFF_TABLE] = turnOffTableV10
+        cardDataHashmapV10[CardName.SHISUI_IRON_RESISTANCE] = ironResistanceV10
+        cardDataHashmapV10[CardName.THALLYA_WAVING_EDGE] = wavingEdge
     }
 
     private suspend fun selectDustToDistance(nowCommand: CommandEnum, game_status: GameStatus,
@@ -2850,8 +2871,8 @@ object CardSet {
             cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
         banlon.addText(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.REACT_ATTACK_STATUS_CHANGE){ card_number, _, _, react_attack ->
             react_attack?.addOtherBuff(OtherBuff(card_number, OtherBuffTag.GET_IMMEDIATE, { player, game_status, attack ->
-                attack.card_class != CardClass.SPECIAL &&
-                        attack.getDamage(game_status, player,  game_status.getPlayerAttackBuff(player)).first >= 3
+                val auraDamage = attack.getDamage(game_status, player,  game_status.getPlayerAttackBuff(player)).first
+                attack.card_class != CardClass.SPECIAL && auraDamage != 999 && auraDamage >= 3
             }) { _, _, attack ->
                 attack.makeNoDamage()
             })
@@ -5967,7 +5988,7 @@ object CardSet {
                             if(it.getNap() == 5){
                                 if(game_status.getCardOwner(card_number) == player && checkCardName(card_number, CardName.HONOKA_HAND_FLOWER)){
                                     game_status.getCardFrom(player, CardName.HONOKA_A_NEW_OPENING, LocationEnum.ADDITIONAL_CARD)?.let { additionalCard ->
-                                        game_status.cardToFlare(player, it.getNap(), it, card_number, LocationEnum.YOUR_USED_CARD)
+                                        game_status.cardToFlare(player, player, it.getNap(), it, card_number, LocationEnum.YOUR_USED_CARD)
                                         game_status.popCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD, true)
                                         game_status.insertCardTo(player, it, LocationEnum.ADDITIONAL_CARD, true)
                                         additionalCard.special_card_state = SpecialCardEnum.PLAYED
@@ -5991,7 +6012,7 @@ object CardSet {
                             if(it.getNap() == 5){
                                 if(game_status.getCardOwner(card_number) == player && checkCardName(card_number, CardName.HONOKA_HAND_FLOWER)){
                                     game_status.getCardFrom(player, CardName.HONOKA_A_NEW_OPENING, LocationEnum.ADDITIONAL_CARD)?.let { additionalCard ->
-                                        game_status.cardToFlare(player, it.getNap() , it, card_number, LocationEnum.YOUR_USED_CARD)
+                                        game_status.cardToFlare(player, player, it.getNap() , it, card_number, LocationEnum.YOUR_USED_CARD)
                                         game_status.popCardFrom(player, card_number, LocationEnum.YOUR_USED_CARD, true)
                                         game_status.insertCardTo(player, it, LocationEnum.ADDITIONAL_CARD, true)
                                         additionalCard.special_card_state = SpecialCardEnum.PLAYED
@@ -15733,6 +15754,181 @@ object CardSet {
         })
     }
 
+    private val banlonV10 = CardData(CardClass.NORMAL, CardName.SHINRA_BANLON, MegamiEnum.SHINRA, CardType.ATTACK, SubType.REACTION)
+    private val grandMountainRespectV10 = CardData(CardClass.SPECIAL, CardName.HAGANE_GRAND_MOUNTAIN_RESPECT, MegamiEnum.HAGANE, CardType.BEHAVIOR, SubType.NONE)
+    private val howlingV10 = CardData(CardClass.NORMAL, CardName.RAIRA_HOWLING, MegamiEnum.RAIRA, CardType.BEHAVIOR, SubType.FULL_POWER)
+    private val threatV10 = CardData(CardClass.NORMAL, CardName.AKINA_THREAT, MegamiEnum.AKINA, CardType.ATTACK, SubType.NONE)
+    private val calcV10 = CardData(CardClass.NORMAL, CardName.AKINA_CALC, MegamiEnum.AKINA, CardType.BEHAVIOR, SubType.REACTION)
+    private val turnOffTableV10 = CardData(CardClass.NORMAL, CardName.AKINA_TURN_OFF_TABLE, MegamiEnum.AKINA, CardType.ENCHANTMENT, SubType.NONE)
+    private val ironResistanceV10 = CardData(CardClass.NORMAL, CardName.SHISUI_IRON_RESISTANCE, MegamiEnum.SHISUI, CardType.ATTACK, SubType.FULL_POWER)
+
+    suspend fun grandMountainText(player: PlayerEnum, game_status: GameStatus) {
+        while(true){
+            val nowCommand = game_status.receiveCardEffectSelect(player, NUMBER_HAGANE_GRAND_MOUNTAIN_RESPECT)
+            if(nowCommand == CommandEnum.SELECT_ONE){
+                game_status.getPlayer(player).normalCardDeck.filter{true}.forEach { card ->
+                    game_status.popCardFrom(player, card.card_number, LocationEnum.DECK, false)?.let {
+                        game_status.insertCardTo(player, it, LocationEnum.DISCARD_YOUR, false)
+                    }
+                }
+                break
+            }
+            else if(nowCommand == CommandEnum.SELECT_TWO){
+                val selected = game_status.selectCardFrom(player, player, player,
+                    listOf(LocationEnum.DISCARD_YOUR), CommandEnum.SELECT_CARD_REASON_CARD_EFFECT,
+                    NUMBER_HAGANE_GRAND_MOUNTAIN_RESPECT, 1) {card, _ ->
+                    card.card_data.sub_type != SubType.FULL_POWER && card.card_data.card_type != CardType.UNDEFINED}?: continue
+
+                game_status.getCardFrom(player, selected[0], LocationEnum.DISCARD_YOUR)?.let {
+                    game_status.useCardFromNotFullAction(player, it, LocationEnum.DISCARD_YOUR, false, null,
+                        isCost = true, isConsume = true, afterPlace = LocationEnum.COVER_CARD)
+                }?:
+                break
+            }
+            else if(nowCommand == CommandEnum.SELECT_NOT){
+                break
+            }
+        }
+    }
+
+
+    fun v10CardInit(){
+        banlonV10.setAttack(
+            DistanceType.CONTINUOUS, Pair(2, 7), null, 1, 999,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        banlonV10.addText(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.REACT_ATTACK_STATUS_CHANGE){ card_number, _, _, react_attack ->
+            react_attack?.addOtherBuff(OtherBuff(card_number, OtherBuffTag.GET_IMMEDIATE, { player, game_status, attack ->
+                attack.card_class != CardClass.SPECIAL &&
+                        attack.getDamage(game_status, player, game_status.getPlayerAttackBuff(player)).first != 999
+            }) { _, _, attack ->
+                attack.makeNoDamage()
+            })
+            null
+        })
+        banlonV10.addText(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD){ _, player, game_status, _ ->
+            game_status.drawCard(player.opposite(), 1)
+            null
+        })
+
+
+        grandMountainRespectV10.setSpecial(3)
+        grandMountainRespectV10.addText(centrifugalText)
+        grandMountainRespectV10.addText(centrifugalLogText)
+        grandMountainRespectV10.addText(Text(TextEffectTimingTag.USING, TextEffectTag.USE_CARD) { _, player, game_status, _ ->
+            for(i in 1..2){
+                grandMountainText(player, game_status)
+            }
+            null
+        })
+
+
+        howlingV10.addText(Text(TextEffectTimingTag.USING, TextEffectTag.CHANGE_RAIRA_GAUGE) { _, player, game_status, _->
+            while(true){
+                when(game_status.receiveCardEffectSelect(player, NUMBER_RAIRA_HOWLING)){
+                    CommandEnum.SELECT_ONE -> {
+                        game_status.setShrink(player.opposite())
+                        game_status.thunderGaugeIncrease(player)
+                        game_status.windGaugeIncrease(player)
+                    }
+                    CommandEnum.SELECT_TWO -> {
+                        game_status.getPlayer(player).thunderGauge?.let {
+                            game_status.setGauge(player, true, it * 2)
+                        }
+                    }
+                    else -> {
+                        continue
+                    }
+                }
+                break
+            }
+            null
+        })
+        howlingV10.addText(Text(TextEffectTimingTag.USING, TextEffectTag.MAKE_ATTACK) { card_number, player, game_status, _->
+            if((game_status.getPlayer(player).thunderGauge?:0) >= 7 || (game_status.getPlayer(player).windGauge?:0) >= 7){
+                game_status.processDamage(player.opposite(), CommandEnum.CHOOSE_AURA, Pair(1, 999), false,
+                    null, null, NUMBER_RAIRA_HOWLING)
+                game_status.gameLogger.insert(GameLog(player, LogEnum.END_EFFECT, NUMBER_RAIRA_HOWLING, -1))
+
+                for(i in 1..2){
+                    if(CommandEnum.SELECT_NOT == game_status.requestAndDoBasicOperation(player, NUMBER_RAIRA_HOWLING)) {
+                        break
+                    }
+                }
+            }
+            null
+        })
+
+
+        threatV10.setAttack(
+            DistanceType.CONTINUOUS, Pair(4, 4), null, 999, 0,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false)
+        threatV10.addText(investmentRightText)
+        threatV10.addText(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { card_number, player, game_status, _->
+            game_status.addThisTurnAttackBuff(player, AttackBuff(
+                card_number,
+                AttackBuffTag.PLUS_MINUS_IMMEDIATE,
+                { buff_player, buff_game_status, _ ->
+                    val buffPlayer = buff_game_status.getPlayer(buff_player)
+                    val otherPlayer = buff_game_status.getPlayer(buff_player.opposite())
+                    buffPlayer.getCapital() >= otherPlayer.getCapital() + 3
+                }) { _, _, attack ->
+                attack.lifePlusMinus(1)
+            })
+            null
+        })
+        threatV10.addText(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.MOVE_CARD) { card_number, player, game_status, _->
+            if(thisCardMoveTextCheck(card_number.toCardName(), CardName.AKINA_THREAT) &&
+                game_status.getPlayer(player).getCapital() <= game_status.getPlayer(player.opposite()).getCapital()){
+                game_status.movePlayingCard(player, LocationEnum.COVER_CARD, card_number, false)
+            }
+            null
+        })
+
+
+        calcV10.addText(Text(TextEffectTimingTag.USING, TextEffectTag.REACT_ATTACK_STATUS_CHANGE){ card_number, _, game_status, react_attack ->
+            react_attack?.addRangeBuff(game_status.useBuffNumberCounter(), RangeBuff(card_number,1, RangeBuffTag.CHANGE_AFTER_IMMEDIATE, { _, _, _ -> true},
+                calcRangeBuffEffect)
+            )
+            null
+        })
+        calcV10.addText(Text(TextEffectTimingTag.USING, TextEffectTag.NEXT_ATTACK_ENCHANTMENT) { card_number, _, game_status, _ ->
+            game_status.addThisTurnRangeBuff(
+                PlayerEnum.PLAYER1, RangeBuff(card_number,999,
+                    RangeBuffTag.CHANGE_AFTER, { _, _, _ -> true}, calcRangeBuffEffect)
+            )
+            game_status.addThisTurnRangeBuff(
+                PlayerEnum.PLAYER2, RangeBuff(card_number,999,
+                    RangeBuffTag.CHANGE_AFTER, { _, _, _ -> true}, calcRangeBuffEffect)
+            )
+            null
+        })
+
+
+        turnOffTableV10.setEnchantment(2)
+        turnOffTableV10.addText(Text(TextEffectTimingTag.CONSTANT_EFFECT, TextEffectTag.USING_CONDITION){ _, _, game_status, _ ->
+            if(game_status.getAdjustDistance() in 0..3) 1
+            else 0
+        })
+        turnOffTableV10.addText(Text(TextEffectTimingTag.START_DEPLOYMENT, TextEffectTag.MOVE_TOKEN){ card_number, player, game_status, _ ->
+            game_status.flareToDistance(player.opposite(), 2, Arrow.ONE_DIRECTION, player, game_status.getCardOwner(card_number), card_number)
+            null
+        })
+        turnOffTableV10.addText(Text(TextEffectTimingTag.IN_DEPLOYMENT, TextEffectTag.THIS_CARD_NAP_LOCATION_CHANGE) { _, _, _, _ ->
+            LocationEnum.FLARE_OTHER.real_number
+        })
+
+
+        ironResistanceV10.setAttack(
+            DistanceType.CONTINUOUS, Pair(2, 5), null, 2, 3,
+            cannotReactNormal = false, cannotReactSpecial = false, cannotReact = false, chogek = false, isLaceration = true)
+        ironResistanceV10.addText(Text(TextEffectTimingTag.AFTER_ATTACK, TextEffectTag.CHANGE_CONCENTRATION) { _, player, game_status, _ ->
+            game_status.setShrink(player.opposite())
+            selectLaceration(player, player, player, game_status, NUMBER_SHISUI_IRON_RESISTANCE)
+            null
+        })
+
+    }
+
     init {
         yurinaCardInit()
         saineCardInit()
@@ -15788,6 +15984,7 @@ object CardSet {
         v8hypen2CardInit()
         v9CardInit()
         v9hypen2CardInit()
+        v10CardInit()
 
         dataHashmapInit()
     }

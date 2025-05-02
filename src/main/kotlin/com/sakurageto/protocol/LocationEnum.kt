@@ -1,7 +1,5 @@
 package com.sakurageto.protocol
 
-import com.sakurageto.plugins.makeBugReportFile
-
 enum class LocationEnum(var real_number: Int){
     //TokenLocation
     AURA_YOUR(0),
@@ -74,15 +72,12 @@ enum class LocationEnum(var real_number: Int){
     ALL_NORMAL_EXCEPT_ADDITIONAL(61),
     NOT_SELECTED_NORMAL_CARD(50);
 
-    suspend fun opposite(): LocationEnum {
-        return oppositeMap[this]?: run {
-            makeBugReportFile("oppositeCommand() do not support command: $this")
-            this
-        }
+    fun opposite(): LocationEnum {
+        return oppositeMap[this]?: this
     }
 
     companion object {
-        fun fromInt(value: Int) = LocationEnum.values().first { it.real_number == value }
+        fun fromInt(value: Int) = entries.first { it.real_number == value }
 
         private val oppositeMap = mapOf(
             AURA_YOUR to AURA_OTHER,

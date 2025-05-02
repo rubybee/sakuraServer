@@ -16,6 +16,7 @@ import kotlin.time.Duration.Companion.seconds
 fun Application.configureSockets() {
     install(WebSockets) {
         timeout = 40.seconds
+        pingPeriod = 15.seconds
         maxFrameSize = Long.MAX_VALUE
         masking = false
     }

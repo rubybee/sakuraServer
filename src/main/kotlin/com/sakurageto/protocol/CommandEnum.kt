@@ -126,7 +126,6 @@ enum class CommandEnum {
     IDEA_OTHER,
     END_IDEA_OTHER,
 
-
     MAKE_ATTACK_COMPLETE_YOUR,
     MAKE_ATTACK_COMPLETE_OTHER,
     ATTACK_INFORMATION_YOUR,
@@ -568,6 +567,6 @@ enum class LocToLoc(var real_number: Int){
     fun encode(value: Int) = this.real_number * 100 + value
 
     companion object {
-        fun fromInt(value: Int) = LocToLoc.values().first { it.real_number == value }
+        fun fromInt(value: Int) = entries.first { it.real_number == value }
     }
 }

@@ -795,11 +795,18 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     private suspend fun moveTokenCardToSome(player: PlayerEnum, place: Int, number: Int, card: Card, card_number: Int){
-        if(place == 9) cardToDistance(player, number, card, card_number)
-        else if(place == 0) cardToAura(player, number, card, card_number)
-        else if(place == 2) cardToFlare(player, number, card, card_number)
-        else if(place > 100){
+        if(place > 100){
             cardToCard(player, number, card, getPlayer(player).enchantmentCard[place]!!, card_number)
+        }
+        else{
+            val location = LocationEnum.fromInt(place)
+            when(location){
+                LocationEnum.DISTANCE -> cardToDistance(player, number, card, card_number)
+                LocationEnum.AURA_YOUR -> cardToAura(player, number, card, card_number)
+                LocationEnum.FLARE_YOUR -> cardToFlare(player, player, number, card, card_number)
+                LocationEnum.FLARE_OTHER -> cardToFlare(player, player.opposite(), number, card, card_number)
+                else -> {}
+            }
         }
     }
 
@@ -921,8 +928,8 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             for (text in it){
                 if(text.tag == TextEffectTag.THIS_CARD_NAP_LOCATION_CHANGE){
                     locationList.addLast(text.effect!!(card.card_number, player, this, null)!!)
+                    break
                 }
-                break
             }
         }
 
@@ -934,6 +941,13 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
             }
             else -> {
                 while(true){
+                    if(turnPlayer != player){
+                        for(index in locationList.indices){
+                            if(locationList[index] < 100){
+                                locationList[index] = LocationEnum.fromInt(locationList[index]).opposite().real_number
+                            }
+                        }
+                    }
                     val receiveData = receiveSelectCard(getSocket(turnPlayer), locationList, CommandEnum.SELECT_NAP_LOCATION, -1)
                     if(receiveData.size != 1){
                         continue
@@ -1735,32 +1749,38 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
     }
 
-    suspend fun cardToFlare(player: PlayerEnum, number: Int?, card: Card,
+    suspend fun cardToFlare(cardPlayer: PlayerEnum, flarePlayer: PlayerEnum, number: Int?, card: Card,
                             reason: Int, location: LocationEnum = LocationEnum.YOUR_ENCHANTMENT_ZONE_CARD){
-        if(!(card.checkCanMoveToken(reason, player, this)) || number == null || number <= 0  || card.isItDestruction()) return
-        val nowPlayer = getPlayer(player)
+        if(!(card.checkCanMoveToken(reason, cardPlayer, this)) || number == null || number <= 0  || card.isItDestruction()) return
+        val nowPlayer = getPlayer(cardPlayer)
 
-        val (sakura, seed) = card.reduceNap(player, this, number)
+        val (sakura, seed) = card.reduceNap(cardPlayer, this, number)
 
         if(seed != 0){
             nowPlayer.notReadySeed = nowPlayer.notReadySeed!! + seed
-            sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SEED_TOKEN,
+            sendMoveToken(getSocket(cardPlayer), getSocket(cardPlayer.opposite()), TokenEnum.SEED_TOKEN,
                 location, LocationEnum.NOT_READY_DIRT_ZONE_YOUR, seed, card.card_number)
         }
 
         if(sakura != 0){
-            nowPlayer.flare += sakura
-            sendMoveToken(getSocket(player), getSocket(player.opposite()), TokenEnum.SAKURA_TOKEN,
+            getPlayer(flarePlayer).flare += sakura
+            sendMoveToken(getSocket(flarePlayer), getSocket(flarePlayer.opposite()), TokenEnum.SAKURA_TOKEN,
                 location, LocationEnum.FLARE_YOUR, sakura, card.card_number)
         }
 
-        gameLogger.insert(GameLog(player, LogEnum.MOVE_TOKEN, reason, seed,
+        gameLogger.insert(GameLog(cardPlayer, LogEnum.MOVE_TOKEN, reason, seed,
             location, LocationEnum.NOT_READY_DIRT_ZONE_YOUR, false))
-        gameLogger.insert(GameLog(player, LogEnum.MOVE_TOKEN, reason, sakura,
-            location, LocationEnum.FLARE_YOUR, false))
+        if(cardPlayer == flarePlayer){
+            gameLogger.insert(GameLog(cardPlayer, LogEnum.MOVE_TOKEN, reason, sakura,
+                location, LocationEnum.FLARE_YOUR, false))
+        }
+        else{
+            gameLogger.insert(GameLog(cardPlayer, LogEnum.MOVE_TOKEN, reason, sakura,
+                location, LocationEnum.FLARE_OTHER, false))
+        }
 
         if(card.getNap() == 0){
-            card.effectText(player, this, null, TextEffectTag.WHEN_THIS_CARD_NAP_REMOVE)
+            card.effectText(cardPlayer, this, null, TextEffectTag.WHEN_THIS_CARD_NAP_REMOVE)
         }
     }
 
@@ -3394,10 +3414,10 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
     }
 
     suspend fun useCardFromNotFullAction(player: PlayerEnum, card: Card, location: LocationEnum, react: Boolean, react_attack: MadeAttack?,
-                                         isCost: Boolean, isConsume: Boolean, napChange: Int = -1, cardMoveCancel: Boolean = false): Boolean{
+                                         isCost: Boolean, isConsume: Boolean, napChange: Int = -1, cardMoveCancel: Boolean = false, afterPlace: LocationEnum? = null): Boolean{
         val preFullAction = getFullAction(player)
         setPlayerFullAction(player, false)
-        val result = useCardFrom(player, card, location , react, react_attack, isCost, isConsume, napChange, cardMoveCancel)
+        val result = useCardFrom(player, card, location , react, react_attack, isCost, isConsume, napChange, cardMoveCancel, afterPlace)
         setPlayerFullAction(player, preFullAction)
         return result
     }
@@ -3481,7 +3501,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
      isConsume means so mo gap
      */
     suspend fun useCardFrom(player: PlayerEnum, card: Card, location: LocationEnum, react: Boolean, react_attack: MadeAttack?,
-                            isCost: Boolean, isConsume: Boolean, napChange: Int = -1, cardMoveCancel: Boolean = false): Boolean{
+                            isCost: Boolean, isConsume: Boolean, napChange: Int = -1, cardMoveCancel: Boolean = false, afterPlace: LocationEnum? = null): Boolean{
         if(react_attack != null && !react){
             react_attack.isItReact = false
         }
@@ -3559,7 +3579,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                         }
                     }
                     sendUseCardMeesage(getSocket(player), getSocket(player.opposite()), react, card.card_number)
-                    card.use(player, this, react_attack, isTermination, napChange, cardMoveCancel)
+                    card.use(player, this, react_attack, isTermination, napChange, cardMoveCancel, afterPlace = afterPlace)
                 }
                 //hatsumi's lighthouse work so, behavior card can not work
                 else{
@@ -3591,7 +3611,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
                     }
                 }
                 sendUseCardMeesage(getSocket(player), getSocket(player.opposite()), react, card.card_number)
-                card.use(player, this, react_attack, isTermination, napChange, cardMoveCancel)
+                card.use(player, this, react_attack, isTermination, napChange, cardMoveCancel, afterPlace = afterPlace)
                 return true
             }
         }
@@ -4170,7 +4190,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
 
     var cardForEffect: Card? = null
 
-    suspend fun afterCardUsed(card_number: Int, player: PlayerEnum, thisCard: Card, cardMoveCancel: Boolean){
+    suspend fun afterCardUsed(card_number: Int, player: PlayerEnum, thisCard: Card, cardMoveCancel: Boolean, afterPlace: LocationEnum?){
         cardForEffect = thisCard
         for(card in getPlayer(player).enchantmentCard.values){
             card.effectAllValidEffect(player, this, TextEffectTag.WHEN_AFTER_CARD_USE)
@@ -4201,7 +4221,7 @@ class GameStatus(val player1: PlayerStatus, val player2: PlayerStatus, private v
         }
 
         if(!cardMoveCancel){
-            movePlayingCard(player, null, card_number, true)
+            movePlayingCard(player, afterPlace, card_number, true)
         }
     }
 

@@ -91,7 +91,7 @@ fun Application.configureRouting() {
                         room.waitStatus = false
                     }
                     else {
-                        call.respondText("invalid room number", status = HttpStatusCode.OK)
+                        call.respondText("invalid room number", status = HttpStatusCode.BadRequest)
                     }
                 }
             }catch (_: NumberFormatException){

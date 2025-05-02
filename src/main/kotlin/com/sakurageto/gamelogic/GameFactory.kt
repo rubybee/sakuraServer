@@ -56,9 +56,7 @@ class GameFactory(private val roomNumber: Int, val player1: Connection, val play
         else{
             this.gameMode = GameMode.SAM_SEUB_IL_SA
         }
-    }
 
-    private suspend fun selectEnd(){
         val data = SakuraArrayData(CommandEnum.END_OF_SELECT_MODE, mutableListOf(gameMode.real_number))
         val sendData = data.toString()
         player1.send(sendData)
@@ -70,15 +68,17 @@ class GameFactory(private val roomNumber: Int, val player1: Connection, val play
         val sendData = Json.encodeToString(data)
         player1.send(sendData)
         player2.send(sendData)
+
         val player1Data = receiveSakuraSendData(player1, CommandEnum.SELECT_MEGAMI)
         val player2Data = receiveSakuraSendData(player2, CommandEnum.SELECT_MEGAMI)
+
         if(gameMode == GameMode.SSANG_JANG_YO_LAN){
-            gameStatus.player1.setMegamiSsangjang(player1Data)
-            gameStatus.player2.setMegamiSsangjang(player2Data)
+            gameStatus.player1.setMegamiSsangjang(player1Data, gameStatus.version)
+            gameStatus.player2.setMegamiSsangjang(player2Data, gameStatus.version)
         }
         else if(gameMode == GameMode.SAM_SEUB_IL_SA){
-            gameStatus.player1.setMegamiSamSep(player1Data)
-            gameStatus.player2.setMegamiSamSep(player2Data)
+            gameStatus.player1.setMegamiSamSep(player1Data, gameStatus.version)
+            gameStatus.player2.setMegamiSamSep(player2Data, gameStatus.version)
         }
     }
 
@@ -301,7 +301,6 @@ class GameFactory(private val roomNumber: Int, val player1: Connection, val play
     suspend fun makeGame(): GameStatus{
         selectVersion()
         selectMode()
-        selectEnd()
         selectMegami()
         if(gameMode == GameMode.SAM_SEUB_IL_SA){
             checkMegami()

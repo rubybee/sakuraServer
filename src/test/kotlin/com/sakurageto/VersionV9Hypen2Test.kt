@@ -288,4 +288,16 @@ class VersionV9Hypen2Test: ApplicationTest() {
 
         assertEquals(10, gameStatus.player2.life)
     }
+
+    @Test
+    fun threatDamageTest() = runTest {
+        resetValue(0, 0, 10, 10, 4, 0)
+        gameStatus.player1.flow = 1
+
+        addReactData(PlayerEnum.PLAYER2)
+        addCard(PlayerEnum.PLAYER1, CardName.AKINA_THREAT, LocationEnum.HAND)
+        useCard(PlayerEnum.PLAYER1, CardName.AKINA_THREAT, LocationEnum.HAND)
+
+        assertEquals(9, gameStatus.player2.life)
+    }
 }
